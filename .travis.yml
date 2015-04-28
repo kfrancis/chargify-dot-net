@@ -1,0 +1,6 @@
+language: csharp
+solution: Chargify.sln
+install:
+  - nuget restore Chargify.sln
+script:
+  - xbuild /p:Configuration=Release Chargify.sln
