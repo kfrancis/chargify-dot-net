@@ -3,4 +3,7 @@ solution: Chargify.sln
 install:
   - nuget restore Chargify.sln
 script:
+  - wget http://nuget.org/nuget.exe
+  - cp nuget.exe ./.nuget/NuGet.exe
+  - chmod a+x ./.nuget/NuGet.exe
   - xbuild /p:Configuration=Release Chargify.sln
