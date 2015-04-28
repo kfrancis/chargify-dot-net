@@ -3,14 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using ChargifyDotNetTests.Base;
 using ChargifyNET;
+#if NUNIT
+using NUnit.Framework;
+#else
+using TestFixture = Microsoft.VisualStudio.TestTools.UnitTesting.TestClassAttribute;
+using Test = Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute;
+using TestFixtureSetUp = Microsoft.VisualStudio.TestTools.UnitTesting.TestInitializeAttribute;
+using SetUp = Microsoft.VisualStudio.TestTools.UnitTesting.TestInitializeAttribute;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+#endif
 
 namespace ChargifyDotNetTests
 {
-    [TestClass]
+    [TestFixture]
     public class CustomerTests : ChargifyTestBase
     {
-        [TestMethod]
+        [Test]
         public void Customer_CreateCustomer()
         {
             // Arrange
@@ -36,7 +44,7 @@ namespace ChargifyDotNetTests
 
             // Assert
             Assert.IsNotNull(createdCustomer);
-            Assert.IsInstanceOfType(createdCustomer, typeof(Customer));
+            //Assert.IsInstanceOfType(createdCustomer, typeof(Customer));
             Assert.IsTrue(createdCustomer.SystemID == customer.SystemID);
             Assert.IsTrue(createdCustomer.FirstName == customer.FirstName);
             Assert.IsTrue(createdCustomer.LastName == customer.LastName);
@@ -53,7 +61,7 @@ namespace ChargifyDotNetTests
             // Can't cleanup, Chargify doesn't support customer deletions
         }
 
-        [TestMethod]
+        [Test]
         public void Customer_OddCharactersForOrganization()
         {
             // Arrange
@@ -79,11 +87,11 @@ namespace ChargifyDotNetTests
 
             // Assert
             Assert.IsNotNull(createdCustomer);
-            Assert.IsInstanceOfType(createdCustomer, typeof(Customer));
+            //Assert.IsInstanceOfType(createdCustomer, typeof(Customer));
             Assert.IsTrue(createdCustomer.Organization == customer.Organization);
         }
 
-        [TestMethod]
+        [Test]
         public void Customer_ReadSingleCustomer()
         {
             var customers = Chargify.GetCustomerList().Keys;
@@ -106,7 +114,7 @@ namespace ChargifyDotNetTests
         /// <summary>
         /// Get the list of customers
         /// </summary>
-        [TestMethod]
+        [Test]
         public void Customer_ListCustomers()
         {
             IDictionary<string, ICustomer> customerList = Chargify.GetCustomerList();
@@ -114,7 +122,7 @@ namespace ChargifyDotNetTests
             Assert.AreNotEqual(0, customerList.Count);
         }
 
-        [TestMethod]
+        [Test]
         public void Customer_UpdateCustomer()
         {
             // Load our test customer

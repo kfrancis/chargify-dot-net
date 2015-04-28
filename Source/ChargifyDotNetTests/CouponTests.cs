@@ -2,14 +2,22 @@
 using System.Linq;
 using ChargifyDotNetTests.Base;
 using ChargifyNET;
+#if NUNIT
+using NUnit.Framework;
+#else
+using TestFixture = Microsoft.VisualStudio.TestTools.UnitTesting.TestClassAttribute;
+using Test = Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute;
+using TestFixtureSetUp = Microsoft.VisualStudio.TestTools.UnitTesting.TestInitializeAttribute;
+using SetUp = Microsoft.VisualStudio.TestTools.UnitTesting.TestInitializeAttribute;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+#endif
 
 namespace ChargifyDotNetTests
 {
-    [TestClass]
+    [TestFixture]
     public class CouponTests : ChargifyTestBase
     {
-        [TestMethod]
+        [Test]
         public void Coupon_Read()
         {
             // Arrange
@@ -20,12 +28,12 @@ namespace ChargifyDotNetTests
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.IsInstanceOfType(result, typeof(ICoupon));
+            //Assert.IsInstanceOfType(result, typeof(ICoupon));
             Assert.IsTrue(result.AmountInCents != int.MinValue);
             Assert.IsTrue(result.AmountInCents > 0);
             Assert.IsTrue(result.Amount == (Convert.ToDecimal(result.AmountInCents)/100));
         }
-        [TestMethod]
+        [Test]
         public void Coupon_Create()
         {
             // Arrange
@@ -49,14 +57,14 @@ namespace ChargifyDotNetTests
 
             // Assert
             Assert.IsNotNull(createdCoupon);
-            Assert.IsInstanceOfType(createdCoupon, typeof(ICoupon));
+            //Assert.IsInstanceOfType(createdCoupon, typeof(ICoupon));
             Assert.IsTrue(createdCoupon.AllowNegativeBalance == newCoupon.AllowNegativeBalance);
             Assert.IsTrue(createdCoupon.Name == newCoupon.Name);
             Assert.IsTrue(createdCoupon.Description == newCoupon.Description);
             Assert.IsTrue(createdCoupon.Code == newCoupon.Code);
         }
 
-        [TestMethod]
+        [Test]
         public void Coupon_Update()
         {
             // Arrange
@@ -70,7 +78,7 @@ namespace ChargifyDotNetTests
 
             // Assert
             Assert.IsNotNull(updatedCoupon);
-            Assert.IsInstanceOfType(updatedCoupon, typeof(ICoupon));
+            //Assert.IsInstanceOfType(updatedCoupon, typeof(ICoupon));
             Assert.IsTrue(updatedCoupon.Name == originalName + "_1");
 
             // Cleanup

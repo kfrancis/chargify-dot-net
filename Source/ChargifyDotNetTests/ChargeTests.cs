@@ -2,14 +2,22 @@
 using System.Linq;
 using ChargifyDotNetTests.Base;
 using ChargifyNET;
+#if NUNIT
+using NUnit.Framework;
+#else
+using TestFixture = Microsoft.VisualStudio.TestTools.UnitTesting.TestClassAttribute;
+using Test = Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute;
+using TestFixtureSetUp = Microsoft.VisualStudio.TestTools.UnitTesting.TestInitializeAttribute;
+using SetUp = Microsoft.VisualStudio.TestTools.UnitTesting.TestInitializeAttribute;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+#endif
 
 namespace ChargifyDotNetTests
 {
-    [TestClass]
+    [TestFixture]
     public class ChargeTests : ChargifyTestBase
     {
-        [TestMethod]
+        [Test]
         public void Charges_Can_Charge_Successfully()
         {
             // Arrange
@@ -31,7 +39,7 @@ namespace ChargifyDotNetTests
                 Assert.IsTrue(balanceResult == true);
             }
             Assert.IsNotNull(result);
-            Assert.IsInstanceOfType(result, typeof(Charge));
+            //Assert.IsInstanceOfType(result, typeof(Charge));
             Assert.IsTrue(result.SubscriptionID == subscription.SubscriptionID);
             Assert.IsTrue(result.ProductID == subscription.Product.ID);
             Assert.IsTrue(result.Kind == "one_time");
@@ -43,7 +51,7 @@ namespace ChargifyDotNetTests
             Assert.IsTrue(retrievedSubscription.BalanceInCents == 0, "Expected $0, returned {0:C2}", retrievedSubscription.Balance);
         }
 
-        [TestMethod]
+        [Test]
         public void Charges_Can_Charge_And_Use_Negative_Balance()
         {
             // Arrange
@@ -68,10 +76,10 @@ namespace ChargifyDotNetTests
                 Assert.IsTrue(balanceResult == true);
             }
             Assert.IsNotNull(adjustmentResult);
-            Assert.IsInstanceOfType(adjustmentResult, typeof(Adjustment));
+            //Assert.IsInstanceOfType(adjustmentResult, typeof(Adjustment));
             Assert.IsTrue(adjustmentResult.Amount == amountToCharge);
             Assert.IsNotNull(result);
-            Assert.IsInstanceOfType(result, typeof(Charge));
+            //Assert.IsInstanceOfType(result, typeof(Charge));
             Assert.IsTrue(result.SubscriptionID == subscription.SubscriptionID);
             Assert.IsTrue(result.ProductID == subscription.Product.ID);
             Assert.IsTrue(result.Kind == "one_time");
@@ -83,7 +91,7 @@ namespace ChargifyDotNetTests
             //Assert.IsTrue(result.Success == true);
         }
 
-        [TestMethod]
+        [Test]
         public void Charges_Can_Charge_With_Delay()
         {
             // Arrange
@@ -107,7 +115,7 @@ namespace ChargifyDotNetTests
                 Assert.IsTrue(balanceResult == true);
             }
             Assert.IsNotNull(result);
-            Assert.IsInstanceOfType(result, typeof(Charge));
+            //Assert.IsInstanceOfType(result, typeof(Charge));
             Assert.IsTrue(result.SubscriptionID == subscription.SubscriptionID);
             Assert.IsTrue(result.ProductID == subscription.Product.ID);
             Assert.IsTrue(result.Amount == amountToCharge);

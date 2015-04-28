@@ -2,15 +2,23 @@
 using System.Collections.Generic;
 using ChargifyDotNetTests.Base;
 using ChargifyNET;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
+#if NUNIT
+using NUnit.Framework;
+#else
+using TestFixture = Microsoft.VisualStudio.TestTools.UnitTesting.TestClassAttribute;
+using Test = Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute;
+using TestFixtureSetUp = Microsoft.VisualStudio.TestTools.UnitTesting.TestInitializeAttribute;
+using SetUp = Microsoft.VisualStudio.TestTools.UnitTesting.TestInitializeAttribute;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+#endif
 
 namespace ChargifyDotNetTests
 {
-    [TestClass]
+    [TestFixture]
     public class ProductFamilyTests : ChargifyTestBase
     {
-        [TestMethod]
+        [Test]
         public void ProductFamily_Can_Create_Simple()
         {
             // Arrange
@@ -23,12 +31,12 @@ namespace ChargifyDotNetTests
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.IsInstanceOfType(result, typeof(IProductFamily));
+            //Assert.IsInstanceOfType(result, typeof(IProductFamily));
             Assert.AreEqual(newFamily.Name, result.Name, "Name didn't match");
             Assert.AreEqual(newFamily.Name.ToLowerInvariant(), result.Handle, "Handle wasn't as expected");
         }
 
-        [TestMethod]
+        [Test]
         public void ProductFamily_Can_Create_Complex()
         {
             // Arrange
@@ -44,14 +52,14 @@ namespace ChargifyDotNetTests
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.IsInstanceOfType(result, typeof(IProductFamily));
+            //Assert.IsInstanceOfType(result, typeof(IProductFamily));
             Assert.AreEqual(newFamily.Name, result.Name, "Name didn't match");
             Assert.AreEqual(newFamily.Description, result.Description, "Description didn't match");
             Assert.AreEqual(newFamily.Handle, result.Handle, "Handle didn't match");
             //Assert.AreEqual(newFamily.AccountingCode, result.AccountingCode, "Accounting Code didn't match");
         }
 
-        [TestMethod]
+        [Test]
         public void ProductFamily_Can_Get_Listing()
         {
             // Act
@@ -59,11 +67,11 @@ namespace ChargifyDotNetTests
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.IsInstanceOfType(result, typeof(Dictionary<int, IProductFamily>));
+            //Assert.IsInstanceOfType(result, typeof(Dictionary<int, IProductFamily>));
             Assert.IsTrue(result.Count > 0);
         }
 
-        [TestMethod]
+        [Test]
         public void ProductFamily_Can_Retrieve_ByHandle()
         {
             // Arrange
@@ -73,11 +81,11 @@ namespace ChargifyDotNetTests
             var result = Chargify.LoadProductFamily(familyListing.Values.FirstOrDefault().Handle);
 
             Assert.IsNotNull(result);
-            Assert.IsInstanceOfType(result, typeof(IProductFamily));
+            //Assert.IsInstanceOfType(result, typeof(IProductFamily));
             Assert.AreEqual(familyListing.Values.FirstOrDefault().ID, result.ID, "IDs didn't match");
         }
 
-        [TestMethod]
+        [Test]
         public void ProductFamily_Can_Retrieve_ByID()
         {
             // Arrange
@@ -87,7 +95,7 @@ namespace ChargifyDotNetTests
             var result = Chargify.LoadProductFamily(familyListing.Values.FirstOrDefault().ID);
 
             Assert.IsNotNull(result);
-            Assert.IsInstanceOfType(result, typeof(IProductFamily));
+            //Assert.IsInstanceOfType(result, typeof(IProductFamily));
             Assert.AreEqual(familyListing.Values.FirstOrDefault().ID, result.ID, "IDs didn't match");
         }
     }

@@ -3,14 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using ChargifyDotNetTests.Base;
 using ChargifyNET;
+#if NUNIT
+using NUnit.Framework;
+#else
+using TestFixture = Microsoft.VisualStudio.TestTools.UnitTesting.TestClassAttribute;
+using Test = Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute;
+using TestFixtureSetUp = Microsoft.VisualStudio.TestTools.UnitTesting.TestInitializeAttribute;
+using SetUp = Microsoft.VisualStudio.TestTools.UnitTesting.TestInitializeAttribute;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+#endif
 
 namespace ChargifyDotNetTests
 {
-    [TestClass]
+    [TestFixture]
     public class AllocationTests : ChargifyTestBase
     {
-        [TestMethod]
+        [Test]
         public void ComponentAllocation_Can_Get_List()
         {
             // Arrange
@@ -22,11 +30,11 @@ namespace ChargifyDotNetTests
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.IsInstanceOfType(result, typeof(Dictionary<int, List<IComponentAllocation>>));
+            //Assert.IsInstanceOfType(result, typeof(Dictionary<int, List<IComponentAllocation>>));
             Assert.IsTrue(result.Values.Count > 0, "There is no allocation history");
         }
 
-        [TestMethod]
+        [Test]
         public void ComponentAllocation_Can_Create_Using_Object()
         {
             // Arrange
@@ -45,14 +53,14 @@ namespace ChargifyDotNetTests
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.IsInstanceOfType(result, typeof(IComponentAllocation));
+            //Assert.IsInstanceOfType(result, typeof(IComponentAllocation));
             Assert.AreEqual(allocation.Quantity, result.Quantity, "The quantities don't match");
             Assert.AreEqual(allocation.Memo, result.Memo, "The memo text differs");
             Assert.AreEqual(allocation.UpgradeScheme, result.UpgradeScheme, "The upgrade scheme received isn't the same as submitted");
             Assert.AreEqual(allocation.DowngradeScheme, result.DowngradeScheme, "The downgrade scheme received isn't the same as submitted");
         }
 
-        [TestMethod]
+        [Test]
         public void ComponentAllocation_Can_Create_Using_Quantity_Only()
         {
             // Arrange
@@ -74,7 +82,7 @@ namespace ChargifyDotNetTests
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.IsInstanceOfType(result, typeof(IComponentAllocation));
+            //Assert.IsInstanceOfType(result, typeof(IComponentAllocation));
             Assert.AreEqual(quantityToAllocate, result.Quantity);
             Assert.AreEqual(string.Empty, result.Memo);
             // Can't really tell the following, but the default for a site with no changes is to not prorate.

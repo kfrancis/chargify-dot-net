@@ -3,14 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using ChargifyDotNetTests.Base;
 using ChargifyNET;
+#if NUNIT
+using NUnit.Framework;
+#else
+using TestFixture = Microsoft.VisualStudio.TestTools.UnitTesting.TestClassAttribute;
+using Test = Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute;
+using TestFixtureSetUp = Microsoft.VisualStudio.TestTools.UnitTesting.TestInitializeAttribute;
+using SetUp = Microsoft.VisualStudio.TestTools.UnitTesting.TestInitializeAttribute;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+#endif
 
 namespace ChargifyDotNetTests
 {
     /// <summary>
     /// Summary description for UnitTest1
     /// </summary>
-    [TestClass]
+    [TestFixture]
     public class ProductTests : ChargifyTestBase
     {
         public ProductTests()
@@ -33,7 +41,7 @@ namespace ChargifyDotNetTests
         // public static void MyClassCleanup() { }
         //
         // Use TestInitialize to run code before running each test 
-        // [TestInitialize()]
+        // [SetUp]
         // public void MyTestInitialize() { }
         //
         // Use TestCleanup to run code after each test has run
@@ -45,7 +53,7 @@ namespace ChargifyDotNetTests
         /// <summary>
         /// Get the list of products
         /// </summary>
-        [TestMethod]
+        [Test]
         public void Test_ListProducts()
         {
             IDictionary<int, IProduct> productList = Chargify.GetProductList();
@@ -57,7 +65,7 @@ namespace ChargifyDotNetTests
         /// <summary>
         /// Get a single product via the handle and Chargify ID
         /// </summary>
-        [TestMethod]
+        [Test]
         public void Test_GetSingleProductByHandle()
         {
             // Test using handle
@@ -70,7 +78,7 @@ namespace ChargifyDotNetTests
             Assert.IsFalse(string.IsNullOrWhiteSpace(basicProduct.PublicSignupPages.FirstOrDefault().URL));
         }
 
-        [TestMethod]
+        [Test]
         public void Test_GetSingleProductByID()
         {
             // Test using the Chargify ID
@@ -80,7 +88,7 @@ namespace ChargifyDotNetTests
             Assert.AreEqual("basic", basicProduct.Handle);
         }
 
-        [TestMethod]
+        [Test]
         public void Test_CreateProduct()
         {
             // Arrange

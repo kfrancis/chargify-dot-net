@@ -1,15 +1,23 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ChargifyDotNetTests.Base;
 using ChargifyNET;
 using System.Linq;
+#if NUNIT
+using NUnit.Framework;
+#else
+using TestFixture = Microsoft.VisualStudio.TestTools.UnitTesting.TestClassAttribute;
+using Test = Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute;
+using TestFixtureSetUp = Microsoft.VisualStudio.TestTools.UnitTesting.TestInitializeAttribute;
+using SetUp = Microsoft.VisualStudio.TestTools.UnitTesting.TestInitializeAttribute;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+#endif
 
 namespace ChargifyDotNetTests
 {
-    [TestClass]
+    [TestFixture]
     public class SiteTests : ChargifyTestBase
     {
-        [TestInitialize()]
+        [SetUp]
         public void Startup()
         {
             int familyId = int.MinValue;
@@ -88,7 +96,7 @@ namespace ChargifyDotNetTests
         //    Chargify.ClearTestSite(SiteCleanupScope.All);
         //}
 
-        [TestMethod]
+        [Test]
         public void Sites_Can_Clear_All()
         {
             // Arrange
@@ -105,7 +113,7 @@ namespace ChargifyDotNetTests
             var newCustomerCount = Chargify.GetCustomerList().Count;
 
             // Assert
-            Assert.IsInstanceOfType(result, typeof(bool));
+            //Assert.IsInstanceOfType(result, typeof(bool));
             Assert.IsTrue(result);
             Assert.AreNotEqual(productFamilyCount, newProductFamilyCount);
             Assert.AreNotEqual(productCount, newProductCount);
@@ -117,7 +125,7 @@ namespace ChargifyDotNetTests
             Assert.AreEqual(0, newCustomerCount);
         }
 
-        [TestMethod]
+        [Test]
         public void Sites_Can_Clear_Customers()
         {
             // Arrange
@@ -134,7 +142,7 @@ namespace ChargifyDotNetTests
             var newCustomerCount = Chargify.GetCustomerList().Count;
 
             // Assert
-            Assert.IsInstanceOfType(result, typeof(bool));
+            //Assert.IsInstanceOfType(result, typeof(bool));
             Assert.IsTrue(result);
             Assert.AreEqual(productFamilyCount, newProductFamilyCount);
             Assert.AreEqual(productCount, newProductCount);
@@ -146,7 +154,7 @@ namespace ChargifyDotNetTests
             Assert.AreEqual(0, newCustomerCount);
         }
 
-        [TestMethod]
+        [Test]
         public void Sites_Default_Clear_Clears_Customers()
         {
             // Arrange
@@ -163,7 +171,7 @@ namespace ChargifyDotNetTests
             var newCustomerCount = Chargify.GetCustomerList().Count;
 
             // Assert
-            Assert.IsInstanceOfType(result, typeof(bool));
+            //Assert.IsInstanceOfType(result, typeof(bool));
             Assert.IsTrue(result);
             Assert.AreEqual(productFamilyCount, newProductFamilyCount);
             Assert.AreEqual(productCount, newProductCount);

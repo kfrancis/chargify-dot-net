@@ -2,15 +2,24 @@
 using System.Collections.Generic;
 using System.Linq;
 using ChargifyDotNetTests.Base;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ChargifyNET;
+#if NUNIT
+using NUnit.Framework;
+using System.Diagnostics;
+#else
+using TestFixture = Microsoft.VisualStudio.TestTools.UnitTesting.TestClassAttribute;
+using Test = Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute;
+using TestFixtureSetUp = Microsoft.VisualStudio.TestTools.UnitTesting.TestInitializeAttribute;
+using SetUp = Microsoft.VisualStudio.TestTools.UnitTesting.TestInitializeAttribute;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+#endif
 
 namespace ChargifyDotNetTests
 {
-    [TestClass]
+    [TestFixture]
     public class MetadataTests : ChargifyTestBase
     {
-        [TestMethod]
+        [Test]
         public void Metadata_Can_List_Customer_XML()
         {
             // Act
@@ -24,7 +33,7 @@ namespace ChargifyDotNetTests
             Assert.IsTrue(result.TotalPages != int.MinValue);
         }
 
-        [TestMethod]
+        [Test]
         public void Metadata_Can_List_Customer_JSON()
         {
             // Arrange
@@ -43,7 +52,7 @@ namespace ChargifyDotNetTests
             SetJson(false);
         }
 
-        [TestMethod]
+        [Test]
         public void Metadata_Can_List_Subscription_XML()
         {
             // Act
@@ -57,7 +66,7 @@ namespace ChargifyDotNetTests
             Assert.IsTrue(result.TotalPages != int.MinValue);
         }
 
-        [TestMethod]
+        [Test]
         public void Metadata_Can_List_Subscription_JSON()
         {
             // Arrange
@@ -76,13 +85,17 @@ namespace ChargifyDotNetTests
             SetJson(false);
         }
 
-        [TestMethod]
+        [Test]
         public void Metadata_Can_Read_Subscription()
         {
             // Arrange
             var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value as Subscription;
             Assert.IsNotNull(subscription, "No applicable subscription found.");
-            this.TestContext.WriteLine("Found subscription {0}", subscription.SubscriptionID);
+#if !NUNIT
+            TestContext.WriteLine("SubscriptionID: {0}", subscription.SubscriptionID);
+#else
+            Trace.WriteLine(string.Format("SubscriptionID: {0}", subscription.SubscriptionID));
+#endif
             
             // Act
             var result = Chargify.GetMetadataFor<Subscription>(subscription.SubscriptionID, null);
@@ -96,7 +109,7 @@ namespace ChargifyDotNetTests
             Assert.AreEqual(result.TotalCount, result.Metadata.Count);
         }
 
-        [TestMethod]
+        [Test]
         public void Metadata_Can_Read_Customer()
         {
             // Arrange
@@ -115,13 +128,13 @@ namespace ChargifyDotNetTests
             Assert.AreEqual(result.TotalCount, result.Metadata.Count);
         }
 
-        [TestMethod]
+        [Test]
         public void Metadata_Can_Update()
         {
             
         }
 
-        [TestMethod]
+        [Test]
         public void Metadata_Can_Set_Customers_Single()
         {
             // Arrange
@@ -139,7 +152,7 @@ namespace ChargifyDotNetTests
             Assert.IsTrue(result.Select(m => m.Value == metadata.Value).Count() == 1);
         }
 
-        [TestMethod]
+        [Test]
         public void Metadata_Can_Set_Customers_List()
         {
             // Arrange
@@ -160,7 +173,7 @@ namespace ChargifyDotNetTests
             Assert.AreEqual(metadata.Count, result.Count);
         }
 
-        [TestMethod]
+        [Test]
         public void Metadata_Can_Set_Subscription_Single()
         {
             // Arrange
@@ -178,7 +191,7 @@ namespace ChargifyDotNetTests
             Assert.IsTrue(result.Select(m => m.Value == metadata.Value).Count() == 1);
         }
 
-        [TestMethod]
+        [Test]
         public void Metadata_Can_Set_Subscription_List()
         {
             // Arrange

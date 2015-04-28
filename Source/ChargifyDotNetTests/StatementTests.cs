@@ -1,15 +1,23 @@
 ﻿using System;
 using System.IO;
 using ChargifyDotNetTests.Base;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
+#if NUNIT
+using NUnit.Framework;
+#else
+using TestFixture = Microsoft.VisualStudio.TestTools.UnitTesting.TestClassAttribute;
+using Test = Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute;
+using TestFixtureSetUp = Microsoft.VisualStudio.TestTools.UnitTesting.TestInitializeAttribute;
+using SetUp = Microsoft.VisualStudio.TestTools.UnitTesting.TestInitializeAttribute;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+#endif
 
 namespace ChargifyDotNetTests
 {
-    [TestClass]
+    [TestFixture]
     public class StatementTests : ChargifyTestBase
     {
-        [TestMethod]
+        [Test]
         public void Statements_Can_Get_PDF()
         {
             // Arrange
@@ -25,7 +33,7 @@ namespace ChargifyDotNetTests
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.IsInstanceOfType(result, typeof(byte[]));
+            //Assert.IsInstanceOfType(result, typeof(byte[]));
             Assert.AreNotEqual(0, result.Length);
             Assert.IsTrue(File.Exists(filePath));
 

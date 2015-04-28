@@ -1,14 +1,23 @@
 ﻿using System;
 using System.Linq;
 using ChargifyDotNetTests.Base;
+#if NUNIT
+using NUnit.Framework;
+using System.Diagnostics;
+#else
+using TestFixture = Microsoft.VisualStudio.TestTools.UnitTesting.TestClassAttribute;
+using Test = Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute;
+using TestFixtureSetUp = Microsoft.VisualStudio.TestTools.UnitTesting.TestInitializeAttribute;
+using SetUp = Microsoft.VisualStudio.TestTools.UnitTesting.TestInitializeAttribute;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+#endif
 
 namespace ChargifyDotNetTests
 {
-    [TestClass]
+    [TestFixture]
     public class AdjustmentTests : ChargifyTestBase
     {
-        [TestMethod]
+        [Test]
         public void Adjustment_Can_Adjust_Zero_Decimal()
         {
             // Arrange
@@ -28,10 +37,14 @@ namespace ChargifyDotNetTests
             Assert.AreEqual(memo, result.Memo);
             Assert.AreEqual(preAdjustmentBalance+amount, postAdjustmentSubscription.Balance);
 
+#if !NUNIT
             TestContext.WriteLine("SubscriptionID: {0}", subscription.SubscriptionID);
+#else
+            Trace.WriteLine(string.Format("SubscriptionID: {0}", subscription.SubscriptionID));
+#endif
         }
 
-        [TestMethod]
+        [Test]
         public void Adjustment_Can_Adjust_Zero_Integer()
         {
             // Arrange
@@ -51,7 +64,11 @@ namespace ChargifyDotNetTests
             Assert.AreEqual(memo, result.Memo);
             Assert.AreEqual(preAdjustmentBalance+amount, postAdjustmentSubscription.BalanceInCents);
 
+#if !NUNIT
             TestContext.WriteLine("SubscriptionID: {0}", subscription.SubscriptionID);
+#else
+            Trace.WriteLine(string.Format("SubscriptionID: {0}", subscription.SubscriptionID));
+#endif
         }
     }
 }

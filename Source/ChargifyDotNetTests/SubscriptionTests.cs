@@ -1,18 +1,26 @@
 ﻿using System;
 using ChargifyDotNetTests.Base;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
 using ChargifyNET;
 using System.Collections.Generic;
+#if NUNIT
+using NUnit.Framework;
+#else
+using TestFixture = Microsoft.VisualStudio.TestTools.UnitTesting.TestClassAttribute;
+using Test = Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute;
+using TestFixtureSetUp = Microsoft.VisualStudio.TestTools.UnitTesting.TestInitializeAttribute;
+using SetUp = Microsoft.VisualStudio.TestTools.UnitTesting.TestInitializeAttribute;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+#endif
 
 namespace ChargifyDotNetTests
 {
-    [TestClass]
+    [TestFixture]
     public class SubscriptionTests : ChargifyTestBase
     {
         #region Tests
 
-        [TestMethod]
+        [Test]
         public void Subscription_Can_Get_PaymentProfile_Id()
         {
             // Arrange
@@ -28,7 +36,7 @@ namespace ChargifyDotNetTests
             Assert.IsTrue(loadedSubscription.PaymentProfile.Id >= 0);
         }
 
-        [TestMethod]
+        [Test]
         public void Subscription_Can_Get_ProductVersion()
         {
             // Arrange
@@ -42,7 +50,7 @@ namespace ChargifyDotNetTests
             Assert.IsTrue(subscription.ProductVersionNumber >= 0);
         }
 
-        [TestMethod]
+        [Test]
         public void Subscription_Can_Update_Payment_FirstLast()
         {
             // Arrange
@@ -64,7 +72,7 @@ namespace ChargifyDotNetTests
 
             // Assert
             Assert.IsNotNull(updatedSubscription);
-            Assert.IsInstanceOfType(updatedSubscription, typeof(Subscription));
+            //Assert.IsInstanceOfType(updatedSubscription, typeof(Subscription));
             Assert.AreEqual(newFirst, updatedSubscription.PaymentProfile.FirstName);
             Assert.AreEqual(newLast, updatedSubscription.PaymentProfile.LastName);
             Assert.AreEqual(subscription.PaymentProfile.ExpirationYear, updatedSubscription.PaymentProfile.ExpirationYear);
@@ -82,7 +90,7 @@ namespace ChargifyDotNetTests
             Assert.AreEqual(oldLast, replacedSubscription.PaymentProfile.LastName);
         }
 
-        [TestMethod]
+        [Test]
         public void Subscription_Can_Update_PaymentCollectionMethod()
         {
             // Arrange
@@ -95,13 +103,15 @@ namespace ChargifyDotNetTests
 
             // Assert
             Assert.IsNotNull(subscription);
+#if !NUNIT
             Assert.IsInstanceOfType(subscription, typeof(Subscription));
-            Assert.IsNotNull(updatedSubscription);
             Assert.IsInstanceOfType(updatedSubscription, typeof(Subscription));
+#endif
+            Assert.IsNotNull(updatedSubscription);
             Assert.IsTrue(subscription.PaymentCollectionMethod != updatedSubscription.PaymentCollectionMethod);
         }
 
-        [TestMethod]
+        [Test]
         public void Subscription_ReactivateExpired()
         {
             // Arrange
@@ -123,7 +133,7 @@ namespace ChargifyDotNetTests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void Subscription_Can_Reactivate_Without_Trial()
         {
             // Arrange
@@ -145,12 +155,14 @@ namespace ChargifyDotNetTests
 
             // Assert
             Assert.IsNotNull(result);
+#if !NUNIT
             Assert.IsInstanceOfType(result, typeof(ISubscription));
+#endif
             Assert.IsTrue(result.State != foundSubscription.State);
             Assert.IsTrue(result.State == SubscriptionState.Active);
         }
 
-        [TestMethod]
+        [Test]
         public void Subscription_Can_Reactivate_With_Trial()
         {
             // Arrange
@@ -172,12 +184,14 @@ namespace ChargifyDotNetTests
 
             // Assert
             Assert.IsNotNull(result);
+#if !NUNIT
             Assert.IsInstanceOfType(result, typeof(ISubscription));
+#endif
             Assert.IsTrue(result.State != foundSubscription.State);
             Assert.IsTrue(result.State == SubscriptionState.Trialing);
         }
 
-        [TestMethod]
+        [Test]
         public void Subscription_Reactivation()
         {
             // Arrange
@@ -195,18 +209,20 @@ namespace ChargifyDotNetTests
             var resultSubscription = Chargify.ReactivateSubscription(foundSubscription.SubscriptionID);
 
             // Assert
+#if !NUNIT
             Assert.IsInstanceOfType(newSubscription, typeof(Subscription));
+            Assert.IsInstanceOfType(foundSubscription, typeof(Subscription));
+            Assert.IsInstanceOfType(resultSubscription, typeof(Subscription));
+#endif
             Assert.IsNotNull(newSubscription);
             Assert.IsTrue(result);
-            Assert.IsInstanceOfType(foundSubscription, typeof(Subscription));
             Assert.IsNotNull(foundSubscription);
             Assert.IsTrue(foundSubscription.State == SubscriptionState.Canceled);
-            Assert.IsInstanceOfType(resultSubscription, typeof(Subscription));
             Assert.IsNotNull(newSubscription);
             Assert.IsTrue(resultSubscription.State == SubscriptionState.Active);
         }
 
-        [TestMethod]
+        [Test]
         public void Subscription_Create_With_SpecialChars()
         {
             var product = Chargify.GetProductList().Values.FirstOrDefault();
@@ -223,7 +239,9 @@ namespace ChargifyDotNetTests
             var newSubscription = Chargify.CreateSubscription(product.Handle, newCustomer, newPaymentInfo);
 
             // Assert
+#if !NUNIT
             Assert.IsInstanceOfType(newSubscription, typeof(Subscription));
+#endif
             Assert.IsNotNull(newSubscription);
             Assert.IsNotNull(newSubscription.Customer);
             Assert.IsNotNull(newSubscription.PaymentProfile);
@@ -249,7 +267,7 @@ namespace ChargifyDotNetTests
             Assert.IsTrue(Chargify.DeleteSubscription(newSubscription.SubscriptionID, "Automatic cancel due to test"));
         }
 
-        [TestMethod]
+        [Test]
         public void Subscription_Create()
         {
             // Arrange
@@ -264,7 +282,9 @@ namespace ChargifyDotNetTests
             var newSubscription = Chargify.CreateSubscription(product.Handle, newCustomer, newPaymentInfo);
 
             // Assert
+#if !NUNIT
             Assert.IsInstanceOfType(newSubscription, typeof(Subscription));
+#endif
             Assert.IsNotNull(newSubscription);
             Assert.IsNotNull(newSubscription.Customer);
             Assert.IsNotNull(newSubscription.PaymentProfile);
@@ -294,7 +314,7 @@ namespace ChargifyDotNetTests
             Assert.IsTrue(Chargify.DeleteSubscription(newSubscription.SubscriptionID, "Automatic cancel due to test"));
         }
 
-        [TestMethod]
+        [Test]
         public void Subscription_Create_WithComponent()
         {
             // Arrange
@@ -315,7 +335,9 @@ namespace ChargifyDotNetTests
                                  select c;
 
             // Assert
+#if !NUNIT
             Assert.IsInstanceOfType(newSubscription, typeof(Subscription));
+#endif
             Assert.IsNotNull(newSubscription);
             Assert.IsNotNull(newSubscription.Customer);
             Assert.IsNotNull(newSubscription.PaymentProfile);
@@ -343,7 +365,7 @@ namespace ChargifyDotNetTests
             Assert.IsTrue(Chargify.DeleteSubscription(newSubscription.SubscriptionID, "Automatic cancel due to test"));
         }
 
-        [TestMethod]
+        [Test]
         public void Subscription_Create_WithTwoComponents()
         {
             // Arrange
@@ -368,7 +390,9 @@ namespace ChargifyDotNetTests
                                  select c;
 
             // Assert
+#if !NUNIT
             Assert.IsInstanceOfType(newSubscription, typeof(Subscription));
+#endif
             Assert.IsNotNull(newSubscription);
             Assert.IsNotNull(newSubscription.Customer);
             Assert.IsNotNull(newSubscription.PaymentProfile);
@@ -396,7 +420,7 @@ namespace ChargifyDotNetTests
             Assert.IsTrue(Chargify.DeleteSubscription(newSubscription.SubscriptionID, "Automatic cancel due to test"));
         }
 
-        [TestMethod]
+        [Test]
         public void Subscription_Create_WithCouponAfterSignup()
         {
             // Arrange
@@ -408,7 +432,9 @@ namespace ChargifyDotNetTests
 
             // Assert
             Assert.IsNotNull(createdSubscription);
+#if !NUNIT
             Assert.IsInstanceOfType(createdSubscription, typeof(ISubscription));
+#endif
             Assert.IsTrue(createdSubscription.CouponCode == string.Empty);
 
             // Act Again
@@ -416,11 +442,13 @@ namespace ChargifyDotNetTests
 
             // Assert Again
             Assert.IsNotNull(updatedSubscription);
+#if !NUNIT
             Assert.IsInstanceOfType(updatedSubscription, typeof(ISubscription));
+#endif
             Assert.IsTrue(updatedSubscription.CouponCode == "AC511");
         }
 
-        [TestMethod]
+        [Test]
         public void Subscription_UpdateBillingDate()
         {
             // Arrange
@@ -438,7 +466,7 @@ namespace ChargifyDotNetTests
             Assert.IsTrue(billingDate == restoredSubscription.NextAssessmentAt);
         }
 
-        [TestMethod, Ignore]
+        [Test, Ignore]
         public void Subscription_Update()
         {
             // Arrange
@@ -460,7 +488,7 @@ namespace ChargifyDotNetTests
             Assert.IsTrue(restoredSubscription.Customer.Email == updatedSubscription.Customer.Email);
         }
 
-        [TestMethod, Ignore]
+        [Test, Ignore]
         public void Subscription_Load_Where_State_Is_TrialEnded()
         {
             // Arrange
@@ -471,12 +499,14 @@ namespace ChargifyDotNetTests
             var retreivedSubscription = Chargify.Find<Subscription>(subscription.SubscriptionID);
 
             // Assert
-            Assert.IsNotNull(retreivedSubscription);
-            Assert.IsInstanceOfType(retreivedSubscription, typeof(Subscription));
+            Assert.IsNotNull(retreivedSubscription);            
             Assert.IsTrue(retreivedSubscription.State == SubscriptionState.Trial_Ended);
+#if !NUNIT
+            Assert.IsInstanceOfType(retreivedSubscription, typeof(Subscription));
+#endif
         }
 
-        [TestMethod]
+        [Test]
         public void Subscription_Load_ComponentsFor()
         {
             // Arrange
@@ -491,7 +521,7 @@ namespace ChargifyDotNetTests
             Assert.IsTrue(subscriptionComponents.Count > 0);
         }
 
-        [TestMethod]
+        [Test]
         public void Subscription_Create_Using_ExistingProfile()
         {
             // Arrange
