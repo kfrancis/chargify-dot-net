@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>chargify</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>$author$</authors>
+    <owners>$author$</owners>
+    <projectUrl>http://chargify.codeplex.com</projectUrl>
+    <iconUrl>http://www.clinicalsupportsystems.com/chargifyDotNET/chargifyDotNet.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <copyright>Copyright Kori Francis, 2013</copyright>
+    <tags>Chargify</tags>
+  </metadata>
+  <files>
+    <file src="web.config.transform" target="content"/>
+  </files>
+</package>

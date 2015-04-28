@@ -1,0 +1,10 @@
+<configuration>
+    <configSections>
+        <section name="chargify" type="ChargifyNET.Configuration.ChargifyAccountRetrieverSection"/>
+    </configSections>
+    <chargify defaultAccount="YourAccount">
+        <accounts>
+            <add name="YourAccount" site="https://your-subdomain.chargify.com/" apiKey="abcdefghijklmnopqrs" apiPassword="P" />
+        </accounts>
+    </chargify>
+</configuration>
