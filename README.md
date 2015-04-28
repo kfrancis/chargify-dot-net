@@ -1,4 +1,4 @@
-# Chargify.NET
+# Chargify.NET [![Build Status](https://travis-ci.org/kfrancis/chargify-dot-net.svg)](https://travis-ci.org/kfrancis/chargify-dot-net)
 _A comprehensive C# API wrapper library for accessing [chargify.com](http://www.chargify.com), using XML or JSON to read/write._
 
 ## Important SSLv3/POODLE
