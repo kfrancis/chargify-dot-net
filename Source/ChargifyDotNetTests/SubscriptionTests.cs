@@ -279,6 +279,10 @@ namespace ChargifyDotNetTests
             var newPaymentInfo = GetTestPaymentMethod(newCustomer);
 
             // Act
+            string data = string.Empty;
+            Chargify.LogRequest = (requestMethod, address, postedData) => {
+                data = postedData;
+            };
             var newSubscription = Chargify.CreateSubscription(product.Handle, newCustomer, newPaymentInfo);
 
             // Assert
@@ -290,10 +294,10 @@ namespace ChargifyDotNetTests
             Assert.IsNotNull(newSubscription.PaymentProfile);
             Assert.IsTrue(newSubscription.SubscriptionID > int.MinValue);
             Assert.IsTrue(newSubscription.Customer.ChargifyID > int.MinValue);
-            Assert.IsTrue(newSubscription.Customer.FirstName == newCustomer.FirstName);
-            Assert.IsTrue(newSubscription.Customer.LastName == newCustomer.LastName);
-            Assert.IsTrue(newSubscription.Customer.Email == newCustomer.Email);
-            Assert.IsTrue(newSubscription.Customer.Phone == newCustomer.Phone);
+            Assert.AreEqual(newCustomer.FirstName, newSubscription.Customer.FirstName);
+            Assert.AreEqual(newCustomer.LastName, newSubscription.Customer.LastName);
+            Assert.AreEqual(newCustomer.Email, newSubscription.Customer.Email);
+            Assert.AreEqual(newCustomer.Phone, newSubscription.Customer.Phone);
             Assert.IsTrue(newSubscription.Customer.Organization == newCustomer.Organization);
             Assert.IsTrue(newSubscription.Customer.SystemID == referenceID);
             Assert.IsTrue(newSubscription.PaymentProfile.FirstName == newPaymentInfo.FirstName);
@@ -308,7 +312,8 @@ namespace ChargifyDotNetTests
             Assert.IsTrue(newSubscription.PaymentProfile.BillingZip == newPaymentInfo.BillingZip);
             Assert.IsTrue(newSubscription.ProductPriceInCents == product.PriceInCents);
             Assert.IsTrue(newSubscription.ProductPrice == product.Price);
-            Assert.AreEqual(SubscriptionState.Active, newSubscription.State);
+            Assert.AreEqual(product.TrialInterval > int.MinValue ? SubscriptionState.Trialing : SubscriptionState.Active, newSubscription.State);
+            Assert.AreEqual(Chargify.UseJSON, Chargify.UseJSON ? data.IsJSON() : data.IsXml());
 
             // Cleanup
             Assert.IsTrue(Chargify.DeleteSubscription(newSubscription.SubscriptionID, "Automatic cancel due to test"));

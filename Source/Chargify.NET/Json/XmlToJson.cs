@@ -12,6 +12,27 @@ namespace ChargifyNET.Json
     /// </summary>
     public static class XmlToJsonConverter
     {
+        public static bool HasChildren(this XmlElement node)
+        {
+            bool hasChildrenArray = false;
+            string childName = string.Empty;
+            foreach (object child in node)
+            {
+                if (child as XmlElement != null)
+                {
+                    if (childName == string.Empty)
+                    {
+                        childName = ((XmlElement)child).Name;
+                    }
+                    else
+                    {
+                        hasChildrenArray = childName == ((XmlElement)child).Name;
+                    }
+                }
+            }
+            return hasChildrenArray;
+        }
+
         /// <summary>
         /// Method converts XmlDocument to JSON
         /// </summary>
@@ -60,11 +81,14 @@ namespace ChargifyNET.Json
                     OutputNode(childname, alChild[0], sbJSON, true);
                 else
                 {
-                    sbJSON.Append(" \"" + SafeJSON(childname) + "\": [ ");
+                    var alChildElement = alChild[0] as XmlElement;
+                    //var alParentElementHasChildren = alChildElement != null ? (alChildElement.ParentNode as XmlElement) != null ? (alChildElement.ParentNode as XmlElement).HasChildren() : false : false;
+                    bool hasChildrenArray = alChildElement.HasChildren();
+                    sbJSON.Append(" \"" + SafeJSON(childname) + string.Format("\": {0} ", hasChildrenArray ? "[" : string.Empty));   
                     foreach (object Child in alChild)
                         OutputNode(childname, Child, sbJSON, false);
                     sbJSON.Remove(sbJSON.Length - 2, 2);
-                    sbJSON.Append(" ],");
+                    sbJSON.AppendFormat(" {0},", hasChildrenArray ? "]" : string.Empty);
                 }
             }
             sbJSON.Remove(sbJSON.Length - 2, 2);

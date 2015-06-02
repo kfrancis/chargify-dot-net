@@ -81,11 +81,15 @@ namespace ChargifyDotNetTests
         [Test]
         public void Test_GetSingleProductByID()
         {
-            // Test using the Chargify ID
-            IProduct basicProduct = Chargify.LoadProduct("1302", false);
+            // Arrange
+            var firstProduct =Chargify.GetProductList().FirstOrDefault();
 
-            Assert.IsNotNull(basicProduct);
-            Assert.AreEqual("basic", basicProduct.Handle);
+            // Act
+            var result = Chargify.LoadProduct(firstProduct.Key.ToString(), false);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(firstProduct.Value.Handle, result.Handle);
         }
 
         [Test]

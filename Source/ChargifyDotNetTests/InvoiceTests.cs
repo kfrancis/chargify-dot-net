@@ -70,7 +70,8 @@ namespace ChargifyDotNetTests
         public void Can_Create_Invoice_Subscription()
         {
             // Arrange
-            var product = Chargify.GetProductList().Values.FirstOrDefault(p => p.PriceInCents > 0);
+            var product = Chargify.GetProductList().Values.DefaultIfEmpty(null).FirstOrDefault(p => p.PriceInCents > 0 && p.RequireCreditCard == false);
+            if (product == null) { Assert.Inconclusive("No product to test"); return; }
             var referenceID = Guid.NewGuid().ToString();
             var newCustomer = new CustomerAttributes("Scott", "Pilgrim", "demonhead_sucks@scottpilgrim.com", "123-456-7890", "Chargify", referenceID);
 
