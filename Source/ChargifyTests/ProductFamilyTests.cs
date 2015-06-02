@@ -10,6 +10,7 @@ using Test = Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute;
 using TestFixtureSetUp = Microsoft.VisualStudio.TestTools.UnitTesting.TestInitializeAttribute;
 using SetUp = Microsoft.VisualStudio.TestTools.UnitTesting.TestInitializeAttribute;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Threading.Tasks;
 #endif
 
 namespace ChargifyTests
@@ -25,6 +26,21 @@ namespace ChargifyTests
 
             // Act
             var result = chargify.ProductFamilies.All();
+
+            // Assert
+            Assert.IsNotNull(result);
+            //Assert.IsInstanceOfType(result, typeof(IEnumerable<ProductFamily>));
+            Assert.IsTrue(result.Count() > 0);
+        }
+
+        [Test]
+        public async Task ProductFamily_All_Async()
+        {
+            // Arrange
+            var chargify = new ChargifyClient();
+
+            // Act
+            var result = await chargify.ProductFamilies.AllAsync();
 
             // Assert
             Assert.IsNotNull(result);

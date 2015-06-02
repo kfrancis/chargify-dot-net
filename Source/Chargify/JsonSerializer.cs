@@ -1,4 +1,5 @@
-﻿#region License
+﻿
+#region License
 //   Copyright 2010 John Sheehan
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,16 +14,19 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License. 
 #endregion
+
 #region Acknowledgements
 // Original JsonSerializer contributed by Daniel Crenna (@dimebrain)
 #endregion
 
-using System.IO;
-using Newtonsoft.Json;
-using RestSharp.Serializers;
-
 namespace Chargify
 {
+    #region Imports
+    using System.IO;
+    using Newtonsoft.Json;
+    using RestSharp.Serializers;
+    #endregion
+
     /// <summary>
     /// Default JSON serializer for request bodies
     /// Doesn't currently use the SerializeAs attribute, defers to Newtonsoft's attributes

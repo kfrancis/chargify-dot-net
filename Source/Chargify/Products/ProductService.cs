@@ -1,103 +1,47 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
+#region License, Terms and Conditions
+//
+// ProductService.cs
+//
+// Authors: Kori Francis <twitter.com/djbyter>, David Ball
+// Copyright (C) 2010 Clinical Support Systems, Inc. All rights reserved.
+// 
+//  THIS FILE IS LICENSED UNDER THE MIT LICENSE AS OUTLINED IMMEDIATELY BELOW:
+//
+//  Permission is hereby granted, free of charge, to any person obtaining a
+//  copy of this software and associated documentation files (the "Software"),
+//  to deal in the Software without restriction, including without limitation
+//  the rights to use, copy, modify, merge, publish, distribute, sublicense,
+//  and/or sell copies of the Software, and to permit persons to whom the
+//  Software is furnished to do so, subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be included in
+//  all copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+//  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+//  DEALINGS IN THE SOFTWARE.
+//
+#endregion
 
 namespace Chargify
 {
-    public partial class ProductService : ChargifyApiBase, IProductService
+    #region Imports
+    using System;
+    using System.Linq;
+    #endregion
+
+    public class ProductService : BaseService<Product>
     {
         public static readonly string ProductKey = "products";
 
         public ProductService(string apiKey, string apiPassword, bool useJson)
             : base(apiKey, apiPassword, useJson)
-        { }
-
-        public IEnumerable<Product> All()
         {
-            string url = string.Format(format: "/{0}", arg0: ProductKey);
-            return GetRequest<List<Product>>(url);
         }
-
-        public IEnumerable<Product> All(int familyId)
-        {
-            string url = string.Format(format: "/{0}/{1}/{2}", arg0: ProductFamilyService.ProductFamilyKey, arg1: familyId, arg2: ProductKey);
-            return GetRequest<List<Product>>(url);
-        }
-
-        public Product Single(int id)
-        {
-            string url = string.Format(format: "/{0}/{1}", arg0: ProductKey, arg1: id);
-            return GetRequest<Product>(url);
-        }
-
-        public Product Single(string handle)
-        {
-            string url = string.Format(format: "/{0}/handle/{1}", arg0: ProductKey, arg1: handle);
-            return GetRequest<Product>(url);
-        }
-
-        public Product Create(int familyId, Product product)
-        {
-            string url = string.Format(format: "/{0}/{1}/{2}", arg0: ProductFamilyService.ProductFamilyKey, arg1: familyId, arg2: ProductKey);
-            return PostRequest<Product, Product>(product, url);
-        }
-
-        public void Archive(Product product)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<IEnumerable<Product>> AllAsync()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<IEnumerable<Product>> AllAsync(int familyId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<Product> SingleAsync(int id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<Product> SingleAsync(string handle)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<Product> CreateAsync(int familyId, Product product)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task ArchiveAsync(Product product)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    public interface IProductService
-    {
-        IEnumerable<Product> All();
-        Task<IEnumerable<Product>> AllAsync();
-
-        IEnumerable<Product> All(int familyId);
-        Task<IEnumerable<Product>> AllAsync(int familyId);
-
-        Product Single(int id);
-        Task<Product> SingleAsync(int id);
-
-        Product Single(string handle);
-        Task<Product> SingleAsync(string handle);
-
-        Product Create(int familyId, Product product);
-        Task<Product> CreateAsync(int familyId, Product product);
-
-        void Archive(Product product);
-        Task ArchiveAsync(Product product);
     }
 }
