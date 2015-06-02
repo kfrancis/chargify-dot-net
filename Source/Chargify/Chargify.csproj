@@ -67,9 +67,7 @@
     <Compile Include="ProductFamilies\ProductFamily.cs" />
     <Compile Include="ProductFamilies\ProductFamilyService.cs" />
     <Compile Include="Products\Product.cs" />
-    <Compile Include="Products\ProductService.Async.cs" />
     <Compile Include="Products\ProductService.cs" />
-    <Compile Include="Products\ProductService.Sync.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UsefulExtensions.cs" />
   </ItemGroup>
