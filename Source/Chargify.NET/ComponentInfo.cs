@@ -47,6 +47,7 @@ namespace ChargifyNET
         private const string IDKey = "id";
         private const string ComponentIDKey = "component_id";
         private const string NameKey = "name";
+		private const string DescriptionKey = "description";
         private const string PricePerUnitInCentsKey = "price_per_unit_in_cents";
         private const string PricingSchemeKey = "pricing_scheme";
         private const string ProductFamilyIDKey = "product_family_id";
@@ -130,6 +131,9 @@ namespace ChargifyNET
                     case NameKey:
                         _name = obj.GetJSONContentAsString(key);
                         break;
+					case DescriptionKey:
+		                _description = obj.GetJSONContentAsString(key);
+		                break;
                     case PricePerUnitInCentsKey:
                         _pricePerUnit = obj.GetJSONContentAsInt(key);
                         break;
@@ -213,6 +217,9 @@ namespace ChargifyNET
                     case NameKey:
                         _name = dataNode.GetNodeContentAsString();
                         break;
+					case DescriptionKey:
+						_description = dataNode.GetNodeContentAsString();
+						break;
                     case PricePerUnitInCentsKey:
                         _pricePerUnit = dataNode.GetNodeContentAsInt();
                         break;
@@ -297,6 +304,15 @@ namespace ChargifyNET
             get { return _name; }
         }
         private string _name = string.Empty;
+
+		/// <summary>
+		/// The description of the component as created by the Chargify user
+		/// </summary>
+		public string Description
+		{
+			get { return _description; }
+		}
+		private string _description = string.Empty;
 
         /// <summary>
         /// Price of the component per unit (in cents)
