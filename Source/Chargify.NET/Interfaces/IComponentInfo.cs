@@ -102,6 +102,12 @@ namespace ChargifyNET
         /// The name of the component as created by the Chargify user
         /// </summary>
         string Name { get; }
+
+		/// <summary>
+		/// The description of the component as created by the Chargify user
+		/// </summary>
+		string Description { get; }
+
         /// <summary>
         /// Price of the component per unit (in cents)
         /// </summary>
