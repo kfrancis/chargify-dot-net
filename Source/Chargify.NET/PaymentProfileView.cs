@@ -38,7 +38,7 @@ namespace ChargifyNET
     /// Class representing view information for a credit card
     /// </summary>
     [DebuggerDisplay("Type: {Type}, Full Number: {FullNumber}, Expiration: {ExpirationMonth}/{ExpirationYear}, Name: {FirstName} {LastName}")]
-    public class PaymentProfileView : PaymentProfileBase, IPaymentProfileBase
+    public class PaymentProfileView : PaymentProfileBase, IPaymentProfileBase, IPaymentProfileView
     {
         /// <summary>
         /// Constructor
