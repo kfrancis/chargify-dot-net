@@ -215,7 +215,7 @@ namespace ChargifyNET
         /// <summary>
         /// Get the credit card details for this subscription
         /// </summary>
-        PaymentProfileView PaymentProfile { get; }
+        IPaymentProfileView PaymentProfile { get; }
         /// <summary>
         /// Get the customer details for this subscription
         /// </summary>

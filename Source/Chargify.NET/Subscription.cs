@@ -786,14 +786,14 @@ using ChargifyNET.Json;
         /// <summary>
         /// Get the credit card information for this subscription
         /// </summary>
-        public PaymentProfileView PaymentProfile 
+        public IPaymentProfileView PaymentProfile
         {
             get
             {
                 return _paymentProfile;
             }
         }
-        private PaymentProfileView _paymentProfile = null;
+        private IPaymentProfileView _paymentProfile = null;
 
         /// <summary>
         /// Get the customer information for this subscription
