@@ -46,6 +46,51 @@
                 output.Write(b, 0, r);
         }
 
+        public static bool IsWebhookRequestValid(this Stream requestStream, string sharedKey, string givenSignature = null)
+        {
+            bool retVal = true;
+            string possibleData = string.Empty;
+            using (StreamReader sr = new StreamReader(requestStream))
+            {
+                requestStream.Position = 0;
+                possibleData = sr.ReadToEnd();
+            }
+
+            if (!string.IsNullOrEmpty(possibleData))
+            {
+                var calculatedSignature = UsefulExtensions.CalculateHMAC256Signature(possibleData, sharedKey);
+                if (calculatedSignature != givenSignature)
+                {
+                    retVal = false;
+                }
+            }
+            else
+            {
+                retVal = false;
+            }
+
+            return retVal;
+        }
+
+        /// <summary>
+        /// Method to calculate the expected HMAC-SHA256 signture of a body of text using the site's sharedKey
+        /// </summary>
+        /// <param name="text">The text to run through the hashing algorithm</param>
+        /// <returns>The hex hash of the passed in text</returns>
+        public static string CalculateHMAC256Signature(string text, string secret)
+        {
+            ASCIIEncoding encoding = new ASCIIEncoding();
+            byte[] keyByte = encoding.GetBytes(secret);
+
+            HMACSHA256 hmacsha256 = new HMACSHA256(keyByte);
+            byte[] messageBytes = encoding.GetBytes(text);
+            byte[] hashMessage = hmacsha256.ComputeHash(messageBytes);
+            string hexaHash = string.Empty;
+            foreach (byte b in hashMessage) { hexaHash += String.Format("{0:x2}", b); }
+
+            return hexaHash;
+        }
+
         /// <summary>
         /// Method for checking if the data passed back via the webhook interface are valid
         /// </summary>

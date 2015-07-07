@@ -30,6 +30,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{7F8C95
 		.nuget\packages.config = .nuget\packages.config
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChargifyNetSample.MVC", "Source\ChargifyNetSample.MVC\ChargifyNetSample.MVC.csproj", "{C618CDC0-A9D1-4FF0-93A8-5A46848BFE14}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -89,6 +91,16 @@ Global
 		{CD8E53D2-B177-494B-AE08-1CEEF98E43D7}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{CD8E53D2-B177-494B-AE08-1CEEF98E43D7}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{CD8E53D2-B177-494B-AE08-1CEEF98E43D7}.Release|x86.ActiveCfg = Release|Any CPU
+		{C618CDC0-A9D1-4FF0-93A8-5A46848BFE14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C618CDC0-A9D1-4FF0-93A8-5A46848BFE14}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C618CDC0-A9D1-4FF0-93A8-5A46848BFE14}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{C618CDC0-A9D1-4FF0-93A8-5A46848BFE14}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{C618CDC0-A9D1-4FF0-93A8-5A46848BFE14}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C618CDC0-A9D1-4FF0-93A8-5A46848BFE14}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C618CDC0-A9D1-4FF0-93A8-5A46848BFE14}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C618CDC0-A9D1-4FF0-93A8-5A46848BFE14}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{C618CDC0-A9D1-4FF0-93A8-5A46848BFE14}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{C618CDC0-A9D1-4FF0-93A8-5A46848BFE14}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -99,6 +111,7 @@ Global
 		{7AD58394-09A2-4D11-AEAD-4127CADED3F9} = {1109C7B5-C897-4B8C-8942-AF7F8B7FFE83}
 		{F4C6848A-523E-4895-831B-BEB20D9F9965} = {B1023B37-8D93-4B15-80DB-4C99742E26EE}
 		{CD8E53D2-B177-494B-AE08-1CEEF98E43D7} = {D741C8EB-46FE-477B-97D2-5D2463EA6BDC}
+		{C618CDC0-A9D1-4FF0-93A8-5A46848BFE14} = {D741C8EB-46FE-477B-97D2-5D2463EA6BDC}
 	EndGlobalSection
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = Chargify.vsmdi
