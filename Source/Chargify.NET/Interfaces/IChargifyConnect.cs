@@ -267,7 +267,7 @@ namespace ChargifyNET
         /// <param name="delayCharge">(Optional) Should the charge be billed during the next assessment? Default = false</param>
         /// <param name="useNegativeBalance">(Optional) Should the subscription balance be taken into consideration? Default = false</param>
         /// <returns>The charge details</returns>
-        ICharge CreateCharge(int SubscriptionID, decimal amount, string memo, bool useNegativeBalance = false, bool delayCharge = false);
+        ICharge CreateCharge(int SubscriptionID, decimal amount, string memo, bool useNegativeBalance = false, bool delayCharge = false, PaymentCollectionMethod paymentCollectionMethod = PaymentCollectionMethod.Automatic);
         /// <summary>
         /// Create a new one-time credit
         /// </summary>
