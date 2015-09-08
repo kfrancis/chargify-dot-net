@@ -22,15 +22,15 @@ Also, a sample ASP.NET MVC sample is currently being worked on, and will be avai
 
 ### Get Started!
 New to _Chargify.NET_? 
-* Download the [url:latest release|http://chargify.codeplex.com/releases] or from the NuGet "Package Manager Console", run {{Install-Package chargify}}
+* Download the [latest release](http://chargify.codeplex.com/releases) or from the NuGet "Package Manager Console", run {{Install-Package chargify}}
 * Look at the [Getting Started] page
-* Review the [url:documentation|http://chargify.codeplex.com/documentation]
+* Review the [documentation](http://chargify.codeplex.com/documentation)
 * Review the [Breaking Changes]
-* Join in the [url:discussion|http://chargify.codeplex.com/discussions]
-* Need a quick question answered? Find me on twitter: [url:@djbyter|http://www.twitter.com/djbyter]
+* Join in the [discussion](http://chargify.codeplex.com/discussions)
+* Need a quick question answered? Find me on twitter: [@djbyter](http://www.twitter.com/djbyter)
 
 New to _Chargify_?
-* Check out their [url:documentation|http://docs.chargify.com] site
-* Submit a "ticket" to their [url:support area|http://support.chargify.com]
+* Check out their [documentation](http://docs.chargify.com) site
+* Submit a "ticket" to their [support area](http://support.chargify.com)
 
-Looking for a DNS managing service? I use [url:DNSimple|https://dnsimple.com/r/811f4af066782e], and it's super easy. (They are Chargify users as well!)
+Looking for a DNS managing service? I use [DNSimple](https://dnsimple.com/r/811f4af066782e), and it's super easy. (They are Chargify users as well!)
