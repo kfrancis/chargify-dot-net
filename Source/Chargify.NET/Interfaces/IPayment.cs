@@ -46,7 +46,7 @@ namespace ChargifyNET
         int AmountInCents { get; }
 
         /// <summary>
-        /// The amount of the payment
+        /// The amount of the payment (in dollars and cents)
         /// </summary>
         decimal Amount { get; }
 
