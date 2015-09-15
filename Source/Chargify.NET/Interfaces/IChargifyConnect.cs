@@ -187,6 +187,31 @@ namespace ChargifyNET
         bool ClearTestSite(SiteCleanupScope? CleanupScope = SiteCleanupScope.Customers);
         #endregion
 
+        #region Payments
+
+        /// <summary>
+        /// Chargify allows you to record payments that occur outside of the normal flow of payment processing.
+        /// These payments are considered external payments.A common case to apply such a payment is when a 
+        /// customer pays by check or some other means for their subscription.
+        /// </summary>
+        /// <param name="SubscriptionID">The ID of the subscription to apply this manual payment record to</param>
+        /// <param name="Amount">The decimal amount of the payment (ie. 10.00 for $10)</param>
+        /// <param name="Memo">The memo to include with the manual payment</param>
+        /// <returns>The payment result, null otherwise.</returns>
+        IPayment AddPayment(int SubscriptionID, decimal Amount, string Memo);
+
+        /// <summary>
+        /// Chargify allows you to record payments that occur outside of the normal flow of payment processing.
+        /// These payments are considered external payments.A common case to apply such a payment is when a 
+        /// customer pays by check or some other means for their subscription.
+        /// </summary>
+        /// <param name="SubscriptionID">The ID of the subscription to apply this manual payment record to</param>
+        /// <param name="AmountInCents">The amount in cents of the payment (ie. $10 would be 1000 cents)</param>
+        /// <param name="Memo">The memo to include with the manual payment</param>
+        /// <returns>The payment result, null otherwise.</returns>
+        IPayment AddPayment(int SubscriptionID, int AmountInCents, string Memo);
+        #endregion
+
         /// <summary>
         /// Method for adding a metered component usage to the subscription
         /// </summary>

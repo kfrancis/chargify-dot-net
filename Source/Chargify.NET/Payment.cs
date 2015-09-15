@@ -1,7 +1,7 @@
 ﻿
 #region License, Terms and Conditions
 //
-// Charge.cs
+// Payment.cs
 //
 // Authors: Kori Francis <twitter.com/djbyter>, David Ball
 // Copyright (C) 2010 Clinical Support Systems, Inc. All rights reserved.
@@ -30,100 +30,104 @@
 
 namespace ChargifyNET
 {
+    using Json;
     #region Imports
     using System;
     using System.Xml;
-    using ChargifyNET.Json;
     #endregion
 
     /// <summary>
-    /// The one-time charge class bump
+    /// Chargify allows you to record payments that occur outside of the normal flow of payment processing.
+    /// These payments are considered external payments.A common case to apply such a payment is when a customer pays by check or some other means for their subscription.
     /// </summary>
-    public class Charge : ChargifyBase, ICharge, IComparable<Charge>
+    public class Payment : ChargifyBase, IPayment, IComparable<Payment>
     {
         #region Field Keys
-        private const string SuccessKey = "success";
-        private const string MemoKey = "memo";
         private const string AmountInCentsKey = "amount_in_cents";
         private const string CreatedAtKey = "created_at";
         private const string EndingBalanceInCentsKey = "ending_balance_in_cents";
         private const string IDKey = "id";
         private const string KindKey = "kind";
+        private const string MemoKey = "memo";
         private const string PaymentIDKey = "payment_id";
         private const string ProductIDKey = "product_id";
+        private const string StartingBalanceInCentsKey = "starting_balance_in_cents";
         private const string SubscriptionIDKey = "subscription_id";
+        private const string SuccessKey = "success";
         private const string TypeKey = "type";
         private const string TransactionTypeKey = "transaction_type";
         private const string GatewayTransactionIDKey = "gateway_transaction_id";
         #endregion
 
         #region Constructors
-
         /// <summary>
-        /// Constructor.  Values set to default
+        /// Default constructor
         /// </summary>
-        public Charge() : base() { }
+        public Payment()
+            : base()
+        {
+        }
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="chargeXml">XML containing charge info (in expected format)</param>
-        public Charge(string chargeXml)
+        /// <param name="PaymentXML">XML containing payment info (in expected format)</param>
+        public Payment(string PaymentXML)
             : base()
         {
             // get the XML into an XML document
-            XmlDocument doc = new XmlDocument();
-            doc.LoadXml(chargeXml);
-            if (doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", "chargeXml");
+            XmlDocument Doc = new XmlDocument();
+            Doc.LoadXml(PaymentXML);
+            if (Doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", "PaymentXML");
             // loop through the child nodes of this node
-            foreach (XmlNode elementNode in doc.ChildNodes)
+            foreach (XmlNode elementNode in Doc.ChildNodes)
             {
-                if (elementNode.Name == "charge")
+                if (elementNode.Name == "payment")
                 {
                     this.LoadFromNode(elementNode);
                     return;
                 }
             }
             // if we get here, then no info was found
-            throw new ArgumentException("XML does not contain charge information", "ChargeXML");
+            throw new ArgumentException("XML does not contain payment information", "PaymentXML");
         }
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="chargeNode">XML containing charge info (in expected format)</param>
-        internal Charge(XmlNode chargeNode)
+        /// <param name="paymentNode">XML containing payment info (in expected format)</param>
+        internal Payment(XmlNode paymentNode)
             : base()
         {
-            if (chargeNode == null) throw new ArgumentNullException("ChargeNode");
-            if (chargeNode.Name != "charge") throw new ArgumentException("Not a vaild charge node", "chargeNode");
-            if (chargeNode.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", "chargeNode");
-            this.LoadFromNode(chargeNode);
+            if (paymentNode == null) throw new ArgumentNullException("PaymentNode");
+            if (paymentNode.Name != "payment") throw new ArgumentException("Not a vaild payment node", "paymentNode");
+            if (paymentNode.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", "paymentNode");
+            this.LoadFromNode(paymentNode);
         }
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="chargeObject">Json containing charge info (in expected format)</param>
-        public Charge(JsonObject chargeObject) : base()
+        /// <param name="paymentObject">JsonObject containing payment info (in expected format)</param>
+        public Payment(JsonObject paymentObject)
+            : base()
         {
-            if (chargeObject == null) throw new ArgumentNullException("chargeObject");
-            if (chargeObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild charge object", "chargeObject");
-            this.LoadFromJSON(chargeObject);
+            if (paymentObject == null) throw new ArgumentNullException("paymentObject");
+            if (paymentObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild payment object", "paymentObject");
+            this.LoadFromJSON(paymentObject);
         }
 
+        /// <summary>
+        /// Load data from a JsonObject
+        /// </summary>
+        /// <param name="obj">The JsonObject containing object data</param>
         private void LoadFromJSON(JsonObject obj)
         {
+            // loop through the keys of this JsonObject to get object info, and parse it out
             foreach (string key in obj.Keys)
             {
                 switch (key)
                 {
-                    case SuccessKey:
-                        _success = obj.GetJSONContentAsBoolean(key);
-                        break;
-                    case MemoKey:
-                        _memo = obj.GetJSONContentAsString(key);
-                        break;
                     case AmountInCentsKey:
                         _amountInCents = obj.GetJSONContentAsInt(key);
                         break;
@@ -139,17 +143,26 @@ namespace ChargifyNET
                     case KindKey:
                         _kind = obj.GetJSONContentAsString(key);
                         break;
+                    case MemoKey:
+                        _memo = obj.GetJSONContentAsString(key);
+                        break;
                     case PaymentIDKey:
                         _paymentID = obj.GetJSONContentAsNullableInt(key);
                         break;
                     case ProductIDKey:
                         _productID = obj.GetJSONContentAsInt(key);
                         break;
+                    case StartingBalanceInCentsKey:
+                        _startingBalanceInCents = obj.GetJSONContentAsInt(key);
+                        break;
                     case SubscriptionIDKey:
                         _subscriptionID = obj.GetJSONContentAsInt(key);
                         break;
+                    case SuccessKey:
+                        _success = obj.GetJSONContentAsBoolean(key);
+                        break;
                     case TypeKey:
-                        _chargeType = obj.GetJSONContentAsString(key);
+                        _type = obj.GetJSONContentAsString(key);
                         break;
                     case TransactionTypeKey:
                         _transactionType = obj.GetJSONContentAsString(key);
@@ -164,21 +177,15 @@ namespace ChargifyNET
         }
 
         /// <summary>
-        /// Load data from a subscription node
+        /// Load data from a payment node
         /// </summary>
-        /// <param name="subscriptionNode">The subscription node</param>
-        private void LoadFromNode(XmlNode subscriptionNode)
+        /// <param name="paymentNode">The payment node</param>
+        private void LoadFromNode(XmlNode paymentNode)
         {
-            foreach (XmlNode dataNode in subscriptionNode.ChildNodes)
+            foreach (XmlNode dataNode in paymentNode.ChildNodes)
             {
                 switch (dataNode.Name)
                 {
-                    case SuccessKey:
-                        _success = dataNode.GetNodeContentAsBoolean();
-                        break;
-                    case MemoKey:
-                        _memo = dataNode.GetNodeContentAsString();
-                        break;
                     case AmountInCentsKey:
                         _amountInCents = dataNode.GetNodeContentAsInt();
                         break;
@@ -194,17 +201,26 @@ namespace ChargifyNET
                     case KindKey:
                         _kind = dataNode.GetNodeContentAsString();
                         break;
+                    case MemoKey:
+                        _memo = dataNode.GetNodeContentAsString();
+                        break;
                     case PaymentIDKey:
                         _paymentID = dataNode.GetNodeContentAsNullableInt();
                         break;
                     case ProductIDKey:
                         _productID = dataNode.GetNodeContentAsInt();
                         break;
+                    case StartingBalanceInCentsKey:
+                        _startingBalanceInCents = dataNode.GetNodeContentAsInt();
+                        break;
                     case SubscriptionIDKey:
                         _subscriptionID = dataNode.GetNodeContentAsInt();
                         break;
+                    case SuccessKey:
+                        _success = dataNode.GetNodeContentAsBoolean();
+                        break;
                     case TypeKey:
-                        _chargeType = dataNode.GetNodeContentAsString();
+                        _type = dataNode.GetNodeContentAsString();
                         break;
                     case TransactionTypeKey:
                         _transactionType = dataNode.GetNodeContentAsString();
@@ -217,141 +233,119 @@ namespace ChargifyNET
                 }
             }
         }
-
         #endregion
 
-        #region ICharge Members
+        #region Implementation
+        /// <summary>
+        /// The amount of the payment
+        /// </summary>
+        public int AmountInCents { get { return _amountInCents; } }
+        private int _amountInCents = int.MinValue;
 
         /// <summary>
-        /// Either true or false, depending on the success of the charge.
-        /// <remarks>At this time, all charges that are returned will return true here. 
-        /// Flase may be returned in the future when more options are added to the charge creation API</remarks>
+        /// The amount of the payment
         /// </summary>
-        public bool Success
-        {
-            get { return _success; }
-        }
-        private bool _success = false;
+        public decimal Amount { get { return Convert.ToDecimal(_amountInCents) / 100; } }
 
         /// <summary>
-        /// Get the amount (in cents)
+        /// The date the payment was created
         /// </summary>
-        public int AmountInCents
-        {
-            get { return _amountInCents; }
-        }
-        private int _amountInCents;
-
-        /// <summary>
-        /// Get the amount, in dollars and cents.
-        /// </summary>
-        public decimal Amount
-        {
-            get { return Convert.ToDecimal(this._amountInCents) / 100;  }
-        }
-
-        /// <summary>
-        /// The memo for the created charge
-        /// </summary>
-        public string Memo
-        {
-            get { return _memo; }
-        }
-        private string _memo = string.Empty;
-
-        /// <summary>
-        /// The date the charge was created
-        /// </summary>
-        public DateTime CreatedAt { get { return this._createdAt; } }
+        public DateTime CreatedAt { get { return _createdAt; } }
         private DateTime _createdAt = DateTime.MinValue;
 
         /// <summary>
-        /// The ending balance of the subscription, in cents
+        /// The ending balance of the subscription after the payment
         /// </summary>
-        public int EndingBalanceInCents { get { return this._endingBalanceInCents; } }
+        public int EndingBalanceInCents { get { return _endingBalanceInCents; } }
         private int _endingBalanceInCents = int.MinValue;
 
         /// <summary>
-        /// The ending balance of the subscription, in dollars and cents (formatted as decimal)
+        /// The ID of the payment
         /// </summary>
-        public decimal EndingBalance { get { return Convert.ToDecimal(this._endingBalanceInCents) / 100; } }
-
-        /// <summary>
-        /// The ID of the charge
-        /// </summary>
-        public int ID { get { return this._id; } }
+        public int ID { get { return _id; } }
         private int _id = int.MinValue;
 
         /// <summary>
-        /// The kind of charge
+        /// The kind of payment
         /// </summary>
-        public string Kind { get { return this._kind; } }
+        public string Kind { get { return _kind; } }
         private string _kind = string.Empty;
 
         /// <summary>
-        /// The ID of the payment associated with this charge
+        /// The payment memo
         /// </summary>
-        public int? PaymentID { get { return this._paymentID; } }
+        public string Memo { get { return _memo; } }
+        private string _memo = string.Empty;
+
+        /// <summary>
+        /// The ID of the payment
+        /// </summary>
+        public int? PaymentID { get { return _paymentID; } }
         private int? _paymentID = null;
 
         /// <summary>
-        /// The product ID the subscription was subscribed to at the time of the charge
+        /// The ID of the product
         /// </summary>
-        public int ProductID { get { return this._productID; } }
+        public int ProductID { get { return _productID; } }
         private int _productID = int.MinValue;
 
         /// <summary>
-        /// The subscription ID that this charge was applied to
+        /// The balance of the subscription before the payment
         /// </summary>
-        public int SubscriptionID { get { return this._subscriptionID; } }
+        public int StartingBalanceInCents { get { return _startingBalanceInCents; } }
+        private int _startingBalanceInCents = int.MinValue;
+
+        /// <summary>
+        /// The subscription ID
+        /// </summary>
+        public int SubscriptionID { get { return _subscriptionID; } }
         private int _subscriptionID = int.MinValue;
 
         /// <summary>
-        /// The type of charge
+        /// Was the payment successful?
         /// </summary>
-        public string ChargeType { get { return this._chargeType; } }
-        private string _chargeType = string.Empty;
+        public bool Success { get { return _success; } }
+        private bool _success = false;
+
+        /// <summary>
+        /// The type of payment
+        /// </summary>
+        public string Type { get { return _type; } }
+        private string _type = string.Empty;
 
         /// <summary>
         /// The type of transaction
         /// </summary>
-        public string TransactionType { get { return this._transactionType; } }
+        public string TransactionType { get { return _transactionType; } }
         private string _transactionType = string.Empty;
 
         /// <summary>
-        /// The ID of the gateway transaction, useful for debugging.
+        /// The related gateway transaction ID
         /// </summary>
-        public int? GatewayTransactionID { get { return this._gatewayTransactionID; } }
+        public int? GatewayTransactionID { get { return _gatewayTransactionID; } }
         private int? _gatewayTransactionID = null;
-
         #endregion
 
-        #region IComparable<ICharge> Members
-
+        #region IComparible<Payment> Members
         /// <summary>
-        /// Compare this instance to another (by AmountInCents)
+        /// Compare the payments
         /// </summary>
-        /// <param name="other">The other instance</param>
-        /// <returns>The result of the comparison</returns>
-        public int CompareTo(ICharge other)
+        /// <param name="other">The other payment</param>
+        /// <returns></returns>
+        public int CompareTo(IPayment other)
         {
-            return this.AmountInCents.CompareTo(other.AmountInCents);
+            return this.ID.CompareTo(other.ID);
         }
 
-        #endregion
-
-        #region IComparable<Charge> Members
-
         /// <summary>
-        /// Compare this instance to another (by AmountInCents)
+        /// Compare the payments
         /// </summary>
-        /// <param name="other">The other instance</param>
-        /// <returns>The result of the comparison</returns>
-        public int CompareTo(Charge other)
+        /// <param name="other">The other payment</param>
+        /// <returns></returns>
+        public int CompareTo(Payment other)
         {
-            return this.AmountInCents.CompareTo(other.AmountInCents);
+            return this.ID.CompareTo(other.ID);
         }
-
         #endregion
     }
 }

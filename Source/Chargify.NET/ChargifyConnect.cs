@@ -4895,10 +4895,57 @@ namespace ChargifyNET
                 // All we're expecting back is 200 OK when it works, and 403 FORBIDDEN when it's not being called appropriately.
                 retVal = true;
             }
-            catch(ChargifyException cEx) {}
+            catch(ChargifyException) {}
 
             return retVal;
         }
+        #endregion
+
+        #region Payments
+        /// <summary>
+        /// Chargify allows you to record payments that occur outside of the normal flow of payment processing.
+        /// These payments are considered external payments.A common case to apply such a payment is when a 
+        /// customer pays by check or some other means for their subscription.
+        /// </summary>
+        /// <param name="SubscriptionID">The ID of the subscription to apply this manual payment record to</param>
+        /// <param name="Amount">The decimal amount of the payment (ie. 10.00 for $10)</param>
+        /// <param name="Memo">The memo to include with the manual payment</param>
+        /// <returns>The payment result, null otherwise.</returns>
+        public IPayment AddPayment(int SubscriptionID, decimal Amount, string Memo)
+        {
+            return AddPayment(SubscriptionID, Convert.ToInt32(Amount * 100), Memo);
+        }
+
+        /// <summary>
+        /// Chargify allows you to record payments that occur outside of the normal flow of payment processing.
+        /// These payments are considered external payments.A common case to apply such a payment is when a 
+        /// customer pays by check or some other means for their subscription.
+        /// </summary>
+        /// <param name="SubscriptionID">The ID of the subscription to apply this manual payment record to</param>
+        /// <param name="AmountInCents">The amount in cents of the payment (ie. $10 would be 1000 cents)</param>
+        /// <param name="Memo">The memo to include with the manual payment</param>
+        /// <returns>The payment result, null otherwise.</returns>
+        public IPayment AddPayment(int SubscriptionID, int AmountInCents, string Memo)
+        {
+            // make sure data is valid
+            if (string.IsNullOrEmpty(Memo)) throw new ArgumentNullException("Memo");
+            // make sure that the SubscriptionID is unique
+            if (this.LoadSubscription(SubscriptionID) == null) throw new ArgumentException("Not an SubscriptionID", "SubscriptionID");
+
+            // create XML for creation of a payment
+            var PaymentXML = new StringBuilder(GetXMLStringIfApplicable());
+            PaymentXML.Append("<payment>");
+            PaymentXML.AppendFormat("<amount_in_cents>{0}</amount_in_cents>", AmountInCents);
+            PaymentXML.AppendFormat("<memo>{0}</memo>", HttpUtility.HtmlEncode(Memo));
+            PaymentXML.Append("</payment>");
+
+            // now make the request
+            string response = this.DoRequest(string.Format("subscriptions/{0}/payments.{1}", SubscriptionID, GetMethodExtension()), HttpRequestMethod.Post, PaymentXML.ToString());
+
+            // change the response to the object
+            return response.ConvertResponseTo<Payment>("payment");
+        }
+
         #endregion
 
         #region Utility Methods

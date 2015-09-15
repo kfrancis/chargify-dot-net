@@ -96,8 +96,10 @@
     <Compile Include="Interfaces\IMetadata.cs" />
     <Compile Include="Interfaces\IMetadataResult.cs" />
     <Compile Include="Interfaces\IPublicSignupPage.cs" />
+    <Compile Include="Interfaces\IPayment.cs" />
     <Compile Include="Metadata.cs" />
     <Compile Include="MetadataResult.cs" />
+    <Compile Include="Payment.cs" />
     <Compile Include="PaymentProfileBase.cs" />
     <Compile Include="PaymentProfileView.cs" />
     <Compile Include="Customer.cs" />
