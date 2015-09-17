@@ -19,6 +19,30 @@ namespace ChargifyDotNetTests
     public class CustomerTests : ChargifyTestBase
     {
         [Test]
+        public void Customer_CreateWithError()
+        {
+            // Arrange
+            var customer = new Customer()
+            {
+                FirstName = "Joe"
+            };
+
+            // Act
+            try
+            {
+                Chargify.CreateCustomer(customer);
+                Assert.Fail("Error was expected, but not received");
+            }
+            catch (ChargifyException chEx)
+            {
+                Assert.IsNotNull(chEx.ErrorMessages);
+                Assert.AreEqual(2, chEx.ErrorMessages.Count);
+                Assert.IsTrue(chEx.ErrorMessages.Any(e => e.Message == "Last name: cannot be blank."));
+                Assert.IsTrue(chEx.ErrorMessages.Any(e => e.Message == "Email address: cannot be blank."));
+            }
+        }
+
+        [Test]
         public void Customer_CreateCustomer()
         {
             // Arrange

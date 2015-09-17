@@ -103,7 +103,7 @@ namespace ChargifyNET
                 {
                     string errorResponse = reader.ReadToEnd();
                     List<ChargifyError> errors = new List<ChargifyError>();
-                    
+
                     // Response is frequently " " ...
                     if (string.IsNullOrEmpty(errorResponse.Trim())) return errors;
 
@@ -111,12 +111,24 @@ namespace ChargifyNET
                     {
                         // New way - Linq-y
                         XDocument xdoc = XDocument.Parse(errorResponse);
-                        var results = from e in xdoc.Descendants("errors")
-                                      select new ChargifyError
-                                      {
-                                           Message = e.Value
-                                      };
-                        errors = results.ToList();
+                        if (xdoc.Descendants("error").Count() > 0)
+                        {
+                            var results = from e in xdoc.Descendants("error")
+                                          select new ChargifyError
+                                          {
+                                              Message = e.Value
+                                          };
+                            errors = results.ToList();
+                        }
+                        else
+                        {
+                            var results = from e in xdoc.Descendants("errors")
+                                          select new ChargifyError
+                                          {
+                                              Message = e.Value
+                                          };
+                            errors = results.ToList();
+                        }
                     }
                     else if (errorResponse.IsJSON())
                     {
@@ -128,7 +140,7 @@ namespace ChargifyNET
                             JsonArray array = obj["errors"] as JsonArray;
                             for (int i = 0; i <= array.Length - 1; i++)
                             {
-                                if (((array.Items[i] as JsonString) != null)&&(!string.IsNullOrEmpty((array.Items[i] as JsonString).Value)))
+                                if (((array.Items[i] as JsonString) != null) && (!string.IsNullOrEmpty((array.Items[i] as JsonString).Value)))
                                 {
                                     JsonString errorStr = array.Items[i] as JsonString;
                                     ChargifyError anError = new ChargifyError(errorStr);
@@ -177,7 +189,7 @@ namespace ChargifyNET
         /// </summary>
         /// <param name="errorResponse">The response that caused the exception</param>
         /// <param name="wex">The original web exception.  This becomes the inner exception of ths exception</param>
-        public ChargifyException(HttpWebResponse errorResponse, WebException wex) : 
+        public ChargifyException(HttpWebResponse errorResponse, WebException wex) :
             base(string.Format("The server returned '{0}' with the status code {1} ({1:d}).", errorResponse.StatusDescription, errorResponse.StatusCode), wex)
         {
             _statusDescription = errorResponse.StatusDescription;
@@ -213,7 +225,7 @@ namespace ChargifyNET
             }
         }
         private string _statusDescription = "";
-        
+
         /// <summary>
         /// Get the status code
         /// </summary>
@@ -253,10 +265,10 @@ namespace ChargifyNET
         /// <summary>
         /// Get object data
         /// </summary>
-        [SecurityPermission(SecurityAction.LinkDemand, Flags=SecurityPermissionFlag.SerializationFormatter)]
+        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.SerializationFormatter)]
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-         	 base.GetObjectData(info, context);
+            base.GetObjectData(info, context);
         }
 
         /// <summary>
