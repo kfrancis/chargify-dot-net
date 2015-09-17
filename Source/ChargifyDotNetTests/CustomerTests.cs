@@ -22,6 +22,7 @@ namespace ChargifyDotNetTests
         public void Customer_CreateWithError()
         {
             // Arrange
+            Chargify.UseJSON = true;
             var customer = new Customer()
             {
                 FirstName = "Joe"
@@ -40,6 +41,7 @@ namespace ChargifyDotNetTests
                 Assert.IsTrue(chEx.ErrorMessages.Any(e => e.Message == "Last name: cannot be blank."));
                 Assert.IsTrue(chEx.ErrorMessages.Any(e => e.Message == "Email address: cannot be blank."));
             }
+            Chargify.UseJSON = false;
         }
 
         [Test]

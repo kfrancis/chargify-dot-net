@@ -549,10 +549,10 @@ namespace ChargifyNET
             // create XML for creation of customer
             var CustomerXML = new StringBuilder(GetXMLStringIfApplicable());
             CustomerXML.Append("<customer>");
-            CustomerXML.AppendFormat("<email>{0}</email>", EmailAddress);
+            if (!string.IsNullOrEmpty(EmailAddress)) CustomerXML.AppendFormat("<email>{0}</email>", EmailAddress);
             if (!string.IsNullOrEmpty(Phone)) CustomerXML.AppendFormat("<{0}>{1}</{2}>", CustomerAttributes.PhoneKey, Phone, CustomerAttributes.PhoneKey);
-            CustomerXML.AppendFormat("<first_name>{0}</first_name>", FirstName);
-            CustomerXML.AppendFormat("<last_name>{0}</last_name>", LastName);
+            if (!string.IsNullOrEmpty(FirstName)) CustomerXML.AppendFormat("<first_name>{0}</first_name>", FirstName);
+            if (!string.IsNullOrEmpty(LastName)) CustomerXML.AppendFormat("<last_name>{0}</last_name>", LastName);
             if (!string.IsNullOrEmpty(Organization)) CustomerXML.AppendFormat("<organization>{0}</organization>", HttpUtility.HtmlEncode(Organization));
             if (!string.IsNullOrEmpty(SystemID)) CustomerXML.AppendFormat("<reference>{0}</reference>", SystemID);
             if (!string.IsNullOrEmpty(ShippingAddress)) CustomerXML.AppendFormat("<address>{0}</address>", ShippingAddress);
