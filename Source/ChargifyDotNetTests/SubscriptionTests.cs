@@ -19,6 +19,24 @@ namespace ChargifyDotNetTests
     public class SubscriptionTests : ChargifyTestBase
     {
         #region Tests
+        [Test]
+        public void Subscription_Create_Using_Existing_Customer()
+        {
+            // Arrange
+            var client = this.Chargify;
+            var product = Chargify.GetProductList().Values.FirstOrDefault();
+            var exampleCustomer = client.GetCustomerList().Values.DefaultIfEmpty(defaultValue: null).FirstOrDefault();
+            var paymentInfo = GetTestPaymentMethod(exampleCustomer.ToCustomerAttributes() as CustomerAttributes);
+
+            // Act
+            var newSubscription = client.CreateSubscription(product.Handle, exampleCustomer.ChargifyID, paymentInfo);
+
+            // Assert
+            Assert.IsNotNull(newSubscription);
+            Assert.AreEqual(exampleCustomer.FirstName, newSubscription.Customer.FirstName);
+            Assert.AreEqual(exampleCustomer.LastName, newSubscription.Customer.LastName);
+            Assert.AreEqual(exampleCustomer.ChargifyID, newSubscription.Customer.ChargifyID);
+        }
 
         [Test]
         public void Subscription_Can_Get_PaymentProfile_Id()
