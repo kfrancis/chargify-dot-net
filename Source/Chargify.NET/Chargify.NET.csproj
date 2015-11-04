@@ -97,6 +97,7 @@
     <Compile Include="Interfaces\IMetadataResult.cs" />
     <Compile Include="Interfaces\IPublicSignupPage.cs" />
     <Compile Include="Interfaces\IPayment.cs" />
+    <Compile Include="Interfaces\ISubscriptionOverride.cs" />
     <Compile Include="Metadata.cs" />
     <Compile Include="MetadataResult.cs" />
     <Compile Include="Payment.cs" />
@@ -156,6 +157,7 @@
     <Compile Include="SiteStatistics.cs" />
     <Compile Include="Statement.cs" />
     <Compile Include="Subscription.cs" />
+    <Compile Include="SubscriptionOverride.cs" />
     <Compile Include="SubscriptionPostbackHandler.cs" />
     <Compile Include="Transaction.cs" />
     <Compile Include="Usage.cs" />

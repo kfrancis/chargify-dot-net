@@ -35,7 +35,7 @@ namespace ChargifyNET
     using System.Diagnostics;
     using System.Text;
     using System.Xml;
-using ChargifyNET.Json;
+    using ChargifyNET.Json;
     #endregion
 
     /// <summary>
@@ -89,7 +89,7 @@ using ChargifyNET.Json;
         /// </summary>
         /// <param name="SubscriptionXML">XML containing subscription info (in expected format)</param>
         public Subscription(string SubscriptionXML) : base()
-        { 
+        {
             // get the XML into an XML document
             XmlDocument Doc = new XmlDocument();
             Doc.LoadXml(SubscriptionXML);
@@ -444,7 +444,7 @@ using ChargifyNET.Json;
                             foreach (XmlNode childNode in dataNode.ChildNodes)
                             {
                                 switch (childNode.Name)
-                                {                            
+                                {
                                     case "first_name":
                                         _paymentProfile.FirstName = childNode.GetNodeContentAsString();
                                         break;
@@ -580,11 +580,11 @@ using ChargifyNET.Json;
         /// <summary>
         /// The subscription unique ID within Chargify
         /// </summary>
-        public int SubscriptionID 
+        public int SubscriptionID
         {
-            get 
-            { 
-                return _subscriptionID; 
+            get
+            {
+                return _subscriptionID;
             }
         }
         private int _subscriptionID;
@@ -593,11 +593,11 @@ using ChargifyNET.Json;
         /// The current state of the subscription. 
         /// It may be "trailing", "active", "soft_failure", "past_due", "suspended", "closed" or "expired"
         /// </summary>
-        public SubscriptionState State 
+        public SubscriptionState State
         {
-            get 
-            { 
-                return _state; 
+            get
+            {
+                return _state;
             }
         }
         private SubscriptionState _state = SubscriptionState.Unknown;
@@ -605,11 +605,11 @@ using ChargifyNET.Json;
         /// <summary>
         /// Gives the current outstanding subscription balance, in the number of cents
         /// </summary>
-        public int BalanceInCents 
+        public int BalanceInCents
         {
-            get 
-            { 
-                return _balanceInCents; 
+            get
+            {
+                return _balanceInCents;
             }
         }
         private int _balanceInCents;
@@ -617,9 +617,9 @@ using ChargifyNET.Json;
         /// <summary>
         /// Gives the current outstanding subscription balance, in the number of dollars and cents
         /// </summary>
-        public decimal Balance 
+        public decimal Balance
         {
-            get 
+            get
             {
                 return Convert.ToDecimal(this._balanceInCents) / 100;
             }
@@ -628,11 +628,11 @@ using ChargifyNET.Json;
         /// <summary>
         /// Seller-provided reason for, or note about, the cancellation
         /// </summary>
-        public string CancellationMessage 
+        public string CancellationMessage
         {
-            get 
-            { 
-                return _cancellationMessage; 
+            get
+            {
+                return _cancellationMessage;
             }
         }
         private string _cancellationMessage = "";
@@ -641,7 +641,7 @@ using ChargifyNET.Json;
         /// Timestamp for when the subscription began
         /// <remarks>i.e. when it came out of trial, or when it began in the case of no trial</remarks>
         /// </summary>
-        public DateTime ActivatedAt 
+        public DateTime ActivatedAt
         {
             get
             {
@@ -661,16 +661,16 @@ using ChargifyNET.Json;
             }
         }
         private DateTime _created = DateTime.MinValue;
-        
+
         /// <summary>
         /// Timestamp giving the expiration date of this subscription (if any)
         /// </summary>
-        public DateTime ExpiresAt 
-        { 
-            get 
-            { 
-                return _expiresAt; 
-            } 
+        public DateTime ExpiresAt
+        {
+            get
+            {
+                return _expiresAt;
+            }
         }
         private DateTime _expiresAt = DateTime.MinValue;
 
@@ -689,12 +689,12 @@ using ChargifyNET.Json;
         /// <summary>
         /// Get the date the subscription was cancelled
         /// </summary>
-        public DateTime CanceledAt 
+        public DateTime CanceledAt
         {
             get
             {
                 return _canceledAt;
-            } 
+            }
         }
         private DateTime _canceledAt = DateTime.MinValue;
 
@@ -713,12 +713,12 @@ using ChargifyNET.Json;
         /// <summary>
         /// Timestamp relating to the start of the current (recurring) period
         /// </summary>
-        public DateTime CurrentPeriodStartedAt 
-        { 
-            get 
-            { 
-                return _currentPeriodStartedAt; 
-            } 
+        public DateTime CurrentPeriodStartedAt
+        {
+            get
+            {
+                return _currentPeriodStartedAt;
+            }
         }
         private DateTime _currentPeriodStartedAt = DateTime.MinValue;
 
@@ -726,19 +726,19 @@ using ChargifyNET.Json;
         /// Timestamp relating to the end of the current (recurring) period
         /// <remarks>i.e. when the next regularily scheduled attemped charge will occur</remarks>
         /// </summary>
-        public DateTime CurrentPeriodEndsAt 
-        { 
-            get 
-            { 
-                return _currentPeriodEndsAt; 
-            } 
+        public DateTime CurrentPeriodEndsAt
+        {
+            get
+            {
+                return _currentPeriodEndsAt;
+            }
         }
         private DateTime _currentPeriodEndsAt = DateTime.MinValue;
 
         /// <summary>
         /// Get the date and time that indicates when capture of payment will be tried or retried.
         /// </summary>
-        public DateTime NextAssessmentAt 
+        public DateTime NextAssessmentAt
         {
             get
             {
@@ -750,24 +750,24 @@ using ChargifyNET.Json;
         /// <summary>
         /// Timestamp for when the trial period (if any) began
         /// </summary>
-        public DateTime TrialStartedAt 
-        { 
-            get 
-            { 
-                return _trialStartedAt; 
-            } 
+        public DateTime TrialStartedAt
+        {
+            get
+            {
+                return _trialStartedAt;
+            }
         }
         private DateTime _trialStartedAt = DateTime.MinValue;
 
         /// <summary>
         /// Timestamp for when the trial period (if any) ended
         /// </summary>
-        public DateTime TrialEndedAt 
-        { 
-            get 
+        public DateTime TrialEndedAt
+        {
+            get
             {
-                return _trialEndedAt; 
-            } 
+                return _trialEndedAt;
+            }
         }
         private DateTime _trialEndedAt = DateTime.MinValue;
 
@@ -798,7 +798,7 @@ using ChargifyNET.Json;
         /// <summary>
         /// Get the customer information for this subscription
         /// </summary>
-        public ICustomer Customer 
+        public ICustomer Customer
         {
             get
             {
@@ -855,14 +855,16 @@ using ChargifyNET.Json;
         /// <summary>
         /// The total subscription revenue (in dollars and cents)
         /// </summary>
-        public decimal TotalRevenue {
-            get { return Convert.ToDecimal(this._totalRevenueInCents) / 100; } 
+        public decimal TotalRevenue
+        {
+            get { return Convert.ToDecimal(this._totalRevenueInCents) / 100; }
         }
         /// <summary>
         /// The total subscription revenue (in cents)
         /// </summary>
-        public int TotalRevenueInCents {
-            get { return _totalRevenueInCents; } 
+        public int TotalRevenueInCents
+        {
+            get { return _totalRevenueInCents; }
         }
         private int _totalRevenueInCents = int.MinValue;
 
@@ -891,7 +893,8 @@ using ChargifyNET.Json;
         /// <summary>
         /// At what price was the product on when initial subscribed? (in cents)
         /// </summary>
-        public int ProductPriceInCents {
+        public int ProductPriceInCents
+        {
             get { return _productPriceInCents; }
         }
         private int _productPriceInCents = int.MinValue;
@@ -899,7 +902,8 @@ using ChargifyNET.Json;
         /// <summary>
         /// At what price was the product on when initial subscribed? (in dollars and cents)
         /// </summary>
-        public decimal ProductPrice {
+        public decimal ProductPrice
+        {
             get { return Convert.ToDecimal(this._productPriceInCents) / 100; }
         }
 
@@ -1056,6 +1060,5 @@ using ChargifyNET.Json;
         }
 
         #endregion
-
     }
 }

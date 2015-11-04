@@ -212,6 +212,26 @@ namespace ChargifyNET
         IPayment AddPayment(int SubscriptionID, int AmountInCents, string Memo);
         #endregion
 
+        #region Subscription Override
+        /// <summary>
+        /// This API endpoint allows you to set certain subscription fields that are usually managed for you automatically. Some of the fields can be set via the normal Subscriptions Update API, but others can only be set using this endpoint.
+        /// </summary>
+        /// <param name="SubscriptionID"></param>
+        /// <param name="OverrideDetails"></param>
+        /// <returns>The details returned by Chargify</returns>
+        bool SetSubscriptionOverride(int SubscriptionID, ISubscriptionOverride OverrideDetails);
+        /// <summary>
+        /// This API endpoint allows you to set certain subscription fields that are usually managed for you automatically. Some of the fields can be set via the normal Subscriptions Update API, but others can only be set using this endpoint.
+        /// </summary>
+        /// <param name="SubscriptionID"></param>
+        /// <param name="ActivatedAt"></param>
+        /// <param name="CanceledAt"></param>
+        /// <param name="CancellationMessage"></param>
+        /// <param name="ExpiresAt"></param>
+        /// <returns></returns>
+        bool SetSubscriptionOverride(int SubscriptionID, DateTime? ActivatedAt = null, DateTime? CanceledAt = null, string CancellationMessage = null, DateTime? ExpiresAt = null);
+        #endregion
+
         /// <summary>
         /// Method for adding a metered component usage to the subscription
         /// </summary>
@@ -321,6 +341,7 @@ namespace ChargifyNET
         /// <param name="memo">A note regarding the reason for the credit</param>
         /// <returns>The object if successful, null otherwise.</returns>
         ICredit CreateCredit(int SubscriptionID, decimal amount, string memo);
+
         #region Customer
         /// <summary>
         /// Create a new chargify customer
@@ -356,6 +377,7 @@ namespace ChargifyNET
         /// <remarks>This method does not currently work, but it will once they open up the API. This will always return false, as Chargify will send a Http Forbidden everytime.</remarks>
         bool DeleteCustomer(string SystemID);
         #endregion
+
         #region Subscriptions
         /// <summary>
         /// Create a new subscription and a new customer at the same time without submitting PaymentProfile attributes

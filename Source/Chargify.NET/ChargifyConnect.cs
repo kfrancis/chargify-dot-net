@@ -832,9 +832,9 @@ namespace ChargifyNET
             }
         }
 
-#endregion
+        #endregion
 
-#region Products
+        #region Products
 
         /// <summary>
         /// Method to create a new product and add it to the site
@@ -989,9 +989,9 @@ namespace ChargifyNET
             return retValue;
         }
 
-#endregion
+        #endregion
 
-#region Product Families
+        #region Product Families
         /// <summary>
         /// Method for creating a new product family via the API
         /// </summary>
@@ -1132,9 +1132,9 @@ namespace ChargifyNET
                 throw;
             }
         }
-#endregion
+        #endregion
 
-#region Subscriptions
+        #region Subscriptions
 
         /// <summary>
         /// Method to get the secure URL (with pretty id) for updating the payment details for a subscription.
@@ -3195,9 +3195,70 @@ namespace ChargifyNET
             }
         }
 
-#endregion
+        #endregion
 
-#region Migrations
+        #region Subscription Override
+        /// <summary>
+        /// This API endpoint allows you to set certain subscription fields that are usually managed for you automatically. Some of the fields can be set via the normal Subscriptions Update API, but others can only be set using this endpoint.
+        /// </summary>
+        /// <param name="SubscriptionID"></param>
+        /// <param name="OverrideDetails"></param>
+        /// <returns>The details returned by Chargify</returns>
+        public bool SetSubscriptionOverride(int SubscriptionID, ISubscriptionOverride OverrideDetails)
+        {
+            if (OverrideDetails == null) throw new ArgumentNullException("OverrideDetails");
+            return SetSubscriptionOverride(SubscriptionID, OverrideDetails.ActivatedAt, OverrideDetails.CanceledAt, OverrideDetails.CancellationMessage, OverrideDetails.ExpiresAt);
+        }
+
+        /// <summary>
+        /// This API endpoint allows you to set certain subscription fields that are usually managed for you automatically. Some of the fields can be set via the normal Subscriptions Update API, but others can only be set using this endpoint.
+        /// </summary>
+        /// <param name="SubscriptionID"></param>
+        /// <param name="ActivatedAt"></param>
+        /// <param name="CanceledAt"></param>
+        /// <param name="CancellationMessage"></param>
+        /// <param name="ExpiresAt"></param>
+        /// <returns>The details returned by Chargify</returns>
+        public bool SetSubscriptionOverride(int SubscriptionID, DateTime? ActivatedAt = null, DateTime? CanceledAt = null, string CancellationMessage = null, DateTime? ExpiresAt = null)
+        {
+            try
+            {
+                // make sure data is valid
+                if (ActivatedAt == null && CanceledAt == null && CancellationMessage == null && ExpiresAt == null)
+                {
+                    throw new ArgumentException("No valid parameters provided");
+                }
+
+                // make sure that the SubscriptionID is unique
+                if (this.LoadSubscription(SubscriptionID) == null) throw new ArgumentException("No subscription found with that ID", "SubscriptionID");
+
+                // create XML for creation of a charge
+                var OverrideXML = new StringBuilder(GetXMLStringIfApplicable());
+                OverrideXML.Append("<subscription>");
+                if (ActivatedAt.HasValue) { OverrideXML.AppendFormat("<activated_at>{0}</activated_at>", ActivatedAt.Value.ToString("o")); }
+                if (!string.IsNullOrEmpty(CancellationMessage)) { OverrideXML.AppendFormat("<cancellation_message>{0}</cancellation_message>", HttpUtility.HtmlEncode(CancellationMessage)); }
+                if (CanceledAt.HasValue) { OverrideXML.AppendFormat("<canceled_at>{0}</canceled_at>", CanceledAt.Value.ToString("o")); }
+                if (ExpiresAt.HasValue) { OverrideXML.AppendFormat("<expires_at>{0}</expires_at>", ExpiresAt.Value.ToString("o")); }
+                OverrideXML.Append("</subscription>");
+
+                // now make the request
+                var result = this.DoRequest(string.Format("subscriptions/{0}/override.{1}", SubscriptionID, GetMethodExtension()), HttpRequestMethod.Put, OverrideXML.ToString());
+                return result == string.Empty;
+            }
+            catch (ChargifyException cex)
+            {
+                switch (cex.StatusCode)
+                {
+                    case HttpStatusCode.BadRequest:
+                        return false;
+                    default:
+                        throw;
+                }
+            }
+        }
+        #endregion
+
+        #region Migrations
         /// <summary>
         /// Return a preview of charges for a subscription product migrations
         /// </summary>
@@ -3266,9 +3327,9 @@ namespace ChargifyNET
             if (Product == null) throw new ArgumentNullException("Product");
             return PreviewMigrateSubscriptionProduct(Subscription.SubscriptionID, Product.ID);
         }
-#endregion
+        #endregion
 
-#region Coupons
+        #region Coupons
 
         /// <summary>
         /// Method for retrieving information about a coupon using the ID of that coupon.
@@ -3430,9 +3491,9 @@ namespace ChargifyNET
             return CouponXML.ToString();
 
         }
-#endregion
+        #endregion
 
-#region One-Time Charges
+        #region One-Time Charges
 
         /// <summary>
         /// Create a new one-time charge
@@ -3492,9 +3553,9 @@ namespace ChargifyNET
             return response.ConvertResponseTo<Charge>("charge");
         }
 
-#endregion
+        #endregion
 
-#region One-Time Credits
+        #region One-Time Credits
 
         /// <summary>
         /// Create a new one-time credit
@@ -3534,9 +3595,9 @@ namespace ChargifyNET
             // change the response to the object
             return response.ConvertResponseTo<Credit>("credit");
         }
-#endregion
+        #endregion
 
-#region Components
+        #region Components
 
         /// <summary>
         /// Method to update the allocated amount of a component for a subscription
@@ -3852,9 +3913,9 @@ namespace ChargifyNET
             }
         }
 
-#endregion
+        #endregion
 
-#region Component Allocations
+        #region Component Allocations
         /// <summary>
         /// Returns the 50 most recent Allocations, ordered by most recent first.
         /// </summary>
@@ -4044,9 +4105,9 @@ namespace ChargifyNET
             return ComponentAllocationXML.ToString();
 
         }
-#endregion
+        #endregion
 
-#region Transactions
+        #region Transactions
         /// <summary>
         /// Method for getting a list of transactions
         /// </summary>
@@ -4447,9 +4508,9 @@ namespace ChargifyNET
             }
         }
 
-#endregion
+        #endregion
 
-#region Refunds
+        #region Refunds
         /// <summary>
         /// Create a refund
         /// </summary>
@@ -4489,9 +4550,9 @@ namespace ChargifyNET
             // change the response to the object            
             return response.ConvertResponseTo<Refund>("refund");
         }
-#endregion
+        #endregion
 
-#region Statements
+        #region Statements
         /// <summary>
         /// Method for getting a specific statement
         /// </summary>
@@ -4709,9 +4770,9 @@ namespace ChargifyNET
             }
             return retValue;
         }
-#endregion
+        #endregion
 
-#region Statistics
+        #region Statistics
 
         /// <summary>
         /// Method for getting the statstics of a Chargify site
@@ -4732,9 +4793,9 @@ namespace ChargifyNET
             }
         }
 
-#endregion
+        #endregion
 
-#region Adjustments
+        #region Adjustments
         /// <summary>
         /// Method for applying an adjustment to a subscription
         /// </summary>
@@ -4818,9 +4879,9 @@ namespace ChargifyNET
             // change the response to the object
             return response.ConvertResponseTo<Adjustment>("adjustment");
         }
-#endregion
+        #endregion
 
-#region Billing Portal
+        #region Billing Portal
         /// <summary>
         /// From http://docs.chargify.com/api-billing-portal
         /// </summary>
@@ -4843,9 +4904,9 @@ namespace ChargifyNET
                 throw;
             }
         }
-#endregion
+        #endregion
 
-#region Invoices
+        #region Invoices
         /// <summary>
         /// Gets a list of invoices
         /// </summary>
@@ -4868,9 +4929,9 @@ namespace ChargifyNET
             }
             return retValue;
         }
-#endregion
+        #endregion
 
-#region Sites
+        #region Sites
         /// <summary>
         /// Clean up a site in test mode.
         /// </summary>
@@ -4897,13 +4958,13 @@ namespace ChargifyNET
                 // All we're expecting back is 200 OK when it works, and 403 FORBIDDEN when it's not being called appropriately.
                 retVal = true;
             }
-            catch(ChargifyException) {}
+            catch (ChargifyException) { }
 
             return retVal;
         }
-#endregion
+        #endregion
 
-#region Payments
+        #region Payments
         /// <summary>
         /// Chargify allows you to record payments that occur outside of the normal flow of payment processing.
         /// These payments are considered external payments.A common case to apply such a payment is when a 
@@ -4948,9 +5009,9 @@ namespace ChargifyNET
             return response.ConvertResponseTo<Payment>("payment");
         }
 
-#endregion
+        #endregion
 
-#region Utility Methods
+        #region Utility Methods
         private Dictionary<int, T> GetListedJSONResponse<T>(string key, string response)
             where T : class, IChargifyEntity
         {
@@ -5014,9 +5075,9 @@ namespace ChargifyNET
 
             return retValue;
         }
-#endregion
+        #endregion
 
-#region Request Methods
+        #region Request Methods
 
         /// <summary>
         /// Should the URI method extension be json or xml?
@@ -5341,6 +5402,6 @@ namespace ChargifyNET
                 }
             }
         }
-#endregion
+        #endregion
     }
 }
