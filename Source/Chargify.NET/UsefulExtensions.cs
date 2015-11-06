@@ -46,6 +46,13 @@
                 output.Write(b, 0, r);
         }
 
+        /// <summary>
+        /// Determine if the webhook request is valid by calculating the expected signature and comparing it
+        /// </summary>
+        /// <param name="requestStream">The request stream</param>
+        /// <param name="sharedKey">The site shared key from Chargify</param>
+        /// <param name="givenSignature">The signature returned along side the webhook for verification</param>
+        /// <returns>True if verified, false otherwise.</returns>
         public static bool IsWebhookRequestValid(this Stream requestStream, string sharedKey, string givenSignature = null)
         {
             bool retVal = true;
