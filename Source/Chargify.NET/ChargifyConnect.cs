@@ -615,30 +615,30 @@ namespace ChargifyNET
             if (Customer.ChargifyID == int.MinValue) throw new ArgumentException("Invalid chargify ID detected", "Customer.ChargifyID");
             ICustomer OldCust = this.LoadCustomer(Customer.ChargifyID);
             // create XML for creation of customer
-            StringBuilder CustomerXML = new StringBuilder(GetXMLStringIfApplicable());
-            CustomerXML.Append("<customer>");
+            var customerXml = new StringBuilder(GetXMLStringIfApplicable());
+            customerXml.Append("<customer>");
             if (OldCust != null)
             {
                 if (OldCust.ChargifyID != Customer.ChargifyID) throw new ArgumentException("Not unique", "Customer.SystemID");
-                if (OldCust.FirstName != Customer.FirstName) CustomerXML.AppendFormat("<first_name>{0}</first_name>", HttpUtility.HtmlEncode(Customer.FirstName));
-                if (OldCust.LastName != Customer.LastName) CustomerXML.AppendFormat("<last_name>{0}</last_name>", HttpUtility.HtmlEncode(Customer.LastName));
-                if (OldCust.Email != Customer.Email) CustomerXML.AppendFormat("<email>{0}</email>", Customer.Email);
-                if (OldCust.Organization != Customer.Organization) CustomerXML.AppendFormat("<organization>{0}</organization>", HttpUtility.HtmlEncode(Customer.Organization));
-                if (OldCust.Phone != Customer.Phone) CustomerXML.AppendFormat("<phone>{0}</phone>", HttpUtility.HtmlEncode(Customer.Phone));
-                if (OldCust.SystemID != Customer.SystemID) CustomerXML.AppendFormat("<reference>{0}</reference>", Customer.SystemID);
-                if (OldCust.ShippingAddress != Customer.ShippingAddress) CustomerXML.AppendFormat("<address>{0}</address>", HttpUtility.HtmlEncode(Customer.ShippingAddress));
-                if (OldCust.ShippingAddress2 != Customer.ShippingAddress2) CustomerXML.AppendFormat("<address_2>{0}</address_2>", HttpUtility.HtmlEncode(Customer.ShippingAddress2));
-                if (OldCust.ShippingCity != Customer.ShippingCity) CustomerXML.AppendFormat("<city>{0}</city>", HttpUtility.HtmlEncode(Customer.ShippingCity));
-                if (OldCust.ShippingState != Customer.ShippingState) CustomerXML.AppendFormat("<state>{0}</state>", HttpUtility.HtmlEncode(Customer.ShippingState));
-                if (OldCust.ShippingZip != Customer.ShippingZip) CustomerXML.AppendFormat("<zip>{0}</zip>", Customer.ShippingZip);
-                if (OldCust.ShippingCountry != Customer.ShippingCountry) CustomerXML.AppendFormat("<country>{0}</country>", HttpUtility.HtmlEncode(Customer.ShippingCountry));
+                if (OldCust.FirstName != Customer.FirstName) customerXml.AppendFormat("<first_name>{0}</first_name>", HttpUtility.HtmlEncode(Customer.FirstName));
+                if (OldCust.LastName != Customer.LastName) customerXml.AppendFormat("<last_name>{0}</last_name>", HttpUtility.HtmlEncode(Customer.LastName));
+                if (OldCust.Email != Customer.Email) customerXml.AppendFormat("<email>{0}</email>", Customer.Email);
+                if (OldCust.Organization != Customer.Organization) customerXml.AppendFormat("<organization>{0}</organization>", HttpUtility.HtmlEncode(Customer.Organization));
+                if (OldCust.Phone != Customer.Phone) customerXml.AppendFormat("<phone>{0}</phone>", HttpUtility.HtmlEncode(Customer.Phone));
+                if (OldCust.SystemID != Customer.SystemID) customerXml.AppendFormat("<reference>{0}</reference>", Customer.SystemID);
+                if (OldCust.ShippingAddress != Customer.ShippingAddress) customerXml.AppendFormat("<address>{0}</address>", HttpUtility.HtmlEncode(Customer.ShippingAddress));
+                if (OldCust.ShippingAddress2 != Customer.ShippingAddress2) customerXml.AppendFormat("<address_2>{0}</address_2>", HttpUtility.HtmlEncode(Customer.ShippingAddress2));
+                if (OldCust.ShippingCity != Customer.ShippingCity) customerXml.AppendFormat("<city>{0}</city>", HttpUtility.HtmlEncode(Customer.ShippingCity));
+                if (OldCust.ShippingState != Customer.ShippingState) customerXml.AppendFormat("<state>{0}</state>", HttpUtility.HtmlEncode(Customer.ShippingState));
+                if (OldCust.ShippingZip != Customer.ShippingZip) customerXml.AppendFormat("<zip>{0}</zip>", Customer.ShippingZip);
+                if (OldCust.ShippingCountry != Customer.ShippingCountry) customerXml.AppendFormat("<country>{0}</country>", HttpUtility.HtmlEncode(Customer.ShippingCountry));
             }
-            CustomerXML.Append("</customer>");
+            customerXml.Append("</customer>");
 
             try
             {
                 // now make the request
-                string response = this.DoRequest(string.Format("customers/{0}.{1}", Customer.ChargifyID, GetMethodExtension()), HttpRequestMethod.Put, CustomerXML.ToString());
+                string response = this.DoRequest(string.Format("customers/{0}.{1}", Customer.ChargifyID, GetMethodExtension()), HttpRequestMethod.Put, customerXml.ToString());
                 // change the response to the object
                 return response.ConvertResponseTo<Customer>("customer");
             }
@@ -1845,57 +1845,57 @@ namespace ChargifyNET
             if (this._cvvRequired && string.IsNullOrEmpty(CVV)) throw new ArgumentNullException("CVV");
             if (this._cvvRequired && ((CVV.Length < 3) || (CVV.Length > 4))) throw new ArgumentException("CVV must be 3 or 4 digits", "CVV");
 
-            if (!string.IsNullOrEmpty(NewSystemID))
-            {
-                // make sure that the system ID is unique
-                if (this.LoadCustomer(NewSystemID) != null) throw new ArgumentException("Not unique", "NewSystemID");
-            }
+            //if (!string.IsNullOrEmpty(NewSystemID))
+            //{
+            //    // make sure that the system ID is unique
+            //    if (this.LoadCustomer(NewSystemID) != null) throw new ArgumentException("Not unique", "NewSystemID");
+            //}
 
             // create XML for creation of customer
-            StringBuilder SubscriptionXML = new StringBuilder(GetXMLStringIfApplicable());
-            SubscriptionXML.Append("<subscription>");
-            SubscriptionXML.AppendFormat("<product_handle>{0}</product_handle>", ProductHandle);
-            SubscriptionXML.Append("<customer_attributes>");
-            SubscriptionXML.AppendFormat("<first_name>{0}</first_name>", FirstName);
-            SubscriptionXML.AppendFormat("<last_name>{0}</last_name>", LastName);
-            SubscriptionXML.AppendFormat("<email>{0}</email>", EmailAddress);
-            if (!string.IsNullOrEmpty(Phone)) SubscriptionXML.AppendFormat("<phone>{0}</phone>", Phone);
-            SubscriptionXML.AppendFormat("<organization>{0}</organization>", (Organization != null) ? HttpUtility.HtmlEncode(Organization) : "null");
-            SubscriptionXML.AppendFormat("<reference>{0}</reference>", NewSystemID.ToString());
-            if (!string.IsNullOrEmpty(ShippingAddress)) SubscriptionXML.AppendFormat("<address>{0}</address>", ShippingAddress);
-            if (!string.IsNullOrEmpty(ShippingCity)) SubscriptionXML.AppendFormat("<city>{0}</city>", ShippingCity);
-            if (!string.IsNullOrEmpty(ShippingState)) SubscriptionXML.AppendFormat("<state>{0}</state>", ShippingState);
-            if (!string.IsNullOrEmpty(ShippingZip)) SubscriptionXML.AppendFormat("<zip>{0}</zip>", ShippingZip);
-            if (!string.IsNullOrEmpty(ShippingCountry)) SubscriptionXML.AppendFormat("<country>{0}</country>", ShippingCountry);
-            SubscriptionXML.Append("</customer_attributes>");
-            SubscriptionXML.Append("<credit_card_attributes>");
-            SubscriptionXML.AppendFormat("<full_number>{0}</full_number>", FullNumber);
-            SubscriptionXML.AppendFormat("<expiration_month>{0}</expiration_month>", ExpirationMonth);
-            SubscriptionXML.AppendFormat("<expiration_year>{0}</expiration_year>", ExpirationYear);
-            if (this._cvvRequired) { SubscriptionXML.AppendFormat("<cvv>{0}</cvv>", CVV); }
-            if (!string.IsNullOrEmpty(BillingAddress)) SubscriptionXML.AppendFormat("<billing_address>{0}</billing_address>", BillingAddress);
-            if (!string.IsNullOrEmpty(BillingCity)) SubscriptionXML.AppendFormat("<billing_city>{0}</billing_city>", BillingCity);
-            if (!string.IsNullOrEmpty(BillingState)) SubscriptionXML.AppendFormat("<billing_state>{0}</billing_state>", BillingState);
-            if (!string.IsNullOrEmpty(BillingZip)) SubscriptionXML.AppendFormat("<billing_zip>{0}</billing_zip>", BillingZip);
-            if (!string.IsNullOrEmpty(BillingCountry)) SubscriptionXML.AppendFormat("<billing_country>{0}</billing_country>", BillingCountry);
-            SubscriptionXML.Append("</credit_card_attributes>");
-            if (!string.IsNullOrEmpty(CouponCode)) { SubscriptionXML.AppendFormat("<coupon_code>{0}</coupon_code>", CouponCode); }
-            if (NextBillingAt.HasValue) { SubscriptionXML.AppendFormat("<next_billing_at>{0}</next_billing_at>", NextBillingAt.Value.ToString("o")); }
+            var subscriptionXml = new StringBuilder(GetXMLStringIfApplicable());
+            subscriptionXml.Append("<subscription>");
+            subscriptionXml.AppendFormat("<product_handle>{0}</product_handle>", ProductHandle);
+            subscriptionXml.Append("<customer_attributes>");
+            subscriptionXml.AppendFormat("<first_name>{0}</first_name>", FirstName);
+            subscriptionXml.AppendFormat("<last_name>{0}</last_name>", LastName);
+            subscriptionXml.AppendFormat("<email>{0}</email>", EmailAddress);
+            if (!string.IsNullOrEmpty(Phone)) subscriptionXml.AppendFormat("<phone>{0}</phone>", Phone);
+            subscriptionXml.AppendFormat("<organization>{0}</organization>", (Organization != null) ? HttpUtility.HtmlEncode(Organization) : "null");
+            subscriptionXml.AppendFormat("<reference>{0}</reference>", NewSystemID.ToString());
+            if (!string.IsNullOrEmpty(ShippingAddress)) subscriptionXml.AppendFormat("<address>{0}</address>", ShippingAddress);
+            if (!string.IsNullOrEmpty(ShippingCity)) subscriptionXml.AppendFormat("<city>{0}</city>", ShippingCity);
+            if (!string.IsNullOrEmpty(ShippingState)) subscriptionXml.AppendFormat("<state>{0}</state>", ShippingState);
+            if (!string.IsNullOrEmpty(ShippingZip)) subscriptionXml.AppendFormat("<zip>{0}</zip>", ShippingZip);
+            if (!string.IsNullOrEmpty(ShippingCountry)) subscriptionXml.AppendFormat("<country>{0}</country>", ShippingCountry);
+            subscriptionXml.Append("</customer_attributes>");
+            subscriptionXml.Append("<credit_card_attributes>");
+            subscriptionXml.AppendFormat("<full_number>{0}</full_number>", FullNumber);
+            subscriptionXml.AppendFormat("<expiration_month>{0}</expiration_month>", ExpirationMonth);
+            subscriptionXml.AppendFormat("<expiration_year>{0}</expiration_year>", ExpirationYear);
+            if (this._cvvRequired) { subscriptionXml.AppendFormat("<cvv>{0}</cvv>", CVV); }
+            if (!string.IsNullOrEmpty(BillingAddress)) subscriptionXml.AppendFormat("<billing_address>{0}</billing_address>", BillingAddress);
+            if (!string.IsNullOrEmpty(BillingCity)) subscriptionXml.AppendFormat("<billing_city>{0}</billing_city>", BillingCity);
+            if (!string.IsNullOrEmpty(BillingState)) subscriptionXml.AppendFormat("<billing_state>{0}</billing_state>", BillingState);
+            if (!string.IsNullOrEmpty(BillingZip)) subscriptionXml.AppendFormat("<billing_zip>{0}</billing_zip>", BillingZip);
+            if (!string.IsNullOrEmpty(BillingCountry)) subscriptionXml.AppendFormat("<billing_country>{0}</billing_country>", BillingCountry);
+            subscriptionXml.Append("</credit_card_attributes>");
+            if (!string.IsNullOrEmpty(CouponCode)) { subscriptionXml.AppendFormat("<coupon_code>{0}</coupon_code>", CouponCode); }
+            if (NextBillingAt.HasValue) { subscriptionXml.AppendFormat("<next_billing_at>{0}</next_billing_at>", NextBillingAt.Value.ToString("o")); }
             if (ComponentsWithQuantity != null && ComponentsWithQuantity.Count > 0)
             {
-                SubscriptionXML.Append(@"<components type=""array"">");
+                subscriptionXml.Append(@"<components type=""array"">");
                 foreach (var item in ComponentsWithQuantity)
                 {
-                    SubscriptionXML.Append("<component>");
-                    SubscriptionXML.Append(string.Format("<component_id>{0}</component_id>", item.Key));
-                    SubscriptionXML.Append(string.Format("<allocated_quantity>{0}</allocated_quantity>", item.Value));
-                    SubscriptionXML.Append("</component>");
+                    subscriptionXml.Append("<component>");
+                    subscriptionXml.Append(string.Format("<component_id>{0}</component_id>", item.Key));
+                    subscriptionXml.Append(string.Format("<allocated_quantity>{0}</allocated_quantity>", item.Value));
+                    subscriptionXml.Append("</component>");
                 }
-                SubscriptionXML.Append("</components>");
+                subscriptionXml.Append("</components>");
             }
-            SubscriptionXML.Append("</subscription>");
+            subscriptionXml.Append("</subscription>");
             // now make the request
-            string response = this.DoRequest(string.Format("subscriptions.{0}", GetMethodExtension()), HttpRequestMethod.Post, SubscriptionXML.ToString());
+            string response = this.DoRequest(string.Format("subscriptions.{0}", GetMethodExtension()), HttpRequestMethod.Post, subscriptionXml.ToString());
             // change the response to the object
             return response.ConvertResponseTo<Subscription>("subscription");
         }
@@ -2476,11 +2476,11 @@ namespace ChargifyNET
             if (string.IsNullOrEmpty(LastName)) throw new ArgumentNullException("LastName");
             if (string.IsNullOrEmpty(EmailAddress)) throw new ArgumentNullException("EmailAddress");
 
-            if (!string.IsNullOrEmpty(NewSystemID))
-            {
-                // make sure that the system ID is unique
-                if (this.LoadCustomer(NewSystemID) != null) throw new ArgumentException("Not unique", "NewSystemID");
-            }
+            //if (!string.IsNullOrEmpty(NewSystemID))
+            //{
+            //    // make sure that the system ID is unique
+            //    if (this.LoadCustomer(NewSystemID) != null) throw new ArgumentException("Not unique", "NewSystemID");
+            //}
             IProduct subscribingProduct = this.LoadProduct(ProductHandle);
             if (subscribingProduct == null) throw new ArgumentException("Product not found", "ProductHandle");
             if (subscribingProduct.RequireCreditCard)
@@ -2490,7 +2490,7 @@ namespace ChargifyNET
             }
 
             // create XML for creation of customer
-            StringBuilder subscriptionXml = new StringBuilder(GetXMLStringIfApplicable());
+            var subscriptionXml = new StringBuilder(GetXMLStringIfApplicable());
             subscriptionXml.Append("<subscription>");
             subscriptionXml.AppendFormat("<product_handle>{0}</product_handle>", ProductHandle);
             subscriptionXml.Append("<customer_attributes>");
@@ -2590,14 +2590,14 @@ namespace ChargifyNET
             //if (string.IsNullOrEmpty(BillingZip)) throw new ArgumentNullException("BillingZip");
             //if (string.IsNullOrEmpty(BillingCountry)) throw new ArgumentNullException("BillingCountry");
 
-            if (!string.IsNullOrEmpty(NewSystemID))
-            {
-                // make sure that the system ID is unique
-                if (this.LoadCustomer(NewSystemID) != null) throw new ArgumentException("Not unique", "NewSystemID");
-            }
+            //if (!string.IsNullOrEmpty(NewSystemID))
+            //{
+            //    // make sure that the system ID is unique
+            //    if (this.LoadCustomer(NewSystemID) != null) throw new ArgumentException("Not unique", "NewSystemID");
+            //}
 
             // create XML for creation of customer
-            StringBuilder subscriptionXml = new StringBuilder(GetXMLStringIfApplicable());
+            var subscriptionXml = new StringBuilder(GetXMLStringIfApplicable());
             subscriptionXml.Append("<subscription>");
             subscriptionXml.AppendFormat("<product_handle>{0}</product_handle>", ProductHandle);
             subscriptionXml.Append("<customer_attributes>");
