@@ -20,6 +20,83 @@ namespace ChargifyDotNetTests
     {
         #region Tests
         [Test]
+        public void Subscription_Create_UsingOptions_ProductHandle()
+        {
+            // Arrange
+            var exampleCustomer = Chargify.GetCustomerList().Values.DefaultIfEmpty(defaultValue: null).FirstOrDefault();
+            var paymentInfo = GetTestPaymentMethod(exampleCustomer.ToCustomerAttributes() as CustomerAttributes);
+            var product = Chargify.GetProductList().Values.FirstOrDefault();
+            var options = new SubscriptionCreateOptions()
+            {
+                CustomerID = exampleCustomer.ChargifyID,
+                CreditCardAttributes = paymentInfo,
+                ProductHandle = product.Handle
+            };
+
+            // Act
+            var result = this.Chargify.CreateSubscription(options);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(product.Handle, result.Product.Handle);
+            Assert.AreEqual(exampleCustomer.ChargifyID, result.Customer.ChargifyID);
+        }
+
+        [Test, ExpectedException(typeof(ArgumentException))]
+        public void Subscription_Create_UsingOptions_TooManyProducts()
+        {
+            // Arrange
+            var exampleCustomer = Chargify.GetCustomerList().Values.DefaultIfEmpty(defaultValue: null).FirstOrDefault();
+            var paymentInfo = GetTestPaymentMethod(exampleCustomer.ToCustomerAttributes() as CustomerAttributes);
+            var product = Chargify.GetProductList().Values.FirstOrDefault();
+            var options = new SubscriptionCreateOptions()
+            {
+                CustomerID = exampleCustomer.ChargifyID,
+                CreditCardAttributes = paymentInfo,
+                ProductHandle = product.Handle,
+                ProductID = product.ID
+            };
+
+            // Act
+            var result = this.Chargify.CreateSubscription(options);
+        }
+
+        [Test, ExpectedException(typeof(ArgumentException))]
+        public void Subscription_Create_UsingOptions_MissingProduct()
+        {
+            // Arrange
+            var exampleCustomer = Chargify.GetCustomerList().Values.DefaultIfEmpty(defaultValue: null).FirstOrDefault();
+            var paymentInfo = GetTestPaymentMethod(exampleCustomer.ToCustomerAttributes() as CustomerAttributes);
+            var options = new SubscriptionCreateOptions() {
+                CustomerID = exampleCustomer.ChargifyID,
+                CreditCardAttributes = paymentInfo
+            };
+
+            // Act
+            var result = this.Chargify.CreateSubscription(options);
+        }
+
+        [Test, ExpectedException(typeof(ArgumentException))]
+        public void Subscription_Create_UsingOptions_MissingAllDetails()
+        {
+            // Arrange
+            var options = new SubscriptionCreateOptions();
+
+            // Act
+            var result = this.Chargify.CreateSubscription(options);
+        }
+
+        [Test, ExpectedException(typeof(ArgumentNullException))]
+        public void Subscription_Create_UsingOptions_Null()
+        {
+            // Arrange
+            SubscriptionCreateOptions options = null;
+
+            // Act
+            var result = this.Chargify.CreateSubscription(options);
+        }
+
+        [Test]
         public void Subscription_Create_Using_Existing_Customer()
         {
             // Arrange
@@ -330,8 +407,17 @@ namespace ChargifyDotNetTests
             Assert.IsTrue(newSubscription.PaymentProfile.BillingZip == newPaymentInfo.BillingZip);
             Assert.IsTrue(newSubscription.ProductPriceInCents == product.PriceInCents);
             Assert.IsTrue(newSubscription.ProductPrice == product.Price);
-            Assert.AreEqual(product.TrialInterval > int.MinValue ? SubscriptionState.Trialing : SubscriptionState.Active, newSubscription.State);
-            Assert.AreEqual(Chargify.UseJSON, Chargify.UseJSON ? data.IsJSON() : data.IsXml());
+            Assert.AreEqual(product.TrialInterval > 0 ? SubscriptionState.Trialing : SubscriptionState.Active, newSubscription.State);
+            if (Chargify.UseJSON)
+            {
+                Assert.AreEqual(true, data.IsJSON());
+                Assert.AreEqual(false, data.IsXml());
+            }
+            else
+            {
+                Assert.AreEqual(true, data.IsXml());
+                Assert.AreEqual(false, data.IsJSON());
+            }
 
             // Cleanup
             Assert.IsTrue(Chargify.DeleteSubscription(newSubscription.SubscriptionID, "Automatic cancel due to test"));

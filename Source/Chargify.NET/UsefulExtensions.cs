@@ -15,6 +15,11 @@
     using System.Xml;
     #endregion
 
+    public class Utf8StringWriter : StringWriter
+    {
+        public override Encoding Encoding => Encoding.UTF8;
+    }
+
     /// <summary>
     /// Extension class
     /// </summary>

@@ -380,6 +380,12 @@ namespace ChargifyNET
 
         #region Subscriptions
         /// <summary>
+        /// Create a subscription
+        /// </summary>
+        /// <param name="options">The input options for creating a subscription</param>
+        /// <returns>The subscription</returns>
+        ISubscription CreateSubscription(ISubscriptionCreateOptions options);
+        /// <summary>
         /// Create a new subscription and a new customer at the same time without submitting PaymentProfile attributes
         /// </summary>
         /// <param name="ProductHandle">The handle to the product</param>
@@ -457,6 +463,7 @@ namespace ChargifyNET
         /// <param name="CreditCardAttributes">The credit card attributes</param>
         /// <returns>The xml describing the new subsscription</returns>
         ISubscription CreateSubscription(string ProductHandle, int ChargifyID, ICreditCardAttributes CreditCardAttributes);
+        //ISubscription CreateSubscription(string ProductHandle, int ChargifyID, ICreditCardAttributes CreditCardAttributes, DateTime NextBillingAt);
         /// <summary>
         /// Create a subscription using a coupon for discounted rate, without using credit card information.
         /// </summary>
@@ -482,6 +489,15 @@ namespace ChargifyNET
         /// <param name="CreditCardAttributes">The credit card attributes</param>
         /// <returns>The xml describing the new subsscription</returns>
         ISubscription CreateSubscription(string ProductHandle, string SystemID, ICreditCardAttributes CreditCardAttributes);
+        ///// <summary>
+        ///// Create a new subscription 
+        ///// </summary>
+        ///// <param name="ProductHandle">The handle to the product</param>
+        ///// <param name="SystemID">The System ID of the customer</param>
+        ///// <param name="CreditCardAttributes">The credit card attributes</param>
+        ///// <param name="NextBillingAt"></param>
+        ///// <returns>The new subscription</returns>
+        //ISubscription CreateSubscription(string ProductHandle, string SystemID, ICreditCardAttributes CreditCardAttributes, DateTime NextBillingAt);
         /// <summary>
         /// Create a new subscription and a new customer at the same time
         /// </summary>

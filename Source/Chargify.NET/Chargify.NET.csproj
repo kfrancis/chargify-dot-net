@@ -97,6 +97,7 @@
     <Compile Include="Interfaces\IMetadataResult.cs" />
     <Compile Include="Interfaces\IPublicSignupPage.cs" />
     <Compile Include="Interfaces\IPayment.cs" />
+    <Compile Include="Interfaces\ISubscriptionCreateOptions.cs" />
     <Compile Include="Interfaces\ISubscriptionOverride.cs" />
     <Compile Include="Metadata.cs" />
     <Compile Include="MetadataResult.cs" />
