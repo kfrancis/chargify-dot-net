@@ -289,6 +289,12 @@ namespace ChargifyNET
         /// Get or set the customer's organization
         /// </summary>
         public string Organization { get; set; }
+
+        /// <summary>
+        /// The customers vat number
+        /// </summary>
+        public string VatNumber { get; set; }
+
         /// <summary>
         /// The customers shipping address
         /// </summary>
