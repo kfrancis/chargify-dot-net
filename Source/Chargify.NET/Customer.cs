@@ -169,6 +169,9 @@ namespace ChargifyNET
                     case CustomerAttributes.ShippingZipKey:
                         this.ShippingZip = obj.GetJSONContentAsString(key);
                         break;
+                    case CustomerAttributes.VatNumberKey:
+                        this.VatNumber = obj.GetJSONContentAsString(key);
+                        break;
                     default:
                         break;
                 }
@@ -229,6 +232,9 @@ namespace ChargifyNET
                         break;
                     case CustomerAttributes.ShippingZipKey:
                         this.ShippingZip = dataNode.GetNodeContentAsString();
+                        break;
+                    case CustomerAttributes.VatNumberKey:
+                        this.VatNumber = dataNode.GetNodeContentAsString();
                         break;
                     default:
                         break;
