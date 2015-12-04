@@ -51,6 +51,7 @@ namespace ChargifyNET
         internal const string EmailKey = "email";
         internal const string PhoneKey = "phone";
         internal const string OrganizationKey = "organization";
+        internal const string VatNumberKey = "vat_number";
         internal const string ReferenceKey = "reference";
         internal const string IDKey = "id";
         internal const string CreatedAtKey = "created_at";
