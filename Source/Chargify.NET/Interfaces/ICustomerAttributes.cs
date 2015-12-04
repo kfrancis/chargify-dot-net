@@ -59,6 +59,11 @@ namespace ChargifyNET
         /// Get or set the customer's organization
         /// </summary>
         string Organization { get; set; }
+
+        /// <summary>
+        /// The customers vat number
+        /// </summary>
+        string VatNumber { get; set; }
         /// <summary>
         /// Get or set the customer's ID in the calling system
         /// </summary>
