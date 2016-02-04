@@ -1847,7 +1847,7 @@ namespace ChargifyNET
             if (CreditCardAttributes == null) throw new ArgumentNullException("CreditCardAttributes");
             if (CustomerAttributes == null) throw new ArgumentNullException("CustomerAttributes");
             return CreateSubscription(ProductHandle, CustomerAttributes.SystemID, CustomerAttributes.FirstName,
-                                      CustomerAttributes.LastName, CustomerAttributes.Email, CustomerAttributes.Phone, CustomerAttributes.Organization,
+                                      CustomerAttributes.LastName, CustomerAttributes.Email, CustomerAttributes.Phone, CustomerAttributes.Organization, CustomerAttributes.VatNumber,
                                       CustomerAttributes.ShippingAddress, CustomerAttributes.ShippingCity, CustomerAttributes.ShippingState, CustomerAttributes.ShippingZip, CustomerAttributes.ShippingCountry,
                                       CreditCardAttributes.FullNumber, CreditCardAttributes.ExpirationMonth,
                                       CreditCardAttributes.ExpirationYear, CreditCardAttributes.CVV, CreditCardAttributes.BillingAddress, CreditCardAttributes.BillingCity,
@@ -1987,7 +1987,7 @@ namespace ChargifyNET
             if (CreditCardAttributes == null) throw new ArgumentNullException("CreditCardAttributes");
             if (CustomerAttributes == null) throw new ArgumentNullException("CustomerAttributes");
             return CreateSubscription(ProductHandle, CustomerAttributes.SystemID, CustomerAttributes.FirstName,
-                                      CustomerAttributes.LastName, CustomerAttributes.Email, CustomerAttributes.Phone, CustomerAttributes.Organization,
+                                      CustomerAttributes.LastName, CustomerAttributes.Email, CustomerAttributes.Phone, CustomerAttributes.Organization, CustomerAttributes.VatNumber,
                                       CustomerAttributes.ShippingAddress, CustomerAttributes.ShippingCity, CustomerAttributes.ShippingState, CustomerAttributes.ShippingZip, CustomerAttributes.ShippingCountry,
                                       CreditCardAttributes.FullNumber, CreditCardAttributes.ExpirationMonth,
                                       CreditCardAttributes.ExpirationYear, CreditCardAttributes.CVV, CreditCardAttributes.BillingAddress, CreditCardAttributes.BillingCity,
@@ -2057,7 +2057,7 @@ namespace ChargifyNET
             if (CreditCardAttributes == null) throw new ArgumentNullException("CreditCardAttributes");
             if (CustomerAttributes == null) throw new ArgumentNullException("CustomerAttributes");
             return CreateSubscription(ProductHandle, CustomerAttributes.SystemID, CustomerAttributes.FirstName,
-                                      CustomerAttributes.LastName, CustomerAttributes.Email, CustomerAttributes.Phone, CustomerAttributes.Organization,
+                                      CustomerAttributes.LastName, CustomerAttributes.Email, CustomerAttributes.Phone, CustomerAttributes.Organization, CustomerAttributes.VatNumber,
                                       CustomerAttributes.ShippingAddress, CustomerAttributes.ShippingCity, CustomerAttributes.ShippingState, CustomerAttributes.ShippingZip, CustomerAttributes.ShippingCountry,
                                       CreditCardAttributes.FullNumber, CreditCardAttributes.ExpirationMonth,
                                       CreditCardAttributes.ExpirationYear, CreditCardAttributes.CVV, CreditCardAttributes.BillingAddress, CreditCardAttributes.BillingCity,
@@ -2104,7 +2104,7 @@ namespace ChargifyNET
             if (CreditCardAttributes == null) throw new ArgumentNullException("CreditCardAttributes");
             if (CustomerAttributes == null) throw new ArgumentNullException("CustomerAttributes");
             return CreateSubscription(ProductHandle, CustomerAttributes.SystemID, CustomerAttributes.FirstName,
-                                      CustomerAttributes.LastName, CustomerAttributes.Email, CustomerAttributes.Phone, CustomerAttributes.Organization,
+                                      CustomerAttributes.LastName, CustomerAttributes.Email, CustomerAttributes.Phone, CustomerAttributes.Organization, CustomerAttributes.VatNumber,
                                       CustomerAttributes.ShippingAddress, CustomerAttributes.ShippingCity, CustomerAttributes.ShippingState, CustomerAttributes.ShippingZip, CustomerAttributes.ShippingCountry,
                                       CreditCardAttributes.FullNumber, CreditCardAttributes.ExpirationMonth,
                                       CreditCardAttributes.ExpirationYear, CreditCardAttributes.CVV, CreditCardAttributes.BillingAddress, CreditCardAttributes.BillingCity,
@@ -2613,7 +2613,7 @@ namespace ChargifyNET
         /// <param name="AllocatedQuantity">The quantity of the component to allocate when creating the component usage for the new subscription</param>
         /// <returns>The xml describing the new subsscription</returns>
         private ISubscription CreateSubscription(string ProductHandle, string NewSystemID, string FirstName, string LastName, string EmailAddress, string Phone,
-                                                        string Organization, string ShippingAddress, string ShippingCity, string ShippingState, string ShippingZip, string ShippingCountry,
+                                                        string Organization, string VatNumber, string ShippingAddress, string ShippingCity, string ShippingState, string ShippingZip, string ShippingCountry,
                                                         string FullNumber, int ExpirationMonth, int ExpirationYear,
                                                         string CVV, string BillingAddress, string BillingCity, string BillingState, string BillingZip,
                                                         string BillingCountry, string CouponCode, int ComponentID, int AllocatedQuantity)
@@ -2657,6 +2657,7 @@ namespace ChargifyNET
             subscriptionXml.AppendFormat("<email>{0}</email>", EmailAddress);
             if (!string.IsNullOrEmpty(Phone)) subscriptionXml.AppendFormat("<phone>{0}</phone>", Phone.ToHtmlEncoded());
             subscriptionXml.AppendFormat("<organization>{0}</organization>", (Organization != null) ? Organization.ToHtmlEncoded() : "null");
+            subscriptionXml.AppendFormat("<vat_number>{0}</vat_number>", (VatNumber != null) ? VatNumber.ToHtmlEncoded() : null);
             subscriptionXml.AppendFormat("<reference>{0}</reference>", NewSystemID);
             if (!string.IsNullOrEmpty(ShippingAddress)) subscriptionXml.AppendFormat("<address>{0}</address>", ShippingAddress.ToHtmlEncoded());
             if (!string.IsNullOrEmpty(ShippingCity)) subscriptionXml.AppendFormat("<city>{0}</city>", ShippingCity.ToHtmlEncoded());
