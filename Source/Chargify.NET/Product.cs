@@ -157,9 +157,11 @@ namespace ChargifyNET
                         _expirationIntervalUnit = obj.GetJSONContentAsIntervalUnit(key);
                         break;
                     case "return_url":
+                    case "update_return_url":
                         _returnURL = obj.GetJSONContentAsString(key);
                         break;
                     case "return_params":
+                    case "update_return_params":
                         _returnParams = obj.GetJSONContentAsString(key);
                         break;
                     case "require_credit_card":
@@ -256,9 +258,11 @@ namespace ChargifyNET
                         _expirationIntervalUnit = dataNode.GetNodeContentAsIntervalUnit();
                         break;
                     case "return_url":
+                    case "update_return_url":
                         _returnURL = dataNode.GetNodeContentAsString();
                         break;
                     case "return_params":
+                    case "update_return_params":
                         _returnParams = dataNode.GetNodeContentAsString();
                         break;
                     case "require_credit_card":
