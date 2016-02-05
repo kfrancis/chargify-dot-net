@@ -586,6 +586,59 @@
         }
 
         /// <summary>
+        /// Method of getting the PublicSignupPages object from an XmlNode
+        /// </summary>
+        /// <param name="node">The node whose value needs to be extracted</param>
+        /// <returns>The PublicSignupPages value of the node, empty list otherwise.</returns>
+        public static List<IPublicSignupPage> GetNodeContentAsPublicSignupPages(this XmlNode node)
+        {
+            var publicSignupPages = new List<IPublicSignupPage>();
+            foreach (XmlNode childNode in node.ChildNodes)
+            {
+                switch (childNode.Name)
+                {
+                    case "public_signup_page":
+                        publicSignupPages.Add(childNode.GetNodeContentAsPublicSignupPage());
+                        break;
+                    default:
+                        break;
+                }
+            }
+            // Sanity check, should be equal.
+            if (node.ChildNodes.Count != publicSignupPages.Count)
+            {
+                throw new JsonParseException(string.Format("Unable to parse public signup pages ({0} != {1})", node.ChildNodes.Count, publicSignupPages.Count));
+            }
+
+            return publicSignupPages;
+        }
+
+        /// <summary>
+        /// Method of getting the public signup pages object from a JsonObject
+        /// </summary>
+        /// <param name="obj">The JsonObject containing the PublicSignupPages data</param>
+        /// <param name="key">They key of the PublicSignupPages object</param>
+        /// <returns>The list of PublicSignupPages if possible, empty list otherwise.</returns>
+        public static List<IPublicSignupPage> GetJSONContentAsPublicSignupPages(this JsonObject obj, string key)
+        {
+            var publicSignupPages = new List<IPublicSignupPage>();
+            var publicSignupPagesArray = obj[key] as JsonArray;
+            if (publicSignupPagesArray != null)
+            {
+                foreach (JsonObject publicSignupPage in publicSignupPagesArray.Items)
+                {
+                    publicSignupPages.Add(new PublicSignupPage(publicSignupPage));
+                }
+            }
+            // Sanity check, should be equal.
+            if (publicSignupPagesArray.Length != publicSignupPages.Count)
+            {
+                throw new JsonParseException(string.Format("Unable to parse public signup pages ({0} != {1})", publicSignupPagesArray.Length, publicSignupPages.Count));
+            }
+            return publicSignupPages;
+        }
+
+        /// <summary>
         /// Method for getting a Customer object from a JsonObject
         /// </summary>
         /// <param name="obj">The JsonObject containing the Customer data</param>

@@ -190,5 +190,10 @@ using System.Collections.Generic;
         /// List of public signup page URLs and the associated ID
         /// </summary>
         List<IPublicSignupPage> PublicSignupPages { get; }
+
+        /// <summary>
+        /// The version of the product
+        /// </summary>
+        int ProductVersion { get; }
     }
 }

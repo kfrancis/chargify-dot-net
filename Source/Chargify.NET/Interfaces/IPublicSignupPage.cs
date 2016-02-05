@@ -49,5 +49,15 @@ namespace ChargifyNET
         /// The URL of the public signup page
         /// </summary>
         string URL { get; }
+
+        /// <summary>
+        /// The url to which a customer will be returned after a successful signup
+        /// </summary>
+        string ReturnURL { get; }
+
+        /// <summary>
+        /// The params to be appended to the ReturnURL
+        /// </summary>
+        string ReturnParams { get; }
     }
 }

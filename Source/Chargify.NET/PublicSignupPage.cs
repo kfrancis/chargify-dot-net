@@ -47,6 +47,8 @@ namespace ChargifyNET
         #region Field Keys
         private const string IdKey = "id";
         private const string UrlKey = "url";
+        private const string ReturnUrlKey = "return_url";
+        private const string ReturnParamsKey = "return_params";
         #endregion
 
         #region Constructors
@@ -127,6 +129,12 @@ namespace ChargifyNET
                     case UrlKey:
                         _url = dataNode.GetNodeContentAsString();
                         break;
+                    case ReturnUrlKey:
+                        _returnUrl = dataNode.GetNodeContentAsString();
+                        break;
+                    case ReturnParamsKey:
+                        _returnParams = dataNode.GetNodeContentAsString();
+                        break;
                     default:
                         break;
                 }
@@ -144,6 +152,12 @@ namespace ChargifyNET
                         break;
                     case UrlKey:
                         _url = obj.GetJSONContentAsString(key);
+                        break;
+                    case ReturnUrlKey:
+                        _returnUrl = obj.GetJSONContentAsString(key);
+                        break;
+                    case ReturnParamsKey:
+                        _returnParams = obj.GetJSONContentAsString(key);
                         break;
                     default:
                         break;
@@ -166,6 +180,17 @@ namespace ChargifyNET
         public string URL { get { return _url; } }
         private string _url = string.Empty;
 
+        /// <summary>
+        /// The url to which a customer will be returned after a successful signup
+        /// </summary>
+        public string ReturnURL { get { return _returnUrl; } }
+        private string _returnUrl = string.Empty;
+
+        /// <summary>
+        /// The params to be appended to the return_url
+        /// </summary>
+        public string ReturnParams { get { return _returnParams; } }
+        private string _returnParams = string.Empty;
         #endregion
 
         #region IComparible<IPublicSignupPage> Members

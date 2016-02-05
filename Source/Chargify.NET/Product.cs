@@ -179,24 +179,11 @@ namespace ChargifyNET
                     case "archived_at":
                         _archivedAt = obj.GetJSONContentAsDateTime(key);
                         break;
+                    case "product_version":
+                        _productVersion = obj.GetJSONContentAsInt(key);
+                        break;
                     case "public_signup_pages":
-                        if (_publicSignupPages == null)
-                        {
-                            _publicSignupPages = new List<IPublicSignupPage>();
-                        }
-                        JsonArray publicSignupPagesArray = obj[key] as JsonArray;
-                        if (publicSignupPagesArray != null)
-                        {
-                            foreach (JsonObject publicSignupPage in publicSignupPagesArray.Items)
-                            {
-                                _publicSignupPages.Add(new PublicSignupPage(publicSignupPage));
-                            }
-                        }
-                        // Sanity check, should be equal.
-                        if (publicSignupPagesArray.Length != _publicSignupPages.Count)
-                        {
-                            throw new JsonParseException(string.Format("Unable to parse public signup pages ({0} != {1})", publicSignupPagesArray.Length, _publicSignupPages.Count));
-                        }
+                        _publicSignupPages = obj.GetJSONContentAsPublicSignupPages(key);
                         break;
                     default:
                         break;
@@ -280,27 +267,11 @@ namespace ChargifyNET
                     case "archived_at":
                         _archivedAt = dataNode.GetNodeContentAsDateTime();
                         break;
+                    case "product_version":
+                        _productVersion = dataNode.GetNodeContentAsInt();
+                        break;
                     case "public_signup_pages":
-                        if (_publicSignupPages == null)
-                        {
-                            _publicSignupPages = new List<IPublicSignupPage>();
-                        }
-                        foreach (XmlNode childNode in dataNode.ChildNodes)
-                        {
-                            switch (childNode.Name)
-                            {
-                                case "public_signup_page":
-                                    _publicSignupPages.Add(childNode.GetNodeContentAsPublicSignupPage());
-                                    break;
-                                default:
-                                    break;
-                            }
-                        }
-                        // Sanity check, should be equal.
-                        if (dataNode.ChildNodes.Count != _publicSignupPages.Count)
-                        {
-                            throw new JsonParseException(string.Format("Unable to parse public signup pages ({0} != {1})", dataNode.ChildNodes.Count, _publicSignupPages.Count));
-                        }
+                        _publicSignupPages = dataNode.GetNodeContentAsPublicSignupPages();
                         break;
                     default:
                         break;
@@ -514,6 +485,14 @@ namespace ChargifyNET
         private string _returnURL = string.Empty;
 
         /// <summary>
+        /// The URL the buyer is returned to after successful purchase.
+        /// </summary>
+        public string UpdateReturnURL
+        {
+            get { return _returnURL; }
+        }
+        
+        /// <summary>
         /// The parameter string chargify will use in constructing the return URL.
         /// </summary>
         public string ReturnParams
@@ -572,6 +551,12 @@ namespace ChargifyNET
         /// </summary>
         public List<IPublicSignupPage> PublicSignupPages { get { return _publicSignupPages; } }
         private List<IPublicSignupPage> _publicSignupPages = new List<IPublicSignupPage>();
+
+        public int ProductVersion
+        {
+            get { return _productVersion; }
+        }
+        private int _productVersion = int.MinValue;
         #endregion
 
         #region Operators
