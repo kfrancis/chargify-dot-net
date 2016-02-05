@@ -232,6 +232,21 @@ namespace ChargifyNET
         bool SetSubscriptionOverride(int SubscriptionID, DateTime? ActivatedAt = null, DateTime? CanceledAt = null, string CancellationMessage = null, DateTime? ExpiresAt = null);
         #endregion
 
+        #region Payment Profiles
+        /// <summary>
+        /// Retrieve a payment profile
+        /// </summary>
+        /// <param name="ID">The ID of the payment profile</param>
+        /// <returns>The payment profile, null if not found.</returns>
+        IPaymentProfileView LoadPaymentProfile(int ID);
+        /// <summary>
+        /// Updates a payment profile
+        /// </summary>
+        /// <param name="PaymentProfile">The payment profile object</param>
+        /// <returns>The updated payment profile if successful, null or exception otherwise.</returns>
+        IPaymentProfileView UpdatePaymentProfile(PaymentProfileView PaymentProfile);
+        #endregion
+
         /// <summary>
         /// Method for adding a metered component usage to the subscription
         /// </summary>

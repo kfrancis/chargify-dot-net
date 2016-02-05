@@ -30,7 +30,6 @@
 namespace ChargifyNET
 {
     #region Imports
-    using System.Linq;
     using ChargifyNET.Json;
     using System;
     using System.Collections.Generic;
@@ -40,31 +39,6 @@ namespace ChargifyNET
     using System.Web;
     using System.Xml;
     using System.Globalization;
-    #endregion
-
-    #region Enum
-    /// <summary>
-    /// The type of REST request
-    /// </summary>
-    public enum HttpRequestMethod
-    {
-        /// <summary>
-        /// Requests a representation of the specified resource
-        /// </summary>
-        Get,
-        /// <summary>
-        /// Requests that the server accept the entity enclosed in the request as a new subordinate of the web resource identified by the URI
-        /// </summary>
-        Post,
-        /// <summary>
-        /// Requests that the enclosed entity be stored under the supplied URI
-        /// </summary>
-        Put,
-        /// <summary>
-        /// Deletes the specified resource
-        /// </summary>
-        Delete
-    }
     #endregion
 
     /// <summary>
@@ -5061,6 +5035,83 @@ namespace ChargifyNET
             return response.ConvertResponseTo<Payment>("payment");
         }
 
+        #endregion
+
+        #region Payment Profiles
+        /// <summary>
+        /// Retrieve a payment profile
+        /// </summary>
+        /// <param name="ID">The ID of the payment profile</param>
+        /// <returns>The payment profile, null if not found.</returns>
+        public IPaymentProfileView LoadPaymentProfile(int ID)
+        {
+            try
+            {
+                // make sure data is valid
+                if (ID < 0) throw new ArgumentNullException("ID");
+
+                // now make the request
+                string response = this.DoRequest(string.Format("payment_profiles/{0}.{1}", ID, GetMethodExtension()));
+
+                // Convert the Chargify response into the object we're looking for
+                return response.ConvertResponseTo<PaymentProfileView>("payment_profile");
+            }
+            catch (ChargifyException cex)
+            {
+                if (cex.StatusCode == HttpStatusCode.NotFound) return null;
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Updates a payment profile
+        /// </summary>
+        /// <param name="CustomerID">The ID of the customer to whom the profile belongs</param>
+        /// <param name="PaymentProfile">The payment profile object</param>
+        /// <param name="UpdateTarget">credit_card or bank_account</param>
+        /// <returns>The updated payment profile if successful, null or exception otherwise.</returns>
+        public IPaymentProfileView UpdatePaymentProfile(PaymentProfileView PaymentProfile)
+        {
+            try
+            {
+                if (PaymentProfile.Id < 0) throw new ArgumentException("PaymentProfileID");
+                var xml = new StringBuilder(GetXMLStringIfApplicable());
+                xml.Append("<payment_profile>");
+                xml.AppendFormat("<billing_address>{0}</billing_address>", PaymentProfile.BillingAddress);
+                xml.AppendFormat("<billing_address_2>{0}</billing_address_2>", PaymentProfile.BillingAddress2);
+                xml.AppendFormat("<billing_city>{0}</billing_city>", PaymentProfile.BillingCity);
+                xml.AppendFormat("<billing_country>{0}</billing_country>", PaymentProfile.BillingCountry);
+                xml.AppendFormat("<billing_state>{0}</billing_state>", PaymentProfile.BillingState);
+                xml.AppendFormat("<billing_zip>{0}</billing_zip>", PaymentProfile.BillingZip); 
+                xml.AppendFormat("<customer_id>{0}</customer_id>", PaymentProfile.CustomerID);
+                xml.AppendFormat("<first_name>{0}</first_name>", PaymentProfile.FirstName);
+                xml.AppendFormat("<last_name>{0}</last_name>", PaymentProfile.LastName);
+                xml.AppendFormat("<payment_type>{0}</payment_type>", Enum.GetName(typeof(PaymentProfileType), PaymentProfile.PaymentType).ToLowerInvariant());
+                if (PaymentProfile.PaymentType == PaymentProfileType.Credit_Card)
+                {
+                    xml.AppendFormat("<card_type>{0}</card_type>", PaymentProfile.CardType);
+                    xml.AppendFormat("<full_number>{0}</full_number>", PaymentProfile.FullNumber);
+                    xml.AppendFormat("<expiration_month>{0}</expiration_month>", PaymentProfile.ExpirationMonth);
+                    xml.AppendFormat("<expiration_year>{0}</expiration_year>", PaymentProfile.ExpirationYear);
+                }
+                else if (PaymentProfile.PaymentType == PaymentProfileType.Bank_Account)
+                {
+                    xml.AppendFormat("<bank_account_holder_type>{0}</bank_account_holder_type>", Enum.GetName(typeof(BankAccountHolderType), PaymentProfile.BankAccountHolderType).ToLowerInvariant());
+                    xml.AppendFormat("<bank_account_type>{0}</bank_account_type>", Enum.GetName(typeof(BankAccountType), PaymentProfile.BankAccountType).ToLowerInvariant());
+                    xml.AppendFormat("<bank_name>{0}</bank_name>", PaymentProfile.BankName);
+                    xml.AppendFormat("<bank_routing_number>{0}</bank_routing_number>", PaymentProfile.BankRoutingNumber);
+                    xml.AppendFormat("<bank_account_number>{0}</bank_account_number>", PaymentProfile.BankAccountNumber);
+                }
+                xml.Append("</payment_profile>");
+                string response = this.DoRequest(string.Format("payment_profiles/{0}.{1}", PaymentProfile.Id, GetMethodExtension()), HttpRequestMethod.Put, xml.ToString());
+                return response.ConvertResponseTo<PaymentProfileView>("payment_profile");
+            }
+            catch (ChargifyException cex)
+            {
+                if (cex.StatusCode == HttpStatusCode.NotFound) return null;
+                throw;
+            }
+        }
         #endregion
 
         #region Utility Methods

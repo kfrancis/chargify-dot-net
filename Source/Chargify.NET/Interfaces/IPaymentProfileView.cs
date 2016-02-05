@@ -36,6 +36,18 @@ namespace ChargifyNET
     public interface IPaymentProfileView : IPaymentProfileBase
     {
         /// <summary>
+        /// Default is credit_card. May be bank_account or credit_card or paypal_account
+        /// </summary>
+        PaymentProfileType PaymentType { get; set; }
+        /// <summary>
+        /// The ID to the customer associated with this payment profile
+        /// </summary>
+        int CustomerID { get; set; }
+        /// <summary>
+        /// The card verification value
+        /// </summary>
+        string CVV { get; set; }
+        /// <summary>
         /// Get or set the type of the credit card (Visa, MasterCharge. etc.)
         /// </summary>
         string CardType { get; set; }
@@ -44,13 +56,21 @@ namespace ChargifyNET
         /// </summary>
         string BankName { get; set; }
         /// <summary>
-        /// The routing number of the bank
+        /// The masked routing number of the bank
         /// </summary>
         string MaskedBankRoutingNumber { get; set; }
         /// <summary>
-        /// The customer's bank account number
+        /// The routing number of the bank
+        /// </summary>
+        string BankRoutingNumber { get; set; }
+        /// <summary>
+        /// The customer's masked bank account number
         /// </summary>
         string MaskedBankAccountNumber { get; set; }
+        /// <summary>
+        /// The customer's bank account number
+        /// </summary>
+        string BankAccountNumber { get; set; }
         /// <summary>
         /// Either checking or savings
         /// </summary>
@@ -59,5 +79,16 @@ namespace ChargifyNET
         /// Either personal or business
         /// </summary>
         BankAccountHolderType BankAccountHolderType { get; set; }
+
+        /// <summary>
+        /// TODO
+        /// </summary>
+        string PaymentMethodNonce { get; set; }
+
+        /// <summary>
+        /// TODO
+        /// </summary>
+        string PayPalEmail { get; set; }
+        
     }
 }

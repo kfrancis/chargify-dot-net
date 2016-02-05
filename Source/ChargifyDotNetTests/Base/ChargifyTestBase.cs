@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using ChargifyNET;
+using System.Net;
 #if NUNIT
 using NUnit.Framework;
 #else
@@ -45,6 +46,7 @@ namespace ChargifyDotNetTests.Base
                     this._chargify.URL = "https://subdomain.chargify.com/";
                     this._chargify.SharedKey = "123456789";
                     this._chargify.UseJSON = false;
+                    this._chargify.ProtocolType = (SecurityProtocolType)3072;
                 }
                 return this._chargify;
             }

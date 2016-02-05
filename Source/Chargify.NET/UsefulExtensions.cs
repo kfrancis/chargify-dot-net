@@ -679,6 +679,45 @@
         }
 
         /// <summary>
+        /// Method for retrieving the PaymentProfileView from a JsonObject
+        /// </summary>
+        /// <param name="obj">The object to retrieve the PaymentProfileView value from</param>
+        /// <param name="key">The key of the PaymentProfileView field in the JsonObject</param>
+        /// <returns>The PaymentProfileView value, null otherwise.</returns>
+        public static PaymentProfileView GetJSONContentAsPaymentProfileView(this JsonObject obj, string key)
+        {
+            PaymentProfileView result = null;
+            if (obj != null)
+            {
+                if (obj.ContainsKey(key))
+                {
+                    JsonObject paymentProfileViewObj = obj[key] as JsonObject;
+                    if (paymentProfileViewObj != null)
+                    {
+                        // create the new PaymentProfileView object
+                        result = new PaymentProfileView(paymentProfileViewObj);
+                    }
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Method for getting the content of an XmlNode as a PaymentProfileView
+        /// </summary>
+        /// <param name="node">The node whose value needs to be extracted</param>
+        /// <returns>The PaymentProfileView value of the node</returns>
+        public static PaymentProfileView GetNodeContentAsPaymentProfileView(this XmlNode node)
+        {
+            PaymentProfileView result = null;
+            if (node.FirstChild != null)
+            {
+                result = new PaymentProfileView(node);
+            }
+            return result;
+        }
+
+        /// <summary>
         /// Method for retrieving the Product from a JsonObject
         /// </summary>
         /// <param name="obj">The object to retrieve the Product value from</param>

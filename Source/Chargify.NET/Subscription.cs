@@ -70,6 +70,7 @@ namespace ChargifyNET
         private const string CustomerKey = "customer";
         private const string PaymentProfileAsCreditCardKey = "credit_card";
         private const string PaymentProfileAsBankAccountKey = "bank_account";
+        private const string PaymentProfileKey = "payment_profile";
         private const string ProductKey = "product";
         private const string ProductVersionNumberKey = "product_version_number";
         private const string ProductPriceInCentsKey = "product_price_in_cents";
@@ -216,130 +217,11 @@ namespace ChargifyNET
                     case ProductPriceInCentsKey:
                         _productPriceInCents = obj.GetJSONContentAsInt(key);
                         break;
-                    case PaymentProfileAsBankAccountKey:
-                        // create new bank account view object.
-                        _paymentProfile = new PaymentProfileView();
-                        JsonObject viewObj = obj[key] as JsonObject;
-                        if (viewObj != null)
-                        {
-                            foreach (string viewKey in viewObj.Keys)
-                            {
-                                switch (viewKey)
-                                {
-                                    case "first_name":
-                                        _paymentProfile.FirstName = viewObj.GetJSONContentAsString(viewKey);
-                                        break;
-                                    case "last_name":
-                                        _paymentProfile.LastName = viewObj.GetJSONContentAsString(viewKey);
-                                        break;
-                                    case "billing_address":
-                                        _paymentProfile.BillingAddress = viewObj.GetJSONContentAsString(viewKey);
-                                        break;
-                                    case "billing_address_2":
-                                        _paymentProfile.BillingAddress2 = viewObj.GetJSONContentAsString(viewKey);
-                                        break;
-                                    case "billing_city":
-                                        _paymentProfile.BillingCity = viewObj.GetJSONContentAsString(viewKey);
-                                        break;
-                                    case "billing_state":
-                                        _paymentProfile.BillingState = viewObj.GetJSONContentAsString(viewKey);
-                                        break;
-                                    case "billing_zip":
-                                        _paymentProfile.BillingZip = viewObj.GetJSONContentAsString(viewKey);
-                                        break;
-                                    case "billing_country":
-                                        _paymentProfile.BillingCountry = viewObj.GetJSONContentAsString(viewKey);
-                                        break;
-                                    case "bank_account_holder_type":
-                                        _paymentProfile.BankAccountHolderType = viewObj.GetJSONContentAsEnum<BankAccountHolderType>(viewKey);
-                                        break;
-                                    case "bank_account_type":
-                                        _paymentProfile.BankAccountType = viewObj.GetJSONContentAsEnum<BankAccountType>(viewKey);
-                                        break;
-                                    case "bank_name":
-                                        _paymentProfile.BankName = viewObj.GetJSONContentAsString(viewKey);
-                                        break;
-                                    case "masked_bank_account_number":
-                                        _paymentProfile.MaskedBankAccountNumber = viewObj.GetJSONContentAsString(viewKey);
-                                        break;
-                                    case "masked_bank_routing_number":
-                                        _paymentProfile.MaskedBankRoutingNumber = viewObj.GetJSONContentAsString(viewKey);
-                                        break;
-                                    case "card_type":
-                                        _paymentProfile.CardType = viewObj.GetJSONContentAsString(viewKey);
-                                        break;
-                                    case "id":
-                                        _paymentProfile.Id = viewObj.GetJSONContentAsInt(viewKey);
-                                        break;
-                                    case "current_vault":
-                                    case "customer_id":
-                                    case "customer_vault_token":
-                                    case "vault_token":
-                                        break;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            _paymentProfile = null;
-                        }
-                        break;
                     case PaymentProfileAsCreditCardKey:
-                        // create new credit card view object.
-                        _paymentProfile = new PaymentProfileView();
-                        JsonObject viewObj2 = obj[key] as JsonObject;
-                        if (viewObj2 != null)
-                        {
-                            foreach (string viewKey in viewObj2.Keys)
-                            {
-                                switch (viewKey)
-                                {
-                                    case "id":
-                                        _paymentProfile.Id = viewObj2.GetJSONContentAsInt(viewKey);
-                                        break;
-                                    case "card_type":
-                                        _paymentProfile.CardType = viewObj2.GetJSONContentAsString(viewKey);
-                                        break;
-                                    case "expiration_month":
-                                        _paymentProfile.ExpirationMonth = viewObj2.GetJSONContentAsInt(viewKey);
-                                        break;
-                                    case "expiration_year":
-                                        _paymentProfile.ExpirationYear = viewObj2.GetJSONContentAsInt(viewKey);
-                                        break;
-                                    case "first_name":
-                                        _paymentProfile.FirstName = viewObj2.GetJSONContentAsString(viewKey);
-                                        break;
-                                    case "last_name":
-                                        _paymentProfile.LastName = viewObj2.GetJSONContentAsString(viewKey);
-                                        break;
-                                    case "masked_card_number":
-                                        _paymentProfile.FullNumber = viewObj2.GetJSONContentAsString(viewKey);
-                                        break;
-                                    case "billing_address":
-                                        _paymentProfile.BillingAddress = viewObj2.GetJSONContentAsString(viewKey);
-                                        break;
-                                    case "billing_address_2":
-                                        _paymentProfile.BillingAddress2 = viewObj2.GetJSONContentAsString(viewKey);
-                                        break;
-                                    case "billing_city":
-                                        _paymentProfile.BillingCity = viewObj2.GetJSONContentAsString(viewKey);
-                                        break;
-                                    case "billing_state":
-                                        _paymentProfile.BillingState = viewObj2.GetJSONContentAsString(viewKey);
-                                        break;
-                                    case "billing_zip":
-                                        _paymentProfile.BillingZip = viewObj2.GetJSONContentAsString(viewKey);
-                                        break;
-                                    case "billing_country":
-                                        _paymentProfile.BillingCountry = viewObj2.GetJSONContentAsString(viewKey);
-                                        break;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            _paymentProfile = null;
-                        }
+                    case PaymentProfileAsBankAccountKey:
+                    case PaymentProfileKey:
+                        // create new bank account view object.
+                        _paymentProfile = obj.GetJSONContentAsPaymentProfileView(key);
                         break;
                     case CustomerKey:
                         _customer = obj.GetJSONContentAsCustomer(key);
@@ -435,133 +317,10 @@ namespace ChargifyNET
                     case ProductPriceInCentsKey:
                         _productPriceInCents = dataNode.GetNodeContentAsInt();
                         break;
-                    case PaymentProfileAsBankAccountKey:
-                        if (dataNode.FirstChild != null)
-                        {
-                            // create new credit card view object.
-                            _paymentProfile = new PaymentProfileView();
-                            // There's no constructor that takes in an XmlNode, so parse it here.
-                            foreach (XmlNode childNode in dataNode.ChildNodes)
-                            {
-                                switch (childNode.Name)
-                                {
-                                    case "first_name":
-                                        _paymentProfile.FirstName = childNode.GetNodeContentAsString();
-                                        break;
-                                    case "last_name":
-                                        _paymentProfile.LastName = childNode.GetNodeContentAsString();
-                                        break;
-                                    case "billing_address":
-                                        _paymentProfile.BillingAddress = childNode.GetNodeContentAsString();
-                                        break;
-                                    case "billing_address_2":
-                                        _paymentProfile.BillingAddress2 = childNode.GetNodeContentAsString();
-                                        break;
-                                    case "billing_city":
-                                        _paymentProfile.BillingCity = childNode.GetNodeContentAsString();
-                                        break;
-                                    case "billing_state":
-                                        _paymentProfile.BillingState = childNode.GetNodeContentAsString();
-                                        break;
-                                    case "billing_zip":
-                                        _paymentProfile.BillingZip = childNode.GetNodeContentAsString();
-                                        break;
-                                    case "billing_country":
-                                        _paymentProfile.BillingCountry = childNode.GetNodeContentAsString();
-                                        break;
-                                    case "bank_account_holder_type":
-                                        _paymentProfile.BankAccountHolderType = childNode.GetNodeContentAsEnum<BankAccountHolderType>();
-                                        break;
-                                    case "bank_account_type":
-                                        _paymentProfile.BankAccountType = childNode.GetNodeContentAsEnum<BankAccountType>();
-                                        break;
-                                    case "bank_name":
-                                        _paymentProfile.BankName = childNode.GetNodeContentAsString();
-                                        break;
-                                    case "masked_bank_account_number":
-                                        _paymentProfile.MaskedBankAccountNumber = childNode.GetNodeContentAsString();
-                                        break;
-                                    case "masked_bank_routing_number":
-                                        _paymentProfile.MaskedBankRoutingNumber = childNode.GetNodeContentAsString();
-                                        break;
-                                    case "payment_type":
-                                        _paymentProfile.CardType = childNode.GetNodeContentAsString();
-                                        break;
-                                    case "id":
-                                        _paymentProfile.Id = childNode.GetNodeContentAsInt();
-                                        break;
-                                    // TODO
-                                    case "current_vault":
-                                    case "customer_id":
-                                    case "customer_vault_token":
-                                    case "vault_token":
-                                        break;
-                                }
-                            }
-                        }
-                        else
-                            _paymentProfile = null;
-                        break;
                     case PaymentProfileAsCreditCardKey:
-                        if (dataNode.FirstChild != null)
-                        {
-                            // create new credit card view object.
-                            _paymentProfile = new PaymentProfileView();
-                            // There's no constructor that takes in an XmlNode, so parse it here.
-                            foreach (XmlNode childNode in dataNode.ChildNodes)
-                            {
-                                switch (childNode.Name)
-                                {
-                                    case "id":
-                                        _paymentProfile.Id = childNode.GetNodeContentAsInt();
-                                        break;
-                                    case "type":
-                                        _paymentProfile.CardType = childNode.GetNodeContentAsString();
-                                        break;
-                                    case "expiration_month":
-                                        _paymentProfile.ExpirationMonth = childNode.GetNodeContentAsInt();
-                                        break;
-                                    case "expiration_year":
-                                        _paymentProfile.ExpirationYear = childNode.GetNodeContentAsInt();
-                                        break;
-                                    case "first_name":
-                                        _paymentProfile.FirstName = childNode.GetNodeContentAsString();
-                                        break;
-                                    case "last_name":
-                                        _paymentProfile.LastName = childNode.GetNodeContentAsString();
-                                        break;
-                                    case "masked_card_number":
-                                        _paymentProfile.FullNumber = childNode.GetNodeContentAsString();
-                                        break;
-                                    case "billing_address":
-                                        _paymentProfile.BillingAddress = childNode.GetNodeContentAsString();
-                                        break;
-                                    case "billing_address_2":
-                                        _paymentProfile.BillingAddress2 = childNode.GetNodeContentAsString();
-                                        break;
-                                    case "billing_city":
-                                        _paymentProfile.BillingCity = childNode.GetNodeContentAsString();
-                                        break;
-                                    case "billing_state":
-                                        _paymentProfile.BillingState = childNode.GetNodeContentAsString();
-                                        break;
-                                    case "billing_zip":
-                                        _paymentProfile.BillingZip = childNode.GetNodeContentAsString();
-                                        break;
-                                    case "billing_country":
-                                        _paymentProfile.BillingCountry = childNode.GetNodeContentAsString();
-                                        break;
-                                    // TODO
-                                    case "current_vault":
-                                    case "customer_id":
-                                    case "customer_vault_token":
-                                    case "vault_token":
-                                        break;
-                                }
-                            }
-                        }
-                        else
-                            _paymentProfile = null;
+                    case PaymentProfileAsBankAccountKey:
+                    case PaymentProfileKey:
+                        _paymentProfile = dataNode.GetNodeContentAsPaymentProfileView();
                         break;
                     case CustomerKey:
                         _customer = dataNode.GetNodeContentAsCustomer();
