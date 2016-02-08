@@ -66,6 +66,8 @@ namespace ChargifyNET
         private const string PaymentMethodNonceKey = "payment_method_nonce";
         private const string PayPalEmailKey = "paypal_email";
         private const string PaymentTypeKey = "payment_type";
+        private const string CardTypeKey = "card_type";
+        private const string MaskedCardNumberKey = "masked_card_number";
         #endregion
 
         #region Constructors
@@ -183,6 +185,13 @@ namespace ChargifyNET
                     case PaymentTypeKey:
                         _paymentType = dataNode.GetNodeContentAsEnum<PaymentProfileType>();
                         break;
+                    case CardTypeKey:
+                        _cardType = dataNode.GetNodeContentAsString();
+                        break;
+                    case MaskedCardNumberKey:
+                        _maskedCardNumber = dataNode.GetNodeContentAsString();
+                        break;
+
                     default:
                         break;
                 }
@@ -260,6 +269,12 @@ namespace ChargifyNET
                         break;
                     case PaymentTypeKey:
                         _paymentType = obj.GetJSONContentAsEnum<PaymentProfileType>(key);
+                        break;
+                    case CardTypeKey:
+                        _cardType = obj.GetJSONContentAsString(key);
+                        break;
+                    case MaskedCardNumberKey:
+                        _maskedCardNumber = obj.GetJSONContentAsString(key);
                         break;
                     default:
                         break;
@@ -377,6 +392,16 @@ namespace ChargifyNET
             set { if (_bankAccountHolderType != value) _bankAccountHolderType = value; }
         }
         private BankAccountHolderType _bankAccountHolderType = BankAccountHolderType.Unknown;
+
+        /// <summary>
+        /// The customer's masked credit card number
+        /// </summary>
+        public string MaskedCardNumber
+        {
+            get { return _maskedCardNumber; }
+            set { if (_maskedCardNumber != value) _maskedCardNumber = value; }
+        }
+        private string _maskedCardNumber = string.Empty;
 
         /// <summary>
         /// The nonce value
