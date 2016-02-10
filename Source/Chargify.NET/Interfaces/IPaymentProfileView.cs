@@ -81,6 +81,11 @@ namespace ChargifyNET
         BankAccountHolderType BankAccountHolderType { get; set; }
 
         /// <summary>
+        /// The customer's masked credit card number
+        /// </summary>
+        string MaskedCardNumber { get; set; }
+
+        /// <summary>
         /// TODO
         /// </summary>
         string PaymentMethodNonce { get; set; }
