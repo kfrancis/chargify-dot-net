@@ -128,5 +128,46 @@ namespace ChargifyDotNetTests
             Assert.IsTrue(result.EndingBalance == amountToCharge, "Expected {0:C2}, received {1:C2}", amountToCharge, result.EndingBalance);
             Assert.IsTrue(retrievedSubscription.Balance == amountToCharge, "Expected {0:C2}, balance is {1:C2}", amountToCharge, retrievedSubscription.Balance);
         }
+
+        [Test]
+        public void Charges_Can_Charge_With_Invoice()
+        {
+            // Arrange
+            var client = this.Chargify;
+            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value as Subscription;
+            var amountToCharge = 1.00m;
+
+            // Act
+            bool balanceResult = false;
+            if (subscription.BalanceInCents > 0)
+            {
+                balanceResult = client.ResetSubscriptionBalance(subscription.SubscriptionID);
+            }
+            var result = client.CreateCharge(subscription.SubscriptionID, amountToCharge, "Test Charge", paymentCollectionMethod: PaymentCollectionMethod.Invoice);
+            var retrievedSubscription = client.Find<Subscription>(subscription.SubscriptionID);
+            var invoice = client.GetInvoiceList().FirstOrDefault(i => i.Value.SubscriptionID == subscription.SubscriptionID && i.Value.CreatedAt == result.CreatedAt);
+
+            // Assert
+            if (subscription.BalanceInCents > 0)
+            {
+                Assert.IsNotNull(balanceResult);
+                Assert.IsTrue(balanceResult == true);
+            }
+            
+            Assert.IsNotNull(invoice);
+            Assert.IsNotNull(result);
+            //Assert.IsInstanceOfType(result, typeof(Charge));
+            Assert.IsTrue(result.SubscriptionID == subscription.SubscriptionID);
+            Assert.IsTrue(result.ProductID == subscription.Product.ID);
+            Assert.IsTrue(result.Amount == amountToCharge);
+            Assert.IsTrue(result.Kind == "one_time");
+            Assert.IsTrue(result.ChargeType == "Charge");
+            Assert.IsTrue(result.TransactionType == "charge");
+            Assert.IsTrue(result.PaymentID.HasValue == false);
+            Assert.IsTrue(result.ID != int.MinValue);
+            Assert.IsTrue(result.Success == true);
+            Assert.IsTrue(result.EndingBalance == amountToCharge, "Expected {0:C2}, received {1:C2}", amountToCharge, result.EndingBalance);
+            Assert.IsTrue(retrievedSubscription.Balance == amountToCharge, "Expected {0:C2}, balance is {1:C2}", amountToCharge, retrievedSubscription.Balance);
+        }
     }
 }
