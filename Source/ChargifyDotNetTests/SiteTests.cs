@@ -57,17 +57,17 @@ namespace ChargifyDotNetTests
             {
                 var newCustomer = new Customer()
                 {
-                    FirstName = "Scott",
-                    LastName = "Pilgrim",
-                    Email = "demonhead_sucks@scottpilgrim.com",
-                    Phone = "123-456-7890",
-                    Organization = "Chargify",
+                    FirstName = Faker.Name.First(),
+                    LastName = Faker.Name.Last(),
+                    Email = Faker.Internet.Email(),
+                    Phone = Faker.Phone.Number(),
+                    Organization = Faker.Company.Name(),
                     SystemID = referenceID,
-                    ShippingAddress = "Address Line 1",
-                    ShippingAddress2 = "Address Line 2",
-                    ShippingCity = "New York",
-                    ShippingState = "New York",
-                    ShippingZip = "10001",
+                    ShippingAddress = Faker.Address.StreetAddress(false),
+                    ShippingAddress2 = Faker.Address.SecondaryAddress(),
+                    ShippingCity = Faker.Address.City(),
+                    ShippingState = Faker.Address.UsState(),
+                    ShippingZip = Faker.Address.ZipCode(),
                     ShippingCountry = "US"
                 };
 
@@ -193,11 +193,11 @@ namespace ChargifyDotNetTests
                 ExpirationYear = 2020,
                 FullNumber = "1",
                 CVV = "123",
-                BillingAddress = "123 Main St.",
-                BillingCity = "New York",
+                BillingAddress = Faker.Address.StreetAddress(false),
+                BillingCity = Faker.Address.City(),
                 BillingCountry = "US",
-                BillingState = "New York",
-                BillingZip = "10001"
+                BillingState = Faker.Address.UsState(),
+                BillingZip = Faker.Address.ZipCode()
             };
             return retVal;
         }

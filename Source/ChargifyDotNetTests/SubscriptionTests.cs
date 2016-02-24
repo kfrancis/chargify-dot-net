@@ -146,6 +146,37 @@ namespace ChargifyDotNetTests
         }
 
         [Test]
+        [ExpectedException(typeof(ChargifyException))]
+        public void Subscription_Does_PartialUpdate_Fail()
+        {
+            // Arrange
+            var client = this.Chargify;
+            var subscription = client.GetSubscriptionList().FirstOrDefault(s => s.Value.State == ChargifyNET.SubscriptionState.Active).Value;
+
+            // Check that the card isn't expired
+            var expDate = new DateTime(subscription.PaymentProfile.ExpirationYear, subscription.PaymentProfile.ExpirationMonth, 1);
+            if (expDate < DateTime.Now) { 
+                subscription = client.UpdateSubscriptionCreditCard(subscription.SubscriptionID, "1", DateTime.Now.AddMonths(1).Month, DateTime.Now.AddYears(1).Year, "123", subscription.PaymentProfile.BillingAddress, subscription.PaymentProfile.BillingCity, subscription.PaymentProfile.BillingState, subscription.PaymentProfile.BillingZip, subscription.PaymentProfile.BillingCountry);
+            }
+
+            string oldAddress = subscription.PaymentProfile.BillingAddress, oldAddress2 = subscription.PaymentProfile.BillingAddress2,
+                oldCity = subscription.PaymentProfile.BillingCity, 
+                oldState = subscription.PaymentProfile.BillingState, oldZip = subscription.PaymentProfile.BillingZip;
+
+            var newAttributes = new CreditCardAttributes() {
+                BillingAddress = GetNewRandomValue(oldAddress, Faker.Address.StreetAddress),
+                BillingAddress2 = GetNewRandomValue(oldAddress2, Faker.Address.SecondaryAddress),
+                BillingCity = GetNewRandomValue(oldCity, Faker.Address.City),
+                BillingState = GetNewRandomValue(oldState, Faker.Address.UsState),
+                BillingZip = GetNewRandomValue(oldZip, Faker.Address.ZipCode),
+                BillingCountry = "US"
+            };
+
+            // Act
+            var result = client.UpdateSubscriptionCreditCard(subscription.SubscriptionID, newAttributes);
+        }
+
+        [Test]
         public void Subscription_Can_Update_Payment_FirstLast()
         {
             // Arrange
@@ -236,7 +267,7 @@ namespace ChargifyDotNetTests
             var referenceID = Guid.NewGuid().ToString();
             var expMonth = DateTime.Now.AddMonths(1).Month;
             var expYear = DateTime.Now.AddMonths(12).Year;
-            var newCustomer = new CustomerAttributes("Scott", "Pilgrim", "demonhead_sucks@scottpilgrim.com", "123-456-7890", "Chargify", referenceID);
+            var newCustomer = new CustomerAttributes(Faker.Name.First(), Faker.Name.Last(), Faker.Internet.Email(), Faker.Phone.Number(), Faker.Company.Name(), referenceID);
             var newPaymentInfo = GetTestPaymentMethod(newCustomer);
             var createdSubscription = Chargify.CreateSubscription(trialingProduct.Handle, newCustomer, newPaymentInfo);
             Assert.IsNotNull(createdSubscription);
@@ -265,7 +296,7 @@ namespace ChargifyDotNetTests
             var referenceID = Guid.NewGuid().ToString();
             var expMonth = DateTime.Now.AddMonths(1).Month;
             var expYear = DateTime.Now.AddMonths(12).Year;
-            var newCustomer = new CustomerAttributes("Scott", "Pilgrim", "demonhead_sucks@scottpilgrim.com", "123-456-7890", "Chargify", referenceID);
+            var newCustomer = new CustomerAttributes(Faker.Name.First(), Faker.Name.Last(), Faker.Internet.Email(), Faker.Phone.Number(), Faker.Company.Name(), referenceID);
             var newPaymentInfo = GetTestPaymentMethod(newCustomer);
             var createdSubscription = Chargify.CreateSubscription(trialingProduct.Handle, newCustomer, newPaymentInfo);
             Assert.IsNotNull(createdSubscription);
@@ -294,7 +325,7 @@ namespace ChargifyDotNetTests
             var referenceID = Guid.NewGuid().ToString();
             var expMonth = DateTime.Now.AddMonths(1).Month;
             var expYear = DateTime.Now.AddMonths(12).Year;
-            var newCustomer = new CustomerAttributes("Scott", "Pilgrim", "demonhead_sucks@scottpilgrim.com", "123-456-7890", "Chargify", referenceID);
+            var newCustomer = new CustomerAttributes(Faker.Name.First(), Faker.Name.Last(), Faker.Internet.Email(), Faker.Phone.Number(), Faker.Company.Name(), referenceID);
             var newPaymentInfo = GetTestPaymentMethod(newCustomer);
 
             // Act
@@ -370,7 +401,7 @@ namespace ChargifyDotNetTests
             var referenceID = Guid.NewGuid().ToString();
             var expMonth = DateTime.Now.AddMonths(1).Month;
             var expYear = DateTime.Now.AddMonths(12).Year;
-            var newCustomer = new CustomerAttributes("Scott", "Pilgrim", "demonhead_sucks@scottpilgrim.com", "123-456-7890", "Chargify", referenceID);
+            var newCustomer = new CustomerAttributes(Faker.Name.First(), Faker.Name.Last(), Faker.Internet.Email(), Faker.Phone.Number(), Faker.Company.Name(), referenceID);
             var newPaymentInfo = GetTestPaymentMethod(newCustomer);
 
             // Act

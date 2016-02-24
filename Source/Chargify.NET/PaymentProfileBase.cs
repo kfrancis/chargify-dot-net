@@ -50,8 +50,8 @@ namespace ChargifyNET
             this.FirstName = string.Empty;
             this.LastName = string.Empty;
             this.FullNumber = string.Empty;
-            this.ExpirationMonth = 1;
-            this.ExpirationYear = DateTime.Now.Year;
+            this.ExpirationMonth = int.MinValue;
+            this.ExpirationYear = int.MinValue;
         }
         
         /// <summary>

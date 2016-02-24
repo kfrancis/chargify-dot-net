@@ -2792,21 +2792,21 @@ namespace ChargifyNET
             // make sure data is OK
             if (SubscriptionID == int.MinValue) throw new ArgumentNullException("SubscriptionID");
             if (string.IsNullOrEmpty("FullNumber")) throw new ArgumentNullException("FullNumber");
-            if (this._cvvRequired && ((CVV.Length < 3) || (CVV.Length > 4))) throw new ArgumentException("CVV must be 3 or 4 digits", "CVV");
+            if (!string.IsNullOrWhiteSpace(CVV) && this._cvvRequired && ((CVV.Length < 3) || (CVV.Length > 4))) throw new ArgumentException("CVV must be 3 or 4 digits", "CVV");
 
             // make sure subscription exists
             ISubscription existingSubscription = this.LoadSubscription(SubscriptionID);
             if (existingSubscription == null) throw new ArgumentException("Subscription not found", "Subscription.SubscriptionID");
 
             // create XML for creation of customer
-            StringBuilder subscriptionXml = new StringBuilder(GetXMLStringIfApplicable());
+            var subscriptionXml = new StringBuilder(GetXMLStringIfApplicable());
             subscriptionXml.Append("<subscription>");
             subscriptionXml.Append("<credit_card_attributes>");
             if (!string.IsNullOrEmpty(FirstName)) subscriptionXml.AppendFormat("<first_name>{0}</first_name>", FirstName);
             if (!string.IsNullOrEmpty(LastName)) subscriptionXml.AppendFormat("<last_name>{0}</last_name>", LastName);
             if (!string.IsNullOrEmpty(FullNumber)) subscriptionXml.AppendFormat("<full_number>{0}</full_number>", FullNumber);
-            if (ExpirationMonth != null) subscriptionXml.AppendFormat("<expiration_month>{0}</expiration_month>", ExpirationMonth);
-            if (ExpirationYear != null) subscriptionXml.AppendFormat("<expiration_year>{0}</expiration_year>", ExpirationYear);
+            if (ExpirationMonth != null && ExpirationMonth.Value != int.MinValue) subscriptionXml.AppendFormat("<expiration_month>{0}</expiration_month>", ExpirationMonth);
+            if (ExpirationYear != null && ExpirationYear.Value != int.MinValue) subscriptionXml.AppendFormat("<expiration_year>{0}</expiration_year>", ExpirationYear);
             if (this._cvvRequired && !string.IsNullOrEmpty(CVV)) subscriptionXml.AppendFormat("<cvv>{0}</cvv>", CVV);
             if (!string.IsNullOrEmpty(BillingAddress)) subscriptionXml.AppendFormat("<billing_address>{0}</billing_address>", BillingAddress);
             if (!string.IsNullOrEmpty(BillingCity)) subscriptionXml.AppendFormat("<billing_city>{0}</billing_city>", BillingCity);
@@ -5077,30 +5077,30 @@ namespace ChargifyNET
                 if (PaymentProfile.Id < 0) throw new ArgumentException("PaymentProfileID");
                 var xml = new StringBuilder(GetXMLStringIfApplicable());
                 xml.Append("<payment_profile>");
-                xml.AppendFormat("<billing_address>{0}</billing_address>", PaymentProfile.BillingAddress);
-                xml.AppendFormat("<billing_address_2>{0}</billing_address_2>", PaymentProfile.BillingAddress2);
-                xml.AppendFormat("<billing_city>{0}</billing_city>", PaymentProfile.BillingCity);
-                xml.AppendFormat("<billing_country>{0}</billing_country>", PaymentProfile.BillingCountry);
-                xml.AppendFormat("<billing_state>{0}</billing_state>", PaymentProfile.BillingState);
-                xml.AppendFormat("<billing_zip>{0}</billing_zip>", PaymentProfile.BillingZip); 
-                xml.AppendFormat("<customer_id>{0}</customer_id>", PaymentProfile.CustomerID);
-                xml.AppendFormat("<first_name>{0}</first_name>", PaymentProfile.FirstName);
-                xml.AppendFormat("<last_name>{0}</last_name>", PaymentProfile.LastName);
+                if (!string.IsNullOrWhiteSpace(PaymentProfile.BillingAddress)) xml.AppendFormat("<billing_address>{0}</billing_address>", PaymentProfile.BillingAddress);
+                if (!string.IsNullOrWhiteSpace(PaymentProfile.BillingAddress2)) xml.AppendFormat("<billing_address_2>{0}</billing_address_2>", PaymentProfile.BillingAddress2);
+                if (!string.IsNullOrWhiteSpace(PaymentProfile.BillingCity)) xml.AppendFormat("<billing_city>{0}</billing_city>", PaymentProfile.BillingCity);
+                if (!string.IsNullOrWhiteSpace(PaymentProfile.BillingCountry)) xml.AppendFormat("<billing_country>{0}</billing_country>", PaymentProfile.BillingCountry);
+                if (!string.IsNullOrWhiteSpace(PaymentProfile.BillingState)) xml.AppendFormat("<billing_state>{0}</billing_state>", PaymentProfile.BillingState);
+                if (!string.IsNullOrWhiteSpace(PaymentProfile.BillingZip)) xml.AppendFormat("<billing_zip>{0}</billing_zip>", PaymentProfile.BillingZip); 
+                if (PaymentProfile.CustomerID != int.MinValue) xml.AppendFormat("<customer_id>{0}</customer_id>", PaymentProfile.CustomerID);
+                if (!string.IsNullOrWhiteSpace(PaymentProfile.FirstName)) xml.AppendFormat("<first_name>{0}</first_name>", PaymentProfile.FirstName);
+                if (!string.IsNullOrWhiteSpace(PaymentProfile.LastName)) xml.AppendFormat("<last_name>{0}</last_name>", PaymentProfile.LastName);
                 xml.AppendFormat("<payment_type>{0}</payment_type>", Enum.GetName(typeof(PaymentProfileType), PaymentProfile.PaymentType).ToLowerInvariant());
                 if (PaymentProfile.PaymentType == PaymentProfileType.Credit_Card)
                 {
-                    xml.AppendFormat("<card_type>{0}</card_type>", PaymentProfile.CardType);
-                    xml.AppendFormat("<full_number>{0}</full_number>", PaymentProfile.FullNumber);
-                    xml.AppendFormat("<expiration_month>{0}</expiration_month>", PaymentProfile.ExpirationMonth);
-                    xml.AppendFormat("<expiration_year>{0}</expiration_year>", PaymentProfile.ExpirationYear);
+                    if (!string.IsNullOrWhiteSpace(PaymentProfile.CardType)) xml.AppendFormat("<card_type>{0}</card_type>", PaymentProfile.CardType);
+                    if (!string.IsNullOrWhiteSpace(PaymentProfile.FullNumber)) xml.AppendFormat("<full_number>{0}</full_number>", PaymentProfile.FullNumber);
+                    if (PaymentProfile.ExpirationMonth != int.MinValue) xml.AppendFormat("<expiration_month>{0}</expiration_month>", PaymentProfile.ExpirationMonth);
+                    if (PaymentProfile.ExpirationYear != int.MinValue) xml.AppendFormat("<expiration_year>{0}</expiration_year>", PaymentProfile.ExpirationYear);
                 }
                 else if (PaymentProfile.PaymentType == PaymentProfileType.Bank_Account)
                 {
                     xml.AppendFormat("<bank_account_holder_type>{0}</bank_account_holder_type>", Enum.GetName(typeof(BankAccountHolderType), PaymentProfile.BankAccountHolderType).ToLowerInvariant());
                     xml.AppendFormat("<bank_account_type>{0}</bank_account_type>", Enum.GetName(typeof(BankAccountType), PaymentProfile.BankAccountType).ToLowerInvariant());
-                    xml.AppendFormat("<bank_name>{0}</bank_name>", PaymentProfile.BankName);
-                    xml.AppendFormat("<bank_routing_number>{0}</bank_routing_number>", PaymentProfile.BankRoutingNumber);
-                    xml.AppendFormat("<bank_account_number>{0}</bank_account_number>", PaymentProfile.BankAccountNumber);
+                    if (!string.IsNullOrWhiteSpace(PaymentProfile.BankName)) xml.AppendFormat("<bank_name>{0}</bank_name>", PaymentProfile.BankName);
+                    if (!string.IsNullOrWhiteSpace(PaymentProfile.BankRoutingNumber)) xml.AppendFormat("<bank_routing_number>{0}</bank_routing_number>", PaymentProfile.BankRoutingNumber);
+                    if (!string.IsNullOrWhiteSpace(PaymentProfile.BankAccountNumber)) xml.AppendFormat("<bank_account_number>{0}</bank_account_number>", PaymentProfile.BankAccountNumber);
                 }
                 xml.Append("</payment_profile>");
                 string response = this.DoRequest(string.Format("payment_profiles/{0}.{1}", PaymentProfile.Id, GetMethodExtension()), HttpRequestMethod.Put, xml.ToString());

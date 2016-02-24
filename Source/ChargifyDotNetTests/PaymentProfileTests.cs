@@ -71,6 +71,38 @@ namespace ChargifyDotNetTests
         }
 
         [Test]
+        public void PaymentProfile_Can_Perform_PartialUpdate()
+        {
+            // Arrange
+            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == ChargifyNET.SubscriptionState.Active && s.Value.PaymentProfile != null).Value;
+            var loadedSubscription = Chargify.LoadSubscription(subscription.SubscriptionID);
+
+            var paymentProfile = loadedSubscription.PaymentProfile as PaymentProfileView;
+            paymentProfile.BillingAddress = GetNewRandomValue(subscription.PaymentProfile.BillingAddress, Faker.Address.StreetAddress);
+            paymentProfile.BillingAddress2 = GetNewRandomValue(subscription.PaymentProfile.BillingAddress2, Faker.Address.StreetAddress);
+            paymentProfile.BillingCity = GetNewRandomValue(subscription.PaymentProfile.BillingCity, Faker.Address.StreetAddress);
+            paymentProfile.BillingState = GetNewRandomValue(subscription.PaymentProfile.BillingState, Faker.Address.StreetAddress);
+            paymentProfile.BillingZip = GetNewRandomValue(subscription.PaymentProfile.BillingZip, Faker.Address.StreetAddress);
+
+            // Act
+            var result = Chargify.UpdatePaymentProfile(paymentProfile);
+
+            // Arrange
+            Assert.IsNotNull(result);
+            Assert.AreEqual(subscription.PaymentProfile.Id, result.Id);
+            Assert.AreEqual(paymentProfile.BillingAddress, result.BillingAddress);
+            Assert.AreEqual(paymentProfile.BillingAddress2, result.BillingAddress2);
+            Assert.AreEqual(paymentProfile.BillingCity, result.BillingCity);
+            Assert.AreEqual(paymentProfile.BillingState, result.BillingState);
+            Assert.AreEqual(paymentProfile.BillingZip, result.BillingZip);
+            Assert.AreNotEqual(subscription.PaymentProfile.BillingAddress, result.BillingAddress);
+            Assert.AreNotEqual(subscription.PaymentProfile.BillingAddress2, result.BillingAddress2);
+            Assert.AreNotEqual(subscription.PaymentProfile.BillingCity, result.BillingCity);
+            Assert.AreNotEqual(subscription.PaymentProfile.BillingState, result.BillingState);
+            Assert.AreNotEqual(subscription.PaymentProfile.BillingZip, result.BillingZip);
+        }
+
+        [Test]
         public void PaymentProfile_GetSinglePaymentProfileByID()
         {
             // Arrange

@@ -73,7 +73,7 @@ namespace ChargifyDotNetTests
             var product = Chargify.GetProductList().Values.DefaultIfEmpty(null).FirstOrDefault(p => p.PriceInCents > 0 && p.RequireCreditCard == false);
             if (product == null) { Assert.Inconclusive("No product to test"); return; }
             var referenceID = Guid.NewGuid().ToString();
-            var newCustomer = new CustomerAttributes("Scott", "Pilgrim", "demonhead_sucks@scottpilgrim.com", "123-456-7890", "Chargify", referenceID);
+            var newCustomer = new CustomerAttributes(Faker.Name.First(), Faker.Name.Last(), Faker.Internet.Email(), Faker.Phone.Number(), Faker.Company.Name(), referenceID);
 
             // Act
             var newSubscription = Chargify.CreateSubscription(product.Handle, newCustomer, PaymentCollectionMethod.Invoice);

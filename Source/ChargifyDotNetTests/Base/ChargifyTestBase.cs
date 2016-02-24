@@ -19,8 +19,8 @@ namespace ChargifyDotNetTests.Base
         private TestContext testContextInstance;
 
         /// <summary>
-        ///Gets or sets the test context which provides
-        ///information about and functionality for the current test run.
+        /// Gets or sets the test context which provides
+        /// information about and functionality for the current test run.
         ///</summary>
         public TestContext TestContext
         {
@@ -46,12 +46,29 @@ namespace ChargifyDotNetTests.Base
                     this._chargify.URL = "https://subdomain.chargify.com/";
                     this._chargify.SharedKey = "123456789";
                     this._chargify.UseJSON = false;
-                    this._chargify.ProtocolType = (SecurityProtocolType)3072;
+                    this._chargify.ProtocolType = (SecurityProtocolType)3072; // TLS 1.2
                 }
                 return this._chargify;
             }
         }
         private ChargifyConnect _chargify = null;
+
+        /// <summary>
+        /// Method that allows me to use Faker methods in place rather than writing a bunch of specific "GetRandom.." methods.
+        /// </summary>
+        /// <param name="oldValue">The value that the result cannot be</param>
+        /// <param name="generateValue">The method (that returns string) that will be used to generate the random value</param>
+        /// <returns>A new random string value that isn't the same as the existing/old value</returns>
+        public string GetNewRandomValue(string oldValue, Func<string> generateValue)
+        {
+            var retVal = oldValue;
+            do
+            {
+                retVal = generateValue();
+            }
+            while (retVal == oldValue);
+            return retVal;
+        }
 
         internal void SetJson(bool useJson)
         {

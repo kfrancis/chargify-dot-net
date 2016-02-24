@@ -25,7 +25,7 @@ namespace ChargifyDotNetTests
             Chargify.UseJSON = true;
             var customer = new Customer()
             {
-                FirstName = "Joe"
+                FirstName = Faker.Name.First()
             };
 
             // Act
@@ -51,17 +51,17 @@ namespace ChargifyDotNetTests
             string referenceID = Guid.NewGuid().ToString();
             var customer = new Customer() 
             { 
-                FirstName = "Scott",
-                LastName = "Pilgrim",
-                Email = "demonhead_sucks@scottpilgrim.com",
-                Phone = "123-456-7890",
-                Organization = "Chargify",
+                FirstName = Faker.Name.First(),
+                LastName = Faker.Name.Last(),
+                Email = Faker.Internet.Email(),
+                Phone = Faker.Phone.Number(),
+                Organization = Faker.Company.Name(),
                 SystemID = referenceID,
-                ShippingAddress = "Address Line 1",
-                ShippingAddress2 = "Address Line 2",
-                ShippingCity = "New York",
-                ShippingState = "New York",
-                ShippingZip = "10001",
+                ShippingAddress = Faker.Address.StreetAddress(false),
+                ShippingAddress2 = Faker.Address.SecondaryAddress(),
+                ShippingCity = Faker.Address.City(),
+                ShippingState = Faker.Address.UsState(),
+                ShippingZip = Faker.Address.ZipCode(),
                 ShippingCountry = "US"
             };
 
@@ -93,18 +93,18 @@ namespace ChargifyDotNetTests
             // Arrange
             string referenceID = Guid.NewGuid().ToString();
             var customer = new Customer() 
-            { 
-                FirstName = "Scott",
-                LastName = "Pilgrim",
-                Email = "demonhead_sucks@scottpilgrim.com",
-                Phone = "123-456-7890",
+            {
+                FirstName = Faker.Name.First(),
+                LastName = Faker.Name.Last(),
+                Email = Faker.Internet.Email(),
+                Phone = Faker.Phone.Number(),
                 Organization = "Chargify&",
                 SystemID = referenceID,
-                ShippingAddress = "Address Line 1",
-                ShippingAddress2 = "Address Line 2",
-                ShippingCity = "New York",
-                ShippingState = "New York",
-                ShippingZip = "10001",
+                ShippingAddress = Faker.Address.StreetAddress(false),
+                ShippingAddress2 = Faker.Address.SecondaryAddress(),
+                ShippingCity = Faker.Address.City(),
+                ShippingState = Faker.Address.UsState(),
+                ShippingZip = Faker.Address.ZipCode(),
                 ShippingCountry = "US"
             };
 
@@ -163,15 +163,16 @@ namespace ChargifyDotNetTests
             var oldAddress2 = customer.ShippingAddress2;
             var newAddress1 = Guid.NewGuid().ToString().Replace("-", string.Empty).ToUpperInvariant();
             var newAddress2 = Guid.NewGuid().ToString().Replace("-", string.Empty).ToUpperInvariant();
-            customer.Organization = "TestOrganization";
+            string company = Faker.Company.Name();
+            customer.Organization = company;
             customer.ShippingAddress = newAddress1;
             customer.ShippingAddress2 = newAddress2;
-            Assert.AreEqual("TestOrganization", customer.Organization);
+            Assert.AreEqual(company, customer.Organization);
 
             // Update the customer and check the result
             ICustomer result = Chargify.UpdateCustomer(customer);
             Assert.IsNotNull(result);
-            Assert.AreEqual("TestOrganization", result.Organization);
+            Assert.AreEqual(company, result.Organization);
             Assert.AreEqual(newAddress1, result.ShippingAddress);
             Assert.AreEqual(newAddress2, result.ShippingAddress2);
 
