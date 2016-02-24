@@ -1802,7 +1802,8 @@ namespace ChargifyNET
             if (NextBillingAt == null) throw new ArgumentNullException("NextBillingAt");
             return CreateSubscription(ProductHandle, CustomerAttributes.SystemID, CustomerAttributes.FirstName,
                                       CustomerAttributes.LastName, CustomerAttributes.Email, CustomerAttributes.Phone, CustomerAttributes.Organization, CustomerAttributes.ShippingAddress, CustomerAttributes.ShippingCity,
-                                      CustomerAttributes.ShippingState, CustomerAttributes.ShippingZip, CustomerAttributes.ShippingCountry, CreditCardAttributes.FullNumber, CreditCardAttributes.ExpirationMonth,
+                                      CustomerAttributes.ShippingState, CustomerAttributes.ShippingZip, CustomerAttributes.ShippingCountry,
+                                      CreditCardAttributes.FirstName, CreditCardAttributes.LastName, CreditCardAttributes.FullNumber, CreditCardAttributes.ExpirationMonth,
                                       CreditCardAttributes.ExpirationYear, CreditCardAttributes.CVV, CreditCardAttributes.BillingAddress, CreditCardAttributes.BillingCity, CreditCardAttributes.BillingState, CreditCardAttributes.BillingZip,
                                       CreditCardAttributes.BillingCountry, string.Empty, null, NextBillingAt);
         }
@@ -1843,14 +1844,14 @@ namespace ChargifyNET
             if (CustomerAttributes == null) throw new ArgumentNullException("CustomerAttributes");
             return CreateSubscription(ProductHandle, CustomerAttributes.SystemID, CustomerAttributes.FirstName,
                                       CustomerAttributes.LastName, CustomerAttributes.Email, CustomerAttributes.Phone, CustomerAttributes.Organization, CustomerAttributes.ShippingAddress, CustomerAttributes.ShippingCity, CustomerAttributes.ShippingState, CustomerAttributes.ShippingZip, CustomerAttributes.ShippingCountry,
-                                      CreditCardAttributes.FullNumber, CreditCardAttributes.ExpirationMonth,
+                                      CreditCardAttributes.FirstName, CreditCardAttributes.LastName, CreditCardAttributes.FullNumber, CreditCardAttributes.ExpirationMonth,
                                       CreditCardAttributes.ExpirationYear, CreditCardAttributes.CVV, CreditCardAttributes.BillingAddress, CreditCardAttributes.BillingCity,
                                       CreditCardAttributes.BillingState, CreditCardAttributes.BillingZip, CreditCardAttributes.BillingCountry, string.Empty, ComponentsWithQuantity, null);
         }
 
         private ISubscription CreateSubscription(string ProductHandle, string NewSystemID, string FirstName, string LastName, string EmailAddress, string Phone,
                                                         string Organization, string ShippingAddress, string ShippingCity, string ShippingState, string ShippingZip, string ShippingCountry,
-                                                        string FullNumber, int ExpirationMonth, int ExpirationYear,
+                                                        string CardFirstName, string CardLastName, string FullNumber, int ExpirationMonth, int ExpirationYear,
                                                         string CVV, string BillingAddress, string BillingCity, string BillingState, string BillingZip,
                                                         string BillingCountry, string CouponCode, Dictionary<int, string> ComponentsWithQuantity, DateTime? NextBillingAt)
         {
@@ -1894,6 +1895,8 @@ namespace ChargifyNET
             if (!string.IsNullOrEmpty(ShippingCountry)) subscriptionXml.AppendFormat("<country>{0}</country>", ShippingCountry);
             subscriptionXml.Append("</customer_attributes>");
             subscriptionXml.Append("<credit_card_attributes>");
+            if (!string.IsNullOrWhiteSpace(CardFirstName)) subscriptionXml.AppendFormat("<first_name>{0}</first_name>", CardFirstName);
+            if (!string.IsNullOrWhiteSpace(CardLastName)) subscriptionXml.AppendFormat("<last_name>{0}</last_name>", CardLastName);
             subscriptionXml.AppendFormat("<full_number>{0}</full_number>", FullNumber);
             subscriptionXml.AppendFormat("<expiration_month>{0}</expiration_month>", ExpirationMonth);
             subscriptionXml.AppendFormat("<expiration_year>{0}</expiration_year>", ExpirationYear);
@@ -1941,7 +1944,7 @@ namespace ChargifyNET
             if (CustomerAttributes == null) throw new ArgumentNullException("CustomerAttributes");
             return CreateSubscription(ProductHandle, CustomerAttributes.SystemID, CustomerAttributes.FirstName, CustomerAttributes.LastName, CustomerAttributes.Email, CustomerAttributes.Phone, CustomerAttributes.Organization,
                                       CustomerAttributes.ShippingAddress, CustomerAttributes.ShippingCity, CustomerAttributes.ShippingState, CustomerAttributes.ShippingZip, CustomerAttributes.ShippingCountry,
-                                      CreditCardAttributes.FullNumber, CreditCardAttributes.ExpirationMonth,
+                                      CreditCardAttributes.FirstName, CreditCardAttributes.LastName, CreditCardAttributes.FullNumber, CreditCardAttributes.ExpirationMonth,
                                       CreditCardAttributes.ExpirationYear, CreditCardAttributes.CVV, CreditCardAttributes.BillingAddress, CreditCardAttributes.BillingCity,
                                       CreditCardAttributes.BillingState, CreditCardAttributes.BillingZip, CreditCardAttributes.BillingCountry, CouponCode, ComponentsWithQuantity, null);
         }
@@ -2056,7 +2059,7 @@ namespace ChargifyNET
             return CreateSubscription(ProductHandle, CustomerAttributes.SystemID, CustomerAttributes.FirstName,
                                       CustomerAttributes.LastName, CustomerAttributes.Email, CustomerAttributes.Phone, CustomerAttributes.Organization,
                                       CustomerAttributes.ShippingAddress, CustomerAttributes.ShippingCity, CustomerAttributes.ShippingState, CustomerAttributes.ShippingZip, CustomerAttributes.ShippingCountry,
-                                      CreditCardAttributes.FullNumber, CreditCardAttributes.ExpirationMonth,
+                                      CreditCardAttributes.FirstName, CreditCardAttributes.LastName, CreditCardAttributes.FullNumber, CreditCardAttributes.ExpirationMonth,
                                       CreditCardAttributes.ExpirationYear, CreditCardAttributes.CVV, CreditCardAttributes.BillingAddress, CreditCardAttributes.BillingCity,
                                       CreditCardAttributes.BillingState, CreditCardAttributes.BillingZip, CreditCardAttributes.BillingCountry, CouponCode, null, NextBillingAt);
         }
