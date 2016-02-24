@@ -113,5 +113,27 @@ namespace ChargifyDotNetTests
                 Assert.Fail(string.Format("Call failed. {0}, {1}", cEx.ToString(), string.Join(", ", cEx.ErrorMessages.Select(m => m.Message))));
             }
         }
+
+        [Test]
+        public void Product_CanUpdate()
+        {
+            // Arrange
+            var product = Chargify.GetProductList().Values.FirstOrDefault();
+            var loadedProduct = Chargify.LoadProduct(product.Handle);
+
+            loadedProduct.PriceInCents = RandomProvider.GetThreadRandom().Next(100, 1000);
+
+            // Act
+            var result = Chargify.UpdateProduct(product.ID, loadedProduct);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(loadedProduct.PriceInCents, result.PriceInCents);
+            Assert.AreEqual(loadedProduct.Price, result.Price);
+            Assert.AreNotEqual(product.PriceInCents, result.PriceInCents);
+
+            // Return product to the original value
+            Chargify.UpdateProduct(product.ID, product);
+        }
     }
 }

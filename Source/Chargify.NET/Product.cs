@@ -292,6 +292,10 @@ namespace ChargifyNET
             {
                 return _priceInCents;
             }
+            set
+            {
+                _priceInCents = value;
+            }
         }
         private int _priceInCents = 0;
 
@@ -315,6 +319,10 @@ namespace ChargifyNET
             {
                 return _name;
             }
+            set
+            {
+                _name = value;
+            }
         }
         private string _name = string.Empty;
 
@@ -336,6 +344,10 @@ namespace ChargifyNET
             {
                 return _handle;
             }
+            set
+            {
+                _handle = value;
+            }
         }
         private string _handle = string.Empty;
 
@@ -347,6 +359,10 @@ namespace ChargifyNET
             get
             {
                 return _description;
+            }
+            set
+            {
+                _description = value;
             }
         }
         private string _description = string.Empty;
@@ -372,6 +388,10 @@ namespace ChargifyNET
             {
                 return _accountingCode;
             }
+            set
+            {
+                _accountingCode = value;
+            }
         }
         private string _accountingCode = string.Empty;
 
@@ -383,6 +403,10 @@ namespace ChargifyNET
             get
             {
                 return _intervalUnit;
+            }
+            set
+            {
+                _intervalUnit = value;
             }
         }
         private IntervalUnit _intervalUnit = IntervalUnit.Unknown;
@@ -396,6 +420,10 @@ namespace ChargifyNET
             {
                 return _interval;
             }
+            set
+            {
+                _interval = value;
+            }
         }
         private int _interval = 0;
 
@@ -405,6 +433,10 @@ namespace ChargifyNET
         public int InitialChargeInCents
         {
             get { return _initialChargeInCents; }
+            set
+            {
+                _initialChargeInCents = value;
+            }
         }
         private int _initialChargeInCents = 0;
 
@@ -425,6 +457,10 @@ namespace ChargifyNET
         public int TrialPriceInCents
         {
             get { return _trialPriceInCents; }
+            set
+            {
+                _trialPriceInCents = value;
+            }
         }
         private int _trialPriceInCents = 0;
 
@@ -445,6 +481,10 @@ namespace ChargifyNET
         public int TrialInterval
         {
             get { return _trialInterval; }
+            set
+            {
+                _trialInterval = value;
+            }
         }
         private int _trialInterval = 0;
 
@@ -454,6 +494,10 @@ namespace ChargifyNET
         public IntervalUnit TrialIntervalUnit
         {
             get { return _trialIntervalUnit; }
+            set
+            {
+                _trialIntervalUnit = value;
+            }
         }
         private IntervalUnit _trialIntervalUnit = IntervalUnit.Unknown;
 
@@ -462,7 +506,11 @@ namespace ChargifyNET
         /// </summary>
         public int ExpirationInterval
         {
-            get { return 2; }
+            get { return _expirationInterval; }
+            set
+            {
+                _expirationInterval = value;
+            }
         }
         private int _expirationInterval = 0;
 
@@ -472,6 +520,10 @@ namespace ChargifyNET
         public IntervalUnit ExpirationIntervalUnit
         {
             get { return _expirationIntervalUnit; }
+            set
+            {
+                _expirationIntervalUnit = value;
+            }
         }
         private IntervalUnit _expirationIntervalUnit = IntervalUnit.Unknown;
 
@@ -481,6 +533,10 @@ namespace ChargifyNET
         public string ReturnURL
         {
             get { return _returnURL; }
+            set
+            {
+                _returnURL = value;
+            }
         }
         private string _returnURL = string.Empty;
 
@@ -490,6 +546,10 @@ namespace ChargifyNET
         public string UpdateReturnURL
         {
             get { return _returnURL; }
+            set
+            {
+                _returnURL = value;
+            }
         }
         
         /// <summary>
@@ -498,6 +558,10 @@ namespace ChargifyNET
         public string ReturnParams
         {
             get { return _returnParams; }
+            set
+            {
+                _returnParams = value;
+            }
         }
         private string _returnParams = string.Empty;
 
@@ -507,6 +571,10 @@ namespace ChargifyNET
         public bool RequireCreditCard
         {
             get { return _requireCreditCard; }
+            set
+            {
+                _requireCreditCard = value;
+            }
         }
         private bool _requireCreditCard = false;
 
@@ -516,6 +584,10 @@ namespace ChargifyNET
         public bool RequestCreditCard
         {
             get { return _requestCreditCard; }
+            set
+            {
+                _requestCreditCard = value;
+            }
         }
         private bool _requestCreditCard = false;
 

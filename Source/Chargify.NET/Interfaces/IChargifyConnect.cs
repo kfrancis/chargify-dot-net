@@ -247,19 +247,34 @@ namespace ChargifyNET
         IPaymentProfileView UpdatePaymentProfile(PaymentProfileView PaymentProfile);
         #endregion
 
+        #region Product
         /// <summary>
-        /// Method for adding a metered component usage to the subscription
+        /// Method that updates a product
         /// </summary>
-        /// <param name="SubscriptionID">The subscriptionID to modify</param>
-        /// <param name="ComponentID">The ID of the component (metered or quantity) to add a usage of</param>
-        /// <param name="Quantity">The number of usages to add</param>
-        /// <param name="Memo">The memo for the usage</param>
-        /// <returns>The usage added if successful, otherwise null.</returns>
-        IUsage AddUsage(int SubscriptionID, int ComponentID, int Quantity, string Memo);
+        /// <param name="ProductID">The ID of the product to update</param>
+        /// <param name="UpdatedProduct">The details of the updated product</param>
+        /// <returns>The updated product</returns>
+        IProduct UpdateProduct(int ProductID, IProduct UpdatedProduct);
         /// <summary>
-        /// Get or set the API key
+        /// Load the requested product from chargify by its handle
         /// </summary>
-        string apiKey { get; set; }
+        /// <param name="Handle">The Chargify ID or handle of the product</param>
+        /// <returns>The product with the specified chargify ID</returns>
+        IProduct LoadProduct(string Handle);
+        /// <summary>
+        /// Load the requested product from chargify
+        /// </summary>
+        /// <param name="ProductID">The Chargify ID or handle of the product</param>
+        /// <param name="IsHandle">If true, then the ProductID represents the handle, if false the ProductID represents the Chargify ID</param>
+        /// <returns>The product with the specified chargify ID</returns>
+        IProduct LoadProduct(string ProductID, bool IsHandle);
+
+        /// <summary>
+        /// Get a list of products
+        /// </summary>
+        /// <returns>A list of products (keyed by product handle)</returns>
+        IDictionary<int, IProduct> GetProductList();
+
         /// <summary>
         /// Method to create a new product and add it to the site
         /// </summary>
@@ -267,6 +282,7 @@ namespace ChargifyNET
         /// <param name="NewProduct">The new product details</param>
         /// <returns>The completed product information</returns>
         IProduct CreateProduct(int ProductFamilyID, IProduct NewProduct);
+
         /// <summary>
         /// Allows the creation of a product
         /// </summary>
@@ -280,6 +296,22 @@ namespace ChargifyNET
         /// <param name="Description">The product description</param>
         /// <returns>The created product</returns>
         IProduct CreateProduct(int ProductFamilyID, string Name, string Handle, int PriceInCents, int Interval, IntervalUnit IntervalUnit, string AccountingCode, string Description);
+        #endregion
+
+        /// <summary>
+        /// Method for adding a metered component usage to the subscription
+        /// </summary>
+        /// <param name="SubscriptionID">The subscriptionID to modify</param>
+        /// <param name="ComponentID">The ID of the component (metered or quantity) to add a usage of</param>
+        /// <param name="Quantity">The number of usages to add</param>
+        /// <param name="Memo">The memo for the usage</param>
+        /// <returns>The usage added if successful, otherwise null.</returns>
+        IUsage AddUsage(int SubscriptionID, int ComponentID, int Quantity, string Memo);
+        /// <summary>
+        /// Get or set the API key
+        /// </summary>
+        string apiKey { get; set; }
+        
         /// <summary>
         /// Method for creating a new product family via the API
         /// </summary>
@@ -739,11 +771,6 @@ namespace ChargifyNET
         /// <returns>The secure url of the update page</returns>
         string GetPrettySubscriptionUpdateURL(string FirstName, string LastName, int SubscriptionID);
         /// <summary>
-        /// Get a list of products
-        /// </summary>
-        /// <returns>A list of products (keyed by product handle)</returns>
-        IDictionary<int, IProduct> GetProductList();
-        /// <summary>
         /// Get a list of all subscriptions for a customer.
         /// </summary>
         /// <param name="ChargifyID">The ChargifyID of the customer</param>
@@ -923,19 +950,6 @@ namespace ChargifyNET
         /// <param name="SystemID">The system ID of the customer</param>
         /// <returns>The customer with the specified chargify ID</returns>
         ICustomer LoadCustomer(string SystemID);
-        /// <summary>
-        /// Load the requested product from chargify by its handle
-        /// </summary>
-        /// <param name="Handle">The Chargify ID or handle of the product</param>
-        /// <returns>The product with the specified chargify ID</returns>
-        IProduct LoadProduct(string Handle);
-        /// <summary>
-        /// Load the requested product from chargify
-        /// </summary>
-        /// <param name="ProductID">The Chargify ID or handle of the product</param>
-        /// <param name="IsHandle">If true, then the ProductID represents the handle, if false the ProductID represents the Chargify ID</param>
-        /// <returns>The product with the specified chargify ID</returns>
-        IProduct LoadProduct(string ProductID, bool IsHandle);
         /// <summary>
         /// Load the requested customer from chargify
         /// </summary>

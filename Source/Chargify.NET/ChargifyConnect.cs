@@ -809,6 +809,35 @@ namespace ChargifyNET
         #endregion
 
         #region Products
+        /// <summary>
+        /// Method that updates a product
+        /// </summary>
+        /// <param name="ProductID">The ID of the product to update</param>
+        /// <param name="UpdatedProduct">The details of the updated product</param>
+        /// <returns>The updated product</returns>
+        public IProduct UpdateProduct(int ProductID, IProduct UpdatedProduct)
+        {
+            var ExistingProduct = LoadProduct(ProductID.ToString(), false);
+            if (ExistingProduct == null) throw new ArgumentException(string.Format("No product with ID {0} exists.", ProductID));
+            if (UpdatedProduct == null) throw new ArgumentNullException("Coupon");
+            if (UpdatedProduct.ProductFamily.ID <= 0) throw new ArgumentOutOfRangeException("Product's ProductFamily-> ID must be > 0");
+            if (ProductID <= 0) throw new ArgumentOutOfRangeException("ProductID is not valid");
+
+            var ProductXML = new StringBuilder(GetXMLStringIfApplicable());
+            ProductXML.Append("<product>");
+            if (!string.IsNullOrWhiteSpace(UpdatedProduct.Name) && ExistingProduct.Name != UpdatedProduct.Name) ProductXML.AppendFormat("<name>{0}</name>", HttpUtility.HtmlEncode(UpdatedProduct.Name));
+            if (UpdatedProduct.PriceInCents != int.MinValue && ExistingProduct.PriceInCents != UpdatedProduct.PriceInCents) ProductXML.AppendFormat("<price_in_cents>{0}</price_in_cents>", UpdatedProduct.PriceInCents);
+            if (UpdatedProduct.Interval != int.MinValue && ExistingProduct.Interval != UpdatedProduct.Interval) ProductXML.AppendFormat("<interval>{0}</interval>", UpdatedProduct.Interval);
+            ProductXML.AppendFormat("<interval_unit>{0}</interval_unit>", Enum.GetName(typeof(IntervalUnit), UpdatedProduct.IntervalUnit).ToLowerInvariant());
+            if (!string.IsNullOrEmpty(UpdatedProduct.Handle) && ExistingProduct.Handle != UpdatedProduct.Handle) ProductXML.AppendFormat("<handle>{0}</handle>", UpdatedProduct.Handle);
+            if (!string.IsNullOrEmpty(UpdatedProduct.AccountingCode) && ExistingProduct.AccountingCode != UpdatedProduct.AccountingCode) ProductXML.AppendFormat("<accounting_code>{0}</accounting_code>", UpdatedProduct.AccountingCode);
+            if (!string.IsNullOrEmpty(UpdatedProduct.Description) && ExistingProduct.Description != UpdatedProduct.Description) ProductXML.AppendFormat("<description>{0}</description>", HttpUtility.HtmlEncode(UpdatedProduct.Description));
+            ProductXML.Append("</product>");
+
+            string response = this.DoRequest(string.Format("products/{0}.{1}", ProductID, GetMethodExtension()), HttpRequestMethod.Put, ProductXML.ToString());
+            // change the response to the object
+            return response.ConvertResponseTo<Product>("product");
+        }
 
         /// <summary>
         /// Method to create a new product and add it to the site

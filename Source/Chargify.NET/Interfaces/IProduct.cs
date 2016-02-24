@@ -64,7 +64,7 @@ using System.Collections.Generic;
         /// <summary>
         /// Get the price (in cents)
         /// </summary>
-        int PriceInCents { get; }
+        int PriceInCents { get; set; }
 
         /// <summary>
         /// Get the price, in dollars and cents.
@@ -74,7 +74,7 @@ using System.Collections.Generic;
         /// <summary>
         /// Get the name of this product
         /// </summary>
-        string Name { get; }
+        string Name { get; set; }
 
         /// <summary>
         /// The ID of the product
@@ -84,12 +84,12 @@ using System.Collections.Generic;
         /// <summary>
         /// Get the handle to this product
         /// </summary>
-        string Handle { get; }
+        string Handle { get; set; }
 
         /// <summary>
         /// Get the description of the product
         /// </summary>
-        string Description { get; }
+        string Description { get; set; }
 
         /// <summary>
         /// Get the product family for this product
@@ -99,22 +99,22 @@ using System.Collections.Generic;
         /// <summary>
         /// Get the accounting code for this product
         /// </summary>
-        string AccountingCode { get; }
+        string AccountingCode { get; set; }
 
         /// <summary>
         /// Get the interval unit (day, month) for this product
         /// </summary>
-        IntervalUnit IntervalUnit { get; }
+        IntervalUnit IntervalUnit { get; set; }
 
         /// <summary>
         /// Get the renewal interval for this product
         /// </summary>
-        int Interval { get; }
+        int Interval { get; set; }
 
         /// <summary>
         /// Get the up front charge for this product, in cents. 
         /// </summary>
-        int InitialChargeInCents { get; }
+        int InitialChargeInCents { get; set; }
 
         /// <summary>
         /// Get the up front charge for this product, in dollars and cents.
@@ -124,7 +124,7 @@ using System.Collections.Generic;
         /// <summary>
         /// Get the price of the trial period for a subscription to this product, in cents.
         /// </summary>
-        int TrialPriceInCents { get; }
+        int TrialPriceInCents { get; set; }
 
         /// <summary>
         /// Get the price of the trial period for a subscription to this product, in dollars and cents.
@@ -134,42 +134,42 @@ using System.Collections.Generic;
         /// <summary>
         /// A numerical interval for the length of the trial period of a subscription to this product.
         /// </summary>
-        int TrialInterval { get; }
+        int TrialInterval { get; set; }
 
         /// <summary>
         /// The trial interval unit for this product, either "month" or "day"
         /// </summary>
-        IntervalUnit TrialIntervalUnit { get; }
+        IntervalUnit TrialIntervalUnit { get; set; }
 
         /// <summary>
         /// A numerical interval for the length a subscription to this product will run before it expires.
         /// </summary>
-        int ExpirationInterval { get; }
+        int ExpirationInterval { get; set; }
 
         /// <summary>
         /// The expiration interval for this product, either "month" or "day"
         /// </summary>
-        IntervalUnit ExpirationIntervalUnit { get; }
+        IntervalUnit ExpirationIntervalUnit { get; set; }
 
         /// <summary>
         /// The URL the buyer is returned to after successful purchase.
         /// </summary>
-        string ReturnURL { get; }
+        string ReturnURL { get; set; }
 
         /// <summary>
         /// The parameter string chargify will use in constructing the return URL.
         /// </summary>
-        string ReturnParams { get; }
+        string ReturnParams { get; set; }
 
         /// <summary>
         /// This product requires a credit card
         /// </summary>
-        bool RequireCreditCard { get; }
+        bool RequireCreditCard { get; set; }
 
         /// <summary>
         /// This product requests a credit card
         /// </summary>
-        bool RequestCreditCard { get; }
+        bool RequestCreditCard { get; set; }
 
         /// <summary>
         /// Timestamp indicating when this product was created.
