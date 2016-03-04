@@ -141,16 +141,85 @@ namespace ChargifyNET
         /// </summary>
         string ReferralCode { get; set; }
 
+        /// <summary>
+        /// The ability to specify what specific day of the month that the billing
+        /// should be done on. Cannot be used when also specifying NextBillingAt.
+        /// </summary>
+        CalendarBillingAttributes CalendarBilling { get; set; }
+
+        /// <summary>
+        /// The list of components to set when creating the subscription
+        /// </summary>
+        List<ComponentDetails> Components { get; set; }
+
         // TODO: Add this
-        //CalendarBillingAttributes CalendarBilling { get; set; } 
         //Dictionary<string, string> Metafields { get; set; }
-        //Dictionary<int, string> Components { get; set; }
+
+    }
+
+    [XmlType("component")]
+    [Serializable]
+    public class ComponentDetails
+    {
+        [XmlElement("component_id")]
+        public int? ComponentID { get; set; }
+        public bool ShouldSerializeComponentID()
+        {
+            return ComponentID.HasValue;
+        }
+
+        [XmlElement("enabled")]
+        public bool? Enabled { get; set; }
+        public bool ShouldSerializeEnabled()
+        {
+            return Enabled.HasValue;
+        }
+
+        [XmlElement("allocated_quantity")]
+        public int? AllocatedQuantity { get; set; }
+        public bool ShouldSerializeAllocatedQuantity()
+        {
+            return AllocatedQuantity.HasValue;
+        }
+    }
+
+    [XmlType("calendar_billing")]
+    [Serializable]
+    public class CalendarBillingAttributes
+    {
+        [XmlElement("snap_day")]
+        public string SnapDay { get; set; }
+        public bool ShouldSerializeSnapDay()
+        {
+            return !string.IsNullOrWhiteSpace(SnapDay);
+        }
     }
 
     [XmlType("subscription")]
     [Serializable]
     public class SubscriptionCreateOptions: ISubscriptionCreateOptions
     {
+        /// <summary>
+        /// The list of components to set when creating the subscription
+        /// </summary>
+        [XmlArray("components")]
+        public List<ComponentDetails> Components { get; set; }
+        public bool ShouldSerializeComponents()
+        {
+            return Components != null && Components.Count > 0;
+        }
+
+        /// <summary>
+        /// The ability to specify what specific day of the month that the billing
+        /// should be done on. Cannot be used when also specifying NextBillingAt.
+        /// </summary>
+        [XmlElement("calendar_billing")]
+        public CalendarBillingAttributes CalendarBilling { get; set; }
+        public bool ShouldSerializeCalendarBilling()
+        {
+            return CalendarBilling != null && !NextBillingAt.HasValue && !string.IsNullOrWhiteSpace(CalendarBilling.SnapDay);
+        }
+
         /// <summary>
         /// The ACH agreements terms
         /// </summary>
