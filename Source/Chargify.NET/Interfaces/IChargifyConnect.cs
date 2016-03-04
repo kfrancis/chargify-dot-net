@@ -311,7 +311,7 @@ namespace ChargifyNET
         /// Get or set the API key
         /// </summary>
         string apiKey { get; set; }
-        
+
         /// <summary>
         /// Method for creating a new product family via the API
         /// </summary>
@@ -510,6 +510,15 @@ namespace ChargifyNET
         /// <param name="CreditCardAttributes">The credit card attributes</param>
         /// <returns>The xml describing the new subsscription</returns>
         ISubscription CreateSubscription(string ProductHandle, int ChargifyID, ICreditCardAttributes CreditCardAttributes);
+        /// <summary>
+        /// Create a subscription
+        /// </summary>
+        /// <param name="ProductHandle">The handle of the product</param>
+        /// <param name="ChargifyID">The ID of the customer who should be used in this new subscription</param>
+        /// <param name="CreditCardAttributes">The credit card attributes to use for the new subscription</param>
+        /// <param name="NextBillingAt">The date that should be used for the next_billing_at</param>
+        /// <returns>The new subscription, if successful. Null otherwise.</returns>
+        ISubscription CreateSubscription(string ProductHandle, int ChargifyID, ICreditCardAttributes CreditCardAttributes, DateTime NextBillingAt);
         //ISubscription CreateSubscription(string ProductHandle, int ChargifyID, ICreditCardAttributes CreditCardAttributes, DateTime NextBillingAt);
         /// <summary>
         /// Create a subscription using a coupon for discounted rate, without using credit card information.
@@ -520,7 +529,6 @@ namespace ChargifyNET
         /// <param name="paymentCollectionMethod">Optional, type of payment collection method</param>
         /// <returns>If sucessful, the subscription object. Otherwise null.</returns>
         ISubscription CreateSubscription(string ProductHandle, int ChargifyID, string CouponCode, PaymentCollectionMethod? paymentCollectionMethod);
-
         /// <summary>
         /// Create a new subscription without requiring credit card information
         /// </summary>

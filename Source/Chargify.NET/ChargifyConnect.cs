@@ -1668,6 +1668,23 @@ namespace ChargifyNET
         }
 
         /// <summary>
+        /// Create a subscription
+        /// </summary>
+        /// <param name="ProductHandle">The handle of the product</param>
+        /// <param name="ChargifyID">The ID of the customer who should be used in this new subscription</param>
+        /// <param name="CreditCardAttributes">The credit card attributes to use for the new subscription</param>
+        /// <param name="NextBillingAt">The date that should be used for the next_billing_at</param>
+        /// <returns>The new subscription, if successful. Null otherwise.</returns>
+        public ISubscription CreateSubscription(string ProductHandle, int ChargifyID, ICreditCardAttributes CreditCardAttributes, DateTime NextBillingAt)
+        {
+            // make sure data is valid
+            if (CreditCardAttributes == null) throw new ArgumentNullException("CreditCardAttributes");
+            if (ChargifyID == int.MinValue) throw new ArgumentException("Invalid Customer ID detected", "ChargifyID");
+
+            return CreateSubscription(new SubscriptionCreateOptions() {  ProductHandle = ProductHandle, CustomerID = ChargifyID, CreditCardAttributes = (CreditCardAttributes)CreditCardAttributes, NextBillingAt = NextBillingAt });
+        }
+
+        /// <summary>
         /// Create a subscription using a coupon for discounted rate, without using credit card information.
         /// </summary>
         /// <param name="ProductHandle">The product to subscribe to</param>
