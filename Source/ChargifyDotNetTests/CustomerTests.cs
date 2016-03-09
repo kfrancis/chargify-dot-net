@@ -149,6 +149,21 @@ namespace ChargifyDotNetTests
         }
 
         [Test]
+        public void Customer_Update_Nothing()
+        {
+            // Arrange
+            var customers = Chargify.GetCustomerList().Keys;
+            var referenceValue = customers.FirstOrDefault(systemID => !string.IsNullOrWhiteSpace(systemID));
+            ICustomer customer = Chargify.LoadCustomer(referenceValue);
+
+            // Act
+            var updatedCustomer = Chargify.UpdateCustomer(customer);
+
+            // Assert
+            Assert.IsNotNull(updatedCustomer);
+        }
+
+        [Test]
         public void Customer_UpdateCustomer()
         {
             // Load our test customer

@@ -588,38 +588,48 @@ namespace ChargifyNET
             if (Customer == null) throw new ArgumentNullException("Customer");
             if (Customer.ChargifyID == int.MinValue) throw new ArgumentException("Invalid chargify ID detected", "Customer.ChargifyID");
             ICustomer OldCust = this.LoadCustomer(Customer.ChargifyID);
+
+            bool isUpdateRequired = false;
+
             // create XML for creation of customer
             var customerXml = new StringBuilder(GetXMLStringIfApplicable());
             customerXml.Append("<customer>");
             if (OldCust != null)
             {
                 if (OldCust.ChargifyID != Customer.ChargifyID) throw new ArgumentException("Not unique", "Customer.SystemID");
-                if (OldCust.FirstName != Customer.FirstName) customerXml.AppendFormat("<first_name>{0}</first_name>", HttpUtility.HtmlEncode(Customer.FirstName));
-                if (OldCust.LastName != Customer.LastName) customerXml.AppendFormat("<last_name>{0}</last_name>", HttpUtility.HtmlEncode(Customer.LastName));
-                if (OldCust.Email != Customer.Email) customerXml.AppendFormat("<email>{0}</email>", Customer.Email);
-                if (OldCust.Organization != Customer.Organization) customerXml.AppendFormat("<organization>{0}</organization>", HttpUtility.HtmlEncode(Customer.Organization));
-                if (OldCust.Phone != Customer.Phone) customerXml.AppendFormat("<phone>{0}</phone>", HttpUtility.HtmlEncode(Customer.Phone));
-                if (OldCust.SystemID != Customer.SystemID) customerXml.AppendFormat("<reference>{0}</reference>", Customer.SystemID);
-                if (OldCust.ShippingAddress != Customer.ShippingAddress) customerXml.AppendFormat("<address>{0}</address>", HttpUtility.HtmlEncode(Customer.ShippingAddress));
-                if (OldCust.ShippingAddress2 != Customer.ShippingAddress2) customerXml.AppendFormat("<address_2>{0}</address_2>", HttpUtility.HtmlEncode(Customer.ShippingAddress2));
-                if (OldCust.ShippingCity != Customer.ShippingCity) customerXml.AppendFormat("<city>{0}</city>", HttpUtility.HtmlEncode(Customer.ShippingCity));
-                if (OldCust.ShippingState != Customer.ShippingState) customerXml.AppendFormat("<state>{0}</state>", HttpUtility.HtmlEncode(Customer.ShippingState));
-                if (OldCust.ShippingZip != Customer.ShippingZip) customerXml.AppendFormat("<zip>{0}</zip>", Customer.ShippingZip);
-                if (OldCust.ShippingCountry != Customer.ShippingCountry) customerXml.AppendFormat("<country>{0}</country>", HttpUtility.HtmlEncode(Customer.ShippingCountry));
+                if (OldCust.FirstName != Customer.FirstName) { customerXml.AppendFormat("<first_name>{0}</first_name>", HttpUtility.HtmlEncode(Customer.FirstName)); isUpdateRequired = true; }
+                if (OldCust.LastName != Customer.LastName) { customerXml.AppendFormat("<last_name>{0}</last_name>", HttpUtility.HtmlEncode(Customer.LastName)); isUpdateRequired = true; }
+                if (OldCust.Email != Customer.Email) { customerXml.AppendFormat("<email>{0}</email>", Customer.Email); isUpdateRequired = true; }
+                if (OldCust.Organization != Customer.Organization) { customerXml.AppendFormat("<organization>{0}</organization>", HttpUtility.HtmlEncode(Customer.Organization)); isUpdateRequired = true; }
+                if (OldCust.Phone != Customer.Phone) { customerXml.AppendFormat("<phone>{0}</phone>", HttpUtility.HtmlEncode(Customer.Phone)); isUpdateRequired = true; }
+                if (OldCust.SystemID != Customer.SystemID) { customerXml.AppendFormat("<reference>{0}</reference>", Customer.SystemID); isUpdateRequired = true; }
+                if (OldCust.ShippingAddress != Customer.ShippingAddress) { customerXml.AppendFormat("<address>{0}</address>", HttpUtility.HtmlEncode(Customer.ShippingAddress)); isUpdateRequired = true; }
+                if (OldCust.ShippingAddress2 != Customer.ShippingAddress2) { customerXml.AppendFormat("<address_2>{0}</address_2>", HttpUtility.HtmlEncode(Customer.ShippingAddress2)); isUpdateRequired = true; }
+                if (OldCust.ShippingCity != Customer.ShippingCity) { customerXml.AppendFormat("<city>{0}</city>", HttpUtility.HtmlEncode(Customer.ShippingCity)); isUpdateRequired = true; }
+                if (OldCust.ShippingState != Customer.ShippingState) { customerXml.AppendFormat("<state>{0}</state>", HttpUtility.HtmlEncode(Customer.ShippingState)); isUpdateRequired = true; }
+                if (OldCust.ShippingZip != Customer.ShippingZip) { customerXml.AppendFormat("<zip>{0}</zip>", Customer.ShippingZip); isUpdateRequired = true; }
+                if (OldCust.ShippingCountry != Customer.ShippingCountry) { customerXml.AppendFormat("<country>{0}</country>", HttpUtility.HtmlEncode(Customer.ShippingCountry)); isUpdateRequired = true; }
             }
             customerXml.Append("</customer>");
 
-            try
+            if (isUpdateRequired)
             {
-                // now make the request
-                string response = this.DoRequest(string.Format("customers/{0}.{1}", Customer.ChargifyID, GetMethodExtension()), HttpRequestMethod.Put, customerXml.ToString());
-                // change the response to the object
-                return response.ConvertResponseTo<Customer>("customer");
+                try
+                {
+                    // now make the request
+                    string response = this.DoRequest(string.Format("customers/{0}.{1}", Customer.ChargifyID, GetMethodExtension()), HttpRequestMethod.Put, customerXml.ToString());
+                    // change the response to the object
+                    return response.ConvertResponseTo<Customer>("customer");
+                }
+                catch (ChargifyException cex)
+                {
+                    if (cex.StatusCode == HttpStatusCode.NotFound) throw new InvalidOperationException("Customer not found");
+                    throw;
+                }
             }
-            catch (ChargifyException cex)
+            else
             {
-                if (cex.StatusCode == HttpStatusCode.NotFound) throw new InvalidOperationException("Customer not found");
-                throw;
+                return Customer;
             }
         }
 
