@@ -36,6 +36,7 @@ namespace ChargifyNET
     using System.Xml;
     using ChargifyNET.Json;
     using System.Web;
+    using System.Xml.Serialization;
     #endregion
 
     /// <summary>
@@ -272,56 +273,163 @@ namespace ChargifyNET
         /// <summary>
         /// Get or set the customer's first name
         /// </summary>
+        [XmlElement("first_name")]
         public string FirstName { get; set; }
+        /// <summary>
+        /// Ignore, used for determining if the value should be serialized
+        /// </summary>
+        public bool ShouldSerializeFirstName()
+        {
+            return !string.IsNullOrEmpty(FirstName);
+        }
+
         /// <summary>
         /// Get or set the customer's last name
         /// </summary>
+        [XmlElement("last_name")]
         public string LastName { get; set; }
+        /// <summary>
+        /// Ignore, used for determining if the value should be serialized
+        /// </summary>
+        public bool ShouldSerializeLastName()
+        {
+            return !string.IsNullOrEmpty(LastName);
+        }
+
         /// <summary>
         /// Get or set the customer's email address
         /// </summary>
+        [XmlElement("email")]
         public string Email { get; set; }
+        /// <summary>
+        /// Ignore, used for determining if the value should be serialized
+        /// </summary>
+        public bool ShouldSerializeEmail()
+        {
+            return !string.IsNullOrEmpty(Email);
+        }
+
         /// <summary>
         /// The customer's phone number
         /// </summary>
+        [XmlElement("phone")]
         public string Phone { get; set; }
+        /// <summary>
+        /// Ignore, used for determining if the value should be serialized
+        /// </summary>
+        public bool ShouldSerializePhone()
+        {
+            return !string.IsNullOrEmpty(Phone);
+        }
+
         /// <summary>
         /// Get or set the customer's organization
         /// </summary>
+        [XmlElement("organization")]
         public string Organization { get; set; }
+        /// <summary>
+        /// Ignore, used for determining if the value should be serialized
+        /// </summary>
+        public bool ShouldSerializeOrganization()
+        {
+            return !string.IsNullOrEmpty(Organization);
+        }
 
         /// <summary>
         /// The customers vat number
         /// </summary>
+        [XmlIgnore()]
         public string VatNumber { get; set; }
+        /// <summary>
+        /// Ignore, used for determining if the value should be serialized
+        /// </summary>
+        public bool ShouldSerializeVatNumber()
+        {
+            return !string.IsNullOrEmpty(VatNumber);
+        }
 
         /// <summary>
         /// The customers shipping address
         /// </summary>
+        [XmlElement("address")]
         public string ShippingAddress { get; set; }
+        /// <summary>
+        /// Ignore, used for determining if the value should be serialized
+        /// </summary>
+        public bool ShouldSerializeShippingAddress()
+        {
+            return !string.IsNullOrEmpty(ShippingAddress);
+        }
+
         /// <summary>
         /// The customers shipping address 2
         /// </summary>
+        [XmlElement("address_2")]
         public string ShippingAddress2 { get; set; }
+        /// <summary>
+        /// Ignore, used for determining if the value should be serialized
+        /// </summary>
+        public bool ShouldSerializeShippingAddress2()
+        {
+            return !string.IsNullOrEmpty(ShippingAddress2);
+        }
+
         /// <summary>
         /// The customers shipping city
         /// </summary>
+        [XmlElement("city")]
         public string ShippingCity { get; set; }
+        /// <summary>
+        /// Ignore, used for determining if the value should be serialized
+        /// </summary>
+        public bool ShouldSerializeShippingCity2()
+        {
+            return !string.IsNullOrEmpty(ShippingCity);
+        }
+
         /// <summary>
         /// The customers shipping zip/postal code
         /// </summary>
+        [XmlElement("zip")]
         public string ShippingZip { get; set; }
+        /// <summary>
+        /// Ignore, used for determining if the value should be serialized
+        /// </summary>
+        public bool ShouldSerializeShippingZip()
+        {
+            return !string.IsNullOrEmpty(ShippingZip);
+        }
+
         /// <summary>
         /// The customers shipping state
         /// </summary>
+        [XmlElement("state")]
         public string ShippingState { get; set; }
+        /// <summary>
+        /// Ignore, used for determining if the value should be serialized
+        /// </summary>
+        public bool ShouldSerializeShippingState()
+        {
+            return !string.IsNullOrEmpty(ShippingState);
+        }
+
         /// <summary>
         /// The customers shipping country
         /// </summary>
+        [XmlElement("country")]
         public string ShippingCountry { get; set; }
+        /// <summary>
+        /// Ignore, used for determining if the value should be serialized
+        /// </summary>
+        public bool ShouldSerializeShippingCountry()
+        {
+            return !string.IsNullOrEmpty(ShippingCountry);
+        }
+
         /// <summary>
         /// Get or set the customer's ID in the calling system
         /// </summary>
+        [XmlElement("reference")]
         public string SystemID
         {
             get
@@ -334,10 +442,18 @@ namespace ChargifyNET
             }
         }
         private string _systemID = string.Empty;
+        /// <summary>
+        /// Ignore, used for determining if the value should be serialized
+        /// </summary>
+        public bool ShouldSerializeSystemID()
+        {
+            return !string.IsNullOrEmpty(SystemID);
+        }
 
         /// <summary>
         /// Get the full name LastName FirstName for the customer
         /// </summary>
+        [XmlIgnore]
         public string FullName
         {
             get

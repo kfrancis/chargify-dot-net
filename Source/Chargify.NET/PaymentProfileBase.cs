@@ -32,6 +32,7 @@ namespace ChargifyNET
 {
     #region Imports
     using System;
+    using System.Xml.Serialization;
     #endregion
 
     /// <summary>
@@ -79,62 +80,151 @@ namespace ChargifyNET
         /// <summary>
         /// The Chargify-assigned ID of the stored card.
         /// </summary>
+        [XmlIgnore]
         public int Id { get; set; }
 
         /// <summary>
         /// Get or set the first name on the card
         /// </summary>
+        [XmlElement("first_name")]
         public string FirstName { get; set; }
+        /// <summary>
+        /// Ignore, used for determining if the value should be serialized
+        /// </summary>
+        public bool ShouldSerializeFirstName()
+        {
+            return !string.IsNullOrEmpty(FirstName);
+        }
 
         /// <summary>
         /// Get or set the last name on the card
         /// </summary>
+        [XmlElement("last_name")]
         public string LastName { get; set; }
+        /// <summary>
+        /// Ignore, used for determining if the value should be serialized
+        /// </summary>
+        public bool ShouldSerializeLastName()
+        {
+            return !string.IsNullOrEmpty(LastName);
+        }
 
         /// <summary>
         /// Get or set the full credit card number
         /// </summary>
+        [XmlElement("full_number")]
         public string FullNumber { get; set; }
+        /// <summary>
+        /// Ignore, used for determining if the value should be serialized
+        /// </summary>
+        public bool ShouldSerializeFullNumber()
+        {
+            return !string.IsNullOrEmpty(FullNumber);
+        }
 
         /// <summary>
         /// Get or set the expiration month
         /// </summary>
+        [XmlElement("expiration_month")]
         public int ExpirationMonth { get; set; }
+        /// <summary>
+        /// Ignore, used for determining if the value should be serialized
+        /// </summary>
+        public bool ShouldSerializeExpirationMonth()
+        {
+            return ExpirationMonth != int.MinValue;
+        }
 
         /// <summary>
         /// Get or set the expiration year
         /// </summary>
+        [XmlElement("expiration_year")]
         public int ExpirationYear { get; set; }
+        /// <summary>
+        /// Ignore, used for determining if the value should be serialized
+        /// </summary>
+        public bool ShouldSerializeExpirationYear()
+        {
+            return ExpirationYear != int.MinValue;
+        }
 
         /// <summary>
         /// Get or set the billing address of the credit card
         /// </summary>
+        [XmlElement("billing_address")]
         public string BillingAddress { get; set; }
+        /// <summary>
+        /// Ignore, used for determining if the value should be serialized
+        /// </summary>
+        public bool ShouldSerializeBillingAddress()
+        {
+            return !string.IsNullOrEmpty(BillingAddress);
+        }
 
         /// <summary>
         /// Get or set the billing address 2 of the credit card
         /// </summary>
+        [XmlElement("billing_address_2")]
         public string BillingAddress2 { get; set; }
+        /// <summary>
+        /// Ignore, used for determining if the value should be serialized
+        /// </summary>
+        public bool ShouldSerializeBillingAddress2()
+        {
+            return !string.IsNullOrEmpty(BillingAddress2);
+        }
 
         /// <summary>
         /// Get or set the billing city of the credit card
         /// </summary>
+        [XmlElement("billing_city")]
         public string BillingCity { get; set; }
+        /// <summary>
+        /// Ignore, used for determining if the value should be serialized
+        /// </summary>
+        public bool ShouldSerializeBillingCity()
+        {
+            return !string.IsNullOrEmpty(BillingCity);
+        }
 
         /// <summary>
         /// Get or set the billing state or province of the credit card
         /// </summary>
+        [XmlElement("billing_state")]
         public string BillingState { get; set; }
+        /// <summary>
+        /// Ignore, used for determining if the value should be serialized
+        /// </summary>
+        public bool ShouldSerializeBillingState()
+        {
+            return !string.IsNullOrEmpty(BillingState);
+        }
 
         /// <summary>
         /// Get or set the billing zip code or postal code of the credit card
         /// </summary>
+        [XmlElement("billing_zip")]
         public string BillingZip { get; set; }
+        /// <summary>
+        /// Ignore, used for determining if the value should be serialized
+        /// </summary>
+        public bool ShouldSerializeBillingZip()
+        {
+            return !string.IsNullOrEmpty(BillingZip);
+        }
 
         /// <summary>
         /// Get or set the billing country of the credit card
         /// </summary>
+        [XmlElement("billing_country")]
         public string BillingCountry { get; set; }
+        /// <summary>
+        /// Ignore, used for determining if the value should be serialized
+        /// </summary>
+        public bool ShouldSerializeBillingCountry()
+        {
+            return !string.IsNullOrEmpty(BillingCountry);
+        }
 
         #endregion
     }

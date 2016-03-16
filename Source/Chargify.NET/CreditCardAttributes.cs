@@ -32,6 +32,7 @@ namespace ChargifyNET
 {
     #region Imports
     using System.Diagnostics;
+    using System.Xml.Serialization;
     #endregion
 
     /// <summary>
@@ -82,7 +83,15 @@ namespace ChargifyNET
         /// <summary>
         /// Get or set the CVV number on the credit card
         /// </summary>
+        [XmlElement("cvv")]
         public string CVV { get; set; }
+        /// <summary>
+        /// Ignore, used for determining if the value should be serialized
+        /// </summary>
+        public bool ShouldSerializeCVV()
+        {
+            return !string.IsNullOrEmpty(CVV);
+        }
 
         #endregion
 

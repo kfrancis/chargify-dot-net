@@ -32,6 +32,7 @@ namespace ChargifyNET
 {
     #region Imports
     using System;
+    using System.Xml.Serialization;
     #endregion
 
     /// <summary>
@@ -46,18 +47,32 @@ namespace ChargifyNET
         /// <summary>
         /// A charge is added for the prorated amount due, but the card is not charged until the subscription’s next renewal
         /// </summary>
+        [XmlEnum("prorate-delay-capture")]
         Prorate_Delay_Capture,
         /// <summary>
         /// A charge is added and we attempt to charge the credit card on file. If it fails, the charge will be accrued until the next renewal.
         /// </summary>
+        [XmlEnum("prorate-attempt-capture")]
         Prorate_Attempt_Capture,
         /// <summary>
         /// No charge is added.
         /// </summary>
+        [XmlEnum("no-prorate")]
         No_Prorate,
+        /// <summary>
+        /// A charge is added for the full price of the component change, and we attempt to charge the credit card on file. If it fails, the charge will be accrued until the next renewal.
+        /// </summary>
+        [XmlEnum("full-price-attempt-capture")]
+        Full_Price_Attempt_Capture,
+        /// <summary>
+        /// A charge is added for the full price of the component change, but the card is not charged until the subscription’s next renewal.
+        /// </summary>
+        [XmlEnum("full-price-delay-capture")]
+        Full_Price_Delay_Capture,
         /// <summary>
         /// No value (internal to this library)
         /// </summary>
+        [XmlIgnore]
         Unknown
     }
 
@@ -73,14 +88,17 @@ namespace ChargifyNET
         /// <summary>
         /// A credit is added for the amount owed.
         /// </summary>
+        [XmlEnum("prorate")]
         Prorate,
         /// <summary>
         /// No credit is added
         /// </summary>
+        [XmlEnum("no-prorate")]
         No_Prorate,
         /// <summary>
         /// No value (internal to this library)
         /// </summary>
+        [XmlIgnore]
         Unknown
     }
 

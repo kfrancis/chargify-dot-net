@@ -37,6 +37,9 @@ namespace ChargifyNET
     using System.Xml.Serialization;
     #endregion
 
+    /// <summary>
+    /// The options that allow you to create a subscription. You must set at least a product (by ID or by handle) and a customer (by ID, by attributes or by reference value)
+    /// </summary>
     public interface ISubscriptionCreateOptions
     {
         /// <summary>
@@ -161,8 +164,14 @@ namespace ChargifyNET
     [Serializable]
     public class ComponentDetails
     {
+        /// <summary>
+        /// The ID of the component
+        /// </summary>
         [XmlElement("component_id")]
         public int? ComponentID { get; set; }
+        /// <summary>
+        /// Ignore, used to determine if the field should be serialized
+        /// </summary>
         public bool ShouldSerializeComponentID()
         {
             return ComponentID.HasValue;
@@ -170,6 +179,9 @@ namespace ChargifyNET
 
         [XmlElement("enabled")]
         public bool? Enabled { get; set; }
+        /// <summary>
+        /// Ignore, used to determine if the field should be serialized
+        /// </summary>
         public bool ShouldSerializeEnabled()
         {
             return Enabled.HasValue;
@@ -177,10 +189,33 @@ namespace ChargifyNET
 
         [XmlElement("allocated_quantity")]
         public int? AllocatedQuantity { get; set; }
+        /// <summary>
+        /// Ignore, used to determine if the field should be serialized
+        /// </summary>
         public bool ShouldSerializeAllocatedQuantity()
         {
             return AllocatedQuantity.HasValue;
         }
+
+        ///// <summary>
+        ///// The scheme used if the proration was an upgrade. This is only present when the allocation was created mid-period.
+        ///// </summary>
+        //[XmlElement("proration_upgrade_scheme")]
+        //public ComponentUpgradeProrationScheme? UpgradeScheme { get; set; }
+        //public bool ShouldSerializeUpgradeScheme()
+        //{
+        //    return UpgradeScheme.HasValue && UpgradeScheme.Value != ComponentUpgradeProrationScheme.Unknown;
+        //}
+
+        ///// <summary>
+        ///// The scheme used if the proration was a downgrade. This is only present when the allocation was created mid-period.
+        ///// </summary>
+        //[XmlElement("proration_downgrade_scheme")]
+        //public ComponentDowngradeProrationScheme? DowngradeScheme { get; set; }
+        //public bool ShouldSerializeDowngradeScheme()
+        //{
+        //    return DowngradeScheme.HasValue && DowngradeScheme.Value != ComponentDowngradeProrationScheme.Unknown;
+        //}
     }
 
     [XmlType("calendar_billing")]
@@ -189,6 +224,9 @@ namespace ChargifyNET
     {
         [XmlElement("snap_day")]
         public string SnapDay { get; set; }
+        /// <summary>
+        /// Ignore, used to determine if the field should be serialized
+        /// </summary>
         public bool ShouldSerializeSnapDay()
         {
             return !string.IsNullOrWhiteSpace(SnapDay);
@@ -204,6 +242,9 @@ namespace ChargifyNET
         /// </summary>
         [XmlArray("components")]
         public List<ComponentDetails> Components { get; set; }
+        /// <summary>
+        /// Ignore, used to determine if the field should be serialized
+        /// </summary>
         public bool ShouldSerializeComponents()
         {
             return Components != null && Components.Count > 0;
@@ -215,6 +256,9 @@ namespace ChargifyNET
         /// </summary>
         [XmlElement("calendar_billing")]
         public CalendarBillingAttributes CalendarBilling { get; set; }
+        /// <summary>
+        /// Ignore, used to determine if the field should be serialized
+        /// </summary>
         public bool ShouldSerializeCalendarBilling()
         {
             return CalendarBilling != null && !NextBillingAt.HasValue && !string.IsNullOrWhiteSpace(CalendarBilling.SnapDay);
@@ -225,6 +269,9 @@ namespace ChargifyNET
         /// </summary>
         [XmlElement("agreement_terms")]
         public string AgreementTerms { get; set; }
+        /// <summary>
+        /// Ignore, used to determine if the field should be serialized
+        /// </summary>
         public bool ShouldSerializeAgreementTerms()
         {
             return !string.IsNullOrWhiteSpace(AgreementTerms);
@@ -236,6 +283,9 @@ namespace ChargifyNET
         /// </summary>
         [XmlElement("cancellation_message")]
         public string CancellationMessage { get; set; }
+        /// <summary>
+        /// Ignore, used to determine if the field should be serialized
+        /// </summary>
         public bool ShouldSerializeCancellationMessage()
         {
             return !string.IsNullOrWhiteSpace(CancellationMessage);
@@ -246,6 +296,9 @@ namespace ChargifyNET
         /// </summary>
         [XmlElement("coupon_code")]
         public string CouponCode { get; set; }
+        /// <summary>
+        /// Ignore, used to determine if the field should be serialized
+        /// </summary>
         public bool ShouldSerializeCouponCode()
         {
             return !string.IsNullOrWhiteSpace(CouponCode);
@@ -263,6 +316,9 @@ namespace ChargifyNET
         /// </summary>
         [XmlElement("customer_id")]
         public int? CustomerID { get; set; }
+        /// <summary>
+        /// Ignore, used to determine if the field should be serialized
+        /// </summary>
         public bool ShouldSerializeCustomerID()
         {
             return CustomerID.HasValue;
@@ -275,6 +331,9 @@ namespace ChargifyNET
         /// </summary>
         [XmlElement("customer_reference")]
         public string CustomerReference { get; set; }
+        /// <summary>
+        /// Ignore, used to determine if the field should be serialized
+        /// </summary>
         public bool ShouldSerializeCustomerReference()
         {
             return !string.IsNullOrWhiteSpace(CustomerReference);
@@ -287,6 +346,9 @@ namespace ChargifyNET
         /// </summary>
         [XmlElement("expiration_tracks_next_billing_change")]
         public bool? ExpirationTracksNextBillingChange { get; set; }
+        /// <summary>
+        /// Ignore, used to determine if the field should be serialized
+        /// </summary>
         public bool ShouldSerializeExpirationTracksNextBillingChange()
         {
             return ExpirationTracksNextBillingChange.HasValue;
@@ -298,6 +360,9 @@ namespace ChargifyNET
         /// </summary>
         [XmlElement("next_billing_at")]
         public DateTime? NextBillingAt { get; set; }
+        /// <summary>
+        /// Ignore, used to determine if the field should be serialized
+        /// </summary>
         public bool ShouldSerializeNextBillingAt()
         {
             return NextBillingAt.HasValue;
@@ -309,6 +374,9 @@ namespace ChargifyNET
         /// </summary>
         [XmlElement("payment_collection_method")]
         public PaymentCollectionMethod? PaymentCollectionMethod { get; set; }
+        /// <summary>
+        /// Ignore, used to determine if the field should be serialized
+        /// </summary>
         public bool ShouldSerializePaymentCollectionMethod()
         {
             return PaymentCollectionMethod.HasValue;
@@ -332,6 +400,9 @@ namespace ChargifyNET
         /// </summary>
         [XmlElement("payment_profile_id")]
         public int? PaymentProfileID { get; set; }
+        /// <summary>
+        /// Ignore, used to determine if the field should be serialized
+        /// </summary>
         public bool ShouldSerializePaymentProfileID()
         {
             return PaymentProfileID.HasValue;
@@ -344,6 +415,9 @@ namespace ChargifyNET
         /// </summary>
         [XmlElement("product_change_delayed")]
         public bool? ProductChangeDelayed { get; set; }
+        /// <summary>
+        /// Ignore, used to determine if the field should be serialized
+        /// </summary>
         public bool ShouldSerializeProductChangeDelayed()
         {
             return ProductChangeDelayed.HasValue;
@@ -355,6 +429,9 @@ namespace ChargifyNET
         /// </summary>
         [XmlElement("product_handle")]
         public string ProductHandle { get; set; }
+        /// <summary>
+        /// Ignore, used to determine if the field should be serialized
+        /// </summary>
         public bool ShouldSerializeProductHandle()
         {
             return !string.IsNullOrWhiteSpace(ProductHandle) && !ProductID.HasValue;
@@ -367,6 +444,9 @@ namespace ChargifyNET
         /// </summary>
         [XmlElement("product_id")]
         public int? ProductID { get; set; }
+        /// <summary>
+        /// Ignore, used to determine if the field should be serialized
+        /// </summary>
         public bool ShouldSerializeProductID()
         {
             return ProductID.HasValue && string.IsNullOrWhiteSpace(ProductHandle);
@@ -378,6 +458,9 @@ namespace ChargifyNET
         /// </summary>
         [XmlElement("ref")]
         public string ReferralCode { get; set; }
+        /// <summary>
+        /// Ignore, used to determine if the field should be serialized
+        /// </summary>
         public bool ShouldSerializeReferralCode()
         {
             return !string.IsNullOrWhiteSpace(ReferralCode);
@@ -386,17 +469,19 @@ namespace ChargifyNET
         /// <summary>
         /// (Optional) Supplying the VAT number allows EU customer’s to opt-out of 
         /// the Value Added Tax assuming the merchant address and customer billing 
-        /// address are not within the same EU country.
+        /// address are not within the same EU country. This is part of the customer
+        /// record but is only included in the input as part of this object, and 
+        /// not in the customer attributes (if specified).
         /// </summary>
         [XmlElement("vat_number")]
         public string VatNumber { get; set; }
+        /// <summary>
+        /// Ignore, used to determine if the field should be serialized
+        /// </summary>
         public bool ShouldSerializeVatNumber()
         {
             return !string.IsNullOrWhiteSpace(VatNumber);
         }
-
-        //[XmlElement("components")]
-        //public Dictionary<int, string> Components { get; set; }
 
         //[XmlElement("metafields")]
         //public Dictionary<string, string> Metafields { get; set; }

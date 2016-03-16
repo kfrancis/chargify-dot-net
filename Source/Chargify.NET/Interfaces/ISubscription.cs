@@ -32,6 +32,7 @@ namespace ChargifyNET
 {
     #region Imports
     using System;
+    using System.Xml.Serialization;
     #endregion
 
     /// <summary>
@@ -42,14 +43,17 @@ namespace ChargifyNET
         /// <summary>
         /// This is normal recurring credit card billing
         /// </summary>
+        [XmlEnum("automatic")]
         Automatic,
         /// <summary>
         /// Invoices are issued to users, paid and organized by staff
         /// </summary>
+        [XmlEnum("invoice")]
         Invoice,
         /// <summary>
         /// The default state if the value could not be parsed, or wasn't sent.
         /// </summary>
+        [XmlIgnore]
         Unknown
     }
 
