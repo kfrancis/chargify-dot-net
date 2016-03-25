@@ -32,7 +32,6 @@ namespace Chargify
 {
     #region Imports
     using System;
-    using System.Linq;
     using System.Xml.Serialization;
     #endregion
 

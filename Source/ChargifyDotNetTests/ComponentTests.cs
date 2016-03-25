@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using ChargifyDotNetTests.Base;
+﻿using ChargifyDotNetTests.Base;
 using System.Linq;
 using ChargifyNET;
 #if NUNIT
@@ -42,7 +40,7 @@ namespace ChargifyDotNetTests
         public void Components_Load_ForSubscription()
         {
             // Arrange
-            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == ChargifyNET.SubscriptionState.Active).Value;
+            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value;
 
             // Act
             var results = Chargify.GetComponentsForSubscription(subscription.SubscriptionID);
@@ -56,8 +54,8 @@ namespace ChargifyDotNetTests
         {
             // Arrange
             var productFamily = Chargify.GetProductFamilyList().Values.FirstOrDefault();
-            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == ChargifyNET.SubscriptionState.Active).Value;
-            var component = Chargify.GetComponentsForProductFamily(productFamily.ID, false).FirstOrDefault(c => c.Value.Kind == ChargifyNET.ComponentType.Metered_Component).Value;
+            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value;
+            var component = Chargify.GetComponentsForProductFamily(productFamily.ID, false).FirstOrDefault(c => c.Value.Kind == ComponentType.Metered_Component).Value;
             int usageQuantity = 5;
             string usageDescription = "testing";
 

@@ -158,7 +158,7 @@ namespace ChargifyNET
                 switch (dataNode.Name)
                 {
                     case AllocatedQuantityKey:
-                        _allocatedQuantity = dataNode.GetNodeContentAsInt();
+                        _allocatedQuantity = dataNode.GetNodeContentAsDecimal();
                         break;
                     case ComponentIDKey:
                         _componentID = dataNode.GetNodeContentAsInt();
@@ -233,12 +233,12 @@ namespace ChargifyNET
         /// <summary>
         /// The quantity allocated to this subscription
         /// </summary>
-        public int AllocatedQuantity
+        public decimal AllocatedQuantity
         {
             // Clamp the response to 0+, since that's what makes sense.
-            get { return (_allocatedQuantity < 0 ? 0 : _allocatedQuantity); }
+            get { return (_allocatedQuantity < 0m ? 0m : _allocatedQuantity); }
         }
-        private int _allocatedQuantity = int.MinValue;
+        private decimal _allocatedQuantity = int.MinValue;
 
         /// <summary>
         /// The method used to charge, either: per-unit, volume, tiered or stairstep

@@ -26,7 +26,6 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 #endregion
-using System;
 
 namespace ChargifyNET
 {

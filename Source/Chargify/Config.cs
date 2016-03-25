@@ -31,9 +31,8 @@
 namespace Chargify
 {
     #region Imports
-    using System;
+
     using System.Configuration;
-    using System.Linq;
     using Chargify.Configuration;
     #endregion
 

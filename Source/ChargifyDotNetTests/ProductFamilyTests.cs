@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using ChargifyDotNetTests.Base;
 using ChargifyNET;
 using System.Linq;

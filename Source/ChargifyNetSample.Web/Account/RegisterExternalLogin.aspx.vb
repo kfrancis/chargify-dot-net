@@ -1,8 +1,5 @@
 ﻿Imports Microsoft.AspNet.Identity
-Imports Microsoft.AspNet.Identity.EntityFramework
-Imports Microsoft.AspNet.Identity.Owin
 Imports System
-Imports System.Security.Claims
 Imports System.Web
 Imports Microsoft.Owin.Security
 

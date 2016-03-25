@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using ChargifyNET;
 using System.Net;
 #if NUNIT
@@ -16,42 +15,23 @@ namespace ChargifyDotNetTests.Base
 {
     public class ChargifyTestBase
     {
-        private TestContext testContextInstance;
-
         /// <summary>
         /// Gets or sets the test context which provides
         /// information about and functionality for the current test run.
         ///</summary>
-        public TestContext TestContext
-        {
-            get
-            {
-                return testContextInstance;
-            }
-            set
-            {
-                testContextInstance = value;
-            }
-        }
+        public TestContext TestContext { get; set; }
 
-        public ChargifyConnect Chargify
+        public ChargifyConnect Chargify => _chargify ?? (_chargify = new ChargifyConnect
         {
-            get
-            {
-                if (this._chargify == null)
-                {
-                    this._chargify = new ChargifyConnect();
-                    this._chargify.apiKey = "";
-                    this._chargify.Password = "X";
-                    this._chargify.URL = "https://subdomain.chargify.com/";
-                    this._chargify.SharedKey = "123456789";
-                    this._chargify.UseJSON = false;
-                    this._chargify.ProtocolType = (SecurityProtocolType)3072; // TLS 1.2
-                }
-                return this._chargify;
-            }
-        }
-        private ChargifyConnect _chargify = null;
+            apiKey = "",
+            Password = "X",
+            URL = "https://subdomain.chargify.com/",
+            SharedKey = "123456789",
+            UseJSON = false,
+            ProtocolType = SecurityProtocolType.Tls12
+        });
+
+        private ChargifyConnect _chargify;
 
         /// <summary>
         /// Method that allows me to use Faker methods in place rather than writing a bunch of specific "GetRandom.." methods.
@@ -61,7 +41,7 @@ namespace ChargifyDotNetTests.Base
         /// <returns>A new random string value that isn't the same as the existing/old value</returns>
         public string GetNewRandomValue(string oldValue, Func<string> generateValue)
         {
-            var retVal = oldValue;
+            string retVal;
             do
             {
                 retVal = generateValue();
@@ -72,8 +52,8 @@ namespace ChargifyDotNetTests.Base
 
         internal void SetJson(bool useJson)
         {
-            if (this.Chargify != null) {
-                this._chargify.UseJSON = useJson;
+            if (Chargify != null) {
+                _chargify.UseJSON = useJson;
             }
         }
     }

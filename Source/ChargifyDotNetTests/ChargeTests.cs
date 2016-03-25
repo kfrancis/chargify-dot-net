@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using ChargifyDotNetTests.Base;
 using ChargifyNET;
 #if NUNIT
@@ -21,7 +20,7 @@ namespace ChargifyDotNetTests
         public void Charges_Can_Charge_Successfully()
         {
             // Arrange
-            var client = this.Chargify;
+            var client = Chargify;
             var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value as Subscription;
 
             // Act
@@ -55,7 +54,7 @@ namespace ChargifyDotNetTests
         public void Charges_Can_Charge_And_Use_Negative_Balance()
         {
             // Arrange
-            var client = this.Chargify;
+            var client = Chargify;
             var subscription = client.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value as Subscription;
             var amountToCharge = 1.00m;
 
@@ -95,7 +94,7 @@ namespace ChargifyDotNetTests
         public void Charges_Can_Charge_With_Delay()
         {
             // Arrange
-            var client = this.Chargify;
+            var client = Chargify;
             var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value as Subscription;
             var amountToCharge = 1.00m;
 

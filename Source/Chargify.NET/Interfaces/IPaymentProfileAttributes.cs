@@ -123,6 +123,66 @@ namespace ChargifyNET
         /// </summary>
         Braintree_Blue,
         /// <summary>
+        /// PayPal
+        /// </summary>
+        PayPal,
+        /// <summary>
+        /// QuickPay
+        /// </summary>
+        QuickPay,
+        /// <summary>
+        /// Eway
+        /// </summary>
+        Eway,
+        /// <summary>
+        /// Samurai
+        /// </summary>
+        Samurai,
+        /// <summary>
+        /// Stripe
+        /// </summary>
+        Stripe,
+        /// <summary>
+        /// Pin
+        /// </summary>
+        Pin,
+        /// <summary>
+        /// Wirecard
+        /// </summary>
+        Wirecard,
+        /// <summary>
+        /// Bpoint
+        /// </summary>
+        Bpoint,
+        /// <summary>
+        /// FirstData
+        /// </summary>
+        FirstData,
+        /// <summary>
+        /// Elavon Virtual Merchant Gateway
+        /// </summary>
+        Elavon,
+        /// <summary>
+        /// CyberSource
+        /// </summary>
+        CyberSource,
+        /// <summary>
+        /// PayMill
+        /// </summary>
+        PayMill,
+        /// <summary>
+        /// Litle
+        /// </summary>
+        Litle,
+        /// <summary>
+        /// Moneris
+        /// </summary>
+        Moneris,
+        /// <summary>
+        /// Fusebox
+        /// </summary>
+        Fusebox,
+        /// <summary>
         /// Internal value used to determine if the field has been set.
         /// </summary>
         Unknown = -1

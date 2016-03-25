@@ -1,6 +1,4 @@
 ﻿<%@ Page Title="" Language="vb" AutoEventWireup="false" MasterPageFile="~/Site.Master" CodeBehind="RegisterExternalLogin.aspx.vb" Inherits="ChargifyNetSample.Web.RegisterExternalLogin" Async="true" %>
-
-<%@ Import Namespace="ChargifyNetSample.Web" %>
 <asp:Content runat="server" ID="BodyContent" ContentPlaceHolderID="MainContent">
     <h3>Regsiter with your <%: ProviderName %> account</h3>
     

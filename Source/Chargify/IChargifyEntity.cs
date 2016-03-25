@@ -31,8 +31,9 @@
 namespace Chargify
 {
     #region Imports
-    using System;
-    using System.Linq;
+
+    
+
     #endregion
 
     public interface IChargifyEntity

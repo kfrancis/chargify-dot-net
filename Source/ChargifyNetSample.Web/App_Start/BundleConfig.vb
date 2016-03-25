@@ -1,7 +1,4 @@
-﻿Imports System.Collections.Generic
-Imports System.Linq
-Imports System.Web
-Imports System.Web.Optimization
+﻿Imports System.Web.Optimization
 
 Public Class BundleConfig
     ' For more information on Bundling, visit http://go.microsoft.com/fwlink/?LinkID=303951

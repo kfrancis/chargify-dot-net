@@ -32,7 +32,7 @@
 namespace ChargifyNET
 {
     #region Imports
-    using ChargifyNET;
+
     using ChargifyNET.Json;
     using System;
     #endregion

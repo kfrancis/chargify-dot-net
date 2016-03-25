@@ -1,7 +1,4 @@
 ﻿<%@ Page Title="Register" Language="vb" AutoEventWireup="false" MasterPageFile="~/Site.Master" CodeBehind="Register.aspx.vb" Inherits="ChargifyNetSample.Web.Register" %>
-
-<%@ Import Namespace="ChargifyNetSample.Web" %>
-<%@ Import Namespace="Microsoft.AspNet.Identity" %>
 <asp:Content runat="server" ID="BodyContent" ContentPlaceHolderID="MainContent">
     <h2><%: Title %>.</h2>
     <p class="text-danger">

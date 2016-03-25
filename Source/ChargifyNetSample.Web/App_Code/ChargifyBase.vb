@@ -1,5 +1,4 @@
 ﻿Imports ChargifyNET
-Imports ChargifyNET.Configuration
 
 Public Class ChargifyBase
     Public Shared ReadOnly Property Chargify() As ChargifyConnect

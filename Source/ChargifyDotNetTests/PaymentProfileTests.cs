@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using ChargifyDotNetTests.Base;
 using ChargifyNET;
@@ -54,7 +53,7 @@ namespace ChargifyDotNetTests
         public void PaymentProfile_CanUpdate()
         {
             // Arrange
-            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == ChargifyNET.SubscriptionState.Active && s.Value.PaymentProfile != null).Value;
+            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active && s.Value.PaymentProfile != null).Value;
             var loadedSubscription = Chargify.LoadSubscription(subscription.SubscriptionID);
             TestContext.WriteLine("ID: " + loadedSubscription.PaymentProfile.Id);
             var originalPaymentProfile = loadedSubscription.PaymentProfile as PaymentProfileView;
@@ -74,7 +73,7 @@ namespace ChargifyDotNetTests
         public void PaymentProfile_Can_Perform_PartialUpdate()
         {
             // Arrange
-            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == ChargifyNET.SubscriptionState.Active && s.Value.PaymentProfile != null).Value;
+            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active && s.Value.PaymentProfile != null).Value;
             var loadedSubscription = Chargify.LoadSubscription(subscription.SubscriptionID);
 
             var paymentProfile = loadedSubscription.PaymentProfile as PaymentProfileView;
@@ -106,7 +105,7 @@ namespace ChargifyDotNetTests
         public void PaymentProfile_GetSinglePaymentProfileByID()
         {
             // Arrange
-            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == ChargifyNET.SubscriptionState.Active && s.Value.PaymentProfile != null).Value;
+            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active && s.Value.PaymentProfile != null).Value;
             var loadedSubscription = Chargify.LoadSubscription(subscription.SubscriptionID);
             TestContext.WriteLine("ID: " + loadedSubscription.PaymentProfile.Id);
 

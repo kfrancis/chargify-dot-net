@@ -1,5 +1,4 @@
-﻿using System;
-using ChargifyDotNetTests.Base;
+﻿using ChargifyDotNetTests.Base;
 #if NUNIT
 using NUnit.Framework;
 #else

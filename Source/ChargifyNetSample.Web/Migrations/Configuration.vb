@@ -1,9 +1,7 @@
 Imports System
-Imports System.Data.Entity
 Imports System.Data.Entity.Migrations
 Imports System.Linq
 Imports ChargifyNET
-Imports ChargifyNET.Configuration
 Imports Microsoft.AspNet.Identity
 Imports Microsoft.AspNet.Identity.EntityFramework
 

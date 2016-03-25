@@ -90,13 +90,7 @@ namespace ChargifyDotNetTests
             }
         }
 
-        //[TestCleanup()]
-        //public void Cleanup()
-        //{
-        //    Chargify.ClearTestSite(SiteCleanupScope.All);
-        //}
-
-        [Test]
+        [Test, Ignore]
         public void Sites_Can_Clear_All()
         {
             // Arrange
@@ -125,7 +119,7 @@ namespace ChargifyDotNetTests
             Assert.AreEqual(0, newCustomerCount);
         }
 
-        [Test]
+        [Test, Ignore]
         public void Sites_Can_Clear_Customers()
         {
             // Arrange
@@ -154,7 +148,7 @@ namespace ChargifyDotNetTests
             Assert.AreEqual(0, newCustomerCount);
         }
 
-        [Test]
+        [Test, Ignore]
         public void Sites_Default_Clear_Clears_Customers()
         {
             // Arrange

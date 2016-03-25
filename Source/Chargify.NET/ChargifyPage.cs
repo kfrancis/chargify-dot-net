@@ -34,8 +34,7 @@ namespace ChargifyNET
     using System.Web.UI;
     using System.Configuration;
     using ChargifyNET.Configuration;
-    using System.Reflection;
-    using System;
+
     #endregion
 
     /// <summary>

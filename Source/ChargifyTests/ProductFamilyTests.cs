@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Chargify;
+﻿using Chargify;
 using System.Linq;
 #if NUNIT
 using NUnit.Framework;

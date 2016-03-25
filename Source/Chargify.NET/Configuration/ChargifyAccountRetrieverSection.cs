@@ -32,7 +32,7 @@ namespace ChargifyNET.Configuration
 {
     #region Imports
     using System.Configuration;
-    using System;
+
     #endregion
 
     /// <summary>

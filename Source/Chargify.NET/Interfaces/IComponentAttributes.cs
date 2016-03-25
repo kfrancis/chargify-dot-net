@@ -55,7 +55,7 @@ namespace ChargifyNET
         /// <summary>
         /// The quantity allocated to this subscription
         /// </summary>
-        int AllocatedQuantity { get; }
+        decimal AllocatedQuantity { get; }
         /// <summary>
         /// The method used to charge, either: per-unit, volume, tiered or stairstep
         /// </summary>

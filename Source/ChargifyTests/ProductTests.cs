@@ -1,7 +1,6 @@
 ﻿using System;
 using Chargify;
 using System.Linq;
-using System.Collections.Generic;
 using RestSharp.Serializers;
 using System.Xml.Linq;
 #if NUNIT

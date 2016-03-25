@@ -1,6 +1,4 @@
 ﻿<%@ Page Title="Manage" Language="vb" AutoEventWireup="false" MasterPageFile="~/Site.Master" CodeBehind="Manage.aspx.vb" Inherits="ChargifyNetSample.Web.Manage" %>
-
-<%@ Import Namespace="ChargifyNetSample.Web" %>
 <%@ Import Namespace="Microsoft.AspNet.Identity" %>
 <%@ Register Src="~/Account/OpenAuthProviders.ascx" TagPrefix="uc" TagName="OpenAuthProviders" %>
 

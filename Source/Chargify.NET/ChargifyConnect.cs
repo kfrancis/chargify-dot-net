@@ -48,13 +48,13 @@ namespace ChargifyNET
     {
         #region System Constants
         private const string DateTimeFormat = "yyyy-MM-dd";
-        private const string updateShortName = "update_payment";
+        private const string UpdateShortName = "update_payment";
 
         #endregion
 
         #region Constructors
 
-        private int timeout = 180000;
+        private int _timeout = 180000;
 
         /// <summary>
         /// Constructor
@@ -164,11 +164,11 @@ namespace ChargifyNET
         {
             get
             {
-                return this.timeout;
+                return this._timeout;
             }
             set
             {
-                this.timeout = value;
+                this._timeout = value;
             }
         }
 
@@ -1160,10 +1160,10 @@ namespace ChargifyNET
         {
             if (string.IsNullOrEmpty(this.SharedKey)) throw new ArgumentException("SharedKey is required to generate the hosted page url");
 
-            string message = updateShortName + "--" + SubscriptionID + "--" + SharedKey;
+            string message = UpdateShortName + "--" + SubscriptionID + "--" + SharedKey;
             string token = message.GetChargifyHostedToken();
             string prettyID = string.Format("{0}-{1}-{2}", SubscriptionID, FirstName.Trim().ToLower(), LastName.Trim().ToLower());
-            string methodString = string.Format("{0}/{1}/{2}", updateShortName, prettyID, token);
+            string methodString = string.Format("{0}/{1}/{2}", UpdateShortName, prettyID, token);
             // just in case?
             methodString = HttpUtility.UrlEncode(methodString);
             string updateUrl = string.Format("{0}{1}{2}", this.URL, (this.URL.EndsWith("/") ? "" : "/"), methodString);
@@ -1179,9 +1179,9 @@ namespace ChargifyNET
         {
             if (string.IsNullOrEmpty(this.SharedKey)) throw new ArgumentException("SharedKey is required to generate the hosted page url");
 
-            string message = updateShortName + "--" + SubscriptionID + "--" + SharedKey;
+            string message = UpdateShortName + "--" + SubscriptionID + "--" + SharedKey;
             string token = message.GetChargifyHostedToken();
-            string methodString = string.Format("{0}/{1}/{2}", updateShortName, SubscriptionID, token);
+            string methodString = string.Format("{0}/{1}/{2}", UpdateShortName, SubscriptionID, token);
             methodString = HttpUtility.UrlEncode(methodString);
             string updateURL = string.Format("{0}{1}{2}", this.URL, (this.URL.EndsWith("/") ? "" : "/"), methodString);
             return updateURL;
@@ -5453,7 +5453,7 @@ namespace ChargifyNET
 
             // Create the web request
             HttpWebRequest request = WebRequest.Create(address) as HttpWebRequest;
-            request.Timeout = this.timeout;
+            request.Timeout = this._timeout;
             string credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes(this.apiKey + ":" + this.Password));
             request.Headers[HttpRequestHeader.Authorization] = "Basic " + credentials;
             request.UserAgent = UserAgent;

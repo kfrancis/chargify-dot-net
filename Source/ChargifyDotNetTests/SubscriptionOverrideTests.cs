@@ -3,7 +3,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ChargifyDotNetTests.Base;
 using System.Linq;
 using ChargifyNET;
-using System.Net;
 
 namespace ChargifyDotNetTests
 {
@@ -14,7 +13,7 @@ namespace ChargifyDotNetTests
         public void SubOverride_Can_Override()
         {
             // Arrange
-            var subscription = this.Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == ChargifyNET.SubscriptionState.Active).Value;
+            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value;
             DateTime now = DateTime.Now;
             DateTime activatedAt = now.AddDays(-4);
             DateTime canceledAt = now;
@@ -22,8 +21,8 @@ namespace ChargifyDotNetTests
             string cancellationMessage = Guid.NewGuid().ToString();
 
             // Act
-            bool result = this.Chargify.SetSubscriptionOverride(subscription.SubscriptionID, activatedAt, canceledAt, cancellationMessage, expiresAt);
-            var retrievedSubscription = this.Chargify.Find<Subscription>(subscription.SubscriptionID);
+            bool result = Chargify.SetSubscriptionOverride(subscription.SubscriptionID, activatedAt, canceledAt, cancellationMessage, expiresAt);
+            var retrievedSubscription = Chargify.Find<Subscription>(subscription.SubscriptionID);
 
             // Assert
             Assert.IsTrue(result);
