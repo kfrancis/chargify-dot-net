@@ -262,14 +262,14 @@ namespace ChargifyNET
         }
         private List<ChargifyError> _errors = null;
 
-        /// <summary>
-        /// Get object data
-        /// </summary>
-        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.SerializationFormatter)]
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-        }
+        ///// <summary>
+        ///// Get object data
+        ///// </summary>
+        //[SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.SerializationFormatter)]
+        //public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        //{
+        //    base.GetObjectData(info, context);
+        //}
 
         /// <summary>
         /// Pretty output for this exception
