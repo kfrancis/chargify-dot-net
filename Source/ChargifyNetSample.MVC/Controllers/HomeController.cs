@@ -18,6 +18,7 @@ namespace ChargifyNetSample.MVC.Controllers
         /// POST: /home/webhook
         /// </summary>
         /// <param name="model">The webhook event payload</param>
+        /// <param name="signature_hmac_sha_256"></param>
         /// <returns>Applicable HttpStatusCode result</returns>
         [HttpPost]
         public ActionResult Webhook(WebhookEventData model, string signature_hmac_sha_256)
