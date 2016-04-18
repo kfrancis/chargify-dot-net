@@ -53,7 +53,8 @@
             while (IsNumberPart(str[position]))
                 position++;
 
-            value = double.Parse(str.Substring(startPos, position - startPos));
+            value = double.Parse(str.Substring(startPos, position - startPos),
+                System.Globalization.CultureInfo.InvariantCulture);
 
             return new JsonNumber(value);
         }

@@ -390,7 +390,7 @@
             decimal result = 0;
             if (node.FirstChild != null)
             {
-                if (!decimal.TryParse(node.FirstChild.Value, out result)) result = 0;
+                if (!decimal.TryParse(node.FirstChild.Value, NumberStyles.Number, CultureInfo.InvariantCulture, out result)) result = 0;
             }
             return result;
         }
@@ -411,7 +411,7 @@
                     JsonString str = obj[key] as JsonString;
                     if (str != null)
                     {
-                        if (decimal.TryParse(str.Value, out result))
+                        if (decimal.TryParse(str.Value, NumberStyles.Number, CultureInfo.InvariantCulture, out result))
                         {
                             return result;
                         }
@@ -438,7 +438,7 @@
             if (node.FirstChild != null)
             {
                 int result;
-                if (int.TryParse(node.FirstChild.Value, out result))
+                if (int.TryParse(node.FirstChild.Value, NumberStyles.Number, CultureInfo.InvariantCulture, out result))
                 {
                     return result;
                 }
@@ -495,7 +495,7 @@
             int result = 0;
             if (node.FirstChild != null)
             {
-                if (!int.TryParse(node.FirstChild.Value, out result)) result = 0;
+                if (!int.TryParse(node.FirstChild.Value, NumberStyles.Number, CultureInfo.InvariantCulture, out result)) result = 0;
             }
             return result;
         }
