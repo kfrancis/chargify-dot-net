@@ -1,4 +1,6 @@
 # Chargify.NET [![Build status](https://ci.appveyor.com/api/projects/status/76aex0a2h6j63g5x/branch/master?svg=true)](https://ci.appveyor.com/project/kfrancis/chargify-dot-net/branch/master)
+
+[![Join the chat at https://gitter.im/kfrancis/chargify-dot-net](https://badges.gitter.im/kfrancis/chargify-dot-net.svg)](https://gitter.im/kfrancis/chargify-dot-net?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 _A comprehensive C# API wrapper library for accessing [chargify.com](http://www.chargify.com), using XML or JSON to read/write._
 
 * Chargify.NET: [![NuGet downloads](https://img.shields.io/nuget/dt/chargify.svg)](http://www.nuget.org/packages/chargify) [![NuGet version](https://img.shields.io/nuget/v/chargify.svg)](http://www.nuget.org/packages/chargify)
