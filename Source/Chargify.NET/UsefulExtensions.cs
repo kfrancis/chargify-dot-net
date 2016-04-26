@@ -13,6 +13,7 @@
     using System.Text;
     using System.Text.RegularExpressions;
     using System.Xml;
+    using System.Xml.Serialization;
     #endregion
 
     public class Utf8StringWriter : StringWriter
@@ -290,7 +291,7 @@
         public static string ToChargifyCurrencyFormat(this decimal value)
         {
             var usCulture = CultureInfo.CreateSpecificCulture("en-US");
-            var clonedNumbers = (NumberFormatInfo)usCulture.NumberFormat.Clone();
+            var clonedNumbers = (NumberFormatInfo) usCulture.NumberFormat.Clone();
             clonedNumbers.CurrencyNegativePattern = 2;
             return string.Format(clonedNumbers, "{0:C2}", value).Replace("$", "");
         }
@@ -314,7 +315,7 @@
                     JsonString str = obj[key] as JsonString;
                     if (str != null)
                     {
-                        result = (ComponentDowngradeProrationScheme)Enum.Parse(typeof(ComponentDowngradeProrationScheme), str.Value.Replace("-", "_"), true);
+                        result = (ComponentDowngradeProrationScheme) Enum.Parse(typeof(ComponentDowngradeProrationScheme), str.Value.Replace("-", "_"), true);
                     }
                 }
             }
@@ -333,7 +334,7 @@
             {
                 if (node.FirstChild.Value != null)
                 {
-                    result = (ComponentDowngradeProrationScheme)Enum.Parse(typeof(ComponentDowngradeProrationScheme), node.FirstChild.Value.Replace("-", "_"), true);
+                    result = (ComponentDowngradeProrationScheme) Enum.Parse(typeof(ComponentDowngradeProrationScheme), node.FirstChild.Value.Replace("-", "_"), true);
                 }
             }
             return result;
@@ -355,7 +356,7 @@
                     JsonString str = obj[key] as JsonString;
                     if (str != null)
                     {
-                        result = (ComponentUpgradeProrationScheme)Enum.Parse(typeof(ComponentUpgradeProrationScheme), str.Value.Replace("-", "_"), true);
+                        result = (ComponentUpgradeProrationScheme) Enum.Parse(typeof(ComponentUpgradeProrationScheme), str.Value.Replace("-", "_"), true);
                     }
                 }
             }
@@ -374,7 +375,7 @@
             {
                 if (node.FirstChild.Value != null)
                 {
-                    result = (ComponentUpgradeProrationScheme)Enum.Parse(typeof(ComponentUpgradeProrationScheme), node.FirstChild.Value.Replace("-", "_"), true);
+                    result = (ComponentUpgradeProrationScheme) Enum.Parse(typeof(ComponentUpgradeProrationScheme), node.FirstChild.Value.Replace("-", "_"), true);
                 }
             }
             return result;
@@ -583,6 +584,75 @@
                 result = new ProductFamily(node);
             }
             return result;
+        }
+
+        public static RenewalLineItem GetNodeContentAsRenewalLineItem(this XmlNode node)
+        {
+            RenewalLineItem result = null;
+            if (node.FirstChild != null)
+            {
+                result = new RenewalLineItem(node);
+            }
+            return result;
+        }
+
+        public static T ConvertNode<T>(this XmlNode node) where T : class
+        {
+            using (MemoryStream stm = new MemoryStream())
+            using (StreamWriter stw = new StreamWriter(stm))
+            {
+                stw.WriteLine("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
+                stw.WriteLine(node.OuterXml);
+                stw.Flush();
+
+                stm.Position = 0;
+
+                var ser = new XmlSerializer(typeof(T));
+                T result = (ser.Deserialize(stm) as T);
+                return result;
+            }
+        }
+
+        public static List<RenewalLineItem> GetJSONContentAsRenewalLineItems(this JsonObject obj, string key)
+        {
+            var renewalLineItems = new List<RenewalLineItem>();
+            var renewalLineItemsArray = obj[key] as JsonArray;
+            if (renewalLineItemsArray != null)
+            {
+                foreach (JsonObject renewalLineItem in renewalLineItemsArray.Items)
+                {
+                    renewalLineItems.Add(new RenewalLineItem(renewalLineItem));
+                }
+            }
+            // Sanity check, should be equal.
+            if (renewalLineItemsArray.Length != renewalLineItems.Count)
+            {
+                throw new JsonParseException(string.Format("Unable to parse public signup pages ({0} != {1})", renewalLineItemsArray.Length, renewalLineItems.Count));
+            }
+            return renewalLineItems;
+        }
+
+        public static List<RenewalLineItem> GetNodeContentAsRenewalLineItems(this XmlNode node)
+        {
+            var lineItems = new List<RenewalLineItem>();
+            foreach (XmlNode childNode in node.ChildNodes)
+            {
+                switch (childNode.Name)
+                {
+                    case "line_item":
+                        lineItems.Add(childNode.GetNodeContentAsRenewalLineItem());
+                        break;
+                    default:
+                        break;
+                }
+            }
+            // Sanity check, should be equal.
+            if (node.ChildNodes.Count != lineItems.Count)
+            {
+                throw new JsonParseException(string.Format("Unable to parse renewal line items ({0} != {1})", node.ChildNodes.Count, lineItems.Count));
+            }
+
+            return lineItems;
         }
 
         /// <summary>
@@ -889,7 +959,7 @@
                     JsonString str = obj[key] as JsonString;
                     if (str != null)
                     {
-                        result = (PricingSchemeType)Enum.Parse(typeof(PricingSchemeType), str.Value, true);
+                        result = (PricingSchemeType) Enum.Parse(typeof(PricingSchemeType), str.Value, true);
                     }
                 }
             }
@@ -908,7 +978,7 @@
             {
                 if (node.FirstChild.Value != null)
                 {
-                    result = (PricingSchemeType)Enum.Parse(typeof(PricingSchemeType), node.FirstChild.Value, true);
+                    result = (PricingSchemeType) Enum.Parse(typeof(PricingSchemeType), node.FirstChild.Value, true);
                 }
             }
             return result;
@@ -930,7 +1000,7 @@
                     JsonString str = obj[key] as JsonString;
                     if (str != null)
                     {
-                        result = (ComponentType)Enum.Parse(typeof(ComponentType), str.Value, true);
+                        result = (ComponentType) Enum.Parse(typeof(ComponentType), str.Value, true);
                     }
                 }
             }
@@ -949,7 +1019,7 @@
             {
                 if (node.FirstChild.Value != null)
                 {
-                    result = (ComponentType)Enum.Parse(typeof(ComponentType), node.FirstChild.Value, true);
+                    result = (ComponentType) Enum.Parse(typeof(ComponentType), node.FirstChild.Value, true);
                 }
             }
             return result;
@@ -971,7 +1041,7 @@
                     JsonString str = obj[key] as JsonString;
                     if (str != null)
                     {
-                        result = (PaymentCollectionMethod)Enum.Parse(typeof(PaymentCollectionMethod), str.Value, true);
+                        result = (PaymentCollectionMethod) Enum.Parse(typeof(PaymentCollectionMethod), str.Value, true);
                     }
                 }
             }
@@ -995,7 +1065,7 @@
                     if (str != null)
                     {
                         string value = str.Value;
-                        result = (TransactionType)Enum.Parse(typeof(TransactionType), value, true);
+                        result = (TransactionType) Enum.Parse(typeof(TransactionType), value, true);
                     }
                 }
             }
@@ -1013,7 +1083,7 @@
             if (node.FirstChild != null)
             {
                 string nodeText = node.FirstChild.Value;
-                result = (TransactionType)Enum.Parse(typeof(TransactionType), nodeText, true);
+                result = (TransactionType) Enum.Parse(typeof(TransactionType), nodeText, true);
             }
             return result;
         }
@@ -1028,7 +1098,7 @@
             PaymentCollectionMethod result = PaymentCollectionMethod.Unknown;
             if (node.FirstChild != null)
             {
-                result = (PaymentCollectionMethod)Enum.Parse(typeof(PaymentCollectionMethod), node.FirstChild.Value, true);
+                result = (PaymentCollectionMethod) Enum.Parse(typeof(PaymentCollectionMethod), node.FirstChild.Value, true);
             }
             return result;
         }
@@ -1043,7 +1113,7 @@
             SubscriptionState result = SubscriptionState.Unknown;
             if (node.FirstChild != null)
             {
-                result = (SubscriptionState)Enum.Parse(typeof(SubscriptionState), node.FirstChild.Value, true);
+                result = (SubscriptionState) Enum.Parse(typeof(SubscriptionState), node.FirstChild.Value, true);
             }
             return result;
         }
@@ -1060,7 +1130,7 @@
             {
                 if (CheckEnumIsDefined<T>(node.FirstChild.Value))
                 {
-                    result = (T)Enum.Parse(typeof(T), node.FirstChild.Value, true);
+                    result = (T) Enum.Parse(typeof(T), node.FirstChild.Value, true);
                 }
             }
             return result;
@@ -1084,7 +1154,7 @@
                     {
                         if (CheckEnumIsDefined<T>(str.Value))
                         {
-                            result = (T)Enum.Parse(typeof(T), str.Value, true);
+                            result = (T) Enum.Parse(typeof(T), str.Value, true);
                         }
                     }
                 }
@@ -1108,7 +1178,7 @@
                     JsonString str = obj[key] as JsonString;
                     if (str != null)
                     {
-                        result = (SubscriptionState)Enum.Parse(typeof(SubscriptionState), str.Value, true);
+                        result = (SubscriptionState) Enum.Parse(typeof(SubscriptionState), str.Value, true);
                     }
                 }
             }
@@ -1249,7 +1319,7 @@
                     JsonString str = obj[key] as JsonString;
                     if (str != null)
                     {
-                        result = (IntervalUnit)Enum.Parse(typeof(IntervalUnit), str.Value, true);
+                        result = (IntervalUnit) Enum.Parse(typeof(IntervalUnit), str.Value, true);
                     }
                 }
             }
@@ -1266,7 +1336,7 @@
             IntervalUnit result = IntervalUnit.Unknown;
             if (node.FirstChild != null)
             {
-                result = (IntervalUnit)Enum.Parse(typeof(IntervalUnit), node.FirstChild.Value, true);
+                result = (IntervalUnit) Enum.Parse(typeof(IntervalUnit), node.FirstChild.Value, true);
             }
             return result;
         }
@@ -1301,7 +1371,7 @@
                     Type classType = a.GetType("Microsoft.WindowsAzure.ServiceRuntime.RoleEnvironment");
                     PropertyInfo pi = classType.GetProperty("IsAvailable");
                     // This is the same as calling RoleEnvironment.IsAvailable, but without requiring it be referenced.
-                    result = (bool)pi.GetValue(null, null); // This should get the result of IsAvailable
+                    result = (bool) pi.GetValue(null, null); // This should get the result of IsAvailable
                 }
             }
             catch (Exception) { }
@@ -1325,7 +1395,7 @@
                     Type classType = a.GetType("Microsoft.WindowsAzure.ServiceRuntime.RoleEnvironment");
                     MethodInfo mi = classType.GetMethod("GetConfigurationSettingValue");
                     // This is the same as calling RoleEnvironment.GetConfigurationSettingValue(settingName)
-                    result = (string)mi.Invoke(null, new object[] { settingName });
+                    result = (string) mi.Invoke(null, new object[] { settingName });
                 }
             }
             catch (Exception) { }
@@ -1347,7 +1417,7 @@
             {
                 Type[] argTypes = new Type[] { typeof(System.String) };
                 ConstructorInfo cInfo = typeof(T).GetConstructor(argTypes);
-                return (T)cInfo.Invoke(new object[] { serverResponse });
+                return (T) cInfo.Invoke(new object[] { serverResponse });
             }
             else if (serverResponse.IsJSON())
             {
@@ -1359,13 +1429,13 @@
                     {
                         Type[] argTypes = new Type[] { typeof(JsonObject) };
                         ConstructorInfo cInfo = typeof(T).GetConstructor(argTypes);
-                        return (T)cInfo.Invoke(new object[] { obj[key] as JsonObject });
+                        return (T) cInfo.Invoke(new object[] { obj[key] as JsonObject });
                     }
                     else
                     {
                         Type[] argTypes = new Type[] { typeof(JsonObject) };
                         ConstructorInfo cInfo = typeof(T).GetConstructor(argTypes);
-                        return (T)cInfo.Invoke(new object[] { obj });
+                        return (T) cInfo.Invoke(new object[] { obj });
                     }
                 }
                 else
@@ -1394,15 +1464,15 @@
             {
                 case "customer":
                     if (!typeof(ICustomer).IsAssignableFrom(typeof(T))) throw new ArgumentException();
-                    result = (T)chargify.UpdateCustomer(objectToBeSaved as ICustomer);
+                    result = (T) chargify.UpdateCustomer(objectToBeSaved as ICustomer);
                     break;
                 case "subscription":
                     if (!typeof(ISubscription).IsAssignableFrom(typeof(T))) throw new ArgumentException();
-                    result = (T)chargify.UpdateSubscription(objectToBeSaved as ISubscription);
+                    result = (T) chargify.UpdateSubscription(objectToBeSaved as ISubscription);
                     break;
                 case "coupon":
                     if (!typeof(ICoupon).IsAssignableFrom(typeof(T))) throw new ArgumentException();
-                    result = (T)chargify.UpdateCoupon(objectToBeSaved as ICoupon);
+                    result = (T) chargify.UpdateCoupon(objectToBeSaved as ICoupon);
                     break;
                 default:
                     break;
@@ -1432,16 +1502,16 @@
                     // load the object depending on what the ID can be interpreted as, 
                     // in this case it's either the ChargifyID (int) or the SystemID (string)
                     if (ID is string) customer = chargify.LoadCustomer(ID as string);
-                    else if (ID is int) customer = chargify.LoadCustomer((int)ID);
-                    result = (T)customer;
+                    else if (ID is int) customer = chargify.LoadCustomer((int) ID);
+                    result = (T) customer;
                     break;
                 case "subscription":
                     if (!typeof(ISubscription).IsAssignableFrom(typeof(T))) throw new ArgumentException();
                     ISubscription subscription = null;
                     // load the object depending on what the ID can be interpreted as, 
                     // in this case it's only SubscriptionID (int)
-                    if (ID is int) subscription = chargify.LoadSubscription((int)ID);
-                    result = (T)subscription;
+                    if (ID is int) subscription = chargify.LoadSubscription((int) ID);
+                    result = (T) subscription;
                     break;
                 case "product":
                     if (!typeof(IProduct).IsAssignableFrom(typeof(T))) throw new ArgumentException();
@@ -1449,32 +1519,32 @@
                     // load the object depending on what the ID can be interpreted as, 
                     // in this case it's either the ProductID (int) or the ProductHandle (string)
                     if (ID is string) product = chargify.LoadProduct(ID as string, true);
-                    else if (ID is int) product = chargify.LoadProduct(((int)ID).ToString(), false);
-                    result = (T)product;
+                    else if (ID is int) product = chargify.LoadProduct(((int) ID).ToString(), false);
+                    result = (T) product;
                     break;
                 case "statement":
                     if (!typeof(IStatement).IsAssignableFrom(typeof(T))) throw new ArgumentException();
                     IStatement statement = null;
-                    if (ID is int) statement = chargify.LoadStatement((int)ID);
-                    result = (T)statement;
+                    if (ID is int) statement = chargify.LoadStatement((int) ID);
+                    result = (T) statement;
                     break;
                 case "transaction":
                     if (!typeof(ITransaction).IsAssignableFrom(typeof(T))) throw new ArgumentException();
                     ITransaction transaction = null;
-                    if (ID is int) transaction = chargify.LoadTransaction((int)ID);
-                    result = (T)transaction;
+                    if (ID is int) transaction = chargify.LoadTransaction((int) ID);
+                    result = (T) transaction;
                     break;
                 case "coupon":
                     if (!typeof(ICoupon).IsAssignableFrom(typeof(T))) throw new ArgumentException();
                     ICoupon coupon = null;
-                    if (ID is int && parentID.HasValue && parentID.Value > 0) coupon = chargify.LoadCoupon(parentID.Value, (int)ID);
-                    result = (T)coupon;
+                    if (ID is int && parentID.HasValue && parentID.Value > 0) coupon = chargify.LoadCoupon(parentID.Value, (int) ID);
+                    result = (T) coupon;
                     break;
                 case "productfamily":
                     if (!typeof(IProductFamily).IsAssignableFrom(typeof(T))) throw new ArgumentException();
                     IProductFamily productFamily = null;
-                    if (ID is int) productFamily = chargify.LoadProductFamily((int)ID);
-                    result = (T)productFamily;
+                    if (ID is int) productFamily = chargify.LoadProductFamily((int) ID);
+                    result = (T) productFamily;
                     break;
                 default:
                     break;

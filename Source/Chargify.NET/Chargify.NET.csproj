@@ -105,6 +105,7 @@
     <Compile Include="Interfaces\IMetadataResult.cs" />
     <Compile Include="Interfaces\IPublicSignupPage.cs" />
     <Compile Include="Interfaces\IPayment.cs" />
+    <Compile Include="Interfaces\IRenewalDetails.cs" />
     <Compile Include="Interfaces\ISubscriptionCreateOptions.cs" />
     <Compile Include="Interfaces\ISubscriptionOverride.cs" />
     <Compile Include="Metadata.cs" />
@@ -162,6 +163,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PublicSignupPage.cs" />
     <Compile Include="Refund.cs" />
+    <Compile Include="RenewalDetails.cs" />
     <Compile Include="Sites.cs" />
     <Compile Include="SiteStatistics.cs" />
     <Compile Include="Statement.cs" />

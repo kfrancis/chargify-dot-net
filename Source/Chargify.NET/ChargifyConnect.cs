@@ -5173,6 +5173,22 @@ namespace ChargifyNET
         }
         #endregion
 
+        #region Renewal Preview
+        /// <summary>
+        /// Renewal Preview is an object representing a subscription’s next assessment. 
+        /// You can retrieve it to see a snapshot of how much your customer will be charged on their next renewal.
+        /// </summary>
+        /// <param name="subscriptionID">Integer, the id for the subscription that is to be previewed</param>
+        /// <returns>The snapshot of how much your customer will be charged on their next renewal</returns>
+        public IRenewalDetails PreviewRenewal(int subscriptionID)
+        {
+            // now make the request
+            string response = this.DoRequest($"/subscriptions/{subscriptionID}/renewals/preview.{GetMethodExtension()}", HttpRequestMethod.Post, null);
+            // change the response to the object
+            return response.ConvertResponseTo<RenewalDetails>("renewal_preview");
+        }
+        #endregion
+
         #region Utility Methods
         private Dictionary<int, T> GetListedJSONResponse<T>(string key, string response)
             where T : class, IChargifyEntity

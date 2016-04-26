@@ -298,6 +298,16 @@ namespace ChargifyNET
         IProduct CreateProduct(int ProductFamilyID, string Name, string Handle, int PriceInCents, int Interval, IntervalUnit IntervalUnit, string AccountingCode, string Description);
         #endregion
 
+        #region Renewal Preview
+        /// <summary>
+        /// Renewal Preview is an object representing a subscription’s next assessment. 
+        /// You can retrieve it to see a snapshot of how much your customer will be charged on their next renewal.
+        /// </summary>
+        /// <param name="subscriptionID">Integer, the id for the subscription that is to be previewed</param>
+        /// <returns>The snapshot of how much your customer will be charged on their next renewal</returns>
+        IRenewalDetails PreviewRenewal(int subscriptionID);
+        #endregion
+
         /// <summary>
         /// Method for adding a metered component usage to the subscription
         /// </summary>

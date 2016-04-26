@@ -108,6 +108,7 @@
     <Compile Include="SiteTests.cs" />
     <Compile Include="PaymentTests.cs" />
     <Compile Include="SubscriptionOverrideTests.cs" />
+    <Compile Include="RenewalPreviewTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.0">
