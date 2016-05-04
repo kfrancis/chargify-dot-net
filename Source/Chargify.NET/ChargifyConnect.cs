@@ -2999,13 +2999,14 @@ namespace ChargifyNET
         /// <remarks>Does NOT prorate. Use MigrateSubscriptionProduct to get proration to work.</remarks>
         /// <param name="Subscription">The suscription to update</param>
         /// <param name="Product">The new product</param>
+        /// <param name="ProductChangeDelayed">Optional, determines if the product change should be done immediately or at the time of assessment.</param>
         /// <returns>The new subscription resulting from the change</returns>
-        public ISubscription EditSubscriptionProduct(ISubscription Subscription, IProduct Product)
+        public ISubscription EditSubscriptionProduct(ISubscription Subscription, IProduct Product, bool? ProductChangeDelayed = null)
         {
             // make sure data is OK
             if (Subscription == null) throw new ArgumentNullException("Subscription");
             if (Product == null) throw new ArgumentNullException("Product");
-            return EditSubscriptionProduct(Subscription.SubscriptionID, Product.Handle);
+            return EditSubscriptionProduct(Subscription.SubscriptionID, Product.Handle, ProductChangeDelayed);
         }
 
         /// <summary>
@@ -3014,12 +3015,13 @@ namespace ChargifyNET
         /// <remarks>Does NOT prorate. Use MigrateSubscriptionProduct to get proration to work.</remarks>
         /// <param name="SubscriptionID">The ID of the suscription to update</param>
         /// <param name="Product">The new product</param>
+        /// <param name="ProductChangeDelayed">Optional, determines if the product change should be done immediately or at the time of assessment.</param>
         /// <returns>The new subscription resulting from the change</returns>
-        public ISubscription EditSubscriptionProduct(int SubscriptionID, IProduct Product)
+        public ISubscription EditSubscriptionProduct(int SubscriptionID, IProduct Product, bool? ProductChangeDelayed = null)
         {
             // make sure data is OK
             if (Product == null) throw new ArgumentNullException("Product");
-            return EditSubscriptionProduct(SubscriptionID, Product.Handle);
+            return EditSubscriptionProduct(SubscriptionID, Product.Handle, ProductChangeDelayed);
         }
 
         /// <summary>
@@ -3028,12 +3030,13 @@ namespace ChargifyNET
         /// <remarks>Does NOT prorate. Use MigrateSubscriptionProduct to get proration to work.</remarks>
         /// <param name="Subscription">The suscription to update</param>
         /// <param name="ProductHandle">The handle to the new product</param>
+        /// <param name="ProductChangeDelayed">Optional, determines if the product change should be done immediately or at the time of assessment.</param>
         /// <returns>The new subscription resulting from the change</returns>
-        public ISubscription EditSubscriptionProduct(ISubscription Subscription, string ProductHandle)
+        public ISubscription EditSubscriptionProduct(ISubscription Subscription, string ProductHandle, bool? ProductChangeDelayed = null)
         {
             // make sure data is OK
             if (Subscription == null) throw new ArgumentNullException("Subscription");
-            return EditSubscriptionProduct(Subscription.SubscriptionID, ProductHandle);
+            return EditSubscriptionProduct(Subscription.SubscriptionID, ProductHandle, ProductChangeDelayed);
         }
 
         /// <summary>
@@ -3042,8 +3045,9 @@ namespace ChargifyNET
         /// <remarks>Does NOT prorate. Use MigrateSubscriptionProduct to get proration to work.</remarks>
         /// <param name="SubscriptionID">The ID of the suscription to update</param>
         /// <param name="ProductHandle">The handle to the new product</param>
+        /// <param name="ProductChangeDelayed">Optional, determines if the product change should be done immediately or at the time of assessment.</param>
         /// <returns>The new subscription resulting from the change</returns>
-        public ISubscription EditSubscriptionProduct(int SubscriptionID, string ProductHandle)
+        public ISubscription EditSubscriptionProduct(int SubscriptionID, string ProductHandle, bool? ProductChangeDelayed = null)
         {
             if (SubscriptionID == int.MinValue) throw new ArgumentNullException("SubscriptionID");
             if (string.IsNullOrEmpty(ProductHandle)) throw new ArgumentNullException("ProductHandle");
@@ -3056,6 +3060,11 @@ namespace ChargifyNET
             StringBuilder SubscriptionXML = new StringBuilder(GetXMLStringIfApplicable());
             SubscriptionXML.Append("<subscription>");
             SubscriptionXML.AppendFormat("<product_handle>{0}</product_handle>", ProductHandle);
+            if (ProductChangeDelayed != null && ProductChangeDelayed.HasValue)
+            {
+                //product_change_delayed
+                SubscriptionXML.AppendFormat("<product_change_delayed>{0}</product_change_delayed>", ProductChangeDelayed.Value.ToString().ToLowerInvariant());
+            }
             SubscriptionXML.Append("</subscription>");
             try
             {

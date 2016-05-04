@@ -681,7 +681,7 @@ namespace ChargifyNET
         /// <param name="Subscription">The suscription to update</param>
         /// <param name="Product">The new product</param>
         /// <returns>The new subscription resulting from the change</returns>
-        ISubscription EditSubscriptionProduct(ISubscription Subscription, IProduct Product);
+        ISubscription EditSubscriptionProduct(ISubscription Subscription, IProduct Product, bool? ProductChangeDelayed = null);
         /// <summary>
         /// Update the product information for an existing subscription
         /// </summary>
@@ -689,7 +689,7 @@ namespace ChargifyNET
         /// <param name="Subscription">The suscription to update</param>
         /// <param name="ProductHandle">The handle to the new product</param>
         /// <returns>The new subscription resulting from the change</returns>
-        ISubscription EditSubscriptionProduct(ISubscription Subscription, string ProductHandle);
+        ISubscription EditSubscriptionProduct(ISubscription Subscription, string ProductHandle, bool? ProductChangeDelayed = null);
         /// <summary>
         /// Update the product information for an existing subscription
         /// </summary>
@@ -697,15 +697,16 @@ namespace ChargifyNET
         /// <param name="SubscriptionID">The ID of the suscription to update</param>
         /// <param name="Product">The new product</param>
         /// <returns>The new subscription resulting from the change</returns>
-        ISubscription EditSubscriptionProduct(int SubscriptionID, IProduct Product);
+        ISubscription EditSubscriptionProduct(int SubscriptionID, IProduct Product, bool? ProductChangeDelayed = null);
         /// <summary>
         /// Update the product information for an existing subscription
         /// </summary>
         /// <remarks>Does NOT prorate. Use MigrateSubscriptionProduct to get proration to work.</remarks>
         /// <param name="SubscriptionID">The ID of the suscription to update</param>
         /// <param name="ProductHandle">The handle to the new product</param>
+        /// <param name="ProductChangeDelayed">Optional value of whether to delay the product change until next assessment</param>
         /// <returns>The new subscription resulting from the change</returns>
-        ISubscription EditSubscriptionProduct(int SubscriptionID, string ProductHandle);
+        ISubscription EditSubscriptionProduct(int SubscriptionID, string ProductHandle, bool? ProductChangeDelayed = null);
         /// <summary>
         /// Method to allow users to change the next_assessment_at date
         /// </summary>

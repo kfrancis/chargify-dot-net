@@ -263,6 +263,38 @@ namespace ChargifyDotNetTests
         }
 
         [Test]
+        public void Subscription_Can_EditProduct_WithDelay()
+        {
+            // Arrange
+            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active && s.Value.PaymentProfile != null).Value as Subscription;
+            var otherProduct = Chargify.GetProductList().Values.Where(p => p.Handle != subscription.Product.Handle).FirstOrDefault();
+
+            // Act
+            var result = Chargify.EditSubscriptionProduct(subscription.SubscriptionID, otherProduct.Handle, true);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(subscription.Product.Handle, result.Product.Handle);
+            Assert.AreNotEqual(int.MinValue, subscription.NextProductId);
+            Assert.AreEqual(otherProduct.ID, result.NextProductId);
+        }
+
+        [Test]
+        public void Subscription_Can_EditProduct_NoDelay()
+        {
+            // Arrange
+            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active && s.Value.PaymentProfile != null).Value as Subscription;
+            var otherProduct = Chargify.GetProductList().Values.Where(p => p.Handle != subscription.Product.Handle).FirstOrDefault();
+
+            // Act
+            var result = Chargify.EditSubscriptionProduct(subscription.SubscriptionID, otherProduct.Handle);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(otherProduct.Handle, result.Product.Handle);
+        }
+
+        [Test]
         public void Subscription_Can_Reactivate_Without_Trial()
         {
             // Arrange
