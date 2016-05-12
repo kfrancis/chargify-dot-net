@@ -3057,19 +3057,48 @@ namespace ChargifyNET
             if (existingSubscription == null) throw new ArgumentException("Subscription not found", "Subscription.SubscriptionID");
 
             // create XML for creation of customer
-            StringBuilder SubscriptionXML = new StringBuilder(GetXMLStringIfApplicable());
-            SubscriptionXML.Append("<subscription>");
-            SubscriptionXML.AppendFormat("<product_handle>{0}</product_handle>", ProductHandle);
+            var subscriptionXml = new StringBuilder(GetXMLStringIfApplicable());
+            subscriptionXml.Append("<subscription>");
+            subscriptionXml.AppendFormat("<product_handle>{0}</product_handle>", ProductHandle);
             if (ProductChangeDelayed != null && ProductChangeDelayed.HasValue)
             {
                 //product_change_delayed
-                SubscriptionXML.AppendFormat("<product_change_delayed>{0}</product_change_delayed>", ProductChangeDelayed.Value.ToString().ToLowerInvariant());
+                subscriptionXml.AppendFormat("<product_change_delayed>{0}</product_change_delayed>", ProductChangeDelayed.Value.ToString().ToLowerInvariant());
             }
-            SubscriptionXML.Append("</subscription>");
+            subscriptionXml.Append("</subscription>");
             try
             {
                 // now make the request
-                string response = this.DoRequest(string.Format("subscriptions/{0}.{1}", SubscriptionID, GetMethodExtension()), HttpRequestMethod.Put, SubscriptionXML.ToString());
+                string response = this.DoRequest(string.Format("subscriptions/{0}.{1}", SubscriptionID, GetMethodExtension()), HttpRequestMethod.Put, subscriptionXml.ToString());
+                // change the response to the object
+                return response.ConvertResponseTo<Subscription>("subscription");
+            }
+            catch (ChargifyException cex)
+            {
+                if (cex.StatusCode == HttpStatusCode.NotFound) throw new InvalidOperationException("Subscription not found");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Change the delayed product, or cancel by setting it null
+        /// </summary>
+        /// <param name="subscriptionId">The id of the subscription</param>
+        /// <returns>The subscription</returns>
+        public ISubscription CancelDelayedProductChange(int subscriptionId)
+        {
+            if (subscriptionId <= 0) throw new ArgumentNullException("subscriptionId");
+
+            // create XML for creation of customer
+            var subscriptionXml = new StringBuilder(GetXMLStringIfApplicable());
+            subscriptionXml.Append("<subscription>");
+            subscriptionXml.AppendFormat("<next_product_id>{0}</next_product_id>", string.Empty);
+            subscriptionXml.Append("</subscription>");
+
+            try
+            {
+                // now make the request
+                string response = this.DoRequest(string.Format("subscriptions/{0}.{1}", subscriptionId, GetMethodExtension()), HttpRequestMethod.Put, subscriptionXml.ToString());
                 // change the response to the object
                 return response.ConvertResponseTo<Subscription>("subscription");
             }

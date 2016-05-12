@@ -249,6 +249,12 @@ namespace ChargifyNET
 
         #region Product
         /// <summary>
+        /// Cancel the delayed product change
+        /// </summary>
+        /// <param name="subscriptionId">The id of the subscription</param>
+        /// <returns>The subscription</returns>
+        ISubscription CancelDelayedProductChange(int subscriptionId);
+        /// <summary>
         /// Method that updates a product
         /// </summary>
         /// <param name="ProductID">The ID of the product to update</param>

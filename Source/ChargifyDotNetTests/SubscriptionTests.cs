@@ -22,6 +22,23 @@ namespace ChargifyDotNetTests
         #region Tests
 
         [Test]
+        public void Subscription_Can_Cancel_Delayed_Product_Change()
+        {
+            // Arrange
+            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active && s.Value.PaymentProfile != null && s.Value.NextProductId <= 0).Value;
+            var otherProduct = Chargify.GetProductList().FirstOrDefault(p => p.Key != subscription.Product.ID);
+            var updatedSubscription = Chargify.EditSubscriptionProduct(subscription.SubscriptionID, otherProduct.Value.Handle, true);
+            Assert.AreEqual(otherProduct.Key, updatedSubscription.NextProductId);
+
+            // Act
+            var result = Chargify.CancelDelayedProductChange(updatedSubscription.SubscriptionID);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result.NextProductId <= 0);
+        }
+
+        [Test]
         public void Subscription_Create_UsingOptions_ProductHandle()
         {
             // Arrange
