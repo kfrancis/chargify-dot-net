@@ -247,5 +247,11 @@ namespace ChargifyNET
         /// At what price was the product on when initial subscribed? (in dollars and cents)
         /// </summary>
         decimal ProductPrice { get; }
+
+        /// <summary>
+        /// If a delayed product change is scheduled, the ID of the product that the subscription 
+        /// will be changed to at the next renewal.
+        /// </summary>
+        int NextProductId { get; }
     }
 }

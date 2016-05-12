@@ -74,6 +74,7 @@ namespace ChargifyNET
         private const string ProductKey = "product";
         private const string ProductVersionNumberKey = "product_version_number";
         private const string ProductPriceInCentsKey = "product_price_in_cents";
+        private const string NextProductIdKey = "next_product_id";
         #endregion
 
         #region Constructors
@@ -226,6 +227,9 @@ namespace ChargifyNET
                     case CustomerKey:
                         _customer = obj.GetJSONContentAsCustomer(key);
                         break;
+                    case NextProductIdKey:
+                        _nextProductId = obj.GetJSONContentAsInt(key);
+                        break;
                     default:
                         break;
                 }
@@ -324,6 +328,9 @@ namespace ChargifyNET
                         break;
                     case CustomerKey:
                         _customer = dataNode.GetNodeContentAsCustomer();
+                        break;
+                    case NextProductIdKey:
+                        _nextProductId = dataNode.GetNodeContentAsInt();
                         break;
                     default:
                         break;
@@ -665,6 +672,13 @@ namespace ChargifyNET
         {
             get { return Convert.ToDecimal(this._productPriceInCents) / 100; }
         }
+
+        /// <summary>
+        /// If a delayed product change is scheduled, the ID of the product that the subscription 
+        /// will be changed to at the next renewal.
+        /// </summary>
+        public int NextProductId { get { return _nextProductId; } }
+        private int _nextProductId = int.MinValue;
 
         #endregion
 
