@@ -160,9 +160,9 @@ namespace Chargify
         #endregion
 
         #region Async
-        internal async Task<TObject> GetRequestAsync<TObject>(string path, params object[] args) where TObject : new()
+        internal async Task<T> GetRequestAsync<T>(string path, params object[] args) where T : new()
         {
-            return await GetRequestAsync<TObject>(path, string.Empty, args).ConfigureAwait(continueOnCapturedContext: false);
+            return await GetRequestAsync<T>(path, string.Empty, args).ConfigureAwait(continueOnCapturedContext: false);
         }
 
         internal Task<TObject> GetRequestAsync<TObject>(string path, string rootElement, params object[] args) where TObject : new()

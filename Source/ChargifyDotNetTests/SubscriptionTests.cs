@@ -20,6 +20,7 @@ namespace ChargifyDotNetTests
     public class SubscriptionTests : ChargifyTestBase
     {
         #region Tests
+
         [Test]
         public void Subscription_Create_UsingOptions_ProductHandle()
         {
@@ -70,7 +71,8 @@ namespace ChargifyDotNetTests
             // Arrange
             var exampleCustomer = Chargify.GetCustomerList().Values.DefaultIfEmpty(defaultValue: null).FirstOrDefault();
             var paymentInfo = GetTestPaymentMethod(exampleCustomer.ToCustomerAttributes() as CustomerAttributes);
-            var options = new SubscriptionCreateOptions() {
+            var options = new SubscriptionCreateOptions()
+            {
                 CustomerID = exampleCustomer.ChargifyID,
                 CreditCardAttributes = paymentInfo
             };
@@ -158,15 +160,17 @@ namespace ChargifyDotNetTests
 
             // Check that the card isn't expired
             var expDate = new DateTime(subscription.PaymentProfile.ExpirationYear, subscription.PaymentProfile.ExpirationMonth, 1);
-            if (expDate < DateTime.Now) { 
+            if (expDate < DateTime.Now)
+            {
                 subscription = client.UpdateSubscriptionCreditCard(subscription.SubscriptionID, "1", DateTime.Now.AddMonths(1).Month, DateTime.Now.AddYears(1).Year, "123", subscription.PaymentProfile.BillingAddress, subscription.PaymentProfile.BillingCity, subscription.PaymentProfile.BillingState, subscription.PaymentProfile.BillingZip, subscription.PaymentProfile.BillingCountry);
             }
 
             string oldAddress = subscription.PaymentProfile.BillingAddress, oldAddress2 = subscription.PaymentProfile.BillingAddress2,
-                oldCity = subscription.PaymentProfile.BillingCity, 
+                oldCity = subscription.PaymentProfile.BillingCity,
                 oldState = subscription.PaymentProfile.BillingState, oldZip = subscription.PaymentProfile.BillingZip;
 
-            var newAttributes = new CreditCardAttributes() {
+            var newAttributes = new CreditCardAttributes()
+            {
                 BillingAddress = GetNewRandomValue(oldAddress, Faker.Address.StreetAddress),
                 BillingAddress2 = GetNewRandomValue(oldAddress2, Faker.Address.SecondaryAddress),
                 BillingCity = GetNewRandomValue(oldCity, Faker.Address.City),
@@ -409,7 +413,8 @@ namespace ChargifyDotNetTests
 
             // Act
             string data = string.Empty;
-            Chargify.LogRequest = (requestMethod, address, postedData) => {
+            Chargify.LogRequest = (requestMethod, address, postedData) =>
+            {
                 data = postedData;
             };
             var newSubscription = Chargify.CreateSubscription(product.Handle, newCustomer, newPaymentInfo);
@@ -643,7 +648,7 @@ namespace ChargifyDotNetTests
             var retreivedSubscription = Chargify.Find<Subscription>(subscription.SubscriptionID);
 
             // Assert
-            Assert.IsNotNull(retreivedSubscription);            
+            Assert.IsNotNull(retreivedSubscription);
             Assert.IsTrue(retreivedSubscription.State == SubscriptionState.Trial_Ended);
 #if !NUNIT
             Assert.IsInstanceOfType(retreivedSubscription, typeof(Subscription));
