@@ -3,6 +3,7 @@
 _A comprehensive C# API wrapper library for accessing [chargify.com](http://www.chargify.com), using XML or JSON to read/write._
 
 * Chargify.NET: [![NuGet version](https://img.shields.io/nuget/v/chargify.svg)](http://www.nuget.org/packages/chargify)
+* [![Dependency Status](https://www.versioneye.com/user/projects/5797913674848d0044b8087c/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/5797913674848d0044b8087c)
 
 ## Important SSLv3/POODLE
 To correct the error "Could not create SSL/TLS secure channel", update to at least version [1.1.5400.37999](https://www.nuget.org/packages/chargify/) either through the downloads or (recommended) through nuget. I *HIGHLY* recommend using nuget as I release changes through there very often. For more information, see the Chargify blog post ["Dropping support for SSLv3 - may cause API connection problems"](https://chargify.com/blog/dropping-sslv3/). A list of the likely breaking changes that might affect you are listed here: [Latest Breaking Changes](http://chargify.codeplex.com/wikipage?title=Latest%20Breaking%20Changes&referringTitle=Home). Also, if you're still having trouble - make sure you're specifically setting `ChargifyConnect.ProtocolType` to `SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12` (if possible, to handle fall back to lower TLS). If using .NET 4 or under, just set it to `SecurityProtocolType.Tls`.
