@@ -314,6 +314,14 @@ namespace ChargifyNET
         IRenewalDetails PreviewRenewal(int subscriptionID);
         #endregion
 
+        #region Notes
+        INote CreateNote(INote NewNote);
+        IDictionary<int, INote> GetNotesForSubscription(int SubscriptionID);
+        INote LoadNote(int SubscriptionID, int NoteID);
+        bool DeleteNote(int SubscriptionID, int NoteID);
+        INote UpdateNote(int SubscriptionID, INote UpdatedNote);
+        #endregion
+
         /// <summary>
         /// Method for adding a metered component usage to the subscription
         /// </summary>

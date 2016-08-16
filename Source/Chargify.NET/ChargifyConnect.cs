@@ -1691,7 +1691,7 @@ namespace ChargifyNET
             if (CreditCardAttributes == null) throw new ArgumentNullException("CreditCardAttributes");
             if (ChargifyID == int.MinValue) throw new ArgumentException("Invalid Customer ID detected", "ChargifyID");
 
-            return CreateSubscription(new SubscriptionCreateOptions() {  ProductHandle = ProductHandle, CustomerID = ChargifyID, CreditCardAttributes = (CreditCardAttributes)CreditCardAttributes, NextBillingAt = NextBillingAt });
+            return CreateSubscription(new SubscriptionCreateOptions() { ProductHandle = ProductHandle, CustomerID = ChargifyID, CreditCardAttributes = (CreditCardAttributes) CreditCardAttributes, NextBillingAt = NextBillingAt });
         }
 
         /// <summary>
@@ -4984,7 +4984,7 @@ namespace ChargifyNET
             if (amount == decimal.MinValue) value_in_cents = amount_in_cents;
             if (amount_in_cents == int.MinValue) value_in_cents = Convert.ToInt32(amount * 100);
             if (value_in_cents == int.MinValue) value_in_cents = 0;
-            decimal value = Convert.ToDecimal((double)(value_in_cents) / 100.0);
+            decimal value = Convert.ToDecimal((double) (value_in_cents) / 100.0);
 
             // make sure data is valid
             if (string.IsNullOrEmpty(memo)) throw new ArgumentNullException("Memo");
@@ -5179,7 +5179,7 @@ namespace ChargifyNET
                 if (!string.IsNullOrWhiteSpace(PaymentProfile.BillingCity)) xml.AppendFormat("<billing_city>{0}</billing_city>", PaymentProfile.BillingCity);
                 if (!string.IsNullOrWhiteSpace(PaymentProfile.BillingCountry)) xml.AppendFormat("<billing_country>{0}</billing_country>", PaymentProfile.BillingCountry);
                 if (!string.IsNullOrWhiteSpace(PaymentProfile.BillingState)) xml.AppendFormat("<billing_state>{0}</billing_state>", PaymentProfile.BillingState);
-                if (!string.IsNullOrWhiteSpace(PaymentProfile.BillingZip)) xml.AppendFormat("<billing_zip>{0}</billing_zip>", PaymentProfile.BillingZip); 
+                if (!string.IsNullOrWhiteSpace(PaymentProfile.BillingZip)) xml.AppendFormat("<billing_zip>{0}</billing_zip>", PaymentProfile.BillingZip);
                 if (PaymentProfile.CustomerID != int.MinValue) xml.AppendFormat("<customer_id>{0}</customer_id>", PaymentProfile.CustomerID);
                 if (!string.IsNullOrWhiteSpace(PaymentProfile.FirstName)) xml.AppendFormat("<first_name>{0}</first_name>", PaymentProfile.FirstName);
                 if (!string.IsNullOrWhiteSpace(PaymentProfile.LastName)) xml.AppendFormat("<last_name>{0}</last_name>", PaymentProfile.LastName);
@@ -5227,6 +5227,51 @@ namespace ChargifyNET
         }
         #endregion
 
+        #region Notes
+        public INote CreateNote(INote note)
+        {
+            return CreateNote(note.SubscriptionID, note.Body, note.Sticky);
+        }
+
+        private INote CreateNote(int subscriptionId, string body, bool sticky = false)
+        {
+            // make sure data is valid
+            if (subscriptionId > 0) throw new ArgumentNullException(nameof(subscriptionId));
+            // make sure that the system ID is unique
+            if (this.LoadSubscription(subscriptionId) != null) throw new ArgumentException("Not valid", "subscriptionId");
+            // create XML for creation of customer
+            var NoteXML = new StringBuilder(GetXMLStringIfApplicable());
+            NoteXML.Append("<note>");
+            NoteXML.AppendFormat("<body>{0}</body>", body);
+            NoteXML.AppendFormat("<sticky>{0}</sticky>", sticky);
+            NoteXML.Append("</note>");
+            // now make the request
+            string response = this.DoRequest(string.Format("subscriptions/{0}/notes.{1}", subscriptionId, GetMethodExtension()), HttpRequestMethod.Post, NoteXML.ToString());
+            // change the response to the object
+            return response.ConvertResponseTo<Note>("note");
+        }
+
+        public IDictionary<int, INote> GetNotesForSubscription(int SubscriptionID)
+        {
+            throw new NotImplementedException();
+        }
+
+        public INote LoadNote(int SubscriptionID, int NoteID)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool DeleteNote(int SubscriptionID, int NoteID)
+        {
+            throw new NotImplementedException();
+        }
+
+        public INote UpdateNote(int SubscriptionID, INote UpdatedNote)
+        {
+            throw new NotImplementedException();
+        }
+        #endregion
+
         #region Utility Methods
         private Dictionary<int, T> GetListedJSONResponse<T>(string key, string response)
             where T : class, IChargifyEntity
@@ -5241,7 +5286,7 @@ namespace ChargifyNET
                 if ((array.Items[i] as JsonObject).ContainsKey("statement"))
                 {
                     JsonObject jsonObj = (array.Items[i] as JsonObject)["statement"] as JsonObject;
-                    T value = (T)Activator.CreateInstance(typeof(T), jsonObj);
+                    T value = (T) Activator.CreateInstance(typeof(T), jsonObj);
                     if (!retValue.ContainsKey(value.ID))
                     {
                         retValue.Add(value.ID, value);
@@ -5275,7 +5320,7 @@ namespace ChargifyNET
                     {
                         if (childNode.Name == key)
                         {
-                            T value = (T)Activator.CreateInstance(typeof(T), childNode);
+                            T value = (T) Activator.CreateInstance(typeof(T), childNode);
                             if (!retValue.ContainsKey(value.ID))
                             {
                                 retValue.Add(value.ID, value);
@@ -5448,7 +5493,7 @@ namespace ChargifyNET
                 // build exception and set last response
                 if (wex.Response != null)
                 {
-                    using (HttpWebResponse errorResponse = (HttpWebResponse)wex.Response)
+                    using (HttpWebResponse errorResponse = (HttpWebResponse) wex.Response)
                     {
                         newException = new ChargifyException(errorResponse, wex, postData);
                         _lastResponse = errorResponse;
@@ -5591,7 +5636,7 @@ namespace ChargifyNET
                 // build exception and set last response
                 if (wex.Response != null)
                 {
-                    using (HttpWebResponse errorResponse = (HttpWebResponse)wex.Response)
+                    using (HttpWebResponse errorResponse = (HttpWebResponse) wex.Response)
                     {
                         newException = new ChargifyException(errorResponse, wex, postData);
                         _lastResponse = errorResponse;

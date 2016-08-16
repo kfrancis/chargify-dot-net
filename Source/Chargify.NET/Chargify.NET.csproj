@@ -103,6 +103,7 @@
     <Compile Include="HttpRequestMethod.cs" />
     <Compile Include="Interfaces\IMetadata.cs" />
     <Compile Include="Interfaces\IMetadataResult.cs" />
+    <Compile Include="Interfaces\INote.cs" />
     <Compile Include="Interfaces\IPublicSignupPage.cs" />
     <Compile Include="Interfaces\IPayment.cs" />
     <Compile Include="Interfaces\IRenewalDetails.cs" />
@@ -110,6 +111,7 @@
     <Compile Include="Interfaces\ISubscriptionOverride.cs" />
     <Compile Include="Metadata.cs" />
     <Compile Include="MetadataResult.cs" />
+    <Compile Include="Note.cs" />
     <Compile Include="Payment.cs" />
     <Compile Include="PaymentProfileBase.cs" />
     <Compile Include="PaymentProfileView.cs" />
