@@ -879,8 +879,9 @@ namespace ChargifyNET
         /// <param name="max_id">Returns transactions with an id less than or equal to the one specified. Use int.MinValue to not specify a max_id.</param>
         /// <param name="since_date">Returns transactions with a created_at date greater than or equal to the one specified. Use DateTime.MinValue to not specify a since_date.</param>
         /// <param name="until_date">Returns transactions with a created_at date less than or equal to the one specified. Use DateTime.MinValue to not specify an until_date.</param>
+        /// <param name="descending">Whether to return results in descending order. Default: true</param>
         /// <returns>The dictionary of transaction records if successful, otherwise null.</returns>
-        IDictionary<int, ITransaction> GetTransactionList(int page, int per_page, List<TransactionType> kinds, int since_id, int max_id, DateTime since_date, DateTime until_date);
+        IDictionary<int, ITransaction> GetTransactionList(int page, int per_page, List<TransactionType> kinds, int since_id, int max_id, DateTime since_date, DateTime until_date, bool descending);
         /// <summary>
         /// Method for getting the list of transactions for a subscription
         /// </summary>
