@@ -5253,21 +5253,25 @@ namespace ChargifyNET
 
         public IDictionary<int, INote> GetNotesForSubscription(int SubscriptionID)
         {
+            // TODO
             throw new NotImplementedException();
         }
 
         public INote LoadNote(int SubscriptionID, int NoteID)
         {
+            // TODO
             throw new NotImplementedException();
         }
 
         public bool DeleteNote(int SubscriptionID, int NoteID)
         {
+            // TODO
             throw new NotImplementedException();
         }
 
         public INote UpdateNote(int SubscriptionID, INote UpdatedNote)
         {
+            // TODO
             throw new NotImplementedException();
         }
         #endregion
