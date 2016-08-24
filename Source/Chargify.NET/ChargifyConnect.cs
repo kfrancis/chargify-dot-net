@@ -3616,6 +3616,31 @@ namespace ChargifyNET
         }
         #endregion
 
+        #region Referral Code
+
+        /// <summary>
+        /// Method for retrieving information about a coupon using the ID of that referral code.
+        /// </summary>
+        /// <param name="ReferralCode">Referral code</param>
+        /// <returns>The object if found, null otherwise.</returns>
+        public IReferralCode ValidateReferralCode(string ReferralCode)
+        {
+            try
+            {
+                string response = this.DoRequest(string.Format("referral_codes/validate.{0}?code={1}", GetMethodExtension(), ReferralCode));
+                // change the response to the object
+                return response.ConvertResponseTo<ReferralCode>("referral-code");
+            }
+            catch (ChargifyException cex)
+            {
+                // Throw if anything but not found, since not found is telling us that it's working correctly
+                // but that there just isn't a referral code with that code.
+                if (cex.StatusCode == HttpStatusCode.NotFound) return null;
+                throw cex;
+            }  
+        }
+        #endregion
+
         #region One-Time Charges
 
         /// <summary>

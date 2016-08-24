@@ -36,10 +36,6 @@ namespace ChargifyNET
     public interface IPaymentProfileView : IPaymentProfileBase
     {
         /// <summary>
-        /// Default is credit_card. May be bank_account or credit_card or paypal_account
-        /// </summary>
-        PaymentProfileType PaymentType { get; set; }
-        /// <summary>
         /// The ID to the customer associated with this payment profile
         /// </summary>
         int CustomerID { get; set; }

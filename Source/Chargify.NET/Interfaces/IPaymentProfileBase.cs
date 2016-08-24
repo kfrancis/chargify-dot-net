@@ -41,6 +41,11 @@ namespace ChargifyNET
         int Id { get; set; }
 
         /// <summary>
+        /// Default is credit_card. May be bank_account or credit_card or paypal_account
+        /// </summary>
+        PaymentProfileType PaymentType { get; set; }
+
+        /// <summary>
         /// Get or set the first name on the card
         /// </summary>
         string FirstName { get; set; }

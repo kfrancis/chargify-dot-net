@@ -84,6 +84,16 @@ namespace ChargifyNET
         public int Id { get; set; }
 
         /// <summary>
+        /// Default is credit_card. May be bank_account or credit_card or paypal_account
+        /// </summary>
+        public PaymentProfileType PaymentType
+        {
+            get { return this._paymentType; }
+            set { if (this._paymentType != value) { this._paymentType = value; } }
+        }
+        private PaymentProfileType _paymentType = PaymentProfileType.Credit_Card;
+
+        /// <summary>
         /// Get or set the first name on the card
         /// </summary>
         [XmlElement("first_name")]

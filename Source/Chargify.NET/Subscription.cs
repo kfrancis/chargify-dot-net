@@ -75,6 +75,7 @@ namespace ChargifyNET
         private const string ProductVersionNumberKey = "product_version_number";
         private const string ProductPriceInCentsKey = "product_price_in_cents";
         private const string NextProductIdKey = "next_product_id";
+        private const string ReferralCodeKey = "referral_code";
         #endregion
 
         #region Constructors
@@ -230,6 +231,9 @@ namespace ChargifyNET
                     case NextProductIdKey:
                         _nextProductId = obj.GetJSONContentAsInt(key);
                         break;
+                    case ReferralCodeKey:
+                        _referralCode = obj.GetJSONContentAsString(key);
+                        break;
                     default:
                         break;
                 }
@@ -331,6 +335,9 @@ namespace ChargifyNET
                         break;
                     case NextProductIdKey:
                         _nextProductId = dataNode.GetNodeContentAsInt();
+                        break;
+                    case ReferralCodeKey:
+                        _referralCode = dataNode.GetNodeContentAsString();
                         break;
                     default:
                         break;
@@ -679,6 +686,18 @@ namespace ChargifyNET
         /// </summary>
         public int NextProductId { get { return _nextProductId; } }
         private int _nextProductId = int.MinValue;
+
+        /// <summary>
+        /// Referral code
+        /// </summary>
+        public string ReferralCode
+        {
+            get
+            {
+                return _referralCode;
+            }
+        }
+        private string _referralCode = string.Empty;
 
         #endregion
 

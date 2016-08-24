@@ -28,6 +28,8 @@
 //
 #endregion
 
+using System.Xml.Serialization;
+
 namespace ChargifyNET
 {
     #region Imports
@@ -96,91 +98,112 @@ namespace ChargifyNET
     /// <summary>
     /// The vaults supported by Chargify for importing
     /// </summary>
-    public enum VaultType
+    public enum VaultType 
     {
         /// <summary>
         /// Authorize.NET
         /// </summary>
+        [XmlEnum(Name= "authorizenet")]
         AuthorizeNET,
         /// <summary>
         /// Trust Commerce
         /// </summary>
+        [XmlEnum(Name= "trust_commerce")]
         Trust_Commerce,
         /// <summary>
         /// Payment Express
         /// </summary>
+        [XmlEnum(Name = "payment_express")]
         Payment_Express,
         /// <summary>
         /// Beanstream
         /// </summary>
+        [XmlEnum(Name = "cbeanstream")]
         Beanstream,
         /// <summary>
         /// Braintree Version 1 (Orange)
         /// </summary>
+        [XmlEnum(Name = "braintree1")]
         Braintree1,
         /// <summary>
         /// Braintree Blue
         /// </summary>
+        [XmlEnum(Name = "braintree_blue")]
         Braintree_Blue,
         /// <summary>
         /// PayPal
         /// </summary>
+        [XmlEnum(Name = "paypal")]
         PayPal,
         /// <summary>
         /// QuickPay
         /// </summary>
+        [XmlEnum(Name = "quickpay")]
         QuickPay,
         /// <summary>
-        /// Eway
+        /// Eway 
         /// </summary>
+        [XmlEnum(Name = "eway")]
         Eway,
         /// <summary>
         /// Samurai
         /// </summary>
+        [XmlEnum(Name = "samurai")]
         Samurai,
         /// <summary>
         /// Stripe
         /// </summary>
+        [XmlEnum(Name = "stripe")]
         Stripe,
         /// <summary>
         /// Pin
         /// </summary>
+        [XmlEnum(Name = "pin")]
         Pin,
         /// <summary>
         /// Wirecard
         /// </summary>
+        [XmlEnum(Name = "wirecard")]
         Wirecard,
         /// <summary>
         /// Bpoint
         /// </summary>
+        [XmlEnum(Name = "bpoint")]
         Bpoint,
         /// <summary>
         /// FirstData
         /// </summary>
+        [XmlEnum(Name = "firstdata")]
         FirstData,
         /// <summary>
         /// Elavon Virtual Merchant Gateway
         /// </summary>
+        [XmlEnum(Name = "elavon")]
         Elavon,
         /// <summary>
         /// CyberSource
         /// </summary>
+        [XmlEnum(Name = "cybersource")]
         CyberSource,
         /// <summary>
         /// PayMill
         /// </summary>
+        [XmlEnum(Name = "paymill")]
         PayMill,
         /// <summary>
         /// Litle
         /// </summary>
+        [XmlEnum(Name = "litle")]
         Litle,
         /// <summary>
         /// Moneris
         /// </summary>
+        [XmlEnum(Name = "moneris")]
         Moneris,
         /// <summary>
         /// Fusebox
         /// </summary>
+        [XmlEnum(Name = "fusebox")]
         Fusebox,
         /// <summary>
         /// Internal value used to determine if the field has been set.
@@ -283,5 +306,30 @@ namespace ChargifyNET
         /// Either personal or business
         /// </summary>
         BankAccountHolderType BankAccountHolderType { get; set; }
+        /// <summary>
+        /// Paypal payment method nonce
+        /// </summary>
+        string PaymentMethodNonce { get; set; }
+        /// <summary>
+        /// Paypal email
+        /// </summary>
+        string FirstName { get; set; }
+        string LastName { get; set; }
+
+        string PayPalEmail { get; set; }
+
+        string BillingAddress { get; set; }
+
+        string BillingAddress2 { get; set; }
+
+        string BillingCity { get; set; }
+
+
+        string BillingState { get; set; }
+
+        string BillingZip { get; set; }
+
+        string BillingCountry { get; set; }
+
     }
 }

@@ -1,6 +1,7 @@
+﻿
 #region License, Terms and Conditions
 //
-// HttpRequestMethod.cs
+// ICoupon.cs
 //
 // Authors: Kori Francis <twitter.com/djbyter>, David Ball
 // Copyright (C) 2010 Clinical Support Systems, Inc. All rights reserved.
@@ -27,42 +28,36 @@
 //
 #endregion
 
-using System.Xml.Serialization;
-
 namespace ChargifyNET
 {
+    #region Imports
+    using System;
+    #endregion
+
     /// <summary>
-    /// The type of REST request
+    /// Object representing referral code in Chargify
     /// </summary>
-    public enum HttpRequestMethod
+    public interface IReferralCode : IComparable<IReferralCode>
     {
         /// <summary>
-        /// Requests a representation of the specified resource
+        /// The Id of the referral code.
         /// </summary>
-        Get,
-        /// <summary>
-        /// Requests that the server accept the entity enclosed in the request as a new subordinate of the web resource identified by the URI
-        /// </summary>
-        Post,
-        /// <summary>
-        /// Requests that the enclosed entity be stored under the supplied URI
-        /// </summary>
-        Put,
-        /// <summary>
-        /// Deletes the specified resource
-        /// </summary>
-        Delete
-    }
+        int ID { get; set; }
 
-    public enum PaymentProfileType
-    {
-        [XmlEnum(Name = "credit_card")]
-        Credit_Card,
+        /// <summary>
+        /// The Id of the site.
+        /// </summary>
+        int SiteID { get; set; }
 
-        [XmlEnum(Name = "bank_account")]
-        Bank_Account,
+        /// <summary>
+        /// The Id of the subscription.
+        /// </summary>
+        int SubscriptionID { get; set; }
 
-        [XmlEnum(Name="paypal_account")]
-        PayPal_Account
+        /// <summary>
+        /// The referral code.
+        /// </summary>
+        string Code { get; set; }
+        
     }
 }
