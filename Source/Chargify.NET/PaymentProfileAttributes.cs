@@ -28,6 +28,8 @@
 //
 #endregion
 
+using System.Xml.Serialization;
+
 namespace ChargifyNET
 {
     #region Imports
@@ -74,6 +76,7 @@ namespace ChargifyNET
         /// <summary>
         /// The "token" provided by your vault storage for an already stored payment profile
         /// </summary>
+        [XmlElement("vault_token")]
         public string VaultToken
         {
             get { return _vaultToken; }
@@ -81,20 +84,33 @@ namespace ChargifyNET
         }
         private string _vaultToken = string.Empty;
 
+        public bool ShouldSerializeVaultToken()
+        {
+            return !String.IsNullOrEmpty(_vaultToken);
+        }
+
         /// <summary>
         /// (Only for Authorize.NET CIM storage) The "customerProfileId" for the owner of the
         /// "customerPaymentProfileId" provided as the VaultToken
         /// </summary>
+
+        [XmlElement("customer_vault_token")]
         public string CustomerVaultToken
         {
             get { return _customerVaultToken; }
             set { if (_customerVaultToken != value) _customerVaultToken = value; }
         }
         private string _customerVaultToken = string.Empty;
+        public bool ShouldSerializeCustomerVaultToken()
+        {
+            return !String.IsNullOrEmpty(_customerVaultToken);
+        }
 
         /// <summary>
         /// The vault that stores the payment profile with the provided VaultToken
         /// </summary>
+
+        [XmlElement("current_vault")]
         public VaultType CurrentVault
         {
             get { return _currentVault; }
@@ -102,9 +118,15 @@ namespace ChargifyNET
         }
         private VaultType _currentVault = VaultType.Unknown;
 
+        public bool ShouldSerializeCurrentVault()
+        {
+            return _currentVault != VaultType.Unknown;
+        }
+
         /// <summary>
         /// The year of expiration
         /// </summary>
+        [XmlElement("expiration_year")]
         public int ExpirationYear
         {
             get { return _expirationYear; }
@@ -112,9 +134,15 @@ namespace ChargifyNET
         }
         private int _expirationYear = int.MinValue;
 
+        public bool ShouldSerializeExpirationYear()
+        {
+            return _expirationYear != int.MinValue;
+        }
+
         /// <summary>
         /// The month of expiration
         /// </summary>
+        [XmlElement("expiration_month")]
         public int ExpirationMonth
         {
             get { return _expirationMonth; }
@@ -122,10 +150,16 @@ namespace ChargifyNET
         }
         private int _expirationMonth = int.MinValue;
 
+        public bool ShouldSerializeExpirationMonth()
+        {
+            return _expirationMonth != int.MinValue;
+        }
+
         /// <summary>
         /// (Optional) If you know the card type, you may supply it here so that we may display 
         /// the card type in the UI.
         /// </summary>
+        [XmlElement("card_type")]
         public CardType CardType
         {
             get { return _cardType; }
@@ -133,10 +167,16 @@ namespace ChargifyNET
         }
         private CardType _cardType = CardType.Unknown;
 
+        public bool ShouldSerializeCardType()
+        {
+            return _cardType != CardType.Unknown;
+        }
+
         /// <summary>
         /// (Optional) If you have the last 4 digits of the credit card number, you may supply
         /// them here so we may create a masked card number for display in the UI
         /// </summary>
+        [XmlElement("last_four")]
         public string LastFour
         {
             get { return _lastFour; }
@@ -144,9 +184,15 @@ namespace ChargifyNET
         }
         private string _lastFour = string.Empty;
 
+        public bool ShouldSerializeLastFour()
+        {
+            return !String.IsNullOrEmpty(_lastFour);
+        }
+
         /// <summary>
         /// The name of the bank where the customer's account resides
         /// </summary>
+        [XmlElement("bank_name")]
         public string BankName 
         { 
             get { return _bankName; }
@@ -154,9 +200,15 @@ namespace ChargifyNET
         }
         private string _bankName = string.Empty;
 
+        public bool ShouldSerializeBankName()
+        {
+            return !String.IsNullOrEmpty(_bankName);
+        }
+
         /// <summary>
         /// The routing number of the bank
         /// </summary>
+        [XmlElement("bank_routing_number")]
         public string BankRoutingNumber 
         { 
             get { return _bankRoutingNumber; }
@@ -164,9 +216,15 @@ namespace ChargifyNET
         }
         private string _bankRoutingNumber = string.Empty;
 
+        public bool ShouldSerializeBankRoutingNumber()
+        {
+            return !String.IsNullOrEmpty(_bankRoutingNumber);
+        }
+
         /// <summary>
         /// The customer's bank account number
         /// </summary>
+        [XmlElement("bank_account_number")]
         public string BankAccountNumber 
         {
             get { return _bankAccountNumber; }
@@ -174,9 +232,15 @@ namespace ChargifyNET
         }
         private string _bankAccountNumber = string.Empty;
 
+        public bool ShouldSerializeBankAccountNumber()
+        {
+            return !String.IsNullOrEmpty(_bankAccountNumber);
+        }
+
         /// <summary>
         /// Either checking or savings
         /// </summary>
+        [XmlElement("bank_account_type")]
         public BankAccountType BankAccountType 
         { 
             get { return _bankAccountType; }
@@ -184,15 +248,163 @@ namespace ChargifyNET
         }
         private BankAccountType _bankAccountType = BankAccountType.Unknown;
 
+        public bool ShouldSerializeBankAccountType()
+        {
+            return _bankAccountType != BankAccountType.Unknown;
+        }
+
         /// <summary>
         /// Either personal or business
         /// </summary>
+        [XmlElement("bank_account_holder_type")]
         public BankAccountHolderType BankAccountHolderType
         { 
             get { return _bankAccountHolderType; }
             set { if (_bankAccountHolderType != value) _bankAccountHolderType = value; }
         }
         private BankAccountHolderType _bankAccountHolderType = BankAccountHolderType.Unknown;
+
+        public bool ShouldSerializeBankAccountHolderType()
+        {
+            return _bankAccountHolderType != BankAccountHolderType.Unknown;
+        }
+
+        [XmlElement("payment_method_nonce")]
+        public string PaymentMethodNonce
+        {
+            get { return _paymentMethodNonce; }
+            set { if (_paymentMethodNonce != value) _paymentMethodNonce = value; }
+        }
+        private string _paymentMethodNonce = string.Empty;
+
+        public bool ShouldSerializePaymentMethodNonce()
+        {
+            return !String.IsNullOrEmpty(_paymentMethodNonce);
+        }
+
+        [XmlElement("paypal_email")]
+        public string PayPalEmail
+        {
+            get { return _payPalEmail; }
+            set { if (_payPalEmail != value) _payPalEmail = value; }
+        }
+        private string _payPalEmail = string.Empty;
+
+        public bool ShouldSerializePayPalEmail()
+        {
+            return !String.IsNullOrEmpty(_payPalEmail);
+        }
+
+        [XmlElement("first_name")]
+        public string FirstName
+        {
+            get { return _firstName; }
+            set { if (_firstName != value) _firstName = value; }
+        }
+        private string _firstName = string.Empty;
+        public bool ShouldSerializeFirstName()
+        {
+            return !String.IsNullOrEmpty(_firstName);
+        }
+
+        [XmlElement("last_name")]
+        public string LastName
+        {
+            get { return _lastName; }
+            set { if (_lastName != value) _lastName = value; }
+        }
+        private string _lastName = string.Empty;
+
+        public bool ShouldSerializeLastName()
+        {
+            return !String.IsNullOrEmpty(_lastName);
+        }
+
+        [XmlElement("billing_address")]
+        public string BillingAddress
+        {
+            get { return _billingAddress; }
+            set { if (_billingAddress != value) _billingAddress = value; }
+        }
+        private string _billingAddress = string.Empty;
+
+        public bool ShouldSerializeBillingAddress()
+        {
+            return !String.IsNullOrEmpty(_billingAddress);
+        }
+
+        [XmlElement("billing_address2")]
+        public string BillingAddress2
+        {
+            get { return _billingAddress2; }
+            set { if (_billingAddress2 != value) _billingAddress2 = value; }
+        }
+        private string _billingAddress2 = string.Empty;
+
+        public bool ShouldSerializeBillingAddress2()
+        {
+            return !String.IsNullOrEmpty(_billingAddress2);
+        }
+
+        [XmlElement("billing_city")]
+        public string BillingCity
+        {
+            get { return _billingCity; }
+            set { if (_billingCity != value) _billingCity = value; }
+        }
+        private string _billingCity = string.Empty;
+
+        public bool ShouldSerializeBillingCity()
+        {
+            return !String.IsNullOrEmpty(_billingCity);
+        }
+
+        [XmlElement("billing_state")]
+        public string BillingState
+        {
+            get { return _billingState; }
+            set { if (_billingState != value) _billingState = value; }
+        }
+        private string _billingState = string.Empty;
+
+        public bool ShouldSerializeBillingState()
+        {
+            return !String.IsNullOrEmpty(_billingState);
+        }
+
+        [XmlElement("billing_zip")]
+        public string BillingZip
+        {
+            get { return _billingZip; }
+            set { if (_billingZip != value) _billingZip = value; }
+        }
+        private string _billingZip = string.Empty;
+
+        public bool ShouldSerializeBillingZip()
+        {
+            return !String.IsNullOrEmpty(_billingZip);
+        }
+
+        [XmlElement("billing_country")]
+        public string BillingCountry
+        {
+            get { return _billingCountry; }
+            set { if (_billingCountry != value) _billingCountry = value; }
+        }
+        private string _billingCountry = string.Empty;
+
+        public bool ShouldSerializeBillingCountry()
+        {
+            return !String.IsNullOrEmpty(_billingCountry);
+        }
+
+        [XmlElement("payment_type")]
+        public PaymentProfileType PaymentType
+        {
+            get { return this._paymentType; }
+            set { if (this._paymentType != value) { this._paymentType = value; } }
+        }
+        private PaymentProfileType _paymentType = PaymentProfileType.Credit_Card;
 
         #endregion
 

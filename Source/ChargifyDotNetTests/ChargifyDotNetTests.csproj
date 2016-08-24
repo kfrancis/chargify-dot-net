@@ -88,6 +88,7 @@
   <ItemGroup>
     <Compile Include="Base\ChargifyTestBase.cs" />
     <Compile Include="Base\RandomProvider.cs" />
+    <Compile Include="ReferralCodeTests.cs" />
     <Compile Include="CustomerTests.cs" />
     <Compile Include="PortalTests.cs" />
     <Compile Include="PaymentProfileTests.cs" />

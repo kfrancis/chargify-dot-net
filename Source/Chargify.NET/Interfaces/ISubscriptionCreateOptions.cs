@@ -153,6 +153,7 @@ namespace ChargifyNET
         /// </summary>
         List<ComponentDetails> Components { get; set; }
 
+
         // TODO: Add this
         //Dictionary<string, string> Metafields { get; set; }
 

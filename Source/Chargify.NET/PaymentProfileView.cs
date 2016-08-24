@@ -183,7 +183,7 @@ namespace ChargifyNET
                         _payPalEmail = dataNode.GetNodeContentAsString();
                         break;
                     case PaymentTypeKey:
-                        _paymentType = dataNode.GetNodeContentAsEnum<PaymentProfileType>();
+                        PaymentType = dataNode.GetNodeContentAsEnum<PaymentProfileType>();
                         break;
                     case CardTypeKey:
                         _cardType = dataNode.GetNodeContentAsString();
@@ -268,7 +268,7 @@ namespace ChargifyNET
                         _payPalEmail = obj.GetJSONContentAsString(key);
                         break;
                     case PaymentTypeKey:
-                        _paymentType = obj.GetJSONContentAsEnum<PaymentProfileType>(key);
+                        PaymentType = obj.GetJSONContentAsEnum<PaymentProfileType>(key);
                         break;
                     case CardTypeKey:
                         _cardType = obj.GetJSONContentAsString(key);
@@ -284,15 +284,7 @@ namespace ChargifyNET
         #endregion
 
         #region ICreditCardView Members
-        /// <summary>
-        /// Default is credit_card. May be bank_account or credit_card or paypal_account
-        /// </summary>
-        public PaymentProfileType PaymentType
-        {
-            get { return this._paymentType; }
-            set { if (this._paymentType != value) { this._paymentType = value; } }
-        }
-        private PaymentProfileType _paymentType = PaymentProfileType.Credit_Card;
+
 
         /// <summary>
         /// The ID to the customer associated with this payment profile
