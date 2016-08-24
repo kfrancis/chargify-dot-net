@@ -5602,6 +5602,10 @@ namespace ChargifyNET
 
             // Send the data (when applicable)
             string dataToPost = postData;
+
+            // We should resolve this with XML serilization instead
+            dataToPost = dataToPost.Replace("<components>", "<components type='array'>");
+        
             if (requestMethod == HttpRequestMethod.Post || requestMethod == HttpRequestMethod.Put || requestMethod == HttpRequestMethod.Delete)
             {
                 bool hasWritten = false;
