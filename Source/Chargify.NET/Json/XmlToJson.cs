@@ -10,21 +10,27 @@ namespace ChargifyNET.Json
     /// </summary>
     public static class XmlToJsonConverter
     {
+        /// <summary>
+        /// Does the node have children?
+        /// </summary>
+        /// <param name="node">The xml element node</param>
+        /// <returns>True if the element has children, false otherwise.</returns>
         public static bool HasChildren(this XmlElement node)
         {
             bool hasChildrenArray = false;
             string childName = string.Empty;
             foreach (object child in node)
             {
-                if (child as XmlElement != null)
+                var childElement = child as XmlElement;
+                if (childElement != null)
                 {
                     if (childName == string.Empty)
                     {
-                        childName = ((XmlElement)child).Name;
+                        childName = childElement.Name;
                     }
                     else
                     {
-                        hasChildrenArray = childName == ((XmlElement)child).Name;
+                        hasChildrenArray = childName == childElement.Name;
                     }
                 }
             }
@@ -36,21 +42,21 @@ namespace ChargifyNET.Json
         /// </summary>
         /// <param name="xmlDoc">The document to convert</param>
         /// <returns>The JSON equivalent string</returns>
-        public static string XmlToJSON(XmlDocument xmlDoc)
+        public static string XmlToJson(XmlDocument xmlDoc)
         {
-            StringBuilder sbJSON = new StringBuilder();
-            sbJSON.Append("{");
-            XmlToJSONnode(sbJSON, xmlDoc.DocumentElement, true);
-            sbJSON.Append("}");
-            return sbJSON.ToString();
+            StringBuilder sbJson = new StringBuilder();
+            sbJson.Append("{");
+            XmlToJsoNnode(sbJson, xmlDoc.DocumentElement, true);
+            sbJson.Append("}");
+            return sbJson.ToString();
         }
 
         //  XmlToJSONnode:  Output an XmlElement, possibly as part of a higher array
-        private static void XmlToJSONnode(StringBuilder sbJSON, XmlElement node, bool showNodeName)
+        private static void XmlToJsoNnode(StringBuilder sbJson, XmlElement node, bool showNodeName)
         {
             if (showNodeName)
-                sbJSON.Append("\"" + SafeJSON(node.Name) + "\": ");
-            sbJSON.Append("{");
+                sbJson.Append("\"" + SafeJson(node.Name) + "\": ");
+            sbJson.Append("{");
             // Build a sorted list of key-value pairs
             //  where   key is case-sensitive nodeName
             //          value is an ArrayList of string or XmlElement
@@ -58,9 +64,8 @@ namespace ChargifyNET.Json
             SortedList childNodeNames = new SortedList();
 
             //  Add in all node attributes
-            if (node.Attributes != null)
-                foreach (XmlAttribute attr in node.Attributes)
-                    StoreChildNode(childNodeNames, attr.Name, attr.InnerText);
+            foreach (XmlAttribute attr in node.Attributes)
+                StoreChildNode(childNodeNames, attr.Name, attr.InnerText);
 
             //  Add in all nodes
             foreach (XmlNode cnode in node.ChildNodes)
@@ -76,21 +81,21 @@ namespace ChargifyNET.Json
             {
                 ArrayList alChild = (ArrayList)childNodeNames[childname];
                 if (alChild.Count == 1 && (alChild[0] is string))
-                    OutputNode(childname, alChild[0], sbJSON, true);
+                    OutputNode(childname, alChild[0], sbJson, true);
                 else
                 {
                     var alChildElement = alChild[0] as XmlElement;
                     //var alParentElementHasChildren = alChildElement != null ? (alChildElement.ParentNode as XmlElement) != null ? (alChildElement.ParentNode as XmlElement).HasChildren() : false : false;
                     bool hasChildrenArray = alChildElement.HasChildren();
-                    sbJSON.Append(" \"" + SafeJSON(childname) + string.Format("\": {0} ", hasChildrenArray ? "[" : string.Empty));   
-                    foreach (object Child in alChild)
-                        OutputNode(childname, Child, sbJSON, false);
-                    sbJSON.Remove(sbJSON.Length - 2, 2);
-                    sbJSON.AppendFormat(" {0},", hasChildrenArray ? "]" : string.Empty);
+                    sbJson.Append(" \"" + SafeJson(childname) + string.Format("\": {0} ", hasChildrenArray ? "[" : string.Empty));   
+                    foreach (object child in alChild)
+                        OutputNode(childname, child, sbJson, false);
+                    sbJson.Remove(sbJson.Length - 2, 2);
+                    sbJson.AppendFormat(" {0},", hasChildrenArray ? "]" : string.Empty);
                 }
             }
-            sbJSON.Remove(sbJSON.Length - 2, 2);
-            sbJSON.Append(" }");
+            sbJson.Remove(sbJson.Length - 2, 2);
+            sbJson.Append(" }");
         }
 
         //  StoreChildNode: Store data associated with each nodeName
@@ -98,12 +103,13 @@ namespace ChargifyNET.Json
         private static void StoreChildNode(SortedList childNodeNames, string nodeName, object nodeValue)
         {
             // Pre-process contraction of XmlElement-s
-            if (nodeValue is XmlElement)
+            var nodeElement = nodeValue as XmlElement;
+            if (nodeElement != null)
             {
                 // Convert  <aa></aa> into "aa":null
                 //          <aa>xx</aa> into "aa":"xx"
                 XmlNode cnode = (XmlNode)nodeValue;
-                if (cnode.Attributes.Count == 0)
+                if (cnode.Attributes != null && cnode.Attributes.Count == 0)
                 {
                     XmlNodeList children = cnode.ChildNodes;
                     if (children.Count == 0)
@@ -114,48 +120,48 @@ namespace ChargifyNET.Json
             }
             // Add nodeValue to ArrayList associated with each nodeName
             // If nodeName doesn't exist then add it
-            object oValuesAL = childNodeNames[nodeName];
-            ArrayList ValuesAL;
-            if (oValuesAL == null)
+            object oValuesAl = childNodeNames[nodeName];
+            ArrayList valuesAl;
+            if (oValuesAl == null)
             {
-                ValuesAL = new ArrayList();
-                childNodeNames[nodeName] = ValuesAL;
+                valuesAl = new ArrayList();
+                childNodeNames[nodeName] = valuesAl;
             }
             else
-                ValuesAL = (ArrayList)oValuesAL;
-            ValuesAL.Add(nodeValue);
+                valuesAl = (ArrayList)oValuesAl;
+            if (nodeValue != null) valuesAl.Add(nodeValue);
         }
 
-        private static void OutputNode(string childname, object alChild, StringBuilder sbJSON, bool showNodeName)
+        private static void OutputNode(string childname, object alChild, StringBuilder sbJson, bool showNodeName)
         {
             if (alChild == null)
             {
                 if (showNodeName)
-                    sbJSON.Append("\"" + SafeJSON(childname) + "\": ");
-                sbJSON.Append("null");
+                    sbJson.Append("\"" + SafeJson(childname) + "\": ");
+                sbJson.Append("null");
             }
             else if (alChild is string)
             {
                 if (showNodeName)
-                    sbJSON.Append("\"" + SafeJSON(childname) + "\": ");
+                    sbJson.Append("\"" + SafeJson(childname) + "\": ");
                 string sChild = (string)alChild;
                 sChild = sChild.Trim();
-                sbJSON.Append("\"" + SafeJSON(sChild) + "\"");
+                sbJson.Append("\"" + SafeJson(sChild) + "\"");
             }
             else
-                XmlToJSONnode(sbJSON, (XmlElement)alChild, showNodeName);
-            sbJSON.Append(", ");
+                XmlToJsoNnode(sbJson, (XmlElement)alChild, showNodeName);
+            sbJson.Append(", ");
         }
 
         // Make a string safe for JSON
-        private static string SafeJSON(string sIn)
+        private static string SafeJson(string sIn)
         {
             StringBuilder sbOut = new StringBuilder(sIn.Length);
             foreach (char ch in sIn)
             {
                 if (Char.IsControl(ch) || ch == '\'')
                 {
-                    int ich = (int)ch;
+                    int ich = ch;
                     sbOut.Append(@"\u" + ich.ToString("x4"));
                     continue;
                 }

@@ -1,5 +1,8 @@
 ﻿namespace ChargifyNET
 {
+    /// <summary>
+    /// The type of cleanup being performed
+    /// </summary>
     public enum SiteCleanupScope
     {
         /// <summary>

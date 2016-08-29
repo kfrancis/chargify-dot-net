@@ -32,7 +32,6 @@ namespace ChargifyNET
     #region Imports
     using System;
     using System.Xml;
-
     #endregion
 
     /// <summary>
@@ -52,21 +51,21 @@ namespace ChargifyNET
         /// <summary>
         /// Meaningful values to subscription or customer records
         /// </summary>
-        public Metadata() : base()
+        public Metadata()
         {
         }
-        
+
         /// <summary>
         /// Meaningful values to subscription or customer records
         /// </summary>
-        /// <param name="MetadataXML">The XML to parse into a metadata result</param>
-        public Metadata(string MetadataXML) : base()
+        /// <param name="metadataXml">The XML to parse into a metadata result</param>
+        public Metadata(string metadataXml)
         {
             // get the XML into an XML document
             XmlDocument doc = new XmlDocument();
-            doc.LoadXml(MetadataXML);
+            doc.LoadXml(metadataXml);
             if (doc.ChildNodes.Count == 0)
-                throw new ArgumentException("XML not valid", "MetadataXML");
+                throw new ArgumentException("XML not valid", nameof(metadataXml));
             // loop through the child nodes of this node
             foreach (XmlNode elementNode in doc.ChildNodes)
             {
@@ -77,67 +76,65 @@ namespace ChargifyNET
                 }
             }
             // if we get here, then no metadata result data was found
-            throw new ArgumentException("XML does not contain metadata result information", "MetadataResultXML");
+            throw new ArgumentException("XML does not contain metadata result information", nameof(metadataXml));
         }
 
         /// <summary>
         /// Meaningful values to subscription or customer records
         /// </summary>
-        /// <param name="MetadataNode">The XML document node to use to parse into a metadata result</param>
-        public Metadata(XmlNode MetadataNode) : base()
+        /// <param name="metadataNode">The XML document node to use to parse into a metadata result</param>
+        public Metadata(XmlNode metadataNode)
         {
-            if (MetadataNode == null)
-                throw new ArgumentNullException("MetadataNode");
-            if (MetadataNode.Name != "metadatum")
-                throw new ArgumentException("Not a vaild metadatum results node", "MetadataNode");
-            if (MetadataNode.ChildNodes.Count == 0)
-                throw new ArgumentException("XML not valid", "MetadataNode");
-            LoadFromNode(MetadataNode);
+            if (metadataNode == null)
+                throw new ArgumentNullException(nameof(metadataNode));
+            if (metadataNode.Name != "metadatum")
+                throw new ArgumentException("Not a vaild metadatum results node", nameof(metadataNode));
+            if (metadataNode.ChildNodes.Count == 0)
+                throw new ArgumentException("XML not valid", nameof(metadataNode));
+            LoadFromNode(metadataNode);
         }
-  
+
         private void LoadFromNode(XmlNode metadataNode)
         {
             foreach (XmlNode childNode in metadataNode.ChildNodes)
             {
                 switch (childNode.Name)
-                { 
+                {
                     case "resource-id":
-                        this.ResourceID = childNode.GetNodeContentAsInt();
+                        ResourceID = childNode.GetNodeContentAsInt();
                         break;
                     case "name":
-                        this.Name = childNode.GetNodeContentAsString();
+                        Name = childNode.GetNodeContentAsString();
                         break;
                     case "value":
-                        this.Value = childNode.GetNodeContentAsString();
-                        break;
-                    default:
+                        Value = childNode.GetNodeContentAsString();
                         break;
                 }
             }
         }
-        
+
         #endregion
-        
+
         #region IMetadata Members
 
         /// <summary>
         /// The resource id that the metadata belongs to
         /// </summary>
-        public int ResourceID { get { return this._resourceID; } set { this._resourceID = value; } }
-        private int _resourceID = int.MinValue;
+        public int ResourceID { get { return _resourceId; } set { _resourceId = value; } }
+        private int _resourceId = int.MinValue;
 
         /// <summary>
         /// The value of the attribute that was added to the resource
         /// </summary>
-        public string Value { get { return this._value; } set { this._value = value; } }
-        private string _value = null;
+        public string Value { get { return _value; } set { _value = value; } }
+        private string _value;
 
         /// <summary>
         /// The name of the attribute that is added to the resource
         /// </summary>
-        public string Name { get { return this._name; } set { this._name = value; } }
+        public string Name { get { return _name; } set { _name = value; } }
         private string _name = string.Empty;
-        
+
         #endregion
 
         #region Equality
@@ -150,9 +147,9 @@ namespace ChargifyNET
             unchecked
             {
                 int result = 17;
-                result = result * 23 + this.ResourceID.GetHashCode();
-                result = result * 23 + ((Value != null) ? this.Value.GetHashCode() : 0);
-                result = result * 23 + ((Name != null) ? this.Name.GetHashCode() : 0);
+                result = result * 23 + ResourceID.GetHashCode();
+                result = result * 23 + ((Value != null) ? Value.GetHashCode() : 0);
+                result = result * 23 + ((Name != null) ? Name.GetHashCode() : 0);
                 return result;
             }
         }
@@ -172,9 +169,9 @@ namespace ChargifyNET
             {
                 return true;
             }
-            return this.ResourceID == value.ResourceID &&
-                   Equals(this.Value, value.Value) &&
-                   Equals(this.Name, value.Name);
+            return ResourceID == value.ResourceID &&
+                   Equals(Value, value.Value) &&
+                   Equals(Name, value.Name);
         }
 
         /// <summary>
@@ -187,7 +184,7 @@ namespace ChargifyNET
             Metadata temp = obj as Metadata;
             if (temp == null)
                 return false;
-            return this.Equals(temp);
+            return Equals(temp);
         }
         #endregion
     }

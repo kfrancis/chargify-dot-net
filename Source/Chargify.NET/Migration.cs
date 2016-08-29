@@ -33,7 +33,7 @@ namespace ChargifyNET
     #region Imports
     using System;
     using System.Xml;
-    using ChargifyNET.Json;
+    using Json;
     #endregion
 
     /// <summary>
@@ -53,32 +53,30 @@ namespace ChargifyNET
         /// Constructor.  Values set to default
         /// </summary>
         public Migration()
-            : base()
         {
         }
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="MigrationPreviewXML">XML containing migration info (in expected format)</param>
-        public Migration(string MigrationPreviewXML)
-            : base()
+        /// <param name="migrationPreviewXml">XML containing migration info (in expected format)</param>
+        public Migration(string migrationPreviewXml)
         {
             // get the XML into an XML document
-            XmlDocument Doc = new XmlDocument();
-            Doc.LoadXml(MigrationPreviewXML);
-            if (Doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", "MigrationPreviewXML");
+            XmlDocument doc = new XmlDocument();
+            doc.LoadXml(migrationPreviewXml);
+            if (doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(migrationPreviewXml));
             // loop through the child nodes of this node
-            foreach (XmlNode elementNode in Doc.ChildNodes)
+            foreach (XmlNode elementNode in doc.ChildNodes)
             {
                 if (elementNode.Name == "migration")
                 {
-                    this.LoadFromNode(elementNode);
+                    LoadFromNode(elementNode);
                     return;
                 }
             }
             // if we get here, then no info was found
-            throw new ArgumentException("XML does not contain migration preview information", "MigrationPreviewXML");
+            throw new ArgumentException("XML does not contain migration preview information", nameof(migrationPreviewXml));
         }
 
         /// <summary>
@@ -86,12 +84,11 @@ namespace ChargifyNET
         /// </summary>
         /// <param name="migrationNode">XML containing migration info (in expected format)</param>
         internal Migration(XmlNode migrationNode)
-            : base()
         {
-            if (migrationNode == null) throw new ArgumentNullException("migrationNode");
-            if (migrationNode.Name != "migration") throw new ArgumentException("Not a vaild migration node", "migrationNode");
-            if (migrationNode.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", "migrationNode");
-            this.LoadFromNode(migrationNode);
+            if (migrationNode == null) throw new ArgumentNullException(nameof(migrationNode));
+            if (migrationNode.Name != "migration") throw new ArgumentException("Not a vaild migration node", nameof(migrationNode));
+            if (migrationNode.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(migrationNode));
+            LoadFromNode(migrationNode);
         }
 
         /// <summary>
@@ -100,16 +97,16 @@ namespace ChargifyNET
         /// <param name="migrationObject">JsonObject containing migration info (in expected format)</param>
         public Migration(JsonObject migrationObject)
         {
-            if (migrationObject == null) throw new ArgumentNullException("migrationObject");
-            if (migrationObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild migration object", "migrationObject");
-            this.LoadFromJSON(migrationObject);
+            if (migrationObject == null) throw new ArgumentNullException(nameof(migrationObject));
+            if (migrationObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild migration object", nameof(migrationObject));
+            LoadFromJson(migrationObject);
         }
 
         /// <summary>
         /// Load data from a JsonObject
         /// </summary>
         /// <param name="obj">The JsonObject with migration data</param>
-        private void LoadFromJSON(JsonObject obj)
+        private void LoadFromJson(JsonObject obj)
         {
             foreach (string key in obj.Keys)
             {
@@ -126,8 +123,6 @@ namespace ChargifyNET
                         break;
                     case CreditAppliedInCentsKey:
                         _creditAppliedInCents = obj.GetJSONContentAsInt(key);
-                        break;
-                    default:
                         break;
                 }
             }
@@ -154,8 +149,6 @@ namespace ChargifyNET
                         break;
                     case CreditAppliedInCentsKey:
                         _creditAppliedInCents = dataNode.GetNodeContentAsInt();
-                        break;
-                    default:
                         break;
 
                 }

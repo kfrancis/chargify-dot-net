@@ -46,27 +46,28 @@ namespace ChargifyNET
         /// <summary>
         /// Class which can be used to "import" subscriptions via the API into Chargify
         /// </summary>
-        public PaymentProfileAttributes() : base() { /* Nothing */ }
+        public PaymentProfileAttributes()
+        { /* Nothing */ }
 
         /// <summary>
         /// Class which can be used to "import" subscriptions via the API into Chargify
         /// </summary>
-        /// <param name="VaultToken">The "token" provided by your vault storage for an already stored payment profile</param>
-        /// <param name="CustomerVaultToken">The "customerProfileId" for the owner of the "customerPaymentProfileId" provided as the VaultToken</param>
-        /// <param name="CurrentVault">The vault that stores the payment profile with the provided VaultToken</param>
-        /// <param name="ExpYear">The year of expiration</param>
-        /// <param name="ExpMonth">The month of expiration</param>
-        /// <param name="CardType">If you know the card type, you may supply it here so that Chargify may display it in the AdminUI</param>
-        /// <param name="LastFourDigits">The last four digits of the credit card for use in masked numbers</param>
-        public PaymentProfileAttributes(string VaultToken, string CustomerVaultToken, VaultType CurrentVault, int ExpYear, int ExpMonth, CardType CardType, string LastFourDigits) : base() 
+        /// <param name="vaultToken">The "token" provided by your vault storage for an already stored payment profile</param>
+        /// <param name="customerVaultToken">The "customerProfileId" for the owner of the "customerPaymentProfileId" provided as the VaultToken</param>
+        /// <param name="currentVault">The vault that stores the payment profile with the provided VaultToken</param>
+        /// <param name="expYear">The year of expiration</param>
+        /// <param name="expMonth">The month of expiration</param>
+        /// <param name="cardType">If you know the card type, you may supply it here so that Chargify may display it in the AdminUI</param>
+        /// <param name="lastFourDigits">The last four digits of the credit card for use in masked numbers</param>
+        public PaymentProfileAttributes(string vaultToken, string customerVaultToken, VaultType currentVault, int expYear, int expMonth, CardType cardType, string lastFourDigits)
         {
-            this._vaultToken = VaultToken;
-            this._customerVaultToken = CustomerVaultToken;
-            this._currentVault = CurrentVault;
-            this._expirationYear = ExpYear;
-            this._expirationMonth = ExpMonth;
-            this._cardType = CardType;
-            this._lastFour = LastFourDigits;
+            _vaultToken = vaultToken;
+            _customerVaultToken = customerVaultToken;
+            _currentVault = currentVault;
+            _expirationYear = expYear;
+            _expirationMonth = expMonth;
+            _cardType = cardType;
+            _lastFour = lastFourDigits;
         }
         #endregion
 
@@ -77,7 +78,7 @@ namespace ChargifyNET
         public string VaultToken
         {
             get { return _vaultToken; }
-            set { if (_vaultToken != value) _vaultToken = value; }
+            set { _vaultToken = value; }
         }
         private string _vaultToken = string.Empty;
 
@@ -88,7 +89,7 @@ namespace ChargifyNET
         public string CustomerVaultToken
         {
             get { return _customerVaultToken; }
-            set { if (_customerVaultToken != value) _customerVaultToken = value; }
+            set { _customerVaultToken = value; }
         }
         private string _customerVaultToken = string.Empty;
 
@@ -98,7 +99,7 @@ namespace ChargifyNET
         public VaultType CurrentVault
         {
             get { return _currentVault; }
-            set { if (_currentVault != value) _currentVault = value; }
+            set { _currentVault = value; }
         }
         private VaultType _currentVault = VaultType.Unknown;
 
@@ -108,7 +109,7 @@ namespace ChargifyNET
         public int ExpirationYear
         {
             get { return _expirationYear; }
-            set { if (_expirationYear != value) _expirationYear = value; }
+            set { _expirationYear = value; }
         }
         private int _expirationYear = int.MinValue;
 
@@ -118,7 +119,7 @@ namespace ChargifyNET
         public int ExpirationMonth
         {
             get { return _expirationMonth; }
-            set { if (_expirationMonth != value) _expirationMonth = value; }
+            set { _expirationMonth = value; }
         }
         private int _expirationMonth = int.MinValue;
 
@@ -129,7 +130,7 @@ namespace ChargifyNET
         public CardType CardType
         {
             get { return _cardType; }
-            set { if (_cardType != value) _cardType = value; }
+            set { _cardType = value; }
         }
         private CardType _cardType = CardType.Unknown;
 
@@ -140,47 +141,47 @@ namespace ChargifyNET
         public string LastFour
         {
             get { return _lastFour; }
-            set { if (_lastFour != value) _lastFour = value; }
+            set { _lastFour = value; }
         }
         private string _lastFour = string.Empty;
 
         /// <summary>
         /// The name of the bank where the customer's account resides
         /// </summary>
-        public string BankName 
-        { 
+        public string BankName
+        {
             get { return _bankName; }
-            set { if (_bankName != value) _bankName = value; }
+            set { _bankName = value; }
         }
         private string _bankName = string.Empty;
 
         /// <summary>
         /// The routing number of the bank
         /// </summary>
-        public string BankRoutingNumber 
-        { 
+        public string BankRoutingNumber
+        {
             get { return _bankRoutingNumber; }
-            set { if (_bankRoutingNumber != value) _bankRoutingNumber = value; }
+            set { _bankRoutingNumber = value; }
         }
         private string _bankRoutingNumber = string.Empty;
 
         /// <summary>
         /// The customer's bank account number
         /// </summary>
-        public string BankAccountNumber 
+        public string BankAccountNumber
         {
             get { return _bankAccountNumber; }
-            set { if (_bankAccountNumber != value) _bankAccountNumber = value; }
+            set { _bankAccountNumber = value; }
         }
         private string _bankAccountNumber = string.Empty;
 
         /// <summary>
         /// Either checking or savings
         /// </summary>
-        public BankAccountType BankAccountType 
-        { 
+        public BankAccountType BankAccountType
+        {
             get { return _bankAccountType; }
-            set { if (_bankAccountType != value) _bankAccountType = value; }
+            set { _bankAccountType = value; }
         }
         private BankAccountType _bankAccountType = BankAccountType.Unknown;
 
@@ -188,9 +189,9 @@ namespace ChargifyNET
         /// Either personal or business
         /// </summary>
         public BankAccountHolderType BankAccountHolderType
-        { 
+        {
             get { return _bankAccountHolderType; }
-            set { if (_bankAccountHolderType != value) _bankAccountHolderType = value; }
+            set { _bankAccountHolderType = value; }
         }
         private BankAccountHolderType _bankAccountHolderType = BankAccountHolderType.Unknown;
 
@@ -205,7 +206,7 @@ namespace ChargifyNET
         /// <returns>The result of the comparison</returns>
         public int CompareTo(IPaymentProfileAttributes other)
         {
-            return this.VaultToken.CompareTo(other.VaultToken);
+            return string.Compare(VaultToken, other.VaultToken, StringComparison.InvariantCultureIgnoreCase);
         }
 
         #endregion
@@ -219,7 +220,7 @@ namespace ChargifyNET
         /// <returns>The result of the comparison</returns>
         public int CompareTo(PaymentProfileAttributes other)
         {
-            return this.VaultToken.CompareTo(other.VaultToken);
+            return string.Compare(VaultToken, other.VaultToken, StringComparison.InvariantCultureIgnoreCase);
         }
 
         #endregion

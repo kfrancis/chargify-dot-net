@@ -33,7 +33,7 @@ namespace ChargifyNET
     #region Imports
     using System;
     using System.Xml;
-    using ChargifyNET.Json;
+    using Json;
     #endregion
 
     /// <summary>
@@ -44,46 +44,46 @@ namespace ChargifyNET
     public class Adjustment : ChargifyBase, IAdjustment, IComparable<Adjustment>
     {
         #region Field Keys
-        private const string IDKey = "id";
+        private const string IdKey = "id";
         private const string SuccessKey = "success";
         private const string MemoKey = "memo";
         private const string AmountInCentsKey = "amount_in_cents";
         private const string EndingBalanceInCentsKey = "ending_balance_in_cents";
         private const string TypeKey = "type";
         private const string TransactionTypeKey = "transaction_type";
-        private const string SubscriptionIDKey = "subscription_id";
+        private const string SubscriptionIdKey = "subscription_id";
         private const string CreatedAtKey = "created_at";
-        private const string ProductIDKey = "product_id";
+        private const string ProductIdKey = "product_id";
         #endregion
 
         #region Constructors
         /// <summary>
         /// Constructor.  Values set to default
         /// </summary>
-        public Adjustment() : base() { }
+        public Adjustment()
+        { }
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="AdjustmentXML">XML containing adjustment info (in expected format)</param>
-        public Adjustment(string AdjustmentXML)
-            : base()
+        /// <param name="adjustmentXml">XML containing adjustment info (in expected format)</param>
+        public Adjustment(string adjustmentXml)
         {
             // get the XML into an XML document
-            XmlDocument Doc = new XmlDocument();
-            Doc.LoadXml(AdjustmentXML);
-            if (Doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", "AdjustmentXML");
+            XmlDocument doc = new XmlDocument();
+            doc.LoadXml(adjustmentXml);
+            if (doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(adjustmentXml));
             // loop through the child nodes of this node
-            foreach (XmlNode elementNode in Doc.ChildNodes)
+            foreach (XmlNode elementNode in doc.ChildNodes)
             {
                 if (elementNode.Name == "adjustment")
                 {
-                    this.LoadFromNode(elementNode);
+                    LoadFromNode(elementNode);
                     return;
                 }
             }
             // if we get here, then no info was found
-            throw new ArgumentException("XML does not contain adjustment information", "AdjustmentXML");
+            throw new ArgumentException("XML does not contain adjustment information", nameof(adjustmentXml));
         }
 
         /// <summary>
@@ -91,12 +91,11 @@ namespace ChargifyNET
         /// </summary>
         /// <param name="adjustmentNode">XML containing adjustment info (in expected format)</param>
         internal Adjustment(XmlNode adjustmentNode)
-            : base()
         {
-            if (adjustmentNode == null) throw new ArgumentNullException("adjustmentNode");
-            if (adjustmentNode.Name != "adjustment") throw new ArgumentException("Not a vaild adjustment node", "adjustmentNode");
-            if (adjustmentNode.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", "adjustmentNode");
-            this.LoadFromNode(adjustmentNode);
+            if (adjustmentNode == null) throw new ArgumentNullException(nameof(adjustmentNode));
+            if (adjustmentNode.Name != "adjustment") throw new ArgumentException("Not a vaild adjustment node", nameof(adjustmentNode));
+            if (adjustmentNode.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(adjustmentNode));
+            LoadFromNode(adjustmentNode);
         }
 
         /// <summary>
@@ -104,20 +103,19 @@ namespace ChargifyNET
         /// </summary>
         /// <param name="adjustmentObject">Json containing adjustment info (in expected format)</param>
         public Adjustment(JsonObject adjustmentObject)
-            : base()
         {
-            if (adjustmentObject == null) throw new ArgumentNullException("adjustmentObject");
-            if (adjustmentObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild charge object", "adjustmentObject");
-            this.LoadFromJSON(adjustmentObject);
+            if (adjustmentObject == null) throw new ArgumentNullException(nameof(adjustmentObject));
+            if (adjustmentObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild charge object", nameof(adjustmentObject));
+            LoadFromJson(adjustmentObject);
         }
 
-        private void LoadFromJSON(JsonObject obj)
+        private void LoadFromJson(JsonObject obj)
         {
             foreach (string key in obj.Keys)
             {
                 switch (key)
                 {
-                    case IDKey:
+                    case IdKey:
                         _id = obj.GetJSONContentAsInt(key);
                         break;
                     case EndingBalanceInCentsKey:
@@ -129,11 +127,11 @@ namespace ChargifyNET
                     case TransactionTypeKey:
                         _transactionType = obj.GetJSONContentAsTransactionType(key);
                         break;
-                    case SubscriptionIDKey:
-                        _subscriptionID = obj.GetJSONContentAsInt(key);
+                    case SubscriptionIdKey:
+                        _subscriptionId = obj.GetJSONContentAsInt(key);
                         break;
-                    case ProductIDKey:
-                        _productID = obj.GetJSONContentAsInt(key);
+                    case ProductIdKey:
+                        _productId = obj.GetJSONContentAsInt(key);
                         break;
                     case CreatedAtKey:
                         _createdAt = obj.GetJSONContentAsDateTime(key);
@@ -146,8 +144,6 @@ namespace ChargifyNET
                         break;
                     case AmountInCentsKey:
                         _amountInCents = obj.GetJSONContentAsInt(key);
-                        break;
-                    default:
                         break;
                 }
             }
@@ -163,7 +159,7 @@ namespace ChargifyNET
             {
                 switch (dataNode.Name)
                 {
-                    case IDKey:
+                    case IdKey:
                         _id = dataNode.GetNodeContentAsInt();
                         break;
                     case EndingBalanceInCentsKey:
@@ -175,11 +171,11 @@ namespace ChargifyNET
                     case TransactionTypeKey:
                         _transactionType = dataNode.GetNodeContentAsTransactionType();
                         break;
-                    case SubscriptionIDKey:
-                        _subscriptionID = dataNode.GetNodeContentAsInt();
+                    case SubscriptionIdKey:
+                        _subscriptionId = dataNode.GetNodeContentAsInt();
                         break;
-                    case ProductIDKey:
-                        _productID = dataNode.GetNodeContentAsInt();
+                    case ProductIdKey:
+                        _productId = dataNode.GetNodeContentAsInt();
                         break;
                     case CreatedAtKey:
                         _createdAt = dataNode.GetNodeContentAsDateTime();
@@ -193,18 +189,16 @@ namespace ChargifyNET
                     case AmountInCentsKey:
                         _amountInCents = dataNode.GetNodeContentAsInt();
                         break;
-                    default:
-                        break;
                 }
             }
-        }        
+        }
         #endregion
 
         #region IAdjustment Members
         /// <summary>
         /// The ID of the adjustment
         /// </summary>
-        public int ID 
+        public int ID
         {
             get { return _id; }
         }
@@ -224,7 +218,7 @@ namespace ChargifyNET
         /// </summary>
         public decimal Amount
         {
-            get { return Convert.ToDecimal(this._amountInCents) / 100; }
+            get { return Convert.ToDecimal(_amountInCents) / 100; }
         }
 
         /// <summary>
@@ -241,7 +235,7 @@ namespace ChargifyNET
         /// </summary>
         public decimal EndingBalance
         {
-            get { return Convert.ToDecimal(this._endingBalanceInCents) / 100; }
+            get { return Convert.ToDecimal(_endingBalanceInCents) / 100; }
         }
 
         /// <summary>
@@ -267,18 +261,18 @@ namespace ChargifyNET
         /// </summary>
         public int SubscriptionID
         {
-            get { return _subscriptionID; }
+            get { return _subscriptionId; }
         }
-        private int _subscriptionID = int.MinValue;
+        private int _subscriptionId = int.MinValue;
 
         /// <summary>
         /// The subscribed product at the time of the adjustment
         /// </summary>
         public int ProductID
         {
-            get { return _productID; }
+            get { return _productId; }
         }
-        private int _productID = int.MinValue;
+        private int _productId = int.MinValue;
 
         /// <summary>
         /// The date the adjustment was created
@@ -305,7 +299,7 @@ namespace ChargifyNET
         {
             get { return _success; }
         }
-        private bool _success = false;
+        private bool _success;
 
         #endregion
 
@@ -317,7 +311,7 @@ namespace ChargifyNET
         /// <returns>The comparison value</returns>
         public int CompareTo(IAdjustment other)
         {
-            return this._amountInCents.CompareTo(other.AmountInCents);
+            return _amountInCents.CompareTo(other.AmountInCents);
         }
         #endregion
 
@@ -329,7 +323,7 @@ namespace ChargifyNET
         /// <returns>The comparison value</returns>
         public int CompareTo(Adjustment other)
         {
-            return this._amountInCents.CompareTo(other.AmountInCents);
+            return _amountInCents.CompareTo(other.AmountInCents);
         }
         #endregion
     }

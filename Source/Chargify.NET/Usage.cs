@@ -33,7 +33,7 @@ namespace ChargifyNET
     #region Imports
     using System;
     using System.Xml;
-using ChargifyNET.Json;
+    using Json;
     #endregion
 
     /// <summary>
@@ -46,32 +46,30 @@ using ChargifyNET.Json;
         /// Constructor.  Values set to default
         /// </summary>
         public Usage()
-            : base()
         {
         }
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="UsageXML">XML containing usage info (in expected format)</param>
-        public Usage(string UsageXML)
-            : base()
+        /// <param name="usageXml">XML containing usage info (in expected format)</param>
+        public Usage(string usageXml)
         {
             // get the XML into an XML document
-            XmlDocument Doc = new XmlDocument();
-            Doc.LoadXml(UsageXML);
-            if (Doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", "ChargeXML");
+            XmlDocument doc = new XmlDocument();
+            doc.LoadXml(usageXml);
+            if (doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(usageXml));
             // loop through the child nodes of this node
-            foreach (XmlNode elementNode in Doc.ChildNodes)
+            foreach (XmlNode elementNode in doc.ChildNodes)
             {
                 if (elementNode.Name == "usage")
                 {
-                    this.LoadFromNode(elementNode);
+                    LoadFromNode(elementNode);
                     return;
                 }
             }
             // if we get here, then no info was found
-            throw new ArgumentException("XML does not contain charge information", "ChargeXML");
+            throw new ArgumentException("XML does not contain charge information", nameof(usageXml));
         }
 
         /// <summary>
@@ -79,12 +77,11 @@ using ChargifyNET.Json;
         /// </summary>
         /// <param name="usageNode">XML containing usage info (in expected format)</param>
         internal Usage(XmlNode usageNode)
-            : base()
         {
-            if (usageNode == null) throw new ArgumentNullException("usageNode");
-            if (usageNode.Name != "usage") throw new ArgumentException("Not a vaild usage node", "usageNode");
-            if (usageNode.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", "usageNode");
-            this.LoadFromNode(usageNode);
+            if (usageNode == null) throw new ArgumentNullException(nameof(usageNode));
+            if (usageNode.Name != "usage") throw new ArgumentException("Not a vaild usage node", nameof(usageNode));
+            if (usageNode.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(usageNode));
+            LoadFromNode(usageNode);
         }
 
         /// <summary>
@@ -93,16 +90,16 @@ using ChargifyNET.Json;
         /// <param name="usageObject">JsonObject containing usage info (in expected format)</param>
         public Usage(JsonObject usageObject)
         {
-            if (usageObject == null) throw new ArgumentNullException("usageObject");
-            if (usageObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild usage object", "usageObject");
-            this.LoadFromJSON(usageObject);
+            if (usageObject == null) throw new ArgumentNullException(nameof(usageObject));
+            if (usageObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild usage object", nameof(usageObject));
+            LoadFromJson(usageObject);
         }
 
         /// <summary>
         /// Load usage data from a JsonObject
         /// </summary>
         /// <param name="obj">The JsonObject containing usage data</param>
-        private void LoadFromJSON(JsonObject obj)
+        private void LoadFromJson(JsonObject obj)
         {
             foreach (string key in obj.Keys)
             {
@@ -116,8 +113,6 @@ using ChargifyNET.Json;
                         break;
                     case "quantity":
                         _quantity = obj.GetJSONContentAsInt(key);
-                        break;
-                    default:
                         break;
                 }
             }
@@ -141,8 +136,6 @@ using ChargifyNET.Json;
                         break;
                     case "quantity":
                         _quantity = dataNode.GetNodeContentAsInt();
-                        break;
-                    default:
                         break;
                 }
             }
@@ -189,7 +182,7 @@ using ChargifyNET.Json;
         /// <returns></returns>
         public int CompareTo(Usage other)
         {
-            return this.ID.CompareTo(other.ID);
+            return string.Compare(ID, other.ID, StringComparison.InvariantCultureIgnoreCase);
         }
 
         /// <summary>
@@ -199,7 +192,7 @@ using ChargifyNET.Json;
         /// <returns></returns>
         public int CompareTo(IUsage other)
         {
-            return this.ID.CompareTo(other.ID);
+            return string.Compare(ID, other.ID, StringComparison.InvariantCultureIgnoreCase);
         }
 
         #endregion

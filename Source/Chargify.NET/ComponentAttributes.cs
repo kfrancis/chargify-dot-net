@@ -33,7 +33,7 @@ namespace ChargifyNET
     #region Imports
     using System;
     using System.Xml;
-    using ChargifyNET.Json;
+    using Json;
     #endregion
 
     /// <summary>
@@ -44,8 +44,8 @@ namespace ChargifyNET
     {
         #region Field Keys
         private const string AllocatedQuantityKey = "allocated_quantity";
-        private const string ComponentIDKey = "component_id";
-        private const string SubscriptionIDKey = "subscription_id";
+        private const string ComponentIdKey = "component_id";
+        private const string SubscriptionIdKey = "subscription_id";
         private const string NameKey = "name";
         private const string UnitNameKey = "unit_name";
         private const string KindKey = "kind";
@@ -58,19 +58,19 @@ namespace ChargifyNET
         /// <summary>
         /// Constructor
         /// </summary>
-        private ComponentAttributes() : base() { }
+        private ComponentAttributes()
+        { }
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="componentAttributesXML">An XML string containing a component node</param>
-        public ComponentAttributes(string componentAttributesXML)
-            : base()
+        /// <param name="componentAttributesXml">An XML string containing a component node</param>
+        public ComponentAttributes(string componentAttributesXml)
         {
             // get the XML into an XML document
             XmlDocument doc = new XmlDocument();
-            doc.LoadXml(componentAttributesXML);
-            if (doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", "componentAttributesXML");
+            doc.LoadXml(componentAttributesXml);
+            if (doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(componentAttributesXml));
             // loop through the child nodes of this node
             foreach (XmlNode elementNode in doc.ChildNodes)
             {
@@ -81,7 +81,7 @@ namespace ChargifyNET
                 }
             }
             // if we get here, then no component info was found
-            throw new ArgumentException("XML does not contain component information", "componentAttributesXML");
+            throw new ArgumentException("XML does not contain component information", nameof(componentAttributesXml));
         }
 
         /// <summary>
@@ -89,12 +89,11 @@ namespace ChargifyNET
         /// </summary>
         /// <param name="componentAttributeNode">An xml node with usage information</param>
         internal ComponentAttributes(XmlNode componentAttributeNode)
-            : base()
         {
-            if (componentAttributeNode == null) throw new ArgumentNullException("componentAttributeNode");
-            if (componentAttributeNode.Name != "component") throw new ArgumentException("Not a vaild component node", "componentAttributeNode");
-            if (componentAttributeNode.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", "componentAttributeNode");
-            this.LoadFromNode(componentAttributeNode);
+            if (componentAttributeNode == null) throw new ArgumentNullException(nameof(componentAttributeNode));
+            if (componentAttributeNode.Name != "component") throw new ArgumentException("Not a vaild component node", nameof(componentAttributeNode));
+            if (componentAttributeNode.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(componentAttributeNode));
+            LoadFromNode(componentAttributeNode);
         }
 
         /// <summary>
@@ -102,14 +101,13 @@ namespace ChargifyNET
         /// </summary>
         /// <param name="componentAttributesObject">An JsonObject with component information</param>
         public ComponentAttributes(JsonObject componentAttributesObject)
-            : base()
         {
-            if (componentAttributesObject == null) throw new ArgumentNullException("componentAttributesObject");
-            if (componentAttributesObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild component object", "componentAttributesObject");
-            this.LoadFromJSON(componentAttributesObject);
+            if (componentAttributesObject == null) throw new ArgumentNullException(nameof(componentAttributesObject));
+            if (componentAttributesObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild component object", nameof(componentAttributesObject));
+            LoadFromJson(componentAttributesObject);
         }
 
-        private void LoadFromJSON(JsonObject obj)
+        private void LoadFromJson(JsonObject obj)
         {
             // loop through the keys of this JsonObject to get component info, and parse it out
             foreach (string key in obj.Keys)
@@ -119,11 +117,11 @@ namespace ChargifyNET
                     case AllocatedQuantityKey:
                         _allocatedQuantity = obj.GetJSONContentAsInt(key);
                         break;
-                    case ComponentIDKey:
-                        _componentID = obj.GetJSONContentAsInt(key);
+                    case ComponentIdKey:
+                        _componentId = obj.GetJSONContentAsInt(key);
                         break;
-                    case SubscriptionIDKey:
-                        _subscriptionID = obj.GetJSONContentAsInt(key);
+                    case SubscriptionIdKey:
+                        _subscriptionId = obj.GetJSONContentAsInt(key);
                         break;
                     case NameKey:
                         _name = obj.GetJSONContentAsString(key);
@@ -144,8 +142,6 @@ namespace ChargifyNET
                     case EnabledKey:
                         _enabled = obj.GetJSONContentAsBoolean(key);
                         break;
-                    default:
-                        break;
                 }
             }
         }
@@ -160,11 +156,11 @@ namespace ChargifyNET
                     case AllocatedQuantityKey:
                         _allocatedQuantity = dataNode.GetNodeContentAsDecimal();
                         break;
-                    case ComponentIDKey:
-                        _componentID = dataNode.GetNodeContentAsInt();
+                    case ComponentIdKey:
+                        _componentId = dataNode.GetNodeContentAsInt();
                         break;
-                    case SubscriptionIDKey:
-                        _subscriptionID = dataNode.GetNodeContentAsInt();
+                    case SubscriptionIdKey:
+                        _subscriptionId = dataNode.GetNodeContentAsInt();
                         break;
                     case NameKey:
                         _name = dataNode.GetNodeContentAsString();
@@ -184,8 +180,6 @@ namespace ChargifyNET
                         break;
                     case EnabledKey:
                         _enabled = dataNode.GetNodeContentAsBoolean();
-                        break;
-                    default:
                         break;
                 }
             }
@@ -217,18 +211,18 @@ namespace ChargifyNET
         /// </summary>
         public int SubscriptionID
         {
-            get { return _subscriptionID; }
+            get { return _subscriptionId; }
         }
-        private int _subscriptionID = int.MinValue;
+        private int _subscriptionId = int.MinValue;
 
         /// <summary>
         /// The ID of the component itself
         /// </summary>
         public int ComponentID
         {
-            get { return _componentID; }
+            get { return _componentId; }
         }
-        private int _componentID = int.MinValue;
+        private int _componentId = int.MinValue;
 
         /// <summary>
         /// The quantity allocated to this subscription
@@ -261,10 +255,10 @@ namespace ChargifyNET
         /// <summary>
         /// The balance of units of this component against the subscription
         /// </summary>
-        public int UnitBalance 
+        public int UnitBalance
         {
             // Clamp the response to 0+, since that's what makes sense.
-            get { return (_unitBalance < 0 ? 0 : _unitBalance); } 
+            get { return (_unitBalance < 0 ? 0 : _unitBalance); }
         }
         private int _unitBalance = int.MinValue;
 
@@ -272,11 +266,11 @@ namespace ChargifyNET
         /// The status of whether this component is enabled or disabled.
         /// (On/Off components only)
         /// </summary>
-        public bool Enabled 
+        public bool Enabled
         {
             get { return _enabled; }
         }
-        private bool _enabled = false;
+        private bool _enabled;
 
         #endregion
 
@@ -287,7 +281,7 @@ namespace ChargifyNET
         /// </summary>
         public int CompareTo(ComponentAttributes other)
         {
-            return this.ComponentID.CompareTo(other.ComponentID);
+            return ComponentID.CompareTo(other.ComponentID);
         }
 
         #endregion
@@ -299,7 +293,7 @@ namespace ChargifyNET
         /// </summary>
         public int CompareTo(IComponentAttributes other)
         {
-            return this.ComponentID.CompareTo(other.ComponentID);
+            return ComponentID.CompareTo(other.ComponentID);
         }
 
         #endregion

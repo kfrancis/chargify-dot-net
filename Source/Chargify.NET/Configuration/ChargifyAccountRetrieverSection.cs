@@ -32,7 +32,6 @@ namespace ChargifyNET.Configuration
 {
     #region Imports
     using System.Configuration;
-
     #endregion
 
     /// <summary>
@@ -46,7 +45,7 @@ namespace ChargifyNET.Configuration
         [ConfigurationProperty("defaultAccount")]
         public string DefaultAccount
         {
-            get { return (string)base["defaultAccount"]; }
+            get { return (string) base["defaultAccount"]; }
             set { base["defaultAccount"] = value; }
         }
 
@@ -56,10 +55,10 @@ namespace ChargifyNET.Configuration
         [ConfigurationProperty("useJSON")]
         public bool UseJSON
         {
-            get 
+            get
             {
-                if (base["useJSON"] != null) { return (bool)base["useJSON"]; }
-                else { return false; }
+                if (base["useJSON"] != null) { return (bool) base["useJSON"]; }
+                return false;
             }
             set { base["useJSON"] = value; }
         }
@@ -67,10 +66,10 @@ namespace ChargifyNET.Configuration
         /// <summary>
         /// The collection of Chargify Account elements
         /// </summary>
-        [ConfigurationProperty("accounts", IsDefaultCollection=true)]
+        [ConfigurationProperty("accounts", IsDefaultCollection = true)]
         public ChargifyAccountElementCollection Accounts
         {
-            get { return (ChargifyAccountElementCollection)this["accounts"]; }
+            get { return (ChargifyAccountElementCollection) this["accounts"]; }
             set { this["accounts"] = value; }
         }
 
@@ -80,11 +79,11 @@ namespace ChargifyNET.Configuration
         public ChargifyAccountElement GetDefaultOrFirst()
         {
             ChargifyAccountElement result = null;
-            if (!string.IsNullOrEmpty(this.DefaultAccount))
+            if (!string.IsNullOrEmpty(DefaultAccount))
             {
-                foreach (ChargifyAccountElement element in this.Accounts)
+                foreach (ChargifyAccountElement element in Accounts)
                 {
-                    if (element.Name == this.DefaultAccount)
+                    if (element.Name == DefaultAccount)
                     {
                         result = element;
                         break;
@@ -94,17 +93,14 @@ namespace ChargifyNET.Configuration
             else
             {
                 // If there are account elements in the web.config then ..
-                if (this.Accounts.Count > 0)
+                if (Accounts.Count > 0)
                 {
-                    result = this.Accounts[0] as ChargifyAccountElement;
+                    result = Accounts[0];
                 }
             }
 
             if (result == null) { throw new ConfigurationErrorsException("No accounts listed for Chargify in web.config"); }
-            else
-            {
-                return result;
-            }
+            return result;
         }
 
         /// <summary>
@@ -114,11 +110,11 @@ namespace ChargifyNET.Configuration
         public string GetSharedKeyForDefaultOrFirstSite()
         {
             ChargifyAccountElement result = null;
-            if (!string.IsNullOrEmpty(this.DefaultAccount))
+            if (!string.IsNullOrEmpty(DefaultAccount))
             {
-                foreach (ChargifyAccountElement element in this.Accounts)
+                foreach (ChargifyAccountElement element in Accounts)
                 {
-                    if (element.Name == this.DefaultAccount)
+                    if (element.Name == DefaultAccount)
                     {
                         result = element;
                         break;
@@ -128,17 +124,14 @@ namespace ChargifyNET.Configuration
             else
             {
                 // If there are account elements in the web.config then ..
-                if (this.Accounts.Count > 0)
+                if (Accounts.Count > 0)
                 {
-                    result = this.Accounts[0] as ChargifyAccountElement;
+                    result = Accounts[0];
                 }
             }
 
             if (result == null) { throw new ConfigurationErrorsException("No accounts listed for Chargify in web.config"); }
-            else
-            {
-                return result.SharedKey;
-            }
+            return result.SharedKey;
         }
     }
 }

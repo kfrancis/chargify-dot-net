@@ -46,34 +46,35 @@ namespace ChargifyNET
         /// <summary>
         /// Contructor
         /// </summary>
-        public CreditCardAttributes() : base() { }
+        public CreditCardAttributes()
+        { }
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="FirstName">The first name on the credit card</param>
-        /// <param name="LastName">The last name on the credit card</param>
-        /// <param name="FullNumber">The full credit card number</param>
-        /// <param name="ExpirationYear">The expiration year</param>
-        /// <param name="ExpirationMonth">The expiration month</param>
-        /// <param name="CVV">The CVV number of the credit card</param>
-        /// <param name="BillingAddress">THe billing address of the credit card</param>
-        /// <param name="BillingCity">The billing city of the credit card</param>
-        /// <param name="BillingState">The billing state or province of the credit card</param>
-        /// <param name="BillingZip">The billing zip code or postal code of the credit card</param>
-        /// <param name="BillingCountry">The billing country of the credit card</param>
-        public CreditCardAttributes(string FirstName, string LastName, string FullNumber, int ExpirationYear, int ExpirationMonth,
-                                    string CVV, string BillingAddress, string BillingCity, string BillingState, string BillingZip,
-                                    string BillingCountry)
-            : base(FirstName, LastName, FullNumber, ExpirationYear, ExpirationMonth)
+        /// <param name="firstName">The first name on the credit card</param>
+        /// <param name="lastName">The last name on the credit card</param>
+        /// <param name="fullNumber">The full credit card number</param>
+        /// <param name="expirationYear">The expiration year</param>
+        /// <param name="expirationMonth">The expiration month</param>
+        /// <param name="cvv">The CVV number of the credit card</param>
+        /// <param name="billingAddress">THe billing address of the credit card</param>
+        /// <param name="billingCity">The billing city of the credit card</param>
+        /// <param name="billingState">The billing state or province of the credit card</param>
+        /// <param name="billingZip">The billing zip code or postal code of the credit card</param>
+        /// <param name="billingCountry">The billing country of the credit card</param>
+        public CreditCardAttributes(string firstName, string lastName, string fullNumber, int expirationYear, int expirationMonth,
+                                    string cvv, string billingAddress, string billingCity, string billingState, string billingZip,
+                                    string billingCountry)
+            : base(firstName, lastName, fullNumber, expirationYear, expirationMonth)
 
         {
-            this.CVV = CVV;
-            this.BillingAddress = BillingAddress;
-            this.BillingCity = BillingCity;
-            this.BillingState = BillingState;
-            this.BillingZip = BillingZip;
-            this.BillingCountry = BillingCountry;
+            CVV = cvv;
+            BillingAddress = billingAddress;
+            BillingCity = billingCity;
+            BillingState = billingState;
+            BillingZip = billingZip;
+            BillingCountry = billingCountry;
         }
 
         #endregion
@@ -88,7 +89,7 @@ namespace ChargifyNET
         /// <summary>
         /// Ignore, used for determining if the value should be serialized
         /// </summary>
-        public bool ShouldSerializeCVV()
+        public bool ShouldSerializeCvv()
         {
             return !string.IsNullOrEmpty(CVV);
         }
@@ -96,7 +97,7 @@ namespace ChargifyNET
         #endregion
 
         #region Operators
-        
+
         /// <summary>
         /// Equals operator for two credit card attributes
         /// </summary>
@@ -104,19 +105,19 @@ namespace ChargifyNET
         public static bool operator ==(CreditCardAttributes a, CreditCardAttributes b)
         {
             // If both are null, or both are same instance, return true.
-            if (System.Object.ReferenceEquals(a, b)) { return true; }
+            if (ReferenceEquals(a, b)) { return true; }
 
             // If one is null, but not both, return false.
-            if (((object)a == null) || ((object)b == null)) { return false; }
+            if (((object) a == null) || ((object) b == null)) { return false; }
 
-            return a.FullNumber == b.FullNumber && 
-                   a.CVV == b.CVV && 
-                   a.ExpirationMonth == b.ExpirationMonth && 
-                   a.ExpirationYear == b.ExpirationYear && 
-                   a.BillingAddress == b.BillingAddress && 
-                   a.BillingCity == b.BillingCity && 
-                   a.BillingState == b.BillingState && 
-                   a.BillingZip == b.BillingZip && 
+            return a.FullNumber == b.FullNumber &&
+                   a.CVV == b.CVV &&
+                   a.ExpirationMonth == b.ExpirationMonth &&
+                   a.ExpirationYear == b.ExpirationYear &&
+                   a.BillingAddress == b.BillingAddress &&
+                   a.BillingCity == b.BillingCity &&
+                   a.BillingState == b.BillingState &&
+                   a.BillingZip == b.BillingZip &&
                    a.BillingCountry == b.BillingCountry;
         }
 
@@ -136,10 +137,10 @@ namespace ChargifyNET
         public static bool operator ==(ICreditCardAttributes a, CreditCardAttributes b)
         {
             // If both are null, or both are same instance, return true.
-            if (System.Object.ReferenceEquals(a, b)) { return true; }
+            if (ReferenceEquals(a, b)) { return true; }
 
             // If one is null, but not both, return false.
-            if (((object)a == null) || ((object)b == null)) { return false; }
+            if ((a == null) || ((object) b == null)) { return false; }
 
             return a.FullNumber == b.FullNumber &&
                    a.CVV == b.CVV &&
@@ -168,10 +169,10 @@ namespace ChargifyNET
         public static bool operator ==(CreditCardAttributes a, ICreditCardAttributes b)
         {
             // If both are null, or both are same instance, return true.
-            if (System.Object.ReferenceEquals(a, b)) { return true; }
+            if (ReferenceEquals(a, b)) { return true; }
 
             // If one is null, but not both, return false.
-            if (((object)a == null) || ((object)b == null)) { return false; }
+            if (((object) a == null) || (b == null)) { return false; }
 
             return a.FullNumber == b.FullNumber &&
                    a.CVV == b.CVV &&
@@ -203,7 +204,7 @@ namespace ChargifyNET
         /// <returns>A string representation of the object</returns>
         public override string ToString()
         {
-            return string.Format("{0} CVV: {1}\nName on Card: {2} {3}\nExpires {4}/{5}\nBilling Address:\n\t{6}\n\t{7}\n\t{8}\n\t{9}\n\t{10}", this.FullNumber, this.CVV, this.FirstName, this.LastName, this.ExpirationMonth, this.ExpirationYear, this.BillingAddress, this.BillingCity, this.BillingState, this.BillingCountry, this.BillingZip);
+            return string.Format("{0} CVV: {1}\nName on Card: {2} {3}\nExpires {4}/{5}\nBilling Address:\n\t{6}\n\t{7}\n\t{8}\n\t{9}\n\t{10}", FullNumber, CVV, FirstName, LastName, ExpirationMonth, ExpirationYear, BillingAddress, BillingCity, BillingState, BillingCountry, BillingZip);
         }
 
         /// <summary>
@@ -224,14 +225,11 @@ namespace ChargifyNET
         {
             if (obj == null) return false;
 
-            if (typeof(ICreditCardAttributes).IsAssignableFrom(obj.GetType()))
+            if (obj is ICreditCardAttributes)
             {
-                return (this == (obj as ICreditCardAttributes));
+                return (this == (ICreditCardAttributes) obj);
             }
-            else
-            {
-                return base.Equals(obj);
-            }
+            return ReferenceEquals(this, obj);
         }
         #endregion
     }

@@ -31,12 +31,15 @@
 namespace ChargifyNET
 {
     #region Imports
-    using ChargifyNET.Json;
     using System;
     using System.Collections.Generic;
     using System.Xml;
+    using Json;
     #endregion
 
+    /// <summary>
+    /// Information that is returned when performing a renewal preview
+    /// </summary>
     public class RenewalDetails : ChargifyBase, IRenewalDetails, IComparable<RenewalDetails>
     {
         #region Field Keys
@@ -55,41 +58,42 @@ namespace ChargifyNET
         /// <summary>
         /// Default constructor
         /// </summary>
-        public RenewalDetails() : base() { }
+        public RenewalDetails()
+        { }
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="xml"></param>
-        public RenewalDetails(string xml) : base()
+        /// <param name="renewalXml"></param>
+        public RenewalDetails(string renewalXml)
         {
             // get the XML into an XML document
             var xmlDoc = new XmlDocument();
-            xmlDoc.LoadXml(xml);
-            if (xmlDoc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid, expecting children.", nameof(xml));
+            xmlDoc.LoadXml(renewalXml);
+            if (xmlDoc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid, expecting children.", nameof(renewalXml));
             // loop through the child nodes of this node
             foreach (XmlNode elementNode in xmlDoc.ChildNodes)
             {
                 if (elementNode.Name == "renewal_preview")
                 {
-                    this.LoadFromNode(elementNode);
+                    LoadFromNode(elementNode);
                     return;
                 }
             }
             // if we get here, then no info was found
-            throw new ArgumentException("XML does not contain coupon information", "CouponXML");
+            throw new ArgumentException("XML does not contain coupon information", nameof(renewalXml));
         }
 
         /// <summary>
         /// Xml parsing constructor
         /// </summary>
-        /// <param name="node"></param>
-        internal RenewalDetails(XmlNode node) : base()
+        /// <param name="renewalNode"></param>
+        internal RenewalDetails(XmlNode renewalNode)
         {
-            if (node == null) throw new ArgumentNullException(nameof(node));
-            if (node.Name != "renewal_preview") throw new ArgumentException("Not a vaild renewal preview node", nameof(node));
-            if (node.ChildNodes.Count == 0) throw new ArgumentException("XML not valid, expecting children", nameof(node));
-            this.LoadFromNode(node);
+            if (renewalNode == null) throw new ArgumentNullException(nameof(renewalNode));
+            if (renewalNode.Name != "renewal_preview") throw new ArgumentException("Not a vaild renewal preview node", nameof(renewalNode));
+            if (renewalNode.ChildNodes.Count == 0) throw new ArgumentException("XML not valid, expecting children", nameof(renewalNode));
+            LoadFromNode(renewalNode);
         }
 
         private void LoadFromNode(XmlNode node)
@@ -125,8 +129,6 @@ namespace ChargifyNET
                     case LineItemsKey:
                         _lineItems = dataNode.GetNodeContentAsRenewalLineItems();
                         break;
-                    default:
-                        break;
                 }
             }
         }
@@ -136,12 +138,11 @@ namespace ChargifyNET
         /// </summary>
         /// <param name="obj"></param>
         public RenewalDetails(JsonObject obj)
-            : base()
         {
-            this.LoadFromJSON(obj);
+            LoadFromJson(obj);
         }
 
-        private void LoadFromJSON(JsonObject obj)
+        private void LoadFromJson(JsonObject obj)
         {
             // loop through the keys of this JsonObject to get coupon info, and parse it out
             foreach (string key in obj.Keys)
@@ -174,8 +175,6 @@ namespace ChargifyNET
                         break;
                     case LineItemsKey:
                         _lineItems = obj.GetJSONContentAsRenewalLineItems(key);
-                        break;
-                    default:
                         break;
                 }
             }
@@ -321,11 +320,16 @@ namespace ChargifyNET
                 return _uncalculatedTaxes;
             }
         }
-        private bool _uncalculatedTaxes = false;
+        private bool _uncalculatedTaxes;
 
         #endregion
 
         #region IComparable<RenewalDetails>
+        /// <summary>
+        /// Compare to
+        /// </summary>
+        /// <param name="other">The other details to compare</param>
+        /// <returns></returns>
         public int CompareTo(RenewalDetails other)
         {
             throw new NotImplementedException();

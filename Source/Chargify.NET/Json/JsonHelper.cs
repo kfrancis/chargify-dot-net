@@ -51,8 +51,9 @@ namespace ChargifyNET.Json
             if ((jsonObject[fieldName] == null) && (fieldType != null))
                 throw new NullReferenceException(string.Format("jsonObject field '{0}' == NULL", fieldName));
 
-            if (jsonObject[fieldName].GetType() != fieldType)
-                throw new JsonException(string.Format("JSON field: '{0}', type is '{1}', but expecting: '{2}'", fieldName, jsonObject[fieldName].GetType(), fieldType));
+            var jsonValue = jsonObject[fieldName];
+            if (jsonValue != null && jsonValue.GetType() != fieldType)
+                throw new JsonException(string.Format("JSON field: '{0}', type is '{1}', but expecting: '{2}'", fieldName, jsonValue.GetType(), fieldType));
         }
     }
 }

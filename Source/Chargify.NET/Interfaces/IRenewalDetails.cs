@@ -28,14 +28,14 @@
 //
 #endregion
 
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Xml.Serialization;
 using System.Xml;
+using System.Xml.Serialization;
 using ChargifyNET.Json;
-using System.IO;
+using Newtonsoft.Json;
 
+// ReSharper disable once CheckNamespace
 namespace ChargifyNET
 {
     /// <summary>
@@ -153,12 +153,12 @@ namespace ChargifyNET
             // Deserialize
             var obj = node.ConvertNode<RenewalLineItem>();
 
-            this.TransactionType = obj.TransactionType;
-            this.Kind = obj.Kind;
-            this.AmountInCents = obj.AmountInCents;
-            this.Memo = obj.Memo;
-            this.DiscountAmountInCents = obj.DiscountAmountInCents;
-            this.TaxableAmountInCents = obj.TaxableAmountInCents;
+            TransactionType = obj.TransactionType;
+            Kind = obj.Kind;
+            AmountInCents = obj.AmountInCents;
+            Memo = obj.Memo;
+            DiscountAmountInCents = obj.DiscountAmountInCents;
+            TaxableAmountInCents = obj.TaxableAmountInCents;
         }
 
         /// <summary>
@@ -170,12 +170,12 @@ namespace ChargifyNET
             // Deserialize
             var obj = JsonConvert.DeserializeObject<RenewalLineItem>(renewalLineItem.ToString());
 
-            this.TransactionType = obj.TransactionType;
-            this.Kind = obj.Kind;
-            this.AmountInCents = obj.AmountInCents;
-            this.Memo = obj.Memo;
-            this.DiscountAmountInCents = obj.DiscountAmountInCents;
-            this.TaxableAmountInCents = obj.TaxableAmountInCents;
+            TransactionType = obj.TransactionType;
+            Kind = obj.Kind;
+            AmountInCents = obj.AmountInCents;
+            Memo = obj.Memo;
+            DiscountAmountInCents = obj.DiscountAmountInCents;
+            TaxableAmountInCents = obj.TaxableAmountInCents;
         }
         #endregion
 

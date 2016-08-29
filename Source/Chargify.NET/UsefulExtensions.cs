@@ -3,7 +3,7 @@
     #region Imports
     using System.IO;
     using System.Web;
-    using ChargifyNET.Json;
+    using Json;
     using System;
     using System.Collections.Generic;
     using System.Globalization;
@@ -16,8 +16,14 @@
     using System.Xml.Serialization;
     #endregion
 
+    /// <summary>
+    /// Utf8 String Writer
+    /// </summary>
     public class Utf8StringWriter : StringWriter
     {
+        /// <summary>
+        /// The encoding for this writer
+        /// </summary>
         public override Encoding Encoding => Encoding.UTF8;
     }
 
@@ -62,7 +68,7 @@
         public static bool IsWebhookRequestValid(this Stream requestStream, string sharedKey, string givenSignature = null)
         {
             bool retVal = true;
-            string possibleData = string.Empty;
+            string possibleData;
             using (StreamReader sr = new StreamReader(requestStream))
             {
                 requestStream.Position = 0;
@@ -71,7 +77,7 @@
 
             if (!string.IsNullOrEmpty(possibleData))
             {
-                var calculatedSignature = UsefulExtensions.CalculateHMAC256Signature(possibleData, sharedKey);
+                var calculatedSignature = CalculateHMAC256Signature(possibleData, sharedKey);
                 if (calculatedSignature != givenSignature)
                 {
                     retVal = false;
@@ -89,6 +95,7 @@
         /// Method to calculate the expected HMAC-SHA256 signture of a body of text using the site's sharedKey
         /// </summary>
         /// <param name="text">The text to run through the hashing algorithm</param>
+        /// <param name="secret">The secret used to seed the hash</param>
         /// <returns>The hex hash of the passed in text</returns>
         public static string CalculateHMAC256Signature(string text, string secret)
         {
@@ -117,11 +124,11 @@
             byte[] unencryptedData = Encoding.UTF8.GetBytes(unencryptedText);
             MD5CryptoServiceProvider md5 = new MD5CryptoServiceProvider();
             byte[] hash = md5.ComputeHash(unencryptedData);
-            string hexaHash = "";
-            foreach (byte b in hash) { hexaHash += String.Format("{0:x2}", b); }
+            string hexaHash = string.Empty;
+            foreach (byte b in hash) { hexaHash += $"{b:x2}"; }
 
             // I'm not sure if it could be longer, so just compare the same number as characters.
-            return (signature == hexaHash.Substring(0, signature.Length)) ? true : false;
+            return signature == hexaHash.Substring(0, signature.Length);
         }
 
         /// <summary>
@@ -230,14 +237,14 @@
         {
             try
             {
-                if (value.StartsWith("["))
+                if (value.StartsWith("[", StringComparison.InvariantCultureIgnoreCase))
                 {
                     int position = 0;
-                    Json.JsonArray array = Json.JsonArray.Parse(value, ref position);
+                    JsonArray.Parse(value, ref position);
                 }
                 else
                 {
-                    Json.JsonObject obj = Json.JsonObject.Parse(value);
+                    JsonObject.Parse(value);
                 }
 
                 // If we get here, then all was well. 
@@ -277,8 +284,7 @@
         /// <returns>The JSON result</returns>
         public static string ToJson(this XmlDocument doc)
         {
-            string result = string.Empty;
-            result = XmlToJsonConverter.XmlToJSON(doc);
+            var result = XmlToJsonConverter.XmlToJson(doc);
             result = result.Replace(@"\", @"\\");
             return result;
         }
@@ -586,6 +592,11 @@
             return result;
         }
 
+        /// <summary>
+        /// Convert the xml node into a renewal line item
+        /// </summary>
+        /// <param name="node">The xml node containing renewal line item data</param>
+        /// <returns>The renewal line item object, or null</returns>
         public static RenewalLineItem GetNodeContentAsRenewalLineItem(this XmlNode node)
         {
             RenewalLineItem result = null;
@@ -596,6 +607,12 @@
             return result;
         }
 
+        /// <summary>
+        /// Generic node convert method
+        /// </summary>
+        /// <typeparam name="T">The type to convert to</typeparam>
+        /// <param name="node">The xml node to convert</param>
+        /// <returns>The object if successful, null otherwise</returns>
         public static T ConvertNode<T>(this XmlNode node) where T : class
         {
             using (MemoryStream stm = new MemoryStream())
@@ -613,25 +630,37 @@
             }
         }
 
+        /// <summary>
+        /// Convert the JsonObject to a list of Renewal Line Items
+        /// </summary>
+        /// <param name="obj">The json object to convert</param>
+        /// <param name="key">The key for this object array</param>
+        /// <returns>The list result, or empty list otherwise</returns>
         public static List<RenewalLineItem> GetJSONContentAsRenewalLineItems(this JsonObject obj, string key)
         {
             var renewalLineItems = new List<RenewalLineItem>();
             var renewalLineItemsArray = obj[key] as JsonArray;
             if (renewalLineItemsArray != null)
             {
-                foreach (JsonObject renewalLineItem in renewalLineItemsArray.Items)
+                foreach (var jsonValue in renewalLineItemsArray.Items)
                 {
+                    var renewalLineItem = (JsonObject) jsonValue;
                     renewalLineItems.Add(new RenewalLineItem(renewalLineItem));
                 }
             }
             // Sanity check, should be equal.
-            if (renewalLineItemsArray.Length != renewalLineItems.Count)
+            if (renewalLineItemsArray != null && renewalLineItemsArray.Length != renewalLineItems.Count)
             {
                 throw new JsonParseException(string.Format("Unable to parse public signup pages ({0} != {1})", renewalLineItemsArray.Length, renewalLineItems.Count));
             }
             return renewalLineItems;
         }
 
+        /// <summary>
+        /// Convert the XmlNode to a list of Renewal Line Items
+        /// </summary>
+        /// <param name="node">The xml node to convert</param>
+        /// <returns>The list result, or empty list otherwise</returns>
         public static List<RenewalLineItem> GetNodeContentAsRenewalLineItems(this XmlNode node)
         {
             var lineItems = new List<RenewalLineItem>();
@@ -641,8 +670,6 @@
                 {
                     case "line_item":
                         lineItems.Add(childNode.GetNodeContentAsRenewalLineItem());
-                        break;
-                    default:
                         break;
                 }
             }
@@ -670,8 +697,6 @@
                     case "public_signup_page":
                         publicSignupPages.Add(childNode.GetNodeContentAsPublicSignupPage());
                         break;
-                    default:
-                        break;
                 }
             }
             // Sanity check, should be equal.
@@ -695,13 +720,14 @@
             var publicSignupPagesArray = obj[key] as JsonArray;
             if (publicSignupPagesArray != null)
             {
-                foreach (JsonObject publicSignupPage in publicSignupPagesArray.Items)
+                foreach (var jsonValue in publicSignupPagesArray.Items)
                 {
+                    var publicSignupPage = (JsonObject) jsonValue;
                     publicSignupPages.Add(new PublicSignupPage(publicSignupPage));
                 }
             }
             // Sanity check, should be equal.
-            if (publicSignupPagesArray.Length != publicSignupPages.Count)
+            if (publicSignupPagesArray != null && publicSignupPagesArray.Length != publicSignupPages.Count)
             {
                 throw new JsonParseException(string.Format("Unable to parse public signup pages ({0} != {1})", publicSignupPagesArray.Length, publicSignupPages.Count));
             }
@@ -1362,10 +1388,12 @@
         public static bool IsRunningAzure()
         {
             bool result = false;
-            Assembly a = null;
+            Assembly a;
             try
             {
-                a = Assembly.Load("Microsoft.WindowsAzure.ServiceRuntime, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35");
+                a =
+                    Assembly.Load(
+                        "Microsoft.WindowsAzure.ServiceRuntime, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35");
                 if (a != null)
                 {
                     Type classType = a.GetType("Microsoft.WindowsAzure.ServiceRuntime.RoleEnvironment");
@@ -1374,7 +1402,10 @@
                     result = (bool) pi.GetValue(null, null); // This should get the result of IsAvailable
                 }
             }
-            catch (Exception) { }
+            catch
+            {
+                // ignored
+            }
             return result;
         }
 
@@ -1398,7 +1429,10 @@
                     result = (string) mi.Invoke(null, new object[] { settingName });
                 }
             }
-            catch (Exception) { }
+            catch
+            {
+                // ignored
+            }
             return result;
         }
 
@@ -1415,9 +1449,9 @@
         {
             if (serverResponse.IsXml())
             {
-                Type[] argTypes = new Type[] { typeof(System.String) };
+                Type[] argTypes = { typeof(string) };
                 ConstructorInfo cInfo = typeof(T).GetConstructor(argTypes);
-                return (T) cInfo.Invoke(new object[] { serverResponse });
+                if (cInfo != null) return (T) cInfo.Invoke(new object[] { serverResponse });
             }
             else if (serverResponse.IsJSON())
             {
@@ -1427,15 +1461,15 @@
                 {
                     if (obj.ContainsKey(key) && obj.Keys.Count == 1)
                     {
-                        Type[] argTypes = new Type[] { typeof(JsonObject) };
+                        Type[] argTypes = { typeof(JsonObject) };
                         ConstructorInfo cInfo = typeof(T).GetConstructor(argTypes);
-                        return (T) cInfo.Invoke(new object[] { obj[key] as JsonObject });
+                        if (cInfo != null) return (T) cInfo.Invoke(new object[] { obj[key] as JsonObject });
                     }
                     else
                     {
-                        Type[] argTypes = new Type[] { typeof(JsonObject) };
+                        Type[] argTypes = { typeof(JsonObject) };
                         ConstructorInfo cInfo = typeof(T).GetConstructor(argTypes);
-                        return (T) cInfo.Invoke(new object[] { obj });
+                        if (cInfo != null) return (T) cInfo.Invoke(new object[] { obj });
                     }
                 }
                 else
@@ -1473,8 +1507,6 @@
                 case "coupon":
                     if (!typeof(ICoupon).IsAssignableFrom(typeof(T))) throw new ArgumentException();
                     result = (T) chargify.UpdateCoupon(objectToBeSaved as ICoupon);
-                    break;
-                default:
                     break;
             }
             return result;
@@ -1545,8 +1577,6 @@
                     IProductFamily productFamily = null;
                     if (ID is int) productFamily = chargify.LoadProductFamily((int) ID);
                     result = (T) productFamily;
-                    break;
-                default:
                     break;
             }
             return result;

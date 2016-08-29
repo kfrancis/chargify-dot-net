@@ -31,9 +31,9 @@
 namespace ChargifyNET
 {
     #region Imports
-    using Json;
     using System;
     using System.Xml;
+    using Json;
     #endregion
 
     /// <summary>
@@ -42,11 +42,11 @@ namespace ChargifyNET
     public class Note : ChargifyBase, INote, IComparable<Note>
     {
         #region Field Keys
-        private const string IDKey = "id";
+        private const string IdKey = "id";
         private const string BodyKey = "body";
         private const string StickyKey = "sticky";
         private const string UpdatedAtKey = "updated_at";
-        private const string SubscriptionIDKey = "subscription_id";
+        private const string SubscriptionIdKey = "subscription_id";
         private const string CreatedAtKey = "created_at";
         #endregion
 
@@ -54,30 +54,30 @@ namespace ChargifyNET
         /// <summary>
         /// Constructor.  Values set to default
         /// </summary>
-        public Note() : base() { }
+        public Note()
+        { }
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="NoteXML">XML containing note info (in expected format)</param>
-        public Note(string NoteXML)
-            : base()
+        /// <param name="noteXml">XML containing note info (in expected format)</param>
+        public Note(string noteXml)
         {
             // get the XML into an XML document
-            XmlDocument Doc = new XmlDocument();
-            Doc.LoadXml(NoteXML);
-            if (Doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", "NoteXML");
+            XmlDocument doc = new XmlDocument();
+            doc.LoadXml(noteXml);
+            if (doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(noteXml));
             // loop through the child nodes of this node
-            foreach (XmlNode elementNode in Doc.ChildNodes)
+            foreach (XmlNode elementNode in doc.ChildNodes)
             {
                 if (elementNode.Name == "note")
                 {
-                    this.LoadFromNode(elementNode);
+                    LoadFromNode(elementNode);
                     return;
                 }
             }
             // if we get here, then no info was found
-            throw new ArgumentException("XML does not contain note information", "NoteXML");
+            throw new ArgumentException("XML does not contain note information", nameof(noteXml));
         }
 
         /// <summary>
@@ -85,12 +85,11 @@ namespace ChargifyNET
         /// </summary>
         /// <param name="noteNode">XML containing note info (in expected format)</param>
         internal Note(XmlNode noteNode)
-            : base()
         {
-            if (noteNode == null) throw new ArgumentNullException("noteNode");
-            if (noteNode.Name != "note") throw new ArgumentException("Not a vaild note node", "noteNode");
-            if (noteNode.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", "noteNode");
-            this.LoadFromNode(noteNode);
+            if (noteNode == null) throw new ArgumentNullException(nameof(noteNode));
+            if (noteNode.Name != "note") throw new ArgumentException("Not a vaild note node", nameof(noteNode));
+            if (noteNode.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(noteNode));
+            LoadFromNode(noteNode);
         }
 
         /// <summary>
@@ -98,27 +97,26 @@ namespace ChargifyNET
         /// </summary>
         /// <param name="noteObject">Json containing note info (in expected format)</param>
         public Note(JsonObject noteObject)
-            : base()
         {
-            if (noteObject == null) throw new ArgumentNullException("noteObject");
-            if (noteObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild note object", "noteObject");
-            this.LoadFromJSON(noteObject);
+            if (noteObject == null) throw new ArgumentNullException(nameof(noteObject));
+            if (noteObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild note object", nameof(noteObject));
+            LoadFromJson(noteObject);
         }
 
-        private void LoadFromJSON(JsonObject obj)
+        private void LoadFromJson(JsonObject obj)
         {
             foreach (string key in obj.Keys)
             {
                 switch (key)
                 {
-                    case IDKey:
+                    case IdKey:
                         _id = obj.GetJSONContentAsInt(key);
                         break;
                     case BodyKey:
                         _body = obj.GetJSONContentAsString(key);
                         break;
-                    case SubscriptionIDKey:
-                        _subscriptionID = obj.GetJSONContentAsInt(key);
+                    case SubscriptionIdKey:
+                        _subscriptionId = obj.GetJSONContentAsInt(key);
                         break;
                     case CreatedAtKey:
                         _createdAt = obj.GetJSONContentAsDateTime(key);
@@ -128,8 +126,6 @@ namespace ChargifyNET
                         break;
                     case StickyKey:
                         _sticky = obj.GetJSONContentAsBoolean(key);
-                        break;
-                    default:
                         break;
                 }
             }
@@ -145,14 +141,14 @@ namespace ChargifyNET
             {
                 switch (dataNode.Name)
                 {
-                    case IDKey:
+                    case IdKey:
                         _id = dataNode.GetNodeContentAsInt();
                         break;
                     case BodyKey:
                         _body = dataNode.GetNodeContentAsString();
                         break;
-                    case SubscriptionIDKey:
-                        _subscriptionID = dataNode.GetNodeContentAsInt();
+                    case SubscriptionIdKey:
+                        _subscriptionId = dataNode.GetNodeContentAsInt();
                         break;
                     case CreatedAtKey:
                         _createdAt = dataNode.GetNodeContentAsDateTime();
@@ -163,11 +159,9 @@ namespace ChargifyNET
                     case StickyKey:
                         _sticky = dataNode.GetNodeContentAsBoolean();
                         break;
-                    default:
-                        break;
                 }
             }
-        }        
+        }
         #endregion
 
         #region INote Members
@@ -181,7 +175,7 @@ namespace ChargifyNET
                 return _body;
             }
         }
-        private string _body = null;
+        private string _body;
 
         /// <summary>
         /// Date and time the note was created
@@ -217,7 +211,7 @@ namespace ChargifyNET
                 return _sticky;
             }
         }
-        private bool _sticky = false;
+        private bool _sticky;
 
         /// <summary>
         /// The id of the related subscription
@@ -226,10 +220,10 @@ namespace ChargifyNET
         {
             get
             {
-                return _subscriptionID;
+                return _subscriptionId;
             }
         }
-        private int _subscriptionID = int.MinValue;
+        private int _subscriptionId = int.MinValue;
 
         /// <summary>
         /// Last update timestamp
@@ -252,7 +246,7 @@ namespace ChargifyNET
         /// <returns>The comparison value</returns>
         public int CompareTo(INote other)
         {
-            return this.ID.CompareTo(other.ID);
+            return ID.CompareTo(other.ID);
         }
         #endregion
 
@@ -264,7 +258,7 @@ namespace ChargifyNET
         /// <returns>The comparison value</returns>
         public int CompareTo(Note other)
         {
-            return this.ID.CompareTo(other.ID);
+            return ID.CompareTo(other.ID);
         }
         #endregion
     }

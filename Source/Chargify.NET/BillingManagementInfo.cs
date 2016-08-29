@@ -28,12 +28,14 @@
 //
 #endregion
 
+
+
 namespace ChargifyNET
 {
     #region Imports
     using System;
     using System.Xml;
-    using ChargifyNET.Json;
+    using Json;
     #endregion
 
     /// <summary>
@@ -53,19 +55,19 @@ namespace ChargifyNET
         /// <summary>
         /// Constructor
         /// </summary>
-        private BillingManagementInfo() : base() { }
+        private BillingManagementInfo()
+        { }
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="billingManagementInfoXML">An XML string containing a billingManagementInfo node</param>
-        public BillingManagementInfo(string billingManagementInfoXML)
-            : base()
+        /// <param name="billingManagementInfoXml">An XML string containing a billingManagementInfo node</param>
+        public BillingManagementInfo(string billingManagementInfoXml)
         {
             // get the XML into an XML document
             XmlDocument doc = new XmlDocument();
-            doc.LoadXml(billingManagementInfoXML);
-            if (doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", "billingManagementInfoXML");
+            doc.LoadXml(billingManagementInfoXml);
+            if (doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(billingManagementInfoXml));
             // loop through the child nodes of this node
             foreach (XmlNode elementNode in doc.ChildNodes)
             {
@@ -76,7 +78,7 @@ namespace ChargifyNET
                 }
             }
             // if we get here, then no info was found
-            throw new ArgumentException("XML does not contain billing management information", "billingManagementInfoXML");
+            throw new ArgumentException("XML does not contain billing management information", nameof(billingManagementInfoXml));
         }
 
         /// <summary>
@@ -84,12 +86,11 @@ namespace ChargifyNET
         /// </summary>
         /// <param name="billingManagementInfoNode">An xml node with component information</param>
         internal BillingManagementInfo(XmlNode billingManagementInfoNode)
-            : base()
         {
-            if (billingManagementInfoNode == null) throw new ArgumentNullException("billingManagementInfoNode");
-            if (billingManagementInfoNode.Name != "management_link") throw new ArgumentException("Not a vaild billing management node", "billingManagementInfoNode");
-            if (billingManagementInfoNode.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", "billingManagementInfoNode");
-            this.LoadFromNode(billingManagementInfoNode);
+            if (billingManagementInfoNode == null) throw new ArgumentNullException(nameof(billingManagementInfoNode));
+            if (billingManagementInfoNode.Name != "management_link") throw new ArgumentException("Not a vaild billing management node", nameof(billingManagementInfoNode));
+            if (billingManagementInfoNode.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(billingManagementInfoNode));
+            LoadFromNode(billingManagementInfoNode);
         }
 
         /// <summary>
@@ -97,14 +98,13 @@ namespace ChargifyNET
         /// </summary>
         /// <param name="billingManagementInfoObject">An JsonObject with billing management information</param>
         public BillingManagementInfo(JsonObject billingManagementInfoObject)
-            : base()
         {
-            if (billingManagementInfoObject == null) throw new ArgumentNullException("billingManagementInfoObject");
-            if (billingManagementInfoObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild management object", "billingManagementInfoObject");
-            this.LoadFromJSON(billingManagementInfoObject);
+            if (billingManagementInfoObject == null) throw new ArgumentNullException(nameof(billingManagementInfoObject));
+            if (billingManagementInfoObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild management object", nameof(billingManagementInfoObject));
+            LoadFromJson(billingManagementInfoObject);
         }
 
-        private void LoadFromJSON(JsonObject obj)
+        private void LoadFromJson(JsonObject obj)
         {
             // loop through the keys of this JsonObject to get component info, and parse it out
             foreach (string key in obj.Keys)
@@ -125,8 +125,6 @@ namespace ChargifyNET
                         break;
                     case ExpiresAtKey:
                         _expiresAt = obj.GetJSONContentAsDateTime(key);
-                        break;
-                    default:
                         break;
                 }
             }
@@ -154,8 +152,6 @@ namespace ChargifyNET
                     case NewLinkAvailableAtKey:
                         _newLinkAvailableAt = dataNode.GetNodeContentAsDateTime();
                         break;
-                    default:
-                        break;
                 }
             }
         }
@@ -168,7 +164,7 @@ namespace ChargifyNET
         /// </summary>
         public string URL
         {
-            get { return this._url; }
+            get { return _url; }
         }
         private string _url = string.Empty;
 
@@ -177,7 +173,7 @@ namespace ChargifyNET
         /// </summary>
         public int FetchCount
         {
-            get { return this._fetchCount; }
+            get { return _fetchCount; }
         }
         private int _fetchCount = int.MinValue;
 
@@ -186,7 +182,7 @@ namespace ChargifyNET
         /// </summary>
         public DateTime CreatedAt
         {
-            get { return this._createdAt; }
+            get { return _createdAt; }
         }
         private DateTime _createdAt = DateTime.MinValue;
 
@@ -195,7 +191,7 @@ namespace ChargifyNET
         /// </summary>
         public DateTime NewLinkAvailableAt
         {
-            get { return this._newLinkAvailableAt; }
+            get { return _newLinkAvailableAt; }
         }
         private DateTime _newLinkAvailableAt = DateTime.MinValue;
 
@@ -204,10 +200,10 @@ namespace ChargifyNET
         /// </summary>
         public DateTime ExpiresAt
         {
-            get { return this._expiresAt; }
+            get { return _expiresAt; }
         }
         private DateTime _expiresAt = DateTime.MinValue;
-        
+
         #endregion
 
         #region ICompare Members
@@ -219,7 +215,7 @@ namespace ChargifyNET
         public int CompareTo(BillingManagementInfo other)
         {
             // compare
-            return this.URL.CompareTo(other.URL);
+            return string.Compare(URL, other.URL, StringComparison.InvariantCultureIgnoreCase);
         }
 
         /// <summary>
@@ -229,7 +225,7 @@ namespace ChargifyNET
         /// <returns></returns>
         public int CompareTo(IBillingManagementInfo other)
         {
-            return this.URL.CompareTo(other.URL);
+            return string.Compare(URL, other.URL, StringComparison.CurrentCultureIgnoreCase);
         }
         #endregion
     }

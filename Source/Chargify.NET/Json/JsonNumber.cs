@@ -1,4 +1,6 @@
-﻿namespace ChargifyNET.Json
+﻿using System.Globalization;
+
+namespace ChargifyNET.Json
 {
     /// <summary>
     /// Object representing a JsonNumber
@@ -45,16 +47,14 @@
 
         internal static JsonNumber Parse(string str, ref int position)
         {
-            double value;
-
-            JsonString.EatSpaces(str, ref position);
+            EatSpaces(str, ref position);
 
             int startPos = position;
             while (IsNumberPart(str[position]))
                 position++;
 
-            value = double.Parse(str.Substring(startPos, position - startPos),
-                System.Globalization.CultureInfo.InvariantCulture);
+            var value = double.Parse(str.Substring(startPos, position - startPos),
+                CultureInfo.InvariantCulture);
 
             return new JsonNumber(value);
         }
@@ -65,7 +65,7 @@
         /// <returns></returns>
         public override string ToString()
         {
-            return string.Format("{0}", this.DoubleValue);
+            return string.Format("{0}", DoubleValue);
         }
     }
 }

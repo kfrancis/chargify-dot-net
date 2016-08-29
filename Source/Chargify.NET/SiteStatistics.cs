@@ -28,13 +28,11 @@
 //
 #endregion
 
-
 namespace ChargifyNET
 {
     #region Imports
-
-    using ChargifyNET.Json;
-    using System;
+using System;
+using Json;
     #endregion
 
     /// <summary>
@@ -60,7 +58,6 @@ namespace ChargifyNET
         /// Constructor
         /// </summary>
         public SiteStatistics()
-            : base()
         {
         }
 
@@ -69,14 +66,13 @@ namespace ChargifyNET
         /// </summary>
         /// <param name="statsObject">An JsonObject with stats information</param>
         public SiteStatistics(JsonObject statsObject)
-            : base()
         {
-            if (statsObject == null) throw new ArgumentNullException("statsObject");
-            if (statsObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild stats object", "statsObject");
-            this.LoadFromJSON(statsObject);
+            if (statsObject == null) throw new ArgumentNullException(nameof(statsObject));
+            if (statsObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild stats object", nameof(statsObject));
+            LoadFromJson(statsObject);
         }
 
-        private void LoadFromJSON(JsonObject obj)
+        private void LoadFromJson(JsonObject obj)
         {
             // loop through the keys of this JsonObject to get stats info, and parse it out
             foreach (string key in obj.Keys)
@@ -91,34 +87,31 @@ namespace ChargifyNET
                         break;
                     case StatsKey:
                         JsonObject statsObj = obj[key] as JsonObject;
-                        foreach (string innerKey in statsObj.Keys)
-                        {
-                            switch (innerKey)
+                        if (statsObj != null)
+                            foreach (string innerKey in statsObj.Keys)
                             {
-                                case TotalSubscriptionsKey:
-                                    _totalSubscriptions = statsObj.GetJSONContentAsInt(innerKey);
-                                    break;
-                                case SubscriptionsTodayKey:
-                                    _subscriptionsToday = statsObj.GetJSONContentAsInt(innerKey);
-                                    break;
-                                case TotalRevenueKey:
-                                    _totalRevenue = statsObj.GetJSONContentAsString(innerKey);
-                                    break;
-                                case RevenueTodayKey:
-                                    _revenueToday = statsObj.GetJSONContentAsString(innerKey);
-                                    break;
-                                case RevenueThisMonthKey:
-                                    _revenueThisMonth = statsObj.GetJSONContentAsString(innerKey);
-                                    break;
-                                case RevenueThisYearKey:
-                                    _revenueThisYear = statsObj.GetJSONContentAsString(innerKey);
-                                    break;
-                                default:
-                                    break;
+                                switch (innerKey)
+                                {
+                                    case TotalSubscriptionsKey:
+                                        _totalSubscriptions = statsObj.GetJSONContentAsInt(innerKey);
+                                        break;
+                                    case SubscriptionsTodayKey:
+                                        _subscriptionsToday = statsObj.GetJSONContentAsInt(innerKey);
+                                        break;
+                                    case TotalRevenueKey:
+                                        _totalRevenue = statsObj.GetJSONContentAsString(innerKey);
+                                        break;
+                                    case RevenueTodayKey:
+                                        _revenueToday = statsObj.GetJSONContentAsString(innerKey);
+                                        break;
+                                    case RevenueThisMonthKey:
+                                        _revenueThisMonth = statsObj.GetJSONContentAsString(innerKey);
+                                        break;
+                                    case RevenueThisYearKey:
+                                        _revenueThisYear = statsObj.GetJSONContentAsString(innerKey);
+                                        break;
+                                }
                             }
-                        }
-                        break;
-                    default:
                         break;
                 }
             }

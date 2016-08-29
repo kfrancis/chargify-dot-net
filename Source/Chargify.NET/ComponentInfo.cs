@@ -32,9 +32,9 @@ namespace ChargifyNET
 {
     #region Imports
     using System;
-    using System.Xml;
-    using ChargifyNET.Json;
     using System.Collections.Generic;
+    using System.Xml;
+    using Json;
     #endregion
 
     /// <summary>
@@ -44,13 +44,13 @@ namespace ChargifyNET
     {
         #region Field Keys
         private const string CreatedAtKey = "created_at";
-        private const string IDKey = "id";
-        private const string ComponentIDKey = "component_id";
+        private const string IdKey = "id";
+        private const string ComponentIdKey = "component_id";
         private const string NameKey = "name";
-		private const string DescriptionKey = "description";
+        private const string DescriptionKey = "description";
         private const string PricePerUnitInCentsKey = "price_per_unit_in_cents";
         private const string PricingSchemeKey = "pricing_scheme";
-        private const string ProductFamilyIDKey = "product_family_id";
+        private const string ProductFamilyIdKey = "product_family_id";
         private const string UnitNameKey = "unit_name";
         private const string UpdatedAtKey = "updated_at";
         private const string KindKey = "kind";
@@ -63,19 +63,19 @@ namespace ChargifyNET
         /// <summary>
         /// Constructor
         /// </summary>
-        private ComponentInfo() : base() { }
+        private ComponentInfo()
+        { }
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="componentInfoXML">An XML string containing a component node</param>
-        public ComponentInfo(string componentInfoXML)
-            : base()
+        /// <param name="componentInfoXml">An XML string containing a component node</param>
+        public ComponentInfo(string componentInfoXml)
         {
             // get the XML into an XML document
             XmlDocument doc = new XmlDocument();
-            doc.LoadXml(componentInfoXML);
-            if (doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", "componentInfoXML");
+            doc.LoadXml(componentInfoXml);
+            if (doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(componentInfoXml));
             // loop through the child nodes of this node
             foreach (XmlNode elementNode in doc.ChildNodes)
             {
@@ -86,7 +86,7 @@ namespace ChargifyNET
                 }
             }
             // if we get here, then no component info was found
-            throw new ArgumentException("XML does not contain component information", "componentInfoXML");
+            throw new ArgumentException("XML does not contain component information", nameof(componentInfoXml));
         }
 
         /// <summary>
@@ -94,12 +94,11 @@ namespace ChargifyNET
         /// </summary>
         /// <param name="componentInfoNode">An xml node with component information</param>
         internal ComponentInfo(XmlNode componentInfoNode)
-            : base()
         {
-            if (componentInfoNode == null) throw new ArgumentNullException("componentInfoNode");
-            if (componentInfoNode.Name != "component") throw new ArgumentException("Not a vaild component node", "componentInfoNode");
-            if (componentInfoNode.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", "componentInfoNode");
-            this.LoadFromNode(componentInfoNode);
+            if (componentInfoNode == null) throw new ArgumentNullException(nameof(componentInfoNode));
+            if (componentInfoNode.Name != "component") throw new ArgumentException("Not a vaild component node", nameof(componentInfoNode));
+            if (componentInfoNode.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(componentInfoNode));
+            LoadFromNode(componentInfoNode);
         }
 
         /// <summary>
@@ -107,14 +106,13 @@ namespace ChargifyNET
         /// </summary>
         /// <param name="componentInfoObject">An JsonObject with component information</param>
         public ComponentInfo(JsonObject componentInfoObject)
-            : base()
         {
-            if (componentInfoObject == null) throw new ArgumentNullException("componentInfoObject");
-            if (componentInfoObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild component object", "componentInfoObject");
-            this.LoadFromJSON(componentInfoObject);
+            if (componentInfoObject == null) throw new ArgumentNullException(nameof(componentInfoObject));
+            if (componentInfoObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild component object", nameof(componentInfoObject));
+            LoadFromJson(componentInfoObject);
         }
 
-        private void LoadFromJSON(JsonObject obj)
+        private void LoadFromJson(JsonObject obj)
         {
             // loop through the keys of this JsonObject to get component info, and parse it out
             foreach (string key in obj.Keys)
@@ -124,24 +122,24 @@ namespace ChargifyNET
                     case CreatedAtKey:
                         _createdAt = obj.GetJSONContentAsDateTime(key);
                         break;
-                    case IDKey:
-                    case ComponentIDKey:
+                    case IdKey:
+                    case ComponentIdKey:
                         _id = obj.GetJSONContentAsInt(key);
                         break;
                     case NameKey:
                         _name = obj.GetJSONContentAsString(key);
                         break;
-					case DescriptionKey:
-		                _description = obj.GetJSONContentAsString(key);
-		                break;
+                    case DescriptionKey:
+                        _description = obj.GetJSONContentAsString(key);
+                        break;
                     case PricePerUnitInCentsKey:
                         _pricePerUnit = obj.GetJSONContentAsInt(key);
                         break;
                     case PricingSchemeKey:
                         _pricingScheme = obj.GetJSONContentAsPricingSchemeType(key);
                         break;
-                    case ProductFamilyIDKey:
-                        _productFamilyID = obj.GetJSONContentAsInt(key);
+                    case ProductFamilyIdKey:
+                        _productFamilyId = obj.GetJSONContentAsInt(key);
                         break;
                     case UnitNameKey:
                         _unitName = obj.GetJSONContentAsString(key);
@@ -156,12 +154,13 @@ namespace ChargifyNET
                         _unitPrice = obj.GetJSONContentAsDecimal(key);
                         break;
                     case PricesKey:
-                         _prices = new List<IPriceBracketInfo>();
+                        _prices = new List<IPriceBracketInfo>();
                         JsonArray pricesArray = obj[key] as JsonArray;
                         if (pricesArray != null)
                         {
-                            foreach (JsonObject priceObj in pricesArray.Items)
+                            foreach (var jsonValue in pricesArray.Items)
                             {
+                                var priceObj = (JsonObject) jsonValue;
                                 if (priceObj == null) continue;
                                 var bracketInfo = new PriceBracketInfo();
 
@@ -178,8 +177,6 @@ namespace ChargifyNET
                                         case "unit_price":
                                             bracketInfo.UnitPrice = priceObj.GetJSONContentAsDecimal(bracketKey);
                                             break;
-                                        default:
-                                            break;
                                     }
                                 }
                                 _prices.Add(bracketInfo);
@@ -190,11 +187,9 @@ namespace ChargifyNET
                         {
                             throw new JsonParseException(string.Format("Unable to parse price brackets ({0} != {1})", pricesArray.Length, _prices.Count));
                         }
-                        break;  
+                        break;
                     case ArchivedKey:
                         _archived = obj.GetJSONContentAsBoolean(key);
-                        break;
-                    default:
                         break;
                 }
             }
@@ -210,24 +205,24 @@ namespace ChargifyNET
                     case CreatedAtKey:
                         _createdAt = dataNode.GetNodeContentAsDateTime();
                         break;
-                    case IDKey:
-                    case ComponentIDKey:
+                    case IdKey:
+                    case ComponentIdKey:
                         _id = dataNode.GetNodeContentAsInt();
                         break;
                     case NameKey:
                         _name = dataNode.GetNodeContentAsString();
                         break;
-					case DescriptionKey:
-						_description = dataNode.GetNodeContentAsString();
-						break;
+                    case DescriptionKey:
+                        _description = dataNode.GetNodeContentAsString();
+                        break;
                     case PricePerUnitInCentsKey:
                         _pricePerUnit = dataNode.GetNodeContentAsInt();
                         break;
                     case PricingSchemeKey:
                         _pricingScheme = dataNode.GetNodeContentAsPricingSchemeType();
                         break;
-                    case ProductFamilyIDKey:
-                        _productFamilyID = dataNode.GetNodeContentAsInt();
+                    case ProductFamilyIdKey:
+                        _productFamilyId = dataNode.GetNodeContentAsInt();
                         break;
                     case UnitNameKey:
                         _unitName = dataNode.GetNodeContentAsString();
@@ -259,17 +254,13 @@ namespace ChargifyNET
                                     case "unit_price":
                                         bracketInfo.UnitPrice = bracketNode.GetNodeContentAsDecimal();
                                         break;
-                                    default:
-                                        break;
                                 }
                             }
                             _prices.Add(bracketInfo);
                         }
-                        break; 
+                        break;
                     case ArchivedKey:
                         _archived = dataNode.GetNodeContentAsBoolean();
-                        break;
-                    default:
                         break;
                 }
             }
@@ -305,14 +296,14 @@ namespace ChargifyNET
         }
         private string _name = string.Empty;
 
-		/// <summary>
-		/// The description of the component as created by the Chargify user
-		/// </summary>
-		public string Description
-		{
-			get { return _description; }
-		}
-		private string _description = string.Empty;
+        /// <summary>
+        /// The description of the component as created by the Chargify user
+        /// </summary>
+        public string Description
+        {
+            get { return _description; }
+        }
+        private string _description = string.Empty;
 
         /// <summary>
         /// Price of the component per unit (in cents)
@@ -330,7 +321,7 @@ namespace ChargifyNET
         [Obsolete("This value is depreciated since 1.5, please use UnitPrice instead.")]
         public decimal PricePerUnit
         {
-            get { return Convert.ToDecimal(this._pricePerUnit) / 100; }
+            get { return Convert.ToDecimal(_pricePerUnit) / 100; }
         }
 
         /// <summary>
@@ -347,9 +338,9 @@ namespace ChargifyNET
         /// </summary>
         public int ProductFamilyID
         {
-            get { return _productFamilyID; }
+            get { return _productFamilyId; }
         }
-        private int _productFamilyID = int.MinValue;
+        private int _productFamilyId = int.MinValue;
 
         /// <summary>
         /// The name for the unit this component is measured in.
@@ -381,18 +372,18 @@ namespace ChargifyNET
         /// <summary>
         /// The amount the customer will be charged per unit. This field is only populated for 'per_unit' pricing schemes.
         /// </summary>
-        public decimal UnitPrice 
-        { 
-            get { return _unitPrice; } 
+        public decimal UnitPrice
+        {
+            get { return _unitPrice; }
         }
         private decimal _unitPrice = decimal.MinValue;
 
         /// <summary>
         /// An list of price brackets. If the component uses the 'per_unit' pricing scheme, an empty list will be returned.
         /// </summary>
-        public List<IPriceBracketInfo> Prices 
+        public List<IPriceBracketInfo> Prices
         {
-            get { return _prices; } 
+            get { return _prices; }
         }
         private List<IPriceBracketInfo> _prices = new List<IPriceBracketInfo>();
 
@@ -400,7 +391,7 @@ namespace ChargifyNET
         /// Boolean flag describing whether a component is archived or not
         /// </summary>
         public bool Archived { get { return _archived; } }
-        private bool _archived = false;
+        private bool _archived;
 
         #endregion
 
@@ -413,7 +404,7 @@ namespace ChargifyNET
         /// <returns>The CompareTo value based on comparing IDs</returns>
         public int CompareTo(IComponentInfo other)
         {
-            return this.ID.CompareTo(other.ID);
+            return ID.CompareTo(other.ID);
         }
 
         #endregion
@@ -427,7 +418,7 @@ namespace ChargifyNET
         /// <returns>The CompareTo value based on comparing IDs</returns>
         public int CompareTo(ComponentInfo other)
         {
-            return this.ID.CompareTo(other.ID);
+            return ID.CompareTo(other.ID);
         }
 
         #endregion

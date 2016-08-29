@@ -35,7 +35,7 @@ namespace ChargifyNET
     using System.Diagnostics;
     using System.Web;
     using System.Xml;
-    using ChargifyNET.Json;
+    using Json;
     #endregion
 
     /// <summary>
@@ -43,63 +43,63 @@ namespace ChargifyNET
     /// </summary>
     [Serializable]
     [DebuggerDisplay("Full Name: {FullName}, SystemID: {SystemID}, ChargifyID: {ChargifyID}")]
-    public class Customer :  CustomerAttributes, ICustomer, IComparable<Customer>
+    public class Customer : CustomerAttributes, ICustomer, IComparable<Customer>
     {
         #region Constructors
 
         /// <summary>
         /// Constructor.  Values set to default
         /// </summary>
-        public Customer() : base()
+        public Customer()
         {
         }
 
         /// <summary>
         /// Constructor.  Values specified
         /// </summary>
-        /// <param name="FirstName">The customer's first name</param>
-        /// <param name="LastName">The customer's last name</param>
-        /// <param name="Email">The customer's email address</param>
-        /// <param name="Organization">The customer's organization</param>
-        /// <param name="SystemID">The customer's system ID</param>
-        public Customer(string FirstName, string LastName, string Email, string Organization, string SystemID) 
-            : base(FirstName, LastName, Email, Organization, SystemID)
+        /// <param name="firstName">The customer's first name</param>
+        /// <param name="lastName">The customer's last name</param>
+        /// <param name="email">The customer's email address</param>
+        /// <param name="organization">The customer's organization</param>
+        /// <param name="systemId">The customer's system ID</param>
+        public Customer(string firstName, string lastName, string email, string organization, string systemId)
+            : base(firstName, lastName, email, organization, systemId)
         {
         }
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="CustomerXML">XML containing customer info (in expected format)</param>
-        public Customer(string CustomerXML) : base(CustomerXML)
-        { 
+        /// <param name="customerXml">XML containing customer info (in expected format)</param>
+        public Customer(string customerXml) : base(customerXml)
+        {
             // get the XML into an XML document
-            XmlDocument Doc = new XmlDocument();
-            Doc.LoadXml(CustomerXML);
-            if (Doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", "CustomerXML");
+            XmlDocument doc = new XmlDocument();
+            doc.LoadXml(customerXml);
+            if (doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(customerXml));
             // loop through the child nodes of this node
-            foreach (XmlNode elementNode in Doc.ChildNodes)
+            foreach (XmlNode elementNode in doc.ChildNodes)
             {
                 if (elementNode.Name == "customer")
                 {
-                    this.LoadFromNode(elementNode);
+                    LoadFromNode(elementNode);
                     return;
                 }
             }
             // if we get here, then no customer info was found
-            throw new ArgumentException("XML does not contain customer information", "CustomerXML");
+            throw new ArgumentException("XML does not contain customer information", nameof(customerXml));
         }
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="customerNode">XML containing customer info (in expected format)</param>
-        internal Customer(XmlNode customerNode) : base()
+        internal Customer(XmlNode customerNode)
         {
-            if (customerNode == null) throw new ArgumentNullException("CustomerNode");
-            if (customerNode.Name != "customer") throw new ArgumentException("Not a vaild customer node", "customerNode");
-            if (customerNode.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", "customerNode");
-            this.LoadFromNode(customerNode);
+            if (customerNode == null) throw new ArgumentNullException(nameof(customerNode));
+            if (customerNode.Name != "customer") throw new ArgumentException("Not a vaild customer node", nameof(customerNode));
+            if (customerNode.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(customerNode));
+            LoadFromNode(customerNode);
         }
 
         /// <summary>
@@ -107,11 +107,10 @@ namespace ChargifyNET
         /// </summary>
         /// <param name="customerObject">JsonObject containing customer info (in expected format)</param>
         public Customer(JsonObject customerObject)
-            : base()
         {
-            if (customerObject == null) throw new ArgumentNullException("customerObject");
-            if (customerObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild customer object", "customerObject");
-            this.LoadFromJSON(customerObject);
+            if (customerObject == null) throw new ArgumentNullException(nameof(customerObject));
+            if (customerObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild customer object", nameof(customerObject));
+            LoadFromJSON(customerObject);
         }
 
         /// <summary>
@@ -124,55 +123,53 @@ namespace ChargifyNET
             {
                 switch (key)
                 {
-                    case CustomerAttributes.FirstNameKey:
-                        this.FirstName = obj.GetJSONContentAsString(key);
+                    case FirstNameKey:
+                        FirstName = obj.GetJSONContentAsString(key);
                         break;
-                    case CustomerAttributes.LastNameKey:
-                        this.LastName = obj.GetJSONContentAsString(key);
+                    case LastNameKey:
+                        LastName = obj.GetJSONContentAsString(key);
                         break;
-                    case CustomerAttributes.EmailKey:
-                        this.Email = obj.GetJSONContentAsString(key);
+                    case EmailKey:
+                        Email = obj.GetJSONContentAsString(key);
                         break;
-                    case CustomerAttributes.PhoneKey:
-                        this.Phone = obj.GetJSONContentAsString(key);
+                    case PhoneKey:
+                        Phone = obj.GetJSONContentAsString(key);
                         break;
-                    case CustomerAttributes.OrganizationKey:
-                        this.Organization = HttpUtility.HtmlDecode(obj.GetJSONContentAsString(key));
+                    case OrganizationKey:
+                        Organization = HttpUtility.HtmlDecode(obj.GetJSONContentAsString(key));
                         break;
-                    case CustomerAttributes.ReferenceKey:
-                        this.SystemID = obj.GetJSONContentAsString(key);
+                    case ReferenceKey:
+                        SystemID = obj.GetJSONContentAsString(key);
                         break;
-                    case CustomerAttributes.IDKey:
-                        _chargifyID = obj.GetJSONContentAsInt(key);
+                    case IdKey:
+                        _chargifyId = obj.GetJSONContentAsInt(key);
                         break;
-                    case CustomerAttributes.CreatedAtKey:
+                    case CreatedAtKey:
                         _created = obj.GetJSONContentAsDateTime(key);
                         break;
-                    case CustomerAttributes.UpdatedAtKey:
+                    case UpdatedAtKey:
                         _lastUpdated = obj.GetJSONContentAsDateTime(key);
                         break;
-                    case CustomerAttributes.ShippingAddressKey:
-                        this.ShippingAddress = obj.GetJSONContentAsString(key);
+                    case ShippingAddressKey:
+                        ShippingAddress = obj.GetJSONContentAsString(key);
                         break;
-                    case CustomerAttributes.ShippingAddress2Key:
-                        this.ShippingAddress2 = obj.GetJSONContentAsString(key);
+                    case ShippingAddress2Key:
+                        ShippingAddress2 = obj.GetJSONContentAsString(key);
                         break;
-                    case CustomerAttributes.ShippingCountryKey:
-                        this.ShippingCountry = obj.GetJSONContentAsString(key);
+                    case ShippingCountryKey:
+                        ShippingCountry = obj.GetJSONContentAsString(key);
                         break;
-                    case CustomerAttributes.ShippingCityKey:
-                        this.ShippingCity = obj.GetJSONContentAsString(key);
+                    case ShippingCityKey:
+                        ShippingCity = obj.GetJSONContentAsString(key);
                         break;
-                    case CustomerAttributes.ShippingStateKey:
-                        this.ShippingState = obj.GetJSONContentAsString(key);
+                    case ShippingStateKey:
+                        ShippingState = obj.GetJSONContentAsString(key);
                         break;
-                    case CustomerAttributes.ShippingZipKey:
-                        this.ShippingZip = obj.GetJSONContentAsString(key);
+                    case ShippingZipKey:
+                        ShippingZip = obj.GetJSONContentAsString(key);
                         break;
-                    case CustomerAttributes.VatNumberKey:
-                        this.VatNumber = obj.GetJSONContentAsString(key);
-                        break;
-                    default:
+                    case VatNumberKey:
+                        VatNumber = obj.GetJSONContentAsString(key);
                         break;
                 }
             }
@@ -188,55 +185,53 @@ namespace ChargifyNET
             {
                 switch (dataNode.Name)
                 {
-                    case CustomerAttributes.FirstNameKey:
-                        this.FirstName = dataNode.GetNodeContentAsString();
+                    case FirstNameKey:
+                        FirstName = dataNode.GetNodeContentAsString();
                         break;
-                    case CustomerAttributes.LastNameKey:
-                        this.LastName = dataNode.GetNodeContentAsString();
+                    case LastNameKey:
+                        LastName = dataNode.GetNodeContentAsString();
                         break;
-                    case CustomerAttributes.EmailKey:
-                        this.Email = dataNode.GetNodeContentAsString();
+                    case EmailKey:
+                        Email = dataNode.GetNodeContentAsString();
                         break;
-                    case CustomerAttributes.PhoneKey:
-                        this.Phone = dataNode.GetNodeContentAsString();
+                    case PhoneKey:
+                        Phone = dataNode.GetNodeContentAsString();
                         break;
-                    case CustomerAttributes.OrganizationKey:
-                        this.Organization = HttpUtility.HtmlDecode(dataNode.GetNodeContentAsString());                        
+                    case OrganizationKey:
+                        Organization = HttpUtility.HtmlDecode(dataNode.GetNodeContentAsString());
                         break;
-                    case CustomerAttributes.ReferenceKey:
-                        this.SystemID = dataNode.GetNodeContentAsString();
+                    case ReferenceKey:
+                        SystemID = dataNode.GetNodeContentAsString();
                         break;
-                    case CustomerAttributes.IDKey:
-                        _chargifyID = dataNode.GetNodeContentAsInt();
+                    case IdKey:
+                        _chargifyId = dataNode.GetNodeContentAsInt();
                         break;
-                    case CustomerAttributes.CreatedAtKey:
+                    case CreatedAtKey:
                         _created = dataNode.GetNodeContentAsDateTime();
                         break;
-                    case CustomerAttributes.UpdatedAtKey:
+                    case UpdatedAtKey:
                         _lastUpdated = dataNode.GetNodeContentAsDateTime();
                         break;
-                    case CustomerAttributes.ShippingAddressKey:
-                        this.ShippingAddress = dataNode.GetNodeContentAsString();
+                    case ShippingAddressKey:
+                        ShippingAddress = dataNode.GetNodeContentAsString();
                         break;
-                    case CustomerAttributes.ShippingAddress2Key:
-                        this.ShippingAddress2 = dataNode.GetNodeContentAsString();
+                    case ShippingAddress2Key:
+                        ShippingAddress2 = dataNode.GetNodeContentAsString();
                         break;
-                    case CustomerAttributes.ShippingCountryKey:
-                        this.ShippingCountry = dataNode.GetNodeContentAsString();
+                    case ShippingCountryKey:
+                        ShippingCountry = dataNode.GetNodeContentAsString();
                         break;
-                    case CustomerAttributes.ShippingCityKey:
-                        this.ShippingCity = dataNode.GetNodeContentAsString();
+                    case ShippingCityKey:
+                        ShippingCity = dataNode.GetNodeContentAsString();
                         break;
-                    case CustomerAttributes.ShippingStateKey:
-                        this.ShippingState = dataNode.GetNodeContentAsString();
+                    case ShippingStateKey:
+                        ShippingState = dataNode.GetNodeContentAsString();
                         break;
-                    case CustomerAttributes.ShippingZipKey:
-                        this.ShippingZip = dataNode.GetNodeContentAsString();
+                    case ShippingZipKey:
+                        ShippingZip = dataNode.GetNodeContentAsString();
                         break;
-                    case CustomerAttributes.VatNumberKey:
-                        this.VatNumber = dataNode.GetNodeContentAsString();
-                        break;
-                    default:
+                    case VatNumberKey:
+                        VatNumber = dataNode.GetNodeContentAsString();
                         break;
                 }
             }
@@ -249,18 +244,18 @@ namespace ChargifyNET
         /// <summary>
         /// Get the customer's chargify ID
         /// </summary>
-        public int ChargifyID 
+        public int ChargifyID
         {
             get
             {
-                return _chargifyID;
+                return _chargifyId;
             }
         }
-        private int _chargifyID = int.MinValue;
+        private int _chargifyId = int.MinValue;
         /// <summary>
         /// Get the date and time the customer was created a Chargify
         /// </summary>
-        public DateTime Created 
+        public DateTime Created
         {
             get
             {
@@ -271,7 +266,7 @@ namespace ChargifyNET
         /// <summary>
         /// Get the date and time the customer was last updated at chargify
         /// </summary>
-        public DateTime LastUpdated 
+        public DateTime LastUpdated
         {
             get
             {
@@ -284,11 +279,11 @@ namespace ChargifyNET
         /// Get a boolean value that indicates whether or not this customer is currently saved
         /// in the Chargify system
         /// </summary>
-        public bool IsSaved 
+        public bool IsSaved
         {
             get
             {
-                return !(this.ChargifyID == int.MinValue);
+                return !(ChargifyID == int.MinValue);
             }
         }
 
@@ -303,10 +298,10 @@ namespace ChargifyNET
         public static bool operator ==(Customer a, Customer b)
         {
             // If both are null or both are the same instance, return true.
-            if (System.Object.ReferenceEquals(a, b)) return true;
+            if (ReferenceEquals(a, b)) return true;
 
             // If one is null, but not both, return false.
-            if (((object)a == null) || ((object)b == null))
+            if (((object) a == null) || ((object) b == null))
             {
                 return false;
             }
@@ -334,10 +329,10 @@ namespace ChargifyNET
         public static bool operator ==(Customer a, ICustomer b)
         {
             // If both are null or both are the same instance, return true.
-            if (System.Object.ReferenceEquals(a, b)) return true;
+            if (ReferenceEquals(a, b)) return true;
 
             // If one is null, but not both, return false.
-            if (((object)a == null) || ((object)b == null))
+            if (((object) a == null) || (b == null))
             {
                 return false;
             }
@@ -365,10 +360,10 @@ namespace ChargifyNET
         public static bool operator ==(ICustomer a, Customer b)
         {
             // If both are null or both are the same instance, return true.
-            if (System.Object.ReferenceEquals(a, b)) return true;
+            if (ReferenceEquals(a, b)) return true;
 
             // If one is null, but not both, return false.
-            if (((object)a == null) || ((object)b == null))
+            if ((a == null) || ((object) b == null))
             {
                 return false;
             }
@@ -435,28 +430,28 @@ namespace ChargifyNET
         public override bool Equals(object obj)
         {
             // If both are null or both are the same instance, return true.
-            if (System.Object.ReferenceEquals(this, obj)) return true;
+            if (ReferenceEquals(this, obj)) return true;
 
             // If one is null, but not both, return false.
-            if (((object)this == null) || ((object)obj == null))
+            if (obj == null)
             {
                 return false;
             }
 
             // Return true if the fields match.
-            return this.ChargifyID == ((Customer)obj).ChargifyID &&
-                   this.Created == ((Customer)obj).Created &&
-                   this.Email == ((Customer)obj).Email &&
-                   this.FirstName == ((Customer)obj).FirstName &&
-                   this.LastName == ((Customer)obj).LastName &&
-                   this.Organization == ((Customer)obj).Organization &&
-                   this.ShippingAddress == ((Customer)obj).ShippingAddress &&
-                   this.ShippingAddress2 == ((Customer)obj).ShippingAddress2 &&
-                   this.ShippingCity == ((Customer)obj).ShippingCity &&
-                   this.ShippingCountry == ((Customer)obj).ShippingCountry &&
-                   this.ShippingState == ((Customer)obj).ShippingState &&
-                   this.ShippingZip == ((Customer)obj).ShippingZip &&
-                   this.SystemID == ((Customer)obj).SystemID;
+            return ChargifyID == ((Customer) obj).ChargifyID &&
+                   Created == ((Customer) obj).Created &&
+                   Email == ((Customer) obj).Email &&
+                   FirstName == ((Customer) obj).FirstName &&
+                   LastName == ((Customer) obj).LastName &&
+                   Organization == ((Customer) obj).Organization &&
+                   ShippingAddress == ((Customer) obj).ShippingAddress &&
+                   ShippingAddress2 == ((Customer) obj).ShippingAddress2 &&
+                   ShippingCity == ((Customer) obj).ShippingCity &&
+                   ShippingCountry == ((Customer) obj).ShippingCountry &&
+                   ShippingState == ((Customer) obj).ShippingState &&
+                   ShippingZip == ((Customer) obj).ShippingZip &&
+                   SystemID == ((Customer) obj).SystemID;
         }
 
         /// <summary>
@@ -465,7 +460,7 @@ namespace ChargifyNET
         /// <returns>The string representation of the object</returns>
         public override string ToString()
         {
-            return this.FullName;
+            return FullName;
         }
 
         #endregion
@@ -479,7 +474,7 @@ namespace ChargifyNET
         /// <returns>The result of the comparison</returns>
         public int CompareTo(ICustomer other)
         {
-            return this.FullName.CompareTo(other.FullName);
+            return string.Compare(FullName, other.FullName, StringComparison.InvariantCultureIgnoreCase);
         }
 
         #endregion
@@ -493,7 +488,7 @@ namespace ChargifyNET
         /// <returns>The result of the comparison</returns>
         public int CompareTo(Customer other)
         {
-            return this.FullName.CompareTo(other.FullName);
+            return string.Compare(FullName, other.FullName, StringComparison.InvariantCultureIgnoreCase);
         }
 
         #endregion

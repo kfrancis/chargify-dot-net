@@ -1,4 +1,5 @@
-﻿#region License, Terms and Conditions
+﻿
+#region License, Terms and Conditions
 //
 // IChargifyConnect.cs
 //
@@ -26,6 +27,8 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 #endregion
+
+// ReSharper disable once CheckNamespace
 namespace ChargifyNET
 {
     #region Imports
@@ -315,10 +318,39 @@ namespace ChargifyNET
         #endregion
 
         #region Notes
+        /// <summary>
+        /// Create note
+        /// </summary>
+        /// <param name="NewNote">The new note information</param>
+        /// <returns>The note (with id) if successful, null otherwise.</returns>
         INote CreateNote(INote NewNote);
+        /// <summary>
+        /// Gets the notes for a particular subscription
+        /// </summary>
+        /// <param name="SubscriptionID">The id of the subscription</param>
+        /// <returns>The collection of notes, keyed by note id. Empty collection otherwise.</returns>
         IDictionary<int, INote> GetNotesForSubscription(int SubscriptionID);
+        /// <summary>
+        /// Load a particular note
+        /// </summary>
+        /// <param name="SubscriptionID">The related subscription id</param>
+        /// <param name="NoteID">The id of the ntoe</param>
+        /// <returns></returns>
         INote LoadNote(int SubscriptionID, int NoteID);
+
+        /// <summary>
+        /// Delete a note
+        /// </summary>
+        /// <param name="SubscriptionID">The related subscription id</param>
+        /// <param name="NoteID">The id of the ntoe</param>
+        /// <returns>True if successful, false otherwise.</returns>
         bool DeleteNote(int SubscriptionID, int NoteID);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="SubscriptionID">The related subscription id</param>
+        /// <param name="UpdatedNote">The updated note information</param>
+        /// <returns>The updated note, if successful. Null otherwise.</returns>
         INote UpdateNote(int SubscriptionID, INote UpdatedNote);
         #endregion
 
@@ -694,6 +726,7 @@ namespace ChargifyNET
         /// <remarks>Does NOT prorate. Use MigrateSubscriptionProduct to get proration to work.</remarks>
         /// <param name="Subscription">The suscription to update</param>
         /// <param name="Product">The new product</param>
+        /// <param name="ProductChangeDelayed">Should the product change be delayed?</param>
         /// <returns>The new subscription resulting from the change</returns>
         ISubscription EditSubscriptionProduct(ISubscription Subscription, IProduct Product, bool? ProductChangeDelayed = null);
         /// <summary>
@@ -702,6 +735,7 @@ namespace ChargifyNET
         /// <remarks>Does NOT prorate. Use MigrateSubscriptionProduct to get proration to work.</remarks>
         /// <param name="Subscription">The suscription to update</param>
         /// <param name="ProductHandle">The handle to the new product</param>
+        /// <param name="ProductChangeDelayed">Should the product change be delayed?</param>
         /// <returns>The new subscription resulting from the change</returns>
         ISubscription EditSubscriptionProduct(ISubscription Subscription, string ProductHandle, bool? ProductChangeDelayed = null);
         /// <summary>
@@ -710,6 +744,7 @@ namespace ChargifyNET
         /// <remarks>Does NOT prorate. Use MigrateSubscriptionProduct to get proration to work.</remarks>
         /// <param name="SubscriptionID">The ID of the suscription to update</param>
         /// <param name="Product">The new product</param>
+        /// <param name="ProductChangeDelayed">Should the product change be delayed?</param>
         /// <returns>The new subscription resulting from the change</returns>
         ISubscription EditSubscriptionProduct(int SubscriptionID, IProduct Product, bool? ProductChangeDelayed = null);
         /// <summary>

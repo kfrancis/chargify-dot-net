@@ -32,9 +32,9 @@ namespace ChargifyNET
 {
     #region Imports
     using System;
-    using System.Xml;
-    using ChargifyNET.Json;
     using System.Diagnostics;
+    using System.Xml;
+    using Json;
     #endregion
 
     /// <summary>
@@ -45,7 +45,7 @@ namespace ChargifyNET
     public class Refund : ChargifyBase, IRefund, IComparable<Refund>
     {
         #region Field Keys
-        private const string PaymentIDKey = "id";
+        private const string PaymentIdKey = "id";
         private const string SuccessKey = "success";
         private const string AmountInCentsKey = "amount_in_cents";
         private const string MemoKey = "memo";
@@ -55,19 +55,19 @@ namespace ChargifyNET
         /// <summary>
         /// Constructor
         /// </summary>
-        private Refund() : base() { }
+        private Refund()
+        { }
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="refundXML">An XML string containing a refund node</param>
-        public Refund(string refundXML)
-            : base()
+        /// <param name="refundXml">An XML string containing a refund node</param>
+        public Refund(string refundXml)
         {
             // get the XML into an XML document
             XmlDocument doc = new XmlDocument();
-            doc.LoadXml(refundXML);
-            if (doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", "refundXML");
+            doc.LoadXml(refundXml);
+            if (doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(refundXml));
             // loop through the child nodes of this node
             foreach (XmlNode elementNode in doc.ChildNodes)
             {
@@ -78,7 +78,7 @@ namespace ChargifyNET
                 }
             }
             // if we get here, then no refund info was found
-            throw new ArgumentException("XML does not contain refund information", "refundXML");
+            throw new ArgumentException("XML does not contain refund information", nameof(refundXml));
         }
 
         /// <summary>
@@ -86,12 +86,11 @@ namespace ChargifyNET
         /// </summary>
         /// <param name="refundNode">An xml node with refund information</param>
         internal Refund(XmlNode refundNode)
-            : base()
         {
-            if (refundNode == null) throw new ArgumentNullException("refundNode");
-            if (refundNode.Name != "refund") throw new ArgumentException("Not a vaild refund node", "refundNode");
-            if (refundNode.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", "refundNode");
-            this.LoadFromNode(refundNode);
+            if (refundNode == null) throw new ArgumentNullException(nameof(refundNode));
+            if (refundNode.Name != "refund") throw new ArgumentException("Not a vaild refund node", nameof(refundNode));
+            if (refundNode.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(refundNode));
+            LoadFromNode(refundNode);
         }
 
         /// <summary>
@@ -99,22 +98,21 @@ namespace ChargifyNET
         /// </summary>
         /// <param name="refundObject">An JsonObject with refund information</param>
         public Refund(JsonObject refundObject)
-            : base()
         {
-            if (refundObject == null) throw new ArgumentNullException("refundObject");
-            if (refundObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild refund object", "refundObject");
-            this.LoadFromJSON(refundObject);
+            if (refundObject == null) throw new ArgumentNullException(nameof(refundObject));
+            if (refundObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild refund object", nameof(refundObject));
+            LoadFromJson(refundObject);
         }
 
-        private void LoadFromJSON(JsonObject obj)
+        private void LoadFromJson(JsonObject obj)
         {
             // loop through the keys of this JsonObject to get component info, and parse it out
             foreach (string key in obj.Keys)
             {
                 switch (key)
                 {
-                    case PaymentIDKey:
-                        _paymentID = obj.GetJSONContentAsInt(key);
+                    case PaymentIdKey:
+                        _paymentId = obj.GetJSONContentAsInt(key);
                         break;
                     case SuccessKey:
                         _success = obj.GetJSONContentAsBoolean(key);
@@ -124,8 +122,6 @@ namespace ChargifyNET
                         break;
                     case MemoKey:
                         _memo = obj.GetJSONContentAsString(key);
-                        break;
-                    default:
                         break;
                 }
             }
@@ -138,8 +134,8 @@ namespace ChargifyNET
             {
                 switch (dataNode.Name)
                 {
-                    case PaymentIDKey:
-                        _paymentID = dataNode.GetNodeContentAsInt();
+                    case PaymentIdKey:
+                        _paymentId = dataNode.GetNodeContentAsInt();
                         break;
                     case SuccessKey:
                         _success = dataNode.GetNodeContentAsBoolean();
@@ -149,8 +145,6 @@ namespace ChargifyNET
                         break;
                     case MemoKey:
                         _memo = dataNode.GetNodeContentAsString();
-                        break;
-                    default:
                         break;
                 }
             }
@@ -164,9 +158,9 @@ namespace ChargifyNET
         /// </summary>
         public int PaymentID
         {
-            get { return _paymentID; }
+            get { return _paymentId; }
         }
-        private int _paymentID = int.MinValue;
+        private int _paymentId = int.MinValue;
 
         /// <summary>
         /// Was the refund successful?
@@ -175,7 +169,7 @@ namespace ChargifyNET
         {
             get { return _success; }
         }
-        private bool _success = false;
+        private bool _success;
 
         /// <summary>
         /// The amount of the refund and captured payment, represented in cents
@@ -191,7 +185,7 @@ namespace ChargifyNET
         /// </summary>
         public decimal Amount
         {
-            get { return Convert.ToDecimal(this._amountInCents) / 100; }
+            get { return Convert.ToDecimal(_amountInCents) / 100; }
         }
 
         /// <summary>
@@ -214,7 +208,7 @@ namespace ChargifyNET
         /// <returns>The result of the comparison</returns>
         public int CompareTo(IRefund other)
         {
-            return this.AmountInCents.CompareTo(other.AmountInCents);
+            return AmountInCents.CompareTo(other.AmountInCents);
         }
 
         #endregion
@@ -228,7 +222,7 @@ namespace ChargifyNET
         /// <returns>The result of the comparison</returns>
         public int CompareTo(Refund other)
         {
-            return this.AmountInCents.CompareTo(other.AmountInCents);
+            return AmountInCents.CompareTo(other.AmountInCents);
         }
 
         #endregion

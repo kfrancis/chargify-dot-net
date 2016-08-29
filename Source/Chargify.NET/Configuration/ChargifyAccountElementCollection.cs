@@ -55,7 +55,7 @@ namespace ChargifyNET.Configuration
         /// <returns></returns>
         protected override object GetElementKey(ConfigurationElement element)
         {
-            return ((ChargifyAccountElement)element).Name;
+            return ((ChargifyAccountElement) element).Name;
         }
 
         /// <summary>
@@ -67,14 +67,14 @@ namespace ChargifyNET.Configuration
         {
             get
             {
-                return (ChargifyAccountElement)base.BaseGet(index);
+                return (ChargifyAccountElement) BaseGet(index);
             }
             set
             {
-                if (base.BaseGet(index) != null)
-                    base.BaseRemoveAt(index);
+                if (BaseGet(index) != null)
+                    BaseRemoveAt(index);
 
-                this.BaseAdd(index, value);
+                BaseAdd(index, value);
             }
         }
     }

@@ -33,7 +33,7 @@ namespace ChargifyNET
     #region Imports
     using System;
     using System.Xml;
-    using ChargifyNET.Json;
+    using Json;
     #endregion
 
     /// <summary>
@@ -42,7 +42,7 @@ namespace ChargifyNET
     public class Component : ChargifyBase, IComponent, IComparable<Component>
     {
         #region Field Keys
-        private const string IDKey = "id";
+        private const string IdKey = "id";
         private const string QuantityKey = "quantity";
         private const string MemoKey = "memo";
         #endregion
@@ -51,18 +51,19 @@ namespace ChargifyNET
         /// <summary>
         /// Constructor
         /// </summary>
-        private Component() : base() { }
+        private Component()
+        { }
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="ComponentXML">An XML string containing a component node</param>
-        public Component(string ComponentXML) : base()
+        /// <param name="componentXml">An XML string containing a component node</param>
+        public Component(string componentXml)
         {
             // get the XML into an XML document
             XmlDocument doc = new XmlDocument();
-            doc.LoadXml(ComponentXML);
-            if (doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", "ComponentXML");
+            doc.LoadXml(componentXml);
+            if (doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(componentXml));
             // loop through the child nodes of this node
             foreach (XmlNode elementNode in doc.ChildNodes)
             {
@@ -73,7 +74,7 @@ namespace ChargifyNET
                 }
             }
             // if we get here, then no component info was found
-            throw new ArgumentException("XML does not contain component information", "ComponentXML");
+            throw new ArgumentException("XML does not contain component information", nameof(componentXml));
         }
 
         /// <summary>
@@ -81,12 +82,11 @@ namespace ChargifyNET
         /// </summary>
         /// <param name="usageNode">An xml node with usage information</param>
         internal Component(XmlNode usageNode)
-            : base()
         {
-            if (usageNode == null) throw new ArgumentNullException("usageNode");
-            if (usageNode.Name != "usage") throw new ArgumentException("Not a vaild usage node", "usageNode");
-            if (usageNode.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", "usageNode");
-            this.LoadFromNode(usageNode);
+            if (usageNode == null) throw new ArgumentNullException(nameof(usageNode));
+            if (usageNode.Name != "usage") throw new ArgumentException("Not a vaild usage node", nameof(usageNode));
+            if (usageNode.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(usageNode));
+            LoadFromNode(usageNode);
         }
 
         /// <summary>
@@ -94,21 +94,20 @@ namespace ChargifyNET
         /// </summary>
         /// <param name="usageObject">An JsonObject with usage information</param>
         public Component(JsonObject usageObject)
-            : base()
         {
-            if (usageObject == null) throw new ArgumentNullException("usageObject");
-            if (usageObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild usage object", "usageObject");
-            this.LoadFromJSON(usageObject);
+            if (usageObject == null) throw new ArgumentNullException(nameof(usageObject));
+            if (usageObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild usage object", nameof(usageObject));
+            LoadFromJson(usageObject);
         }
 
-        private void LoadFromJSON(JsonObject obj)
+        private void LoadFromJson(JsonObject obj)
         {
             // loop through the keys of this JsonObject to get product info, and parse it out
             foreach (string key in obj.Keys)
             {
                 switch (key)
                 {
-                    case IDKey:
+                    case IdKey:
                         _id = obj.GetJSONContentAsString(key);
                         break;
                     case QuantityKey:
@@ -116,8 +115,6 @@ namespace ChargifyNET
                         break;
                     case MemoKey:
                         _memo = obj.GetJSONContentAsString(key);
-                        break;
-                    default:
                         break;
                 }
             }
@@ -130,7 +127,7 @@ namespace ChargifyNET
             {
                 switch (dataNode.Name)
                 {
-                    case IDKey:
+                    case IdKey:
                         _id = dataNode.GetNodeContentAsString();
                         break;
                     case QuantityKey:
@@ -138,8 +135,6 @@ namespace ChargifyNET
                         break;
                     case MemoKey:
                         _memo = dataNode.GetNodeContentAsString();
-                        break;
-                    default:
                         break;
                 }
             }
@@ -164,7 +159,7 @@ namespace ChargifyNET
         {
             get { return _quantity; }
         }
-        private int _quantity = 0;
+        private int _quantity;
 
         /// <summary>
         /// An optional description for this metered component
@@ -184,7 +179,7 @@ namespace ChargifyNET
         /// </summary>
         public int CompareTo(IComponent other)
         {
-            return this.ID.CompareTo(other.ID);
+            return string.Compare(ID, other.ID, StringComparison.InvariantCultureIgnoreCase);
         }
 
         #endregion
@@ -196,7 +191,7 @@ namespace ChargifyNET
         /// </summary>
         public int CompareTo(Component other)
         {
-            return this.ID.CompareTo(other.ID);
+            return string.Compare(ID, other.ID, StringComparison.InvariantCultureIgnoreCase);
         }
 
         #endregion

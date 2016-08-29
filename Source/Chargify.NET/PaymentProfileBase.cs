@@ -31,7 +31,6 @@
 namespace ChargifyNET
 {
     #region Imports
-
     using System.Xml.Serialization;
     #endregion
 
@@ -45,32 +44,32 @@ namespace ChargifyNET
         /// <summary>
         /// Protected Constructor
         /// </summary>
-        protected PaymentProfileBase() : base()
+        protected PaymentProfileBase()
         {
-            this.Id = int.MinValue;
-            this.FirstName = string.Empty;
-            this.LastName = string.Empty;
-            this.FullNumber = string.Empty;
-            this.ExpirationMonth = int.MinValue;
-            this.ExpirationYear = int.MinValue;
+            Id = int.MinValue;
+            FirstName = string.Empty;
+            LastName = string.Empty;
+            FullNumber = string.Empty;
+            ExpirationMonth = int.MinValue;
+            ExpirationYear = int.MinValue;
         }
-        
+
         /// <summary>
         /// Protected Constructor
         /// </summary>
-        /// <param name="FirstName">The first name on the credit card</param>
-        /// <param name="LastName">The last name on the credit card</param>
-        /// <param name="FullNumber">The full credit card number</param>
-        /// <param name="ExpirationYear">The expiration year</param>
-        /// <param name="ExpirationMonth">The expiration month</param>
-        protected PaymentProfileBase(string FirstName, string LastName, string FullNumber, int ExpirationYear, int ExpirationMonth) : base()
+        /// <param name="firstName">The first name on the credit card</param>
+        /// <param name="lastName">The last name on the credit card</param>
+        /// <param name="fullNumber">The full credit card number</param>
+        /// <param name="expirationYear">The expiration year</param>
+        /// <param name="expirationMonth">The expiration month</param>
+        protected PaymentProfileBase(string firstName, string lastName, string fullNumber, int expirationYear, int expirationMonth)
         {
-            this.Id = int.MinValue;
-            this.FirstName = FirstName;
-            this.LastName = LastName;
-            this.FullNumber = FullNumber;
-            this.ExpirationMonth = ExpirationMonth;
-            this.ExpirationYear = ExpirationYear;
+            Id = int.MinValue;
+            FirstName = firstName;
+            LastName = lastName;
+            FullNumber = fullNumber;
+            ExpirationMonth = expirationMonth;
+            ExpirationYear = expirationYear;
         }
 
         #endregion

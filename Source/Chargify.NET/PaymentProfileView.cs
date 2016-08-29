@@ -30,17 +30,17 @@
 
 namespace ChargifyNET
 {
-    using Json;
-    using System;
     #region Imports
     using System.Diagnostics;
     using System.Xml;
+    using System;
+    using Json;
     #endregion
 
     /// <summary>
     /// Class representing view information for a credit card
     /// </summary>
-    [DebuggerDisplay("Type: {Type}, Full Number: {FullNumber}, Expiration: {ExpirationMonth}/{ExpirationYear}, Name: {FirstName} {LastName}")]
+    [DebuggerDisplay("Type: {CardType}, Full Number: {FullNumber}, Expiration: {ExpirationMonth}/{ExpirationYear}, Name: {FirstName} {LastName}")]
     public class PaymentProfileView : PaymentProfileBase, IPaymentProfileBase, IPaymentProfileView
     {
         #region Field Keys
@@ -74,43 +74,53 @@ namespace ChargifyNET
         /// <summary>
         /// Constructor
         /// </summary>
-        public PaymentProfileView() : base() { }
-        public PaymentProfileView(string PaymentProfileXML) : base()
+        public PaymentProfileView()
+        { }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="paymentProfileXml"></param>
+        public PaymentProfileView(string paymentProfileXml)
         {
             // get the XML into an XML document
-            var Doc = new XmlDocument();
-            Doc.LoadXml(PaymentProfileXML);
-            if (Doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", "PaymentProfileXML");
+            var doc = new XmlDocument();
+            doc.LoadXml(paymentProfileXml);
+            if (doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(paymentProfileXml));
             // loop through the child nodes of this node
-            foreach (XmlNode elementNode in Doc.ChildNodes)
+            foreach (XmlNode elementNode in doc.ChildNodes)
             {
                 if (elementNode.Name == "payment_profile" || elementNode.Name == "bank_account" || elementNode.Name == "credit_card")
                 {
-                    this.LoadFromNode(elementNode);
+                    LoadFromNode(elementNode);
                     return;
                 }
             }
             // if we get here, then no customer info was found
-            throw new ArgumentException("XML does not contain payment_profile information", "PaymentProfileXML");
+            throw new ArgumentException("XML does not contain payment_profile information", nameof(paymentProfileXml));
         }
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="subscriptionNode">XML containing payment_profile info (in expected format)</param>
-        internal PaymentProfileView(XmlNode PaymentProfileNode) : base()
+        /// <param name="paymentProfileNode">XML containing payment_profile info (in expected format)</param>
+        internal PaymentProfileView(XmlNode paymentProfileNode)
         {
-            if (PaymentProfileNode == null) throw new ArgumentNullException("PaymentProfileNode");
-            if (PaymentProfileNode.Name != "payment_profile" && PaymentProfileNode.Name != "credit_card" && PaymentProfileNode.Name != "bank_account") throw new ArgumentException("Not a vaild payment_profile node", "PaymentProfileNode");
-            if (PaymentProfileNode.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", "PaymentProfileNode");
-            this.LoadFromNode(PaymentProfileNode);
+            if (paymentProfileNode == null) throw new ArgumentNullException(nameof(paymentProfileNode));
+            if (paymentProfileNode.Name != "payment_profile" && paymentProfileNode.Name != "credit_card" && paymentProfileNode.Name != "bank_account") throw new ArgumentException("Not a vaild payment_profile node", nameof(paymentProfileNode));
+            if (paymentProfileNode.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(paymentProfileNode));
+            LoadFromNode(paymentProfileNode);
         }
 
-        public PaymentProfileView(JsonObject PaymentProfileObject) : base()
+        /// <summary>
+        /// Json Constructor
+        /// </summary>
+        /// <param name="paymentProfileObject">The json object containing payment profile information</param>
+        public PaymentProfileView(JsonObject paymentProfileObject)
         {
-            if (PaymentProfileObject == null) throw new ArgumentNullException("PaymentProfileObject");
-            if (PaymentProfileObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild PaymentProfile node", "PaymentProfileObject");
-            this.LoadFromJSON(PaymentProfileObject);
+            if (paymentProfileObject == null) throw new ArgumentNullException(nameof(paymentProfileObject));
+            if (paymentProfileObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild PaymentProfile node", nameof(paymentProfileObject));
+            LoadFromJson(paymentProfileObject);
         }
 
         private void LoadFromNode(XmlNode rootNode)
@@ -191,14 +201,11 @@ namespace ChargifyNET
                     case MaskedCardNumberKey:
                         _maskedCardNumber = dataNode.GetNodeContentAsString();
                         break;
-
-                    default:
-                        break;
                 }
             }
         }
 
-        private void LoadFromJSON(JsonObject obj)
+        private void LoadFromJson(JsonObject obj)
         {
             foreach (string key in obj.Keys)
             {
@@ -276,8 +283,6 @@ namespace ChargifyNET
                     case MaskedCardNumberKey:
                         _maskedCardNumber = obj.GetJSONContentAsString(key);
                         break;
-                    default:
-                        break;
                 }
             }
         }
@@ -289,8 +294,8 @@ namespace ChargifyNET
         /// </summary>
         public PaymentProfileType PaymentType
         {
-            get { return this._paymentType; }
-            set { if (this._paymentType != value) { this._paymentType = value; } }
+            get { return _paymentType; }
+            set { _paymentType = value; }
         }
         private PaymentProfileType _paymentType = PaymentProfileType.Credit_Card;
 
@@ -299,8 +304,8 @@ namespace ChargifyNET
         /// </summary>
         public int CustomerID
         {
-            get { return this._customerId; }
-            set { if (this._customerId != value) { this._customerId = value; } }
+            get { return _customerId; }
+            set { _customerId = value; }
         }
         private int _customerId = int.MinValue;
 
@@ -309,8 +314,8 @@ namespace ChargifyNET
         /// </summary>
         public string CVV
         {
-            get { return this._cvv; }
-            set { if (this._cvv != value) { this._cvv = value; } }
+            get { return _cvv; }
+            set { _cvv = value; }
         }
         private string _cvv = string.Empty;
 
@@ -319,8 +324,8 @@ namespace ChargifyNET
         /// </summary>
         public string CardType
         {
-            get { return this._cardType; }
-            set { if (this._cardType != value) { this._cardType = value; } }
+            get { return _cardType; }
+            set { _cardType = value; }
         }
         private string _cardType = string.Empty;
 
@@ -330,7 +335,7 @@ namespace ChargifyNET
         public string BankName
         {
             get { return _bankName; }
-            set { if (_bankName != value) _bankName = value; }
+            set { _bankName = value; }
         }
         private string _bankName = string.Empty;
 
@@ -340,7 +345,7 @@ namespace ChargifyNET
         public string MaskedBankRoutingNumber
         {
             get { return _maskedBankRoutingNumber; }
-            set { if (_maskedBankRoutingNumber != value) _maskedBankRoutingNumber = value; }
+            set { _maskedBankRoutingNumber = value; }
         }
         private string _maskedBankRoutingNumber = string.Empty;
 
@@ -350,7 +355,7 @@ namespace ChargifyNET
         public string BankRoutingNumber
         {
             get { return _bankRoutingNumber; }
-            set { if (_bankRoutingNumber != value) _bankRoutingNumber = value; }
+            set { _bankRoutingNumber = value; }
         }
         private string _bankRoutingNumber = string.Empty;
 
@@ -360,7 +365,7 @@ namespace ChargifyNET
         public string MaskedBankAccountNumber
         {
             get { return _maskedBankAccountNumber; }
-            set { if (_maskedBankAccountNumber != value) _maskedBankAccountNumber = value; }
+            set { _maskedBankAccountNumber = value; }
         }
         private string _maskedBankAccountNumber = string.Empty;
 
@@ -370,7 +375,7 @@ namespace ChargifyNET
         public string BankAccountNumber
         {
             get { return _bankAccountNumber; }
-            set { if (_bankAccountNumber != value) _bankAccountNumber = value; }
+            set { _bankAccountNumber = value; }
         }
         private string _bankAccountNumber = string.Empty;
         /// <summary>
@@ -379,7 +384,7 @@ namespace ChargifyNET
         public BankAccountType BankAccountType
         {
             get { return _bankAccountType; }
-            set { if (_bankAccountType != value) _bankAccountType = value; }
+            set { _bankAccountType = value; }
         }
         private BankAccountType _bankAccountType = BankAccountType.Unknown;
 
@@ -389,7 +394,7 @@ namespace ChargifyNET
         public BankAccountHolderType BankAccountHolderType
         {
             get { return _bankAccountHolderType; }
-            set { if (_bankAccountHolderType != value) _bankAccountHolderType = value; }
+            set { _bankAccountHolderType = value; }
         }
         private BankAccountHolderType _bankAccountHolderType = BankAccountHolderType.Unknown;
 
@@ -399,7 +404,7 @@ namespace ChargifyNET
         public string MaskedCardNumber
         {
             get { return _maskedCardNumber; }
-            set { if (_maskedCardNumber != value) _maskedCardNumber = value; }
+            set { _maskedCardNumber = value; }
         }
         private string _maskedCardNumber = string.Empty;
 
@@ -409,7 +414,7 @@ namespace ChargifyNET
         public string PaymentMethodNonce
         {
             get { return _paymentMethodNonce; }
-            set { if (_paymentMethodNonce != value) _paymentMethodNonce = value; }
+            set { _paymentMethodNonce = value; }
         }
         private string _paymentMethodNonce = string.Empty;
 
@@ -419,30 +424,9 @@ namespace ChargifyNET
         public string PayPalEmail
         {
             get { return _payPalEmail; }
-            set { if (_payPalEmail != value) _payPalEmail = value; }
+            set { _payPalEmail = value; }
         }
         private string _payPalEmail = string.Empty;
-        #endregion
-
-        #region Equality
-        /// <summary>
-        /// GetHashCode
-        /// </summary>
-        /// <returns></returns>
-        public override int GetHashCode()
-        {
-            return base.GetHashCode();
-        }
-
-        /// <summary>
-        /// Equality Operator
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
-        public override bool Equals(object obj)
-        {
-            return base.Equals(obj);
-        }
         #endregion
 
         /// <summary>
@@ -451,7 +435,7 @@ namespace ChargifyNET
         /// <returns>A string representation of the object</returns>
         public override string ToString()
         {
-            return string.Format(" {0}: {1}\nName on Card: {2} {3}\nExpires {4}/{5}", this.CardType, this.FullNumber, this.FirstName, this.LastName, this.ExpirationMonth, this.ExpirationYear);
+            return string.Format(" {0}: {1}\nName on Card: {2} {3}\nExpires {4}/{5}", CardType, FullNumber, FirstName, LastName, ExpirationMonth, ExpirationYear);
         }
 
     }

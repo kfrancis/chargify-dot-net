@@ -100,6 +100,7 @@
     <Compile Include="Coupon.cs" />
     <Compile Include="Credit.cs" />
     <Compile Include="CreditCardAttributes.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="HttpRequestMethod.cs" />
     <Compile Include="Interfaces\IMetadata.cs" />
     <Compile Include="Interfaces\IMetadataResult.cs" />

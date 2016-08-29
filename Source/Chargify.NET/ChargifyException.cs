@@ -34,12 +34,10 @@ namespace ChargifyNET
     using System;
     using System.Net;
     using System.Diagnostics;
-    using System.Runtime.Serialization;
-    using System.Security.Permissions;
     using System.Xml;
     using System.Collections.Generic;
     using System.IO;
-    using ChargifyNET.Json;
+    using Json;
     using System.Xml.Linq;
     using System.Linq;
     #endregion
@@ -67,7 +65,7 @@ namespace ChargifyNET
         /// <param name="message">The string error message to relay to the user</param>
         internal ChargifyError(string message)
         {
-            this.Message = message;
+            Message = message;
         }
 
         /// <summary>
@@ -76,7 +74,7 @@ namespace ChargifyNET
         /// <param name="errorNode">The XML node that contains the error message</param>
         internal ChargifyError(XmlNode errorNode)
         {
-            this.Message = errorNode.Value;
+            Message = errorNode.Value;
         }
 
         /// <summary>
@@ -85,7 +83,7 @@ namespace ChargifyNET
         /// <param name="errorStr">The JsonString obj that contains the error message</param>
         internal ChargifyError(JsonString errorStr)
         {
-            this.Message = errorStr.Value;
+            Message = errorStr.Value;
         }
 
         #endregion
@@ -97,68 +95,73 @@ namespace ChargifyNET
         /// <returns>The list of errors returned from Chargify</returns>
         internal static List<ChargifyError> ParseChargifyErrors(HttpWebResponse response)
         {
+            List<ChargifyError> errors = new List<ChargifyError>();
             if (response != null)
             {
-                using (StreamReader reader = new StreamReader(response.GetResponseStream()))
+                var responseStream = response.GetResponseStream();
+                if (responseStream != null)
                 {
-                    string errorResponse = reader.ReadToEnd();
-                    List<ChargifyError> errors = new List<ChargifyError>();
-
-                    // Response is frequently " " ...
-                    if (string.IsNullOrEmpty(errorResponse.Trim())) return errors;
-
-                    if (errorResponse.IsXml())
+                    using (StreamReader reader = new StreamReader(responseStream))
                     {
-                        // New way - Linq-y
-                        XDocument xdoc = XDocument.Parse(errorResponse);
-                        if (xdoc.Descendants("error").Count() > 0)
+                        string errorResponse = reader.ReadToEnd();
+
+                        // Response is frequently " " ...
+                        if (string.IsNullOrEmpty(errorResponse.Trim())) return errors;
+
+                        if (errorResponse.IsXml())
                         {
-                            var results = from e in xdoc.Descendants("error")
-                                          select new ChargifyError
-                                          {
-                                              Message = e.Value
-                                          };
-                            errors = results.ToList();
-                        }
-                        else
-                        {
-                            var results = from e in xdoc.Descendants("errors")
-                                          select new ChargifyError
-                                          {
-                                              Message = e.Value
-                                          };
-                            errors = results.ToList();
-                        }
-                    }
-                    else if (errorResponse.IsJSON())
-                    {
-                        // slightly different json response from the usual
-                        int position = 0;
-                        JsonObject obj = JsonObject.Parse(errorResponse, ref position);
-                        if (obj.ContainsKey("errors"))
-                        {
-                            JsonArray array = obj["errors"] as JsonArray;
-                            for (int i = 0; i <= array.Length - 1; i++)
+                            // New way - Linq-y
+                            XDocument xdoc = XDocument.Parse(errorResponse);
+                            if (xdoc.Descendants("error").Any())
                             {
-                                if (((array.Items[i] as JsonString) != null) && (!string.IsNullOrEmpty((array.Items[i] as JsonString).Value)))
+                                var results = from e in xdoc.Descendants("error")
+                                              select new ChargifyError
+                                              {
+                                                  Message = e.Value
+                                              };
+                                errors = results.ToList();
+                            }
+                            else
+                            {
+                                var results = from e in xdoc.Descendants("errors")
+                                              select new ChargifyError
+                                              {
+                                                  Message = e.Value
+                                              };
+                                errors = results.ToList();
+                            }
+                        }
+                        else if (errorResponse.IsJSON())
+                        {
+                            // slightly different json response from the usual
+                            int position = 0;
+                            JsonObject obj = JsonObject.Parse(errorResponse, ref position);
+                            if (obj.ContainsKey("errors"))
+                            {
+                                JsonArray array = obj["errors"] as JsonArray;
+                                if (array != null && array.Length > 0)
                                 {
-                                    JsonString errorStr = array.Items[i] as JsonString;
-                                    ChargifyError anError = new ChargifyError(errorStr);
-                                    if (!errors.Contains(anError))
+                                    for (int i = 0; i <= array.Length - 1; i++)
                                     {
-                                        errors.Add(anError);
+                                        if ((((JsonString) array.Items[i]) != null) && (!string.IsNullOrEmpty(((JsonString) array.Items[i]).Value)))
+                                        {
+                                            JsonString errorStr = array.Items[i] as JsonString;
+                                            ChargifyError anError = new ChargifyError(errorStr);
+                                            if (!errors.Contains(anError))
+                                            {
+                                                errors.Add(anError);
+                                            }
+                                        }
                                     }
                                 }
                             }
                         }
+
                     }
-                    return errors;
                 }
+                return errors;
             }
-            else
-            {
-                throw new ChargifyNetException("Unknown Error");
-            }
+            throw new ChargifyNetException("Unknown Error");
         }
     }
 
@@ -224,7 +227,7 @@ namespace ChargifyNET
                 return _statusDescription;
             }
         }
-        private string _statusDescription = "";
+        private string _statusDescription;
 
         /// <summary>
         /// Get the status code
@@ -236,7 +239,7 @@ namespace ChargifyNET
                 return _statusCode;
             }
         }
-        private HttpStatusCode _statusCode = HttpStatusCode.Accepted;
+        private HttpStatusCode _statusCode;
 
         /// <summary>
         /// Get the last data posted that potentially caused the exception
@@ -260,7 +263,7 @@ namespace ChargifyNET
                 return _errors;
             }
         }
-        private List<ChargifyError> _errors = null;
+        private List<ChargifyError> _errors;
 
         ///// <summary>
         ///// Get object data
@@ -280,7 +283,7 @@ namespace ChargifyNET
             // Used for the LogResponse Action
             string retVal = string.Empty;
             retVal += string.Format("Request: {0}\n", LastDataPosted);
-            retVal += string.Format("Response: {0} {1}\n", StatusCode.ToString(), StatusDescription.ToString());
+            retVal += string.Format("Response: {0} {1}\n", StatusCode, StatusDescription);
             retVal += string.Format("Errors: {0}\n", string.Join(", ", _errors.ToList().Select(e => e.Message).ToArray()));
             return retVal;
         }

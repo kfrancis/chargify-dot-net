@@ -22,9 +22,10 @@ namespace ChargifyDotNetTests
         {
             // Arrange
             var productFamily = Chargify.GetProductFamilyList().Values.FirstOrDefault();
+            Assert.IsNotNull(productFamily, "No valid product family found.");
 
             // Act
-            var result = Chargify.LoadCoupon(productFamily.ID, 3809);
+            var result = Chargify.LoadCoupon(productFamily.ID, 129307);
 
             // Assert
             Assert.IsNotNull(result);
@@ -69,7 +70,8 @@ namespace ChargifyDotNetTests
         {
             // Arrange
             var productFamily = Chargify.GetProductFamilyList().Values.FirstOrDefault();
-            var foundCoupon = Chargify.LoadCoupon(productFamily.ID, 3809);
+            Assert.IsNotNull(productFamily, "No valid product family found.");
+            var foundCoupon = Chargify.LoadCoupon(productFamily.ID, 129307);
             string originalName = foundCoupon.Name;
             foundCoupon.Name = originalName + "_1";
 
