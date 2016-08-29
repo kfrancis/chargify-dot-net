@@ -4270,20 +4270,22 @@ namespace ChargifyNET
         /// <summary>
         /// Method for getting a list of transactions
         /// </summary>
+        /// <param name="descending">Should the results in in descending order?</param>
         /// <returns>The dictionary of transaction records if successful, otherwise null.</returns>
-        public IDictionary<int, ITransaction> GetTransactionList()
+        public IDictionary<int, ITransaction> GetTransactionList(bool descending = true)
         {
-            return GetTransactionList(int.MinValue, int.MinValue, null, int.MinValue, int.MinValue, DateTime.MinValue, DateTime.MinValue);
+            return GetTransactionList(int.MinValue, int.MinValue, null, int.MinValue, int.MinValue, DateTime.MinValue, DateTime.MinValue, descending);
         }
 
         /// <summary>
         /// Method for getting a list of transactions
         /// </summary>
         /// <param name="kinds">A list of the types of transactions to return.</param>
+        /// <param name="descending">Should the results in in descending order?</param>
         /// <returns>The dictionary of transaction records if successful, otherwise null.</returns>
-        public IDictionary<int, ITransaction> GetTransactionList(List<TransactionType> kinds)
+        public IDictionary<int, ITransaction> GetTransactionList(List<TransactionType> kinds, bool descending = true)
         {
-            return GetTransactionList(int.MinValue, int.MinValue, kinds, int.MinValue, int.MinValue, DateTime.MinValue, DateTime.MinValue);
+            return GetTransactionList(int.MinValue, int.MinValue, kinds, int.MinValue, int.MinValue, DateTime.MinValue, DateTime.MinValue, descending);
         }
 
         /// <summary>
@@ -4292,10 +4294,11 @@ namespace ChargifyNET
         /// <param name="kinds">A list of transaction types to return.</param>
         /// <param name="sinceId">Returns transactions with an ID greater than or equal to the one specified. Use int.MinValue to not specify a since_id.</param>
         /// <param name="maxId">Returns transactions with an id less than or equal to the one specified. Use int.MinValue to not specify a max_id.</param>
+        /// <param name="descending">Should the results in in descending order?</param>
         /// <returns>The dictionary of transaction records if successful, otherwise null.</returns>
-        public IDictionary<int, ITransaction> GetTransactionList(List<TransactionType> kinds, int sinceId, int maxId)
+        public IDictionary<int, ITransaction> GetTransactionList(List<TransactionType> kinds, int sinceId, int maxId, bool descending = true)
         {
-            return GetTransactionList(int.MinValue, int.MinValue, kinds, sinceId, maxId, DateTime.MinValue, DateTime.MinValue);
+            return GetTransactionList(int.MinValue, int.MinValue, kinds, sinceId, maxId, DateTime.MinValue, DateTime.MinValue, descending);
         }
 
         /// <summary>
@@ -4306,10 +4309,11 @@ namespace ChargifyNET
         /// <param name="maxId">Returns transactions with an id less than or equal to the one specified. Use int.MinValue to not specify a max_id.</param>
         /// <param name="sinceDate">Returns transactions with a created_at date greater than or equal to the one specified. Use DateTime.MinValue to not specify a since_date.</param>
         /// <param name="untilDate">Returns transactions with a created_at date less than or equal to the one specified. Use DateTime.MinValue to not specify an until_date.</param>
+        /// <param name="descending">Should the results in in descending order?</param>
         /// <returns>The dictionary of transaction records if successful, otherwise null.</returns>
-        public IDictionary<int, ITransaction> GetTransactionList(List<TransactionType> kinds, int sinceId, int maxId, DateTime sinceDate, DateTime untilDate)
+        public IDictionary<int, ITransaction> GetTransactionList(List<TransactionType> kinds, int sinceId, int maxId, DateTime sinceDate, DateTime untilDate, bool descending = true)
         {
-            return GetTransactionList(int.MinValue, int.MinValue, kinds, sinceId, maxId, sinceDate, untilDate);
+            return GetTransactionList(int.MinValue, int.MinValue, kinds, sinceId, maxId, sinceDate, untilDate, descending);
         }
 
         /// <summary>
@@ -4317,10 +4321,11 @@ namespace ChargifyNET
         /// </summary>
         /// <param name="page">The page number</param>
         /// <param name="perPage">The number of results per page (used for pagination)</param>
+        /// <param name="descending">Should the results in in descending order?</param>
         /// <returns>The dictionary of transaction records if successful, otherwise null.</returns>
-        public IDictionary<int, ITransaction> GetTransactionList(int page, int perPage)
+        public IDictionary<int, ITransaction> GetTransactionList(int page, int perPage, bool descending = true)
         {
-            return GetTransactionList(page, perPage, null, int.MinValue, int.MinValue, DateTime.MinValue, DateTime.MinValue);
+            return GetTransactionList(page, perPage, null, int.MinValue, int.MinValue, DateTime.MinValue, DateTime.MinValue, descending);
         }
 
         /// <summary>
@@ -4329,10 +4334,11 @@ namespace ChargifyNET
         /// <param name="page">The page number</param>
         /// <param name="perPage">The number of results per page (used for pagination)</param>
         /// <param name="kinds">A list of the types of transactions to return.</param>
+        /// <param name="descending">Should the results in in descending order?</param>
         /// <returns>The dictionary of transaction records if successful, otherwise null.</returns>
-        public IDictionary<int, ITransaction> GetTransactionList(int page, int perPage, List<TransactionType> kinds)
+        public IDictionary<int, ITransaction> GetTransactionList(int page, int perPage, List<TransactionType> kinds, bool descending = true)
         {
-            return GetTransactionList(page, perPage, kinds, int.MinValue, int.MinValue, DateTime.MinValue, DateTime.MinValue);
+            return GetTransactionList(page, perPage, kinds, int.MinValue, int.MinValue, DateTime.MinValue, DateTime.MinValue, descending);
         }
 
         /// <summary>
@@ -4343,10 +4349,11 @@ namespace ChargifyNET
         /// <param name="kinds">A list of transaction types to return.</param>
         /// <param name="sinceId">Returns transactions with an ID greater than or equal to the one specified. Use int.MinValue to not specify a since_id.</param>
         /// <param name="maxId">Returns transactions with an id less than or equal to the one specified. Use int.MinValue to not specify a max_id.</param>
+        /// <param name="descending">Should the results in in descending order?</param>
         /// <returns>The dictionary of transaction records if successful, otherwise null.</returns>
-        public IDictionary<int, ITransaction> GetTransactionList(int page, int perPage, List<TransactionType> kinds, int sinceId, int maxId)
+        public IDictionary<int, ITransaction> GetTransactionList(int page, int perPage, List<TransactionType> kinds, int sinceId, int maxId, bool descending = true)
         {
-            return GetTransactionList(page, perPage, kinds, sinceId, maxId, DateTime.MinValue, DateTime.MinValue);
+            return GetTransactionList(page, perPage, kinds, sinceId, maxId, DateTime.MinValue, DateTime.MinValue,descending);
         }
 
         /// <summary>
@@ -4359,8 +4366,9 @@ namespace ChargifyNET
         /// <param name="maxId">Returns transactions with an id less than or equal to the one specified. Use int.MinValue to not specify a max_id.</param>
         /// <param name="sinceDate">Returns transactions with a created_at date greater than or equal to the one specified. Use DateTime.MinValue to not specify a since_date.</param>
         /// <param name="untilDate">Returns transactions with a created_at date less than or equal to the one specified. Use DateTime.MinValue to not specify an until_date.</param>
+        /// <param name="descending">Should the results in in descending order?</param>
         /// <returns>The dictionary of transaction records if successful, otherwise null.</returns>
-        public IDictionary<int, ITransaction> GetTransactionList(int page, int perPage, List<TransactionType> kinds, int sinceId, int maxId, DateTime sinceDate, DateTime untilDate)
+        public IDictionary<int, ITransaction> GetTransactionList(int page, int perPage, List<TransactionType> kinds, int sinceId, int maxId, DateTime sinceDate, DateTime untilDate, bool descending = true)
         {
             string qs = string.Empty;
 
@@ -4385,6 +4393,7 @@ namespace ChargifyNET
             if (maxId != int.MinValue) { if (qs.Length > 0) { qs += "&"; } qs += string.Format("max_id={0}", maxId); }
             if (sinceDate != DateTime.MinValue) { if (qs.Length > 0) { qs += "&"; } qs += string.Format("since_date={0}", sinceDate.ToString(DateTimeFormat)); }
             if (untilDate != DateTime.MinValue) { if (qs.Length > 0) { qs += "&"; } qs += string.Format("until_date={0}", untilDate.ToString(DateTimeFormat)); }
+            if (qs.Length > 0) { qs += "&"; } qs += "direction=" + (descending ? "desc" : "asc");
 
             // Construct the url to access Chargify
             string url = string.Format("transactions.{0}", GetMethodExtension());
@@ -5383,7 +5392,7 @@ namespace ChargifyNET
         /// <returns></returns>
         public INote LoadNote(int subscriptionId, int noteId)
         {
-             try
+            try
             {
                 // make sure data is valid
                 if (subscriptionId == int.MinValue) throw new ArgumentNullException(nameof(subscriptionId));
