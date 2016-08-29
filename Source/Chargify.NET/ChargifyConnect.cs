@@ -3534,6 +3534,29 @@ namespace ChargifyNET
         }
 
         /// <summary>
+        /// Method to remove a coupon to a subscription using the API
+        /// </summary>
+        /// <param name="SubscriptionID">The ID of the subscription to modify</param>
+        /// <param name="CouponCode">The code of the coupon to remove from the subscription</param>
+        /// <returns>True if successful, false otherwise.</returns>
+        public bool RemoveCoupon(int SubscriptionID, string CouponCode)
+        {
+            // make sure that the SubscriptionID is unique
+            if (this.LoadSubscription(SubscriptionID) == null) throw new ArgumentException("Not an SubscriptionID", "SubscriptionID");
+            if (string.IsNullOrEmpty(CouponCode)) throw new ArgumentException("Coupon code is empty", "CouponCode");
+            try
+            {
+                string response = this.DoRequest(string.Format("subscriptions/{0}/remove_coupon.{1}?code={2}", SubscriptionID, GetMethodExtension(), CouponCode), HttpRequestMethod.Delete, null);
+                // change the response to the object            
+                return response.Contains("Coupon removed");
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Create a new one-time credit
         /// </summary>
         /// <param name="coupon">The coupon parameters</param>
