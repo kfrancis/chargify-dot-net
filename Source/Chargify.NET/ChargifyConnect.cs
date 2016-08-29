@@ -3542,11 +3542,12 @@ namespace ChargifyNET
         public bool RemoveCoupon(int SubscriptionID, string CouponCode)
         {
             // make sure that the SubscriptionID is unique
-            if (this.LoadSubscription(SubscriptionID) == null) throw new ArgumentException("Not an SubscriptionID", "SubscriptionID");
-            if (string.IsNullOrEmpty(CouponCode)) throw new ArgumentException("Coupon code is empty", "CouponCode");
+            if (this.LoadSubscription(SubscriptionID) == null) throw new ArgumentException("Not an SubscriptionID", nameof(SubscriptionID));
+            if (string.IsNullOrEmpty(CouponCode)) throw new ArgumentException("Coupon code is empty", nameof(CouponCode));
             try
             {
                 string response = this.DoRequest(string.Format("subscriptions/{0}/remove_coupon.{1}?code={2}", SubscriptionID, GetMethodExtension(), CouponCode), HttpRequestMethod.Delete, null);
+
                 // change the response to the object            
                 return response.Contains("Coupon removed");
             }

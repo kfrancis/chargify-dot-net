@@ -125,6 +125,14 @@ namespace ChargifyNET
         /// <param name="CouponCode">The code of the coupon to apply to the subscription</param>
         /// <returns>The subscription details if successful, null otherwise.</returns>
         ISubscription AddCoupon(int SubscriptionID, string CouponCode);
+
+        /// <summary>
+        /// Method to remove a coupon to a subscription using the API
+        /// </summary>
+        /// <param name="SubscriptionID">The ID of the subscription to modify</param>
+        /// <param name="CouponCode">The code of the coupon to remove from the subscription</param>
+        /// <returns>True if successful, false otherwise.</returns>
+        bool RemoveCoupon(int SubscriptionID, string CouponCode);
         #endregion
 
         #region Billing Portal
