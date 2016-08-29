@@ -325,6 +325,14 @@ namespace ChargifyNET
         /// <returns>The note (with id) if successful, null otherwise.</returns>
         INote CreateNote(INote NewNote);
         /// <summary>
+        /// Create note
+        /// </summary>
+        /// <param name="subscriptionId">The id of the subscription</param>
+        /// <param name="body">The note body</param>
+        /// <param name="sticky">Is the note sticky?</param>
+        /// <returns>The note, if successful. Null otherwise</returns>
+        INote CreateNote(int subscriptionId, string body, bool sticky = false);
+        /// <summary>
         /// Gets the notes for a particular subscription
         /// </summary>
         /// <param name="SubscriptionID">The id of the subscription</param>

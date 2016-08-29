@@ -48,12 +48,12 @@ namespace ChargifyNET
         /// <summary>
         /// The main text context of the note
         /// </summary>
-        string Body { get; }
+        string Body { get; set; }
 
         /// <summary>
         /// The ID of the related subscription
         /// </summary>
-        int SubscriptionID { get; }
+        int SubscriptionID { get; set; }
 
         /// <summary>
         /// The date and time the note was created
@@ -68,6 +68,6 @@ namespace ChargifyNET
         /// <summary>
         /// Whether or not it is pinned to the top of the list of notes
         /// </summary>
-        bool Sticky { get; }
+        bool Sticky { get; set; }
     }
 }

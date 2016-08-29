@@ -93,6 +93,7 @@
     <Compile Include="PaymentProfileTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ProductTests.cs" />
+    <Compile Include="NoteTests.cs" />
     <Compile Include="SubscriptionTests.cs" />
     <Compile Include="CouponTests.cs" />
     <Compile Include="ComponentTests.cs" />

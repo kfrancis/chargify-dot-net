@@ -113,10 +113,10 @@ namespace ChargifyNET
                         _id = obj.GetJSONContentAsInt(key);
                         break;
                     case BodyKey:
-                        _body = obj.GetJSONContentAsString(key);
+                        Body = obj.GetJSONContentAsString(key);
                         break;
                     case SubscriptionIdKey:
-                        _subscriptionId = obj.GetJSONContentAsInt(key);
+                        SubscriptionID = obj.GetJSONContentAsInt(key);
                         break;
                     case CreatedAtKey:
                         _createdAt = obj.GetJSONContentAsDateTime(key);
@@ -125,7 +125,7 @@ namespace ChargifyNET
                         _updatedAt = obj.GetJSONContentAsDateTime(key);
                         break;
                     case StickyKey:
-                        _sticky = obj.GetJSONContentAsBoolean(key);
+                        Sticky = obj.GetJSONContentAsBoolean(key);
                         break;
                 }
             }
@@ -145,10 +145,10 @@ namespace ChargifyNET
                         _id = dataNode.GetNodeContentAsInt();
                         break;
                     case BodyKey:
-                        _body = dataNode.GetNodeContentAsString();
+                        Body = dataNode.GetNodeContentAsString();
                         break;
                     case SubscriptionIdKey:
-                        _subscriptionId = dataNode.GetNodeContentAsInt();
+                        SubscriptionID = dataNode.GetNodeContentAsInt();
                         break;
                     case CreatedAtKey:
                         _createdAt = dataNode.GetNodeContentAsDateTime();
@@ -157,7 +157,7 @@ namespace ChargifyNET
                         _updatedAt = dataNode.GetNodeContentAsDateTime();
                         break;
                     case StickyKey:
-                        _sticky = dataNode.GetNodeContentAsBoolean();
+                        Sticky = dataNode.GetNodeContentAsBoolean();
                         break;
                 }
             }
@@ -168,14 +168,7 @@ namespace ChargifyNET
         /// <summary>
         /// The main text content of the note
         /// </summary>
-        public string Body
-        {
-            get
-            {
-                return _body;
-            }
-        }
-        private string _body;
+        public string Body { get; set; }
 
         /// <summary>
         /// Date and time the note was created
@@ -204,26 +197,12 @@ namespace ChargifyNET
         /// <summary>
         /// Whether or not it is pinned to the top of the list of notes
         /// </summary>
-        public bool Sticky
-        {
-            get
-            {
-                return _sticky;
-            }
-        }
-        private bool _sticky;
+        public bool Sticky { get; set; }
 
         /// <summary>
         /// The id of the related subscription
         /// </summary>
-        public int SubscriptionID
-        {
-            get
-            {
-                return _subscriptionId;
-            }
-        }
-        private int _subscriptionId = int.MinValue;
+        public int SubscriptionID { get; set; }
 
         /// <summary>
         /// Last update timestamp

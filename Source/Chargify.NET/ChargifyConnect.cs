@@ -5262,20 +5262,21 @@ namespace ChargifyNET
             return CreateNote(note.SubscriptionID, note.Body, note.Sticky);
         }
 
-        private INote CreateNote(int subscriptionId, string body, bool sticky = false)
+        public INote CreateNote(int subscriptionId, string body, bool sticky = false)
         {
             // make sure data is valid
-            if (subscriptionId > 0) throw new ArgumentNullException(nameof(subscriptionId));
-            // make sure that the system ID is unique
-            if (LoadSubscription(subscriptionId) != null) throw new ArgumentException("Not valid", "subscriptionId");
-            // create XML for creation of customer
+            if (subscriptionId < 0) throw new ArgumentNullException(nameof(subscriptionId));
+
+            // create XML for creation of note
             var noteXml = new StringBuilder(GetXmlStringIfApplicable());
             noteXml.Append("<note>");
             noteXml.AppendFormat("<body>{0}</body>", body);
             noteXml.AppendFormat("<sticky>{0}</sticky>", sticky);
             noteXml.Append("</note>");
+
             // now make the request
             string response = DoRequest(string.Format("subscriptions/{0}/notes.{1}", subscriptionId, GetMethodExtension()), HttpRequestMethod.Post, noteXml.ToString());
+
             // change the response to the object
             return response.ConvertResponseTo<Note>("note");
         }
@@ -5287,8 +5288,67 @@ namespace ChargifyNET
         /// <returns></returns>
         public IDictionary<int, INote> GetNotesForSubscription(int subscriptionId)
         {
-            // TODO
-            throw new NotImplementedException();
+            // make sure data is valid
+            if (subscriptionId == int.MinValue) throw new ArgumentNullException(nameof(subscriptionId));
+
+            // now make the request
+            string response = DoRequest(string.Format("subscriptions/{0}/notes.{1}", subscriptionId, GetMethodExtension()));
+            var retValue = new Dictionary<int, INote>();
+            if (response.IsXml())
+            {
+                // now build a product list based on response XML
+                XmlDocument doc = new XmlDocument();
+                doc.LoadXml(response); // get the XML into an XML document
+                if (doc.ChildNodes.Count == 0) throw new InvalidOperationException("Returned XML not valid");
+                // loop through the child nodes of this node
+
+                foreach (XmlNode elementNode in doc.ChildNodes)
+                {
+                    if (elementNode.Name == "notes")
+                    {
+                        foreach (XmlNode noteNode in elementNode.ChildNodes)
+                        {
+                            if (noteNode.Name == "note")
+                            {
+                                INote loadedNote = new Note(noteNode);
+                                if (!retValue.ContainsKey(loadedNote.ID))
+                                {
+                                    retValue.Add(loadedNote.ID, loadedNote);
+                                }
+                                else
+                                {
+                                    throw new InvalidOperationException("Duplicate Note ID values detected");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else if (response.IsJSON())
+            {
+                // should be expecting an array
+                int position = 0;
+                JsonArray array = JsonArray.Parse(response, ref position);
+                for (int i = 0; i <= array.Length - 1; i++)
+                {
+                    var jsonObject = array.Items[i] as JsonObject;
+                    if (jsonObject != null && jsonObject.ContainsKey("note"))
+                    {
+                        JsonObject componentObj = (array.Items[i] as JsonObject)["note"] as JsonObject;
+                        INote loadedComponent = new Note(componentObj);
+                        if (!retValue.ContainsKey(loadedComponent.ID))
+                        {
+                            retValue.Add(loadedComponent.ID, loadedComponent);
+                        }
+                        else
+                        {
+                            throw new InvalidOperationException("Duplicate Note ID values detected");
+                        }
+                    }
+                }
+            }
+            // return the dictionary
+            return retValue;
         }
 
         /// <summary>
@@ -5299,8 +5359,20 @@ namespace ChargifyNET
         /// <returns></returns>
         public INote LoadNote(int subscriptionId, int noteId)
         {
-            // TODO
-            throw new NotImplementedException();
+             try
+            {
+                // make sure data is valid
+                if (subscriptionId == int.MinValue) throw new ArgumentNullException(nameof(subscriptionId));
+                // now make the request
+                string response = DoRequest(string.Format("subscriptions/{0}/notes/{1}.{2}", subscriptionId, noteId, GetMethodExtension()));
+                // change the response to the object
+                return response.ConvertResponseTo<Note>("note");
+            }
+            catch (ChargifyException cex)
+            {
+                if (cex.StatusCode == HttpStatusCode.NotFound) return null;
+                throw;
+            }
         }
 
         /// <summary>
@@ -5311,20 +5383,70 @@ namespace ChargifyNET
         /// <returns></returns>
         public bool DeleteNote(int subscriptionId, int noteId)
         {
-            // TODO
-            throw new NotImplementedException();
+            try
+            {
+                // make sure data is valid
+                if (subscriptionId < 0) throw new ArgumentNullException(nameof(subscriptionId));
+
+                // now make the request
+                DoRequest(string.Format("subscriptions/{0}/notes/{1}.{2}", subscriptionId, noteId, GetMethodExtension()), HttpRequestMethod.Delete, string.Empty);
+                return true;
+            }
+            catch (ChargifyException cex)
+            {
+                switch (cex.StatusCode)
+                {
+                    case HttpStatusCode.Forbidden:
+                    case HttpStatusCode.NotFound:
+                        return false;
+                    default:
+                        throw;
+                }
+            }
         }
 
         /// <summary>
         /// Updates a note
         /// </summary>
         /// <param name="subscriptionId">The id of the subscription</param>
-        /// <param name="updatedNote">The updated note</param>
-        /// <returns></returns>
-        public INote UpdateNote(int subscriptionId, INote updatedNote)
+        /// <param name="note">The updated note</param>
+        /// <returns>Returns the updated note, or the same note if unsuccessful</returns>
+        public INote UpdateNote(int subscriptionId, INote note)
         {
-            // TODO
-            throw new NotImplementedException();
+            // make sure data is OK
+            if (note == null) throw new ArgumentNullException(nameof(note));
+            if (note.ID == int.MinValue) throw new ArgumentException("Invalid chargify ID detected", nameof(note));
+            INote oldNote = LoadNote(note.SubscriptionID, note.ID);
+
+            bool isUpdateRequired = false;
+
+            // create XML for updating of note
+            var customerXml = new StringBuilder(GetXmlStringIfApplicable());
+            customerXml.Append("<note>");
+            if (oldNote != null)
+            {
+                if (oldNote.SubscriptionID != note.SubscriptionID) throw new ArgumentException("Subscription IDs do not match", nameof(note));
+                if (oldNote.Body != note.Body) { customerXml.AppendFormat("<body>{0}</body>", HttpUtility.HtmlEncode(note.Body)); isUpdateRequired = true; }
+                if (oldNote.Sticky != note.Sticky) { customerXml.AppendFormat("<sticky>{0}</sticky>", note.Sticky ? 1 : 0); isUpdateRequired = true; }
+            }
+            customerXml.Append("</note>");
+
+            if (isUpdateRequired)
+            {
+                try
+                {
+                    // now make the request
+                    string response = DoRequest(string.Format("subscriptions/{0}/notes/{1}.{2}", subscriptionId, note.ID, GetMethodExtension()), HttpRequestMethod.Put, customerXml.ToString());
+                    // change the response to the object
+                    return response.ConvertResponseTo<Note>("note");
+                }
+                catch (ChargifyException cex)
+                {
+                    if (cex.StatusCode == HttpStatusCode.NotFound) throw new InvalidOperationException("Customer not found");
+                    throw;
+                }
+            }
+            return note;
         }
         #endregion
 
