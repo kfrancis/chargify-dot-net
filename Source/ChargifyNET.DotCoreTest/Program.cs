@@ -10,6 +10,7 @@ namespace ChargifyNET.DotCoreTest
     {
         public static void Main(string[] args)
         {
+            var chargify = new ChargifyConnect("https://subdomain.chargify.com/", "", "X");
             chargify.Test();
         }
     }
