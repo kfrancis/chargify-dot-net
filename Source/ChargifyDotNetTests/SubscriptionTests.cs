@@ -495,6 +495,7 @@ namespace ChargifyDotNetTests
             Assert.IsTrue(newSubscription.PaymentProfile.BillingZip == newPaymentInfo.BillingZip);
             Assert.IsTrue(newSubscription.ProductPriceInCents == product.PriceInCents);
             Assert.IsTrue(newSubscription.ProductPrice == product.Price);
+            Assert.IsTrue(!string.IsNullOrWhiteSpace(newSubscription.ReferralCode));
             Assert.AreEqual(product.TrialInterval > 0 ? SubscriptionState.Trialing : SubscriptionState.Active, newSubscription.State);
             if (Chargify.UseJSON)
             {

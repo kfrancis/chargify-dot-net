@@ -4353,7 +4353,7 @@ namespace ChargifyNET
         /// <returns>The dictionary of transaction records if successful, otherwise null.</returns>
         public IDictionary<int, ITransaction> GetTransactionList(int page, int perPage, List<TransactionType> kinds, int sinceId, int maxId, bool descending = true)
         {
-            return GetTransactionList(page, perPage, kinds, sinceId, maxId, DateTime.MinValue, DateTime.MinValue,descending);
+            return GetTransactionList(page, perPage, kinds, sinceId, maxId, DateTime.MinValue, DateTime.MinValue, descending);
         }
 
         /// <summary>
@@ -4393,7 +4393,8 @@ namespace ChargifyNET
             if (maxId != int.MinValue) { if (qs.Length > 0) { qs += "&"; } qs += string.Format("max_id={0}", maxId); }
             if (sinceDate != DateTime.MinValue) { if (qs.Length > 0) { qs += "&"; } qs += string.Format("since_date={0}", sinceDate.ToString(DateTimeFormat)); }
             if (untilDate != DateTime.MinValue) { if (qs.Length > 0) { qs += "&"; } qs += string.Format("until_date={0}", untilDate.ToString(DateTimeFormat)); }
-            if (qs.Length > 0) { qs += "&"; } qs += "direction=" + (descending ? "desc" : "asc");
+            if (qs.Length > 0) { qs += "&"; }
+            qs += "direction=" + (descending ? "desc" : "asc");
 
             // Construct the url to access Chargify
             string url = string.Format("transactions.{0}", GetMethodExtension());
@@ -5480,6 +5481,31 @@ namespace ChargifyNET
                 }
             }
             return note;
+        }
+        #endregion
+
+        #region Referral Code
+
+        /// <summary>
+        /// Method for retrieving information about a coupon using the ID of that referral code.
+        /// </summary>
+        /// <param name="ReferralCode">Referral code</param>
+        /// <returns>The object if found, null otherwise.</returns>
+        public IReferralCode ValidateReferralCode(string ReferralCode)
+        {
+            try
+            {
+                string response = this.DoRequest(string.Format("referral_codes/validate.{0}?code={1}", GetMethodExtension(), ReferralCode));
+                // change the response to the object
+                return response.ConvertResponseTo<ReferralCode>("referral-code");
+            }
+            catch (ChargifyException cex)
+            {
+                // Throw if anything but not found, since not found is telling us that it's working correctly
+                // but that there just isn't a referral code with that code.
+                if (cex.StatusCode == HttpStatusCode.NotFound) return null;
+                throw cex;
+            }
         }
         #endregion
 

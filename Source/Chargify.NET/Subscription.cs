@@ -79,6 +79,7 @@ namespace ChargifyNET
         private const string ProductVersionNumberKey = "product_version_number";
         private const string ProductPriceInCentsKey = "product_price_in_cents";
         private const string NextProductIdKey = "next_product_id";
+        private const string ReferralCodeKey = "referral_code";
         #endregion
 
         #region Constructors
@@ -233,6 +234,9 @@ namespace ChargifyNET
                     case NextProductIdKey:
                         _nextProductId = obj.GetJSONContentAsInt(key);
                         break;
+                    case ReferralCodeKey:
+                        _referralCode = obj.GetJSONContentAsString(key);
+                        break;
                 }
             }
         }
@@ -333,7 +337,9 @@ namespace ChargifyNET
                     case NextProductIdKey:
                         _nextProductId = dataNode.GetNodeContentAsInt();
                         break;
-
+                    case ReferralCodeKey:
+                        _referralCode = dataNode.GetNodeContentAsString();
+                        break;
                 }
             }
         }
@@ -341,6 +347,15 @@ namespace ChargifyNET
         #endregion
 
         #region ISubscription Members
+
+        public string ReferralCode
+        {
+            get
+            {
+                return _referralCode;
+            }
+        }
+        private string _referralCode = string.Empty;
 
         /// <summary>
         /// The subscription unique ID within Chargify
@@ -693,7 +708,7 @@ namespace ChargifyNET
             if (ReferenceEquals(a, b)) { return true; }
 
             // If one is null, but not both, return false.
-            if (((object)a == null) || ((object)b == null)) { return false; }
+            if (((object) a == null) || ((object) b == null)) { return false; }
 
             return (a.SubscriptionID == b.SubscriptionID);
         }
@@ -708,7 +723,7 @@ namespace ChargifyNET
             if (ReferenceEquals(a, b)) { return true; }
 
             // If one is null, but not both, return false.
-            if (((object)a == null) || (b == null)) { return false; }
+            if (((object) a == null) || (b == null)) { return false; }
 
             return (a.SubscriptionID == b.SubscriptionID);
         }
@@ -723,7 +738,7 @@ namespace ChargifyNET
             if (ReferenceEquals(a, b)) { return true; }
 
             // If one is null, but not both, return false.
-            if ((a == null) || ((object)b == null)) { return false; }
+            if ((a == null) || ((object) b == null)) { return false; }
 
             return (a.SubscriptionID == b.SubscriptionID);
         }

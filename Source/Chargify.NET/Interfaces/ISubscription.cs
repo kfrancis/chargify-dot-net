@@ -254,5 +254,10 @@ namespace ChargifyNET
         /// will be changed to at the next renewal.
         /// </summary>
         int NextProductId { get; }
+
+        /// <summary>
+        /// Referral code field
+        /// </summary>
+        string ReferralCode { get; }
     }
 }
