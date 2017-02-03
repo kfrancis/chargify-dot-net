@@ -122,6 +122,20 @@ namespace ChargifyNET
         /// <param name="CouponCode">The code of the coupon to apply to the subscription</param>
         /// <returns>The subscription details if successful, null otherwise.</returns>
         ISubscription AddCoupon(int SubscriptionID, string CouponCode);
+
+        /// <summary>
+        /// Method for retrieving information about a coupon using the ID of that coupon.
+        /// </summary>
+        /// <param name="ProductFamilyID">The ID of the product family that the coupon belongs to</param>
+        /// <returns>A dictionary of objects if found, empty collection otherwise.</returns>
+        IDictionary<int, ICoupon> GetAllCoupons(int ProductFamilyID);
+
+        /// <summary>
+        /// Method for retrieving information about a coupon usage using the ID of that coupon.
+        /// </summary>
+        /// <param name="CouponID">The ID of the coupon</param>
+        /// <returns>The object if found, null otherwise.</returns>
+        IDictionary<int, ICouponUsage> GetCouponUsage(int CouponID);
         #endregion
 
         #region Billing Portal

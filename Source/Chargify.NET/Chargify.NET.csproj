@@ -96,11 +96,13 @@
     <Compile Include="Configuration\ChargifyAccountElement.cs" />
     <Compile Include="Configuration\ChargifyAccountElementCollection.cs" />
     <Compile Include="Configuration\ChargifyAccountRetrieverSection.cs" />
+    <Compile Include="CouponUsage.cs" />
     <Compile Include="Data\Controls\CountryDropDownList.cs" />
     <Compile Include="Coupon.cs" />
     <Compile Include="Credit.cs" />
     <Compile Include="CreditCardAttributes.cs" />
     <Compile Include="HttpRequestMethod.cs" />
+    <Compile Include="Interfaces\ICouponUsage.cs" />
     <Compile Include="Interfaces\IMetadata.cs" />
     <Compile Include="Interfaces\IMetadataResult.cs" />
     <Compile Include="Interfaces\INote.cs" />
