@@ -155,11 +155,9 @@ namespace ChargifyNET
                         _expirationIntervalUnit = obj.GetJSONContentAsIntervalUnit(key);
                         break;
                     case "return_url":
-                    case "update_return_url":
                         _returnUrl = obj.GetJSONContentAsString(key);
                         break;
                     case "return_params":
-                    case "update_return_params":
                         _returnParams = obj.GetJSONContentAsString(key);
                         break;
                     case "require_credit_card":
@@ -182,6 +180,18 @@ namespace ChargifyNET
                         break;
                     case "public_signup_pages":
                         _publicSignupPages = obj.GetJSONContentAsPublicSignupPages(key);
+                        break;
+                    case "initial_charge_after_trial":
+                        _initialChargeAfterTrial = obj.GetJSONContentAsBoolean(key);
+                        break;
+                    case "update_return_url":
+                        _updateReturnUrl = obj.GetJSONContentAsString(key);
+                        break;
+                    case "update_return_params":
+                        _updateReturnParams = obj.GetJSONContentAsString(key);
+                        break;
+                    case "taxable":
+                        _taxable = obj.GetJSONContentAsBoolean(key);
                         break;
                 }
             }
@@ -241,11 +251,9 @@ namespace ChargifyNET
                         _expirationIntervalUnit = dataNode.GetNodeContentAsIntervalUnit();
                         break;
                     case "return_url":
-                    case "update_return_url":
                         _returnUrl = dataNode.GetNodeContentAsString();
                         break;
                     case "return_params":
-                    case "update_return_params":
                         _returnParams = dataNode.GetNodeContentAsString();
                         break;
                     case "require_credit_card":
@@ -268,6 +276,18 @@ namespace ChargifyNET
                         break;
                     case "public_signup_pages":
                         _publicSignupPages = dataNode.GetNodeContentAsPublicSignupPages();
+                        break;
+                    case "initial_charge_after_trial":
+                        _initialChargeAfterTrial = dataNode.GetNodeContentAsBoolean();
+                        break;
+                    case "update_return_url":
+                        _updateReturnUrl = dataNode.GetNodeContentAsString();
+                        break;
+                    case "update_return_params":
+                        _updateReturnParams = dataNode.GetNodeContentAsString();
+                        break;
+                    case "taxable":
+                        _taxable = dataNode.GetNodeContentAsBoolean();
                         break;
                 }
             }
@@ -539,12 +559,9 @@ namespace ChargifyNET
         /// </summary>
         public string UpdateReturnUrl
         {
-            get { return _returnUrl; }
-            set
-            {
-                _returnUrl = value;
-            }
+            get { return _updateReturnUrl; }
         }
+        private string _updateReturnUrl = string.Empty;
 
         /// <summary>
         /// The parameter string chargify will use in constructing the return URL.
@@ -626,6 +643,24 @@ namespace ChargifyNET
             get { return _productVersion; }
         }
         private int _productVersion = int.MinValue;
+
+        /// <summary>
+        /// Is this product taxable?
+        /// </summary>
+        public bool Taxable { get { return _taxable; } }
+        private bool _taxable;
+
+        /// <summary>
+        /// Paramters for update
+        /// </summary>
+        public string UpdateReturnParams { get { return _updateReturnParams; } }
+        private string _updateReturnParams = string.Empty;
+
+        /// <summary>
+        /// Will the setup/initial charge be processed after the trial?
+        /// </summary>
+        public bool InitialChargeAfterTrial { get { return _initialChargeAfterTrial; } }
+        private bool _initialChargeAfterTrial;
         #endregion
 
         #region Operators

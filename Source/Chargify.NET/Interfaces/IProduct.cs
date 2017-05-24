@@ -198,5 +198,25 @@ using System.Collections.Generic;
         /// The version of the product
         /// </summary>
         int ProductVersion { get; }
+
+        /// <summary>
+        /// Is this product taxable?
+        /// </summary>
+        bool Taxable { get; }
+
+        /// <summary>
+        /// The return url upon update
+        /// </summary>
+        string UpdateReturnUrl { get; }
+
+        /// <summary>
+        /// Paramters for update
+        /// </summary>
+        string UpdateReturnParams { get; }
+
+        /// <summary>
+        /// Will the setup/initial charge be processed after the trial?
+        /// </summary>
+        bool InitialChargeAfterTrial { get; }
     }
 }
