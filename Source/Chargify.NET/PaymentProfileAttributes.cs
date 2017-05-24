@@ -33,6 +33,7 @@ namespace ChargifyNET
     #region Imports
     using System;
     using System.Diagnostics;
+    using System.Xml.Serialization;
     #endregion
 
     /// <summary>
@@ -75,6 +76,7 @@ namespace ChargifyNET
         /// <summary>
         /// The "token" provided by your vault storage for an already stored payment profile
         /// </summary>
+        [XmlElement("vault_token")]
         public string VaultToken
         {
             get { return _vaultToken; }
@@ -92,10 +94,15 @@ namespace ChargifyNET
             set { _customerVaultToken = value; }
         }
         private string _customerVaultToken = string.Empty;
+        public bool ShouldSerializeCustomerVaultToken()
+        {
+            return !string.IsNullOrEmpty(CustomerVaultToken);
+        }
 
         /// <summary>
         /// The vault that stores the payment profile with the provided VaultToken
         /// </summary>
+        [XmlElement("current_vault")]
         public VaultType CurrentVault
         {
             get { return _currentVault; }
@@ -113,6 +120,11 @@ namespace ChargifyNET
         }
         private int _expirationYear = int.MinValue;
 
+        public bool ShouldSerializeExpirationYear()
+        {
+            return ExpirationYear >= 0;
+        }
+
         /// <summary>
         /// The month of expiration
         /// </summary>
@@ -122,6 +134,10 @@ namespace ChargifyNET
             set { _expirationMonth = value; }
         }
         private int _expirationMonth = int.MinValue;
+        public bool ShouldSerializeExpirationMonth()
+        {
+            return ExpirationMonth >= 0;
+        }
 
         /// <summary>
         /// (Optional) If you know the card type, you may supply it here so that we may display 
@@ -133,6 +149,10 @@ namespace ChargifyNET
             set { _cardType = value; }
         }
         private CardType _cardType = CardType.Unknown;
+        public bool ShouldSerializeCardType()
+        {
+            return CardType != CardType.Unknown;
+        }
 
         /// <summary>
         /// (Optional) If you have the last 4 digits of the credit card number, you may supply
@@ -144,6 +164,10 @@ namespace ChargifyNET
             set { _lastFour = value; }
         }
         private string _lastFour = string.Empty;
+        public bool ShouldSerializeLastFour()
+        {
+            return !string.IsNullOrEmpty(LastFour);
+        }
 
         /// <summary>
         /// The name of the bank where the customer's account resides
@@ -154,6 +178,10 @@ namespace ChargifyNET
             set { _bankName = value; }
         }
         private string _bankName = string.Empty;
+        public bool ShouldSerializeBankName()
+        {
+            return !string.IsNullOrEmpty(BankName);
+        }
 
         /// <summary>
         /// The routing number of the bank
@@ -165,6 +193,11 @@ namespace ChargifyNET
         }
         private string _bankRoutingNumber = string.Empty;
 
+        public bool ShouldSerializeBankRoutingNumber()
+        {
+            return !string.IsNullOrEmpty(BankRoutingNumber);
+        }
+
         /// <summary>
         /// The customer's bank account number
         /// </summary>
@@ -174,6 +207,11 @@ namespace ChargifyNET
             set { _bankAccountNumber = value; }
         }
         private string _bankAccountNumber = string.Empty;
+
+        public bool ShouldSerializeBankAccountNumber()
+        {
+            return !string.IsNullOrEmpty(BankAccountNumber);
+        }
 
         /// <summary>
         /// Either checking or savings
@@ -185,6 +223,11 @@ namespace ChargifyNET
         }
         private BankAccountType _bankAccountType = BankAccountType.Unknown;
 
+        public bool ShouldSerializeBankAccountType()
+        {
+            return BankAccountType != BankAccountType.Unknown;
+        }
+
         /// <summary>
         /// Either personal or business
         /// </summary>
@@ -194,6 +237,11 @@ namespace ChargifyNET
             set { _bankAccountHolderType = value; }
         }
         private BankAccountHolderType _bankAccountHolderType = BankAccountHolderType.Unknown;
+
+        public bool ShouldSerializeBankAccountHolderType()
+        {
+            return BankAccountHolderType != BankAccountHolderType.Unknown;
+        }
 
         #endregion
 

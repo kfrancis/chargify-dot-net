@@ -33,6 +33,7 @@ namespace ChargifyNET
 {
     #region Imports
     using System;
+    using System.Xml.Serialization;
     #endregion
 
     /// <summary>
@@ -43,50 +44,62 @@ namespace ChargifyNET
         /// <summary>
         /// Visa
         /// </summary>
+        [XmlEnum("visa")]
         Visa,
         /// <summary>
         /// Mastercard
         /// </summary>
+        [XmlEnum("master")]
         Master,
         /// <summary>
         /// Discover
         /// </summary>
+        [XmlEnum("discover")]
         Discover,
         /// <summary>
         /// American Express
         /// </summary>
+        [XmlEnum("american_express")]
         American_Express,
         /// <summary>
         /// Diners Club
         /// </summary>
+        [XmlEnum("diners_club")]
         Diners_Club,
         /// <summary>
         /// JCB
         /// </summary>
+        [XmlEnum("jcb")]
         JCB,
         /// <summary>
         /// Switch
         /// </summary>
+        [XmlEnum("switch")]
         Switch,
         /// <summary>
         /// Solo
         /// </summary>
+        [XmlEnum("solo")]
         Solo,
         /// <summary>
         /// Dankort
         /// </summary>
+        [XmlEnum("dankort")]
         Dankort,
         /// <summary>
         /// Maestro
         /// </summary>
+        [XmlEnum("maestro")]
         Maestro,
         /// <summary>
         /// Forbrugsforeningen
         /// </summary>
+        [XmlEnum("forbrugsforeningen")]
         Forbrugsforeningen,
         /// <summary>
         /// Laser
         /// </summary>
+        [XmlEnum("laser")]
         Laser,
         /// <summary>
         /// Internal value used to determine if the field has been set.
@@ -102,87 +115,103 @@ namespace ChargifyNET
         /// <summary>
         /// Authorize.NET
         /// </summary>
+        [XmlEnum("authorizenet")]
         AuthorizeNET,
         /// <summary>
         /// Trust Commerce
         /// </summary>
+        [XmlEnum("trust_commerce")]
         Trust_Commerce,
         /// <summary>
         /// Payment Express
         /// </summary>
+        [XmlEnum("payment_express")]
         Payment_Express,
         /// <summary>
         /// Beanstream
         /// </summary>
+        [XmlEnum("beanstream")]
         Beanstream,
         /// <summary>
         /// Braintree Version 1 (Orange)
         /// </summary>
+        [XmlEnum("braintree1")]
         Braintree1,
         /// <summary>
         /// Braintree Blue
         /// </summary>
+        [XmlEnum("braintree_blue")]
         Braintree_Blue,
         /// <summary>
         /// PayPal
         /// </summary>
+        [XmlEnum("paypal")]
         PayPal,
         /// <summary>
         /// QuickPay
         /// </summary>
+        [XmlEnum("quickpay")]
         QuickPay,
         /// <summary>
         /// Eway
         /// </summary>
+        [XmlEnum("eway")]
         Eway,
         /// <summary>
-        /// Samurai
+        /// Eway
         /// </summary>
-        Samurai,
+        [XmlEnum("eway_rapid_std")]
+        EwayRapidStd,
         /// <summary>
         /// Stripe
         /// </summary>
+        [XmlEnum("stripe")]
         Stripe,
         /// <summary>
         /// Pin
         /// </summary>
+        [XmlEnum("pin")]
         Pin,
         /// <summary>
         /// Wirecard
         /// </summary>
+        [XmlEnum("wirecard")]
         Wirecard,
         /// <summary>
         /// Bpoint
         /// </summary>
+        [XmlEnum("bpoint")]
         Bpoint,
         /// <summary>
         /// FirstData
         /// </summary>
+        [XmlEnum("firstdata")]
         FirstData,
         /// <summary>
         /// Elavon Virtual Merchant Gateway
         /// </summary>
+        [XmlEnum("elavon")]
         Elavon,
         /// <summary>
         /// CyberSource
         /// </summary>
+        [XmlEnum("cybersource")]
         CyberSource,
         /// <summary>
         /// PayMill
         /// </summary>
+        [XmlEnum("paymill")]
         PayMill,
         /// <summary>
         /// Litle
         /// </summary>
+        [XmlEnum("litle")]
         Litle,
         /// <summary>
         /// Moneris
         /// </summary>
+        [XmlEnum("moneris")]
         Moneris,
-        /// <summary>
-        /// Fusebox
-        /// </summary>
-        Fusebox,
         /// <summary>
         /// Internal value used to determine if the field has been set.
         /// </summary>
@@ -197,10 +226,12 @@ namespace ChargifyNET
         /// <summary>
         /// Checking
         /// </summary>
+        [XmlEnum("checking")]
         Checking,
         /// <summary>
         /// Savings
         /// </summary>
+        [XmlEnum("savings")]
         Savings,
         /// <summary>
         /// Internal value used to determine if the field has been set.
@@ -216,10 +247,12 @@ namespace ChargifyNET
         /// <summary>
         /// Personal
         /// </summary>
+        [XmlEnum("personal")]
         Personal,
         /// <summary>
         /// Buisiness
         /// </summary>
+        [XmlEnum("business")]
         Business,
         /// <summary>
         /// Internal value used to determine if the field has been set.
