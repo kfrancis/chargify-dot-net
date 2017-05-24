@@ -3925,6 +3925,7 @@ namespace ChargifyNET
         /// <param name="componentId">The ID of the component</param>
         /// <param name="newAllocatedQuantity">The amount of component to allocate to the subscription</param>
         /// <returns>The ComponentAttributes object with UnitBalance filled in, null otherwise.</returns>
+        [Obsolete("Use CreateComponentAllocation() Instead")]
         public IComponentAttributes UpdateComponentAllocationForSubscription(int subscriptionId, int componentId, int newAllocatedQuantity)
         {
             // make sure data is valid
@@ -4213,6 +4214,7 @@ namespace ChargifyNET
         /// <param name="componentId">The ID of the component (on/off only) to modify</param>
         /// <param name="setEnabled">True if wanting to turn the component "on", false otherwise.</param>
         /// <returns>IComponentAttributes object if successful, null otherwise.</returns>
+        [Obsolete("Use CreateComponentAllocation() Instead")]
         public IComponentAttributes SetComponent(int subscriptionId, int componentId, bool setEnabled)
         {
             try
