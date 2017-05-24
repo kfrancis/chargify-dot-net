@@ -23,9 +23,9 @@ namespace ChargifyDotNetTests.Base
 
         public ChargifyConnect Chargify => _chargify ?? (_chargify = new ChargifyConnect
         {
-            apiKey = "WQyfCM9jaEV59ktDVGnev859bOlT1afmBvOaBlU",
+            apiKey = "",
             Password = "X",
-            URL = "https://css-test.chargify.com/",
+            URL = "https://subdomain.chargify.com/",
             SharedKey = "123456789",
             UseJSON = false,
             ProtocolType = SecurityProtocolType.Tls12
