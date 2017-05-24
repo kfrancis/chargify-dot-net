@@ -1,3 +1,4 @@
+
 #region License, Terms and Conditions
 //
 // IMetadata.cs
@@ -27,6 +28,7 @@
 //
 #endregion
 
+// ReSharper disable once CheckNamespace
 namespace ChargifyNET
 {
     /// <summary>

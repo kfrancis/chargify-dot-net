@@ -33,7 +33,7 @@ namespace ChargifyNET
     #region Imports
     using System;
     using System.Xml;
-    using ChargifyNET.Json;
+    using Json;
     #endregion
 
     /// <summary>
@@ -47,9 +47,9 @@ namespace ChargifyNET
         private const string CreatedAtKey = "created_at";
         private const string DescriptionKey = "description";
         private const string EndDateKey = "end_date";
-        private const string IDKey = "id";
+        private const string IdKey = "id";
         private const string NameKey = "name";
-        private const string ProductFamilyIDKey = "product_family_id";
+        private const string ProductFamilyIdKey = "product_family_id";
         private const string StartDateKey = "start_date";
         private const string UpdatedAtKey = "updated_at";
         private const string DurationIntervalKey = "duration_interval";
@@ -67,32 +67,30 @@ namespace ChargifyNET
         /// Constructor.  Values set to default
         /// </summary>
         public Coupon()
-            : base()
         {
         }
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="CouponXML">XML containing coupon info (in expected format)</param>
-        public Coupon(string CouponXML)
-            : base()
+        /// <param name="couponXml">XML containing coupon info (in expected format)</param>
+        public Coupon(string couponXml)
         {
             // get the XML into an XML document
-            XmlDocument Doc = new XmlDocument();
-            Doc.LoadXml(CouponXML);
-            if (Doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", "CouponXML");
+            XmlDocument doc = new XmlDocument();
+            doc.LoadXml(couponXml);
+            if (doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(couponXml));
             // loop through the child nodes of this node
-            foreach (XmlNode elementNode in Doc.ChildNodes)
+            foreach (XmlNode elementNode in doc.ChildNodes)
             {
                 if (elementNode.Name == "coupon")
                 {
-                    this.LoadFromNode(elementNode);
+                    LoadFromNode(elementNode);
                     return;
                 }
             }
             // if we get here, then no info was found
-            throw new ArgumentException("XML does not contain coupon information", "CouponXML");
+            throw new ArgumentException("XML does not contain coupon information", nameof(couponXml));
         }
 
         /// <summary>
@@ -100,12 +98,11 @@ namespace ChargifyNET
         /// </summary>
         /// <param name="couponNode">XML containing coupon info (in expected format)</param>
         internal Coupon(XmlNode couponNode)
-            : base()
         {
-            if (couponNode == null) throw new ArgumentNullException("CouponNode");
-            if (couponNode.Name != "coupon") throw new ArgumentException("Not a vaild coupon node", "couponNode");
-            if (couponNode.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", "couponNode");
-            this.LoadFromNode(couponNode);
+            if (couponNode == null) throw new ArgumentNullException(nameof(couponNode));
+            if (couponNode.Name != "coupon") throw new ArgumentException("Not a vaild coupon node", nameof(couponNode));
+            if (couponNode.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(couponNode));
+            LoadFromNode(couponNode);
         }
 
         /// <summary>
@@ -113,18 +110,17 @@ namespace ChargifyNET
         /// </summary>
         /// <param name="couponObject">JsonObject containing coupon info (in expected format)</param>
         public Coupon(JsonObject couponObject)
-            : base()
         {
-            if (couponObject == null) throw new ArgumentNullException("couponObject");
-            if (couponObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild coupon object", "couponObject");
-            this.LoadFromJSON(couponObject);
+            if (couponObject == null) throw new ArgumentNullException(nameof(couponObject));
+            if (couponObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild coupon object", nameof(couponObject));
+            LoadFromJson(couponObject);
         }
 
         /// <summary>
         /// Load data from a JsonObject
         /// </summary>
         /// <param name="obj">The JsonObject containing coupon data</param>
-        private void LoadFromJSON(JsonObject obj)
+        private void LoadFromJson(JsonObject obj)
         {
             // loop through the keys of this JsonObject to get coupon info, and parse it out
             foreach (string key in obj.Keys)
@@ -146,14 +142,14 @@ namespace ChargifyNET
                     case EndDateKey:
                         _endDate = obj.GetJSONContentAsDateTime(key);
                         break;
-                    case IDKey:
+                    case IdKey:
                         _id = obj.GetJSONContentAsInt(key);
                         break;
                     case NameKey:
                         _name = obj.GetJSONContentAsString(key);
                         break;
-                    case ProductFamilyIDKey:
-                        _productFamilyID = obj.GetJSONContentAsInt(key);
+                    case ProductFamilyIdKey:
+                        _productFamilyId = obj.GetJSONContentAsInt(key);
                         break;
                     case StartDateKey:
                         _startDate = obj.GetJSONContentAsDateTime(key);
@@ -181,8 +177,6 @@ namespace ChargifyNET
                         break;
                     case AllowNegativeBalanceKey:
                         _allowNegativeBalance = obj.GetJSONContentAsBoolean(key);
-                        break;
-                    default:
                         break;
                 }
             }
@@ -213,14 +207,14 @@ namespace ChargifyNET
                     case EndDateKey:
                         _endDate = dataNode.GetNodeContentAsDateTime();
                         break;
-                    case IDKey:
+                    case IdKey:
                         _id = dataNode.GetNodeContentAsInt();
                         break;
                     case NameKey:
                         _name = dataNode.GetNodeContentAsString();
                         break;
-                    case ProductFamilyIDKey:
-                        _productFamilyID = dataNode.GetNodeContentAsInt();
+                    case ProductFamilyIdKey:
+                        _productFamilyId = dataNode.GetNodeContentAsInt();
                         break;
                     case StartDateKey:
                         _startDate = dataNode.GetNodeContentAsDateTime();
@@ -248,8 +242,6 @@ namespace ChargifyNET
                         break;
                     case AllowNegativeBalanceKey:
                         _allowNegativeBalance = dataNode.GetNodeContentAsBoolean();
-                        break;
-                    default:
                         break;
                 }
             }
@@ -339,9 +331,9 @@ namespace ChargifyNET
         /// </summary>
         public int ProductFamilyID
         {
-            get { return _productFamilyID; }
+            get { return _productFamilyId; }
         }
-        private int _productFamilyID = int.MinValue;
+        private int _productFamilyId = int.MinValue;
 
         /// <summary>
         /// The date this coupon became active
@@ -409,7 +401,7 @@ namespace ChargifyNET
             get { return _isRecurring; }
             set { _isRecurring = value; }
         }
-        private bool _isRecurring = false;
+        private bool _isRecurring;
 
         /// <summary>
         ///  The date this coupon was archived
@@ -425,7 +417,7 @@ namespace ChargifyNET
             get { return _allowNegativeBalance; }
             set { _allowNegativeBalance = value; }
         }
-        private bool _allowNegativeBalance = false;
+        private bool _allowNegativeBalance;
 
         #endregion
 
@@ -436,7 +428,7 @@ namespace ChargifyNET
         /// </summary>
         public int CompareTo(ICoupon other)
         {
-            return this.AmountInCents.CompareTo(other.AmountInCents);
+            return AmountInCents.CompareTo(other.AmountInCents);
         }
 
         #endregion
@@ -448,7 +440,7 @@ namespace ChargifyNET
         /// </summary>
         public int CompareTo(Coupon other)
         {
-            return this.AmountInCents.CompareTo(other.AmountInCents);
+            return AmountInCents.CompareTo(other.AmountInCents);
         }
         #endregion
     }

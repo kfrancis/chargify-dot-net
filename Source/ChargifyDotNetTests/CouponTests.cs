@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using ChargifyDotNetTests.Base;
 using ChargifyNET;
@@ -22,9 +23,10 @@ namespace ChargifyDotNetTests
         {
             // Arrange
             var productFamily = Chargify.GetProductFamilyList().Values.FirstOrDefault();
+            Assert.IsNotNull(productFamily, "No valid product family found.");
 
             // Act
-            var result = Chargify.LoadCoupon(productFamily.ID, 3809);
+            var result = Chargify.LoadCoupon(productFamily.ID, 129307);
 
             // Assert
             Assert.IsNotNull(result);
@@ -69,7 +71,8 @@ namespace ChargifyDotNetTests
         {
             // Arrange
             var productFamily = Chargify.GetProductFamilyList().Values.FirstOrDefault();
-            var foundCoupon = Chargify.LoadCoupon(productFamily.ID, 3809);
+            Assert.IsNotNull(productFamily, "No valid product family found.");
+            var foundCoupon = Chargify.LoadCoupon(productFamily.ID, 129307);
             string originalName = foundCoupon.Name;
             foundCoupon.Name = originalName + "_1";
 
@@ -85,6 +88,20 @@ namespace ChargifyDotNetTests
             updatedCoupon.Name = originalName;
             var restoredCoupon = Chargify.UpdateCoupon(updatedCoupon);
             Assert.IsTrue(restoredCoupon.Name == originalName);
+        }
+
+        [TestMethod]
+        public void Coupon_Remove()
+        {
+            // Arrange
+            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active && !string.IsNullOrEmpty(s.Value.CouponCode)).Value as Subscription;
+            Assert.IsNotNull(subscription, "No suitable subscription could be found");
+
+            // Act
+            var result = Chargify.RemoveCoupon(subscription.SubscriptionID, subscription.CouponCode);
+
+            // Assert
+            Assert.IsTrue(result);
         }
     }
 }

@@ -28,12 +28,14 @@
 //
 #endregion
 
+
+
 namespace ChargifyNET
 {
-    using Json;
     #region Imports
     using System;
     using System.Xml;
+    using Json;
     #endregion
 
     /// <summary>
@@ -53,43 +55,43 @@ namespace ChargifyNET
         /// <summary>
         /// Constructor.  Values set to default
         /// </summary>
-        public SubscriptionOverride() : base()
+        public SubscriptionOverride()
         {
         }
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="SubscriptionOverrideXML">XML containing subscription override info (in expected format)</param>
-        public SubscriptionOverride(string SubscriptionOverrideXML) : base()
+        /// <param name="subscriptionOverrideXml">XML containing subscription override info (in expected format)</param>
+        public SubscriptionOverride(string subscriptionOverrideXml)
         {
             // get the XML into an XML document
             var xdoc = new XmlDocument();
-            xdoc.LoadXml(SubscriptionOverrideXML);
-            if (xdoc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", "SubscriptionOverrideXML");
+            xdoc.LoadXml(subscriptionOverrideXml);
+            if (xdoc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(subscriptionOverrideXml));
             // loop through the child nodes of this node
             foreach (XmlNode elementNode in xdoc.ChildNodes)
             {
                 if (elementNode.Name == "subscription")
                 {
-                    this.LoadFromNode(elementNode);
+                    LoadFromNode(elementNode);
                     return;
                 }
             }
             // if we get here, then no customer info was found
-            throw new ArgumentException("XML does not contain subscription override information", "SubscriptionOverrideXML");
+            throw new ArgumentException("XML does not contain subscription override information", nameof(subscriptionOverrideXml));
         }
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="subscriptionOverrideNode">XML containing subscription override info (in expected format)</param>
-        internal SubscriptionOverride(XmlNode subscriptionOverrideNode) : base()
+        internal SubscriptionOverride(XmlNode subscriptionOverrideNode)
         {
-            if (subscriptionOverrideNode == null) throw new ArgumentNullException("subscriptionOverrideNode");
-            if (subscriptionOverrideNode.Name != "subscription") throw new ArgumentException("Not a vaild subscription override node", "subscriptionOverrideNode");
-            if (subscriptionOverrideNode.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", "subscriptionOverrideNode");
-            this.LoadFromNode(subscriptionOverrideNode);
+            if (subscriptionOverrideNode == null) throw new ArgumentNullException(nameof(subscriptionOverrideNode));
+            if (subscriptionOverrideNode.Name != "subscription") throw new ArgumentException("Not a vaild subscription override node", nameof(subscriptionOverrideNode));
+            if (subscriptionOverrideNode.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(subscriptionOverrideNode));
+            LoadFromNode(subscriptionOverrideNode);
         }
 
         /// <summary>
@@ -97,18 +99,17 @@ namespace ChargifyNET
         /// </summary>
         /// <param name="subscriptionOverrideObject">JsonObject containing subscription override info (in expected format)</param>
         public SubscriptionOverride(JsonObject subscriptionOverrideObject)
-            : base()
         {
-            if (subscriptionOverrideObject == null) throw new ArgumentNullException("subscriptionOverrideObject");
-            if (subscriptionOverrideObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild subscription override node", "subscriptionOverrideObject");
-            this.LoadFromJSON(subscriptionOverrideObject);
+            if (subscriptionOverrideObject == null) throw new ArgumentNullException(nameof(subscriptionOverrideObject));
+            if (subscriptionOverrideObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild subscription override node", nameof(subscriptionOverrideObject));
+            LoadFromJson(subscriptionOverrideObject);
         }
 
         /// <summary>
         /// Load data from a JsonObject
         /// </summary>
         /// <param name="obj">The JsonObject containing subscription data</param>
-        private void LoadFromJSON(JsonObject obj)
+        private void LoadFromJson(JsonObject obj)
         {
             foreach (string key in obj.Keys)
             {
@@ -125,8 +126,6 @@ namespace ChargifyNET
                         break;
                     case ExpiresAtKey:
                         _expiresAt = obj.GetJSONContentAsDateTime(key);
-                        break;
-                    default:
                         break;
                 }
             }
@@ -154,8 +153,6 @@ namespace ChargifyNET
                     case ExpiresAtKey:
                         _expiresAt = dataNode.GetNodeContentAsDateTime();
                         break;
-                    default:
-                        break;
                 }
             }
         }
@@ -170,11 +167,11 @@ namespace ChargifyNET
         {
             get
             {
-                return this._activatedAt;
+                return _activatedAt;
             }
             set
             {
-                this._activatedAt = value;
+                _activatedAt = value;
             }
         }
         private DateTime _activatedAt = DateTime.MinValue;
@@ -186,11 +183,11 @@ namespace ChargifyNET
         {
             get
             {
-                return this._canceledAt;
+                return _canceledAt;
             }
             set
             {
-                this._canceledAt = value;
+                _canceledAt = value;
             }
         }
         private DateTime _canceledAt = DateTime.MinValue;
@@ -202,11 +199,11 @@ namespace ChargifyNET
         {
             get
             {
-                return this._cancellationMessage;
+                return _cancellationMessage;
             }
             set
             {
-                this._cancellationMessage = value;
+                _cancellationMessage = value;
             }
         }
         private string _cancellationMessage = string.Empty;
@@ -218,11 +215,11 @@ namespace ChargifyNET
         {
             get
             {
-                return this._expiresAt;
+                return _expiresAt;
             }
             set
             {
-                this._expiresAt = value;
+                _expiresAt = value;
             }
         }
         private DateTime _expiresAt = DateTime.MinValue;

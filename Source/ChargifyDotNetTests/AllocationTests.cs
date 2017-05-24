@@ -21,8 +21,9 @@ namespace ChargifyDotNetTests
         public void ComponentAllocation_Can_Get_List()
         {
             // Arrange
-            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value;
+            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active && Chargify.GetComponentsForSubscription(s.Key) != null).Value;
             var component = Chargify.GetComponentsForSubscription(subscription.SubscriptionID).FirstOrDefault(c => (c.Value.Kind == "quantity_based_component" || c.Value.Kind == "on_off_component") && c.Value.AllocatedQuantity > 0).Value;
+            Assert.IsNotNull(component, "A valid component could not be found.");
 
             // Act
             var result = Chargify.GetAllocationListForSubscriptionComponent(subscription.SubscriptionID, component.ComponentID);
@@ -63,10 +64,10 @@ namespace ChargifyDotNetTests
         public void ComponentAllocation_Can_Create_Using_Quantity_Only()
         {
             // Arrange
-            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value;
-            var component = Chargify.GetComponentsForSubscription(subscription.SubscriptionID).FirstOrDefault(c => c.Value.Kind == "quantity_based_component").Value; // || c.Value.Kind == "on_off_component"
+            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active && Chargify.GetComponentsForSubscription(s.Key) != null).Value;
+            var component = Chargify.GetComponentsForSubscription(subscription.SubscriptionID).FirstOrDefault(c => c.Value.Kind == "quantity_based_component" && c.Value.AllocatedQuantity > 0).Value; // || c.Value.Kind == "on_off_component"
 
-            int quantityToAllocate = 1;
+            int quantityToAllocate = (int)component.AllocatedQuantity+1;
             IComponentAllocation result = null;
 
             // Act

@@ -33,7 +33,7 @@ namespace ChargifyNET
     #region Imports
     using System;
     using System.Xml;
-    using ChargifyNET.Json;
+    using Json;
     #endregion
 
     /// <summary>
@@ -52,32 +52,30 @@ namespace ChargifyNET
         /// Constructor.  Values set to default
         /// </summary>
         public Credit()
-            : base()
         {
         }
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="CreditXML">XML containing credit info (in expected format)</param>
-        public Credit(string CreditXML)
-            : base()
+        /// <param name="creditXml">XML containing credit info (in expected format)</param>
+        public Credit(string creditXml)
         {
             // get the XML into an XML document
-            XmlDocument Doc = new XmlDocument();
-            Doc.LoadXml(CreditXML);
-            if (Doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", "CreditXML");
+            XmlDocument doc = new XmlDocument();
+            doc.LoadXml(creditXml);
+            if (doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(creditXml));
             // loop through the child nodes of this node
-            foreach (XmlNode elementNode in Doc.ChildNodes)
+            foreach (XmlNode elementNode in doc.ChildNodes)
             {
                 if (elementNode.Name == "credit")
                 {
-                    this.LoadFromNode(elementNode);
+                    LoadFromNode(elementNode);
                     return;
                 }
             }
             // if we get here, then no info was found
-            throw new ArgumentException("XML does not contain credit information", "CreditXML");
+            throw new ArgumentException("XML does not contain credit information", nameof(creditXml));
         }
 
         /// <summary>
@@ -85,12 +83,11 @@ namespace ChargifyNET
         /// </summary>
         /// <param name="creditNode">XML containing credit info (in expected format)</param>
         internal Credit(XmlNode creditNode)
-            : base()
         {
-            if (creditNode == null) throw new ArgumentNullException("CreditNode");
-            if (creditNode.Name != "credit") throw new ArgumentException("Not a vaild credit node", "creditNode");
-            if (creditNode.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", "creditNode");
-            this.LoadFromNode(creditNode);
+            if (creditNode == null) throw new ArgumentNullException(nameof(creditNode));
+            if (creditNode.Name != "credit") throw new ArgumentException("Not a vaild credit node", nameof(creditNode));
+            if (creditNode.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(creditNode));
+            LoadFromNode(creditNode);
         }
 
         /// <summary>
@@ -99,16 +96,16 @@ namespace ChargifyNET
         /// <param name="creditObject">JsonObject containing credit info (in expected format)</param>
         public Credit(JsonObject creditObject)
         {
-            if (creditObject == null) throw new ArgumentNullException("creditObject");
-            if (creditObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild credit object", "creditObject");
-            this.LoadFromJSON(creditObject);
+            if (creditObject == null) throw new ArgumentNullException(nameof(creditObject));
+            if (creditObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild credit object", nameof(creditObject));
+            LoadFromJson(creditObject);
         }
 
         /// <summary>
         /// Load data from a JsonObject
         /// </summary>
         /// <param name="obj">The JsonObject with credit data</param>
-        private void LoadFromJSON(JsonObject obj)
+        private void LoadFromJson(JsonObject obj)
         {
             foreach (string key in obj.Keys)
             {
@@ -122,8 +119,6 @@ namespace ChargifyNET
                         break;
                     case AmountInCentsKey:
                         _amountInCents = obj.GetJSONContentAsInt(key);
-                        break;
-                    default:
                         break;
                 }
             }
@@ -148,8 +143,6 @@ namespace ChargifyNET
                     case AmountInCentsKey:
                         _amountInCents = dataNode.GetNodeContentAsInt();
                         break;
-                    default:
-                        break;
 
                 }
             }
@@ -165,7 +158,7 @@ namespace ChargifyNET
         {
             get { return _success; }
         }
-        private bool _success = false;
+        private bool _success;
 
         /// <summary>
         /// Get the amount, in cents
@@ -181,7 +174,7 @@ namespace ChargifyNET
         /// </summary>
         public decimal Amount
         {
-            get { return Convert.ToDecimal(this._amountInCents) / 100; }
+            get { return Convert.ToDecimal(_amountInCents) / 100; }
         }
 
         /// <summary>
@@ -203,7 +196,7 @@ namespace ChargifyNET
         /// </summary>
         public int CompareTo(ICredit other)
         {
-            return this.AmountInCents.CompareTo(other.AmountInCents);
+            return AmountInCents.CompareTo(other.AmountInCents);
         }
 
         #endregion
@@ -215,7 +208,7 @@ namespace ChargifyNET
         /// </summary>
         public int CompareTo(Credit other)
         {
-            return this.AmountInCents.CompareTo(other.AmountInCents);
+            return AmountInCents.CompareTo(other.AmountInCents);
         }
 
         #endregion

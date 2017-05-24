@@ -57,7 +57,7 @@ namespace Chargify
                 return _userAgent;
             }
         }
-
+        
         private RestClient _client;
         #endregion
 
@@ -69,7 +69,7 @@ namespace Chargify
         public BaseService(string apiKey, string apiPassword)
         {
             if (string.IsNullOrEmpty(apiKey))
-                throw new ArgumentException(message: "Api key is required. Details can be found at http://docs.chargify.com/api-authentication", paramName: "apiKey");
+                throw new ArgumentException(message: "Api key is required. Details can be found at http://docs.chargify.com/api-authentication", paramName: nameof(apiKey));
 
             ApiKey = apiKey;
             ApiPassword = apiPassword;

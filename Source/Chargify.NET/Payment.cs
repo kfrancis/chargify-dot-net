@@ -30,10 +30,10 @@
 
 namespace ChargifyNET
 {
-    using Json;
     #region Imports
     using System;
     using System.Xml;
+    using Json;
     #endregion
 
     /// <summary>
@@ -46,17 +46,17 @@ namespace ChargifyNET
         private const string AmountInCentsKey = "amount_in_cents";
         private const string CreatedAtKey = "created_at";
         private const string EndingBalanceInCentsKey = "ending_balance_in_cents";
-        private const string IDKey = "id";
+        private const string IdKey = "id";
         private const string KindKey = "kind";
         private const string MemoKey = "memo";
-        private const string PaymentIDKey = "payment_id";
-        private const string ProductIDKey = "product_id";
+        private const string PaymentIdKey = "payment_id";
+        private const string ProductIdKey = "product_id";
         private const string StartingBalanceInCentsKey = "starting_balance_in_cents";
-        private const string SubscriptionIDKey = "subscription_id";
+        private const string SubscriptionIdKey = "subscription_id";
         private const string SuccessKey = "success";
         private const string TypeKey = "type";
         private const string TransactionTypeKey = "transaction_type";
-        private const string GatewayTransactionIDKey = "gateway_transaction_id";
+        private const string GatewayTransactionIdKey = "gateway_transaction_id";
         #endregion
 
         #region Constructors
@@ -64,32 +64,30 @@ namespace ChargifyNET
         /// Default constructor
         /// </summary>
         public Payment()
-            : base()
         {
         }
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="PaymentXML">XML containing payment info (in expected format)</param>
-        public Payment(string PaymentXML)
-            : base()
+        /// <param name="paymentXml">XML containing payment info (in expected format)</param>
+        public Payment(string paymentXml)
         {
             // get the XML into an XML document
-            XmlDocument Doc = new XmlDocument();
-            Doc.LoadXml(PaymentXML);
-            if (Doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", "PaymentXML");
+            XmlDocument doc = new XmlDocument();
+            doc.LoadXml(paymentXml);
+            if (doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(paymentXml));
             // loop through the child nodes of this node
-            foreach (XmlNode elementNode in Doc.ChildNodes)
+            foreach (XmlNode elementNode in doc.ChildNodes)
             {
                 if (elementNode.Name == "payment")
                 {
-                    this.LoadFromNode(elementNode);
+                    LoadFromNode(elementNode);
                     return;
                 }
             }
             // if we get here, then no info was found
-            throw new ArgumentException("XML does not contain payment information", "PaymentXML");
+            throw new ArgumentException("XML does not contain payment information", nameof(paymentXml));
         }
 
         /// <summary>
@@ -97,12 +95,11 @@ namespace ChargifyNET
         /// </summary>
         /// <param name="paymentNode">XML containing payment info (in expected format)</param>
         internal Payment(XmlNode paymentNode)
-            : base()
         {
-            if (paymentNode == null) throw new ArgumentNullException("PaymentNode");
-            if (paymentNode.Name != "payment") throw new ArgumentException("Not a vaild payment node", "paymentNode");
-            if (paymentNode.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", "paymentNode");
-            this.LoadFromNode(paymentNode);
+            if (paymentNode == null) throw new ArgumentNullException(nameof(paymentNode));
+            if (paymentNode.Name != "payment") throw new ArgumentException("Not a vaild payment node", nameof(paymentNode));
+            if (paymentNode.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(paymentNode));
+            LoadFromNode(paymentNode);
         }
 
         /// <summary>
@@ -110,18 +107,17 @@ namespace ChargifyNET
         /// </summary>
         /// <param name="paymentObject">JsonObject containing payment info (in expected format)</param>
         public Payment(JsonObject paymentObject)
-            : base()
         {
-            if (paymentObject == null) throw new ArgumentNullException("paymentObject");
-            if (paymentObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild payment object", "paymentObject");
-            this.LoadFromJSON(paymentObject);
+            if (paymentObject == null) throw new ArgumentNullException(nameof(paymentObject));
+            if (paymentObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild payment object", nameof(paymentObject));
+            LoadFromJson(paymentObject);
         }
 
         /// <summary>
         /// Load data from a JsonObject
         /// </summary>
         /// <param name="obj">The JsonObject containing object data</param>
-        private void LoadFromJSON(JsonObject obj)
+        private void LoadFromJson(JsonObject obj)
         {
             // loop through the keys of this JsonObject to get object info, and parse it out
             foreach (string key in obj.Keys)
@@ -137,7 +133,7 @@ namespace ChargifyNET
                     case EndingBalanceInCentsKey:
                         _endingBalanceInCents = obj.GetJSONContentAsInt(key);
                         break;
-                    case IDKey:
+                    case IdKey:
                         _id = obj.GetJSONContentAsInt(key);
                         break;
                     case KindKey:
@@ -146,17 +142,17 @@ namespace ChargifyNET
                     case MemoKey:
                         _memo = obj.GetJSONContentAsString(key);
                         break;
-                    case PaymentIDKey:
-                        _paymentID = obj.GetJSONContentAsNullableInt(key);
+                    case PaymentIdKey:
+                        _paymentId = obj.GetJSONContentAsNullableInt(key);
                         break;
-                    case ProductIDKey:
-                        _productID = obj.GetJSONContentAsInt(key);
+                    case ProductIdKey:
+                        _productId = obj.GetJSONContentAsInt(key);
                         break;
                     case StartingBalanceInCentsKey:
                         _startingBalanceInCents = obj.GetJSONContentAsInt(key);
                         break;
-                    case SubscriptionIDKey:
-                        _subscriptionID = obj.GetJSONContentAsInt(key);
+                    case SubscriptionIdKey:
+                        _subscriptionId = obj.GetJSONContentAsInt(key);
                         break;
                     case SuccessKey:
                         _success = obj.GetJSONContentAsBoolean(key);
@@ -167,10 +163,8 @@ namespace ChargifyNET
                     case TransactionTypeKey:
                         _transactionType = obj.GetJSONContentAsString(key);
                         break;
-                    case GatewayTransactionIDKey:
-                        _gatewayTransactionID = obj.GetJSONContentAsNullableInt(key);
-                        break;
-                    default:
+                    case GatewayTransactionIdKey:
+                        _gatewayTransactionId = obj.GetJSONContentAsNullableInt(key);
                         break;
                 }
             }
@@ -195,7 +189,7 @@ namespace ChargifyNET
                     case EndingBalanceInCentsKey:
                         _endingBalanceInCents = dataNode.GetNodeContentAsInt();
                         break;
-                    case IDKey:
+                    case IdKey:
                         _id = dataNode.GetNodeContentAsInt();
                         break;
                     case KindKey:
@@ -204,17 +198,17 @@ namespace ChargifyNET
                     case MemoKey:
                         _memo = dataNode.GetNodeContentAsString();
                         break;
-                    case PaymentIDKey:
-                        _paymentID = dataNode.GetNodeContentAsNullableInt();
+                    case PaymentIdKey:
+                        _paymentId = dataNode.GetNodeContentAsNullableInt();
                         break;
-                    case ProductIDKey:
-                        _productID = dataNode.GetNodeContentAsInt();
+                    case ProductIdKey:
+                        _productId = dataNode.GetNodeContentAsInt();
                         break;
                     case StartingBalanceInCentsKey:
                         _startingBalanceInCents = dataNode.GetNodeContentAsInt();
                         break;
-                    case SubscriptionIDKey:
-                        _subscriptionID = dataNode.GetNodeContentAsInt();
+                    case SubscriptionIdKey:
+                        _subscriptionId = dataNode.GetNodeContentAsInt();
                         break;
                     case SuccessKey:
                         _success = dataNode.GetNodeContentAsBoolean();
@@ -225,10 +219,8 @@ namespace ChargifyNET
                     case TransactionTypeKey:
                         _transactionType = dataNode.GetNodeContentAsString();
                         break;
-                    case GatewayTransactionIDKey:
-                        _gatewayTransactionID = dataNode.GetNodeContentAsNullableInt();
-                        break;
-                    default:
+                    case GatewayTransactionIdKey:
+                        _gatewayTransactionId = dataNode.GetNodeContentAsNullableInt();
                         break;
                 }
             }
@@ -280,14 +272,14 @@ namespace ChargifyNET
         /// <summary>
         /// The ID of the payment
         /// </summary>
-        public int? PaymentID { get { return _paymentID; } }
-        private int? _paymentID = null;
+        public int? PaymentID { get { return _paymentId; } }
+        private int? _paymentId;
 
         /// <summary>
         /// The ID of the product
         /// </summary>
-        public int ProductID { get { return _productID; } }
-        private int _productID = int.MinValue;
+        public int ProductID { get { return _productId; } }
+        private int _productId = int.MinValue;
 
         /// <summary>
         /// The balance of the subscription before the payment
@@ -298,14 +290,14 @@ namespace ChargifyNET
         /// <summary>
         /// The subscription ID
         /// </summary>
-        public int SubscriptionID { get { return _subscriptionID; } }
-        private int _subscriptionID = int.MinValue;
+        public int SubscriptionID { get { return _subscriptionId; } }
+        private int _subscriptionId = int.MinValue;
 
         /// <summary>
         /// Was the payment successful?
         /// </summary>
         public bool Success { get { return _success; } }
-        private bool _success = false;
+        private bool _success;
 
         /// <summary>
         /// The type of payment
@@ -322,8 +314,8 @@ namespace ChargifyNET
         /// <summary>
         /// The related gateway transaction ID
         /// </summary>
-        public int? GatewayTransactionID { get { return _gatewayTransactionID; } }
-        private int? _gatewayTransactionID = null;
+        public int? GatewayTransactionID { get { return _gatewayTransactionId; } }
+        private int? _gatewayTransactionId;
         #endregion
 
         #region IComparible<Payment> Members
@@ -334,7 +326,7 @@ namespace ChargifyNET
         /// <returns></returns>
         public int CompareTo(IPayment other)
         {
-            return this.ID.CompareTo(other.ID);
+            return ID.CompareTo(other.ID);
         }
 
         /// <summary>
@@ -344,7 +336,7 @@ namespace ChargifyNET
         /// <returns></returns>
         public int CompareTo(Payment other)
         {
-            return this.ID.CompareTo(other.ID);
+            return ID.CompareTo(other.ID);
         }
         #endregion
     }

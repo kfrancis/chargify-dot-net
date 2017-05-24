@@ -13,24 +13,24 @@ namespace ChargifyNET.Data
     /// </summary>
     public sealed class CountryNameLookup
     {
-        private static XmlDocument countries;
-        private const string countriesFilename = @"ISO_3166-1_list_en.xml";
+        private static XmlDocument _countries;
+        private const string CountriesFilename = @"ISO_3166-1_list_en.xml";
 
         /// <summary>
         /// Constructor
         /// </summary>
         public CountryNameLookup()
         {
-            countries = new XmlDocument();
+            _countries = new XmlDocument();
 
-            var resourceFileWithNamespace = string.Format("{0}.{1}", GetType().Namespace, countriesFilename);
+            var resourceFileWithNamespace = $"{GetType().Namespace}.{CountriesFilename}";
             var fileStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceFileWithNamespace);
 
             if (fileStream != null)
             {
                 using (var reader = new StreamReader(fileStream))
                 {
-                    countries.LoadXml(reader.ReadToEnd());
+                    _countries.LoadXml(reader.ReadToEnd());
                 }
             }
         }
@@ -43,10 +43,12 @@ namespace ChargifyNET.Data
         public string GetCountryName(string countryCode2)
         {
             string result = String.Empty;
-            var countryNode = countries.SelectSingleNode(string.Format(@"/ISO_3166-1_List_en/ISO_3166-1_Entry/ISO_3166-1_Alpha-2_Code_element[.=""{0}""]", countryCode2)).ParentNode;
-            if (countryNode != null)
+            var selectSingleNode = _countries.SelectSingleNode($@"/ISO_3166-1_List_en/ISO_3166-1_Entry/ISO_3166-1_Alpha-2_Code_element[.=""{countryCode2}""]");
+            var countryNode = selectSingleNode?.ParentNode;
+            var singleCountryNode = countryNode?.SelectSingleNode("ISO_3166-1_Country_name");
+            if (singleCountryNode != null)
             {
-                var countryName = countryNode.SelectSingleNode("ISO_3166-1_Country_name").InnerText.ToLower();
+                var countryName = singleCountryNode.InnerText.ToLower();
                 result = char.ToUpper(countryName[0]) + countryName.Substring(1);
             }
             return result;
@@ -59,14 +61,14 @@ namespace ChargifyNET.Data
         /// <returns>The dictionary of data in ISO 3166-1 Alpha 2</returns>
         public Dictionary<string, string> GetData()
         {
-            Dictionary<string, string> result = new Dictionary<string, string>();
-            XDocument doc = XDocument.Parse(countries.OuterXml);
+            Dictionary<string, string> result;
+            XDocument doc = XDocument.Parse(_countries.OuterXml);
 
             result = (from c in doc.Descendants("ISO_3166-1_Entry")
                       select new
                       {
-                          Code = (string)c.Element("ISO_3166-1_Alpha-2_Code_element").Value,
-                          Name = (string)c.Element("ISO_3166-1_Country_name").Value
+                          Code = c.Element("ISO_3166-1_Alpha-2_Code_element")?.Value,
+                          Name = c.Element("ISO_3166-1_Country_name")?.Value
                       }).ToDictionary(c => c.Code, c => c.Name);
             
             return result;

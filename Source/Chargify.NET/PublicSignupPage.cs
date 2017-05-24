@@ -34,7 +34,7 @@ namespace ChargifyNET
     using System;
     using System.Diagnostics;
     using System.Xml;
-    using ChargifyNET.Json;
+    using Json;
     #endregion
 
     /// <summary>
@@ -56,65 +56,61 @@ namespace ChargifyNET
         /// Constructor
         /// </summary>
         private PublicSignupPage()
-            : base()
         {
         }
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="xml">An XML string containing a node</param>
-        public PublicSignupPage(string xml)
-            : base()
+        /// <param name="publicSignupPageXml">An XML string containing a node</param>
+        public PublicSignupPage(string publicSignupPageXml)
         {
             // get the XML into an XML document
             XmlDocument doc = new XmlDocument();
-            doc.LoadXml(xml);
+            doc.LoadXml(publicSignupPageXml);
             if (doc.ChildNodes.Count == 0)
-                throw new ArgumentException("XML not valid", "xml");
+                throw new ArgumentException("XML not valid", nameof(publicSignupPageXml));
             // loop through the child nodes of this node
             foreach (XmlNode elementNode in doc.ChildNodes)
             {
                 if (elementNode.Name == "public_signup_page")
                 {
-                    this.LoadFromNode(elementNode);
+                    LoadFromNode(elementNode);
                     return;
                 }
             }
             // if we get here, then no info was found
-            throw new ArgumentException("XML does not contain information", "xml");
+            throw new ArgumentException("XML does not contain information", nameof(publicSignupPageXml));
         }
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="node">An xml node with data</param>
-        internal PublicSignupPage(XmlNode node)
-            : base()
+        /// <param name="publicSignupPageNode">An xml node with data</param>
+        internal PublicSignupPage(XmlNode publicSignupPageNode)
         {
-            if (node == null)
-                throw new ArgumentNullException("node");
-            if (node.Name != "public_signup_page")
-                throw new ArgumentException("Not a vaild xml node", "node");
-            if (node.ChildNodes.Count == 0)
-                throw new ArgumentException("XML not valid", "node");
+            if (publicSignupPageNode == null)
+                throw new ArgumentNullException(nameof(publicSignupPageNode));
+            if (publicSignupPageNode.Name != "public_signup_page")
+                throw new ArgumentException("Not a vaild xml node", nameof(publicSignupPageNode));
+            if (publicSignupPageNode.ChildNodes.Count == 0)
+                throw new ArgumentException("XML not valid", nameof(publicSignupPageNode));
 
-            this.LoadFromNode(node);
+            LoadFromNode(publicSignupPageNode);
         }
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="json">JsonObject containing json info (in expected format)</param>
-        public PublicSignupPage(JsonObject json)
-            : base()
+        /// <param name="publicSignupPageJson">JsonObject containing json info (in expected format)</param>
+        public PublicSignupPage(JsonObject publicSignupPageJson)
         {
-            if (json == null)
-                throw new ArgumentNullException("json");
-            if (json.Keys.Count <= 0)
-                throw new ArgumentException("Not a vaild json object", "json");
+            if (publicSignupPageJson == null)
+                throw new ArgumentNullException(nameof(publicSignupPageJson));
+            if (publicSignupPageJson.Keys.Count <= 0)
+                throw new ArgumentException("Not a vaild json object", nameof(publicSignupPageJson));
 
-            this.LoadFromJson(json);
+            LoadFromJson(publicSignupPageJson);
         }
 
         private void LoadFromNode(XmlNode node)
@@ -134,8 +130,6 @@ namespace ChargifyNET
                         break;
                     case ReturnParamsKey:
                         _returnParams = dataNode.GetNodeContentAsString();
-                        break;
-                    default:
                         break;
                 }
             }
@@ -158,8 +152,6 @@ namespace ChargifyNET
                         break;
                     case ReturnParamsKey:
                         _returnParams = obj.GetJSONContentAsString(key);
-                        break;
-                    default:
                         break;
                 }
             }
@@ -201,7 +193,7 @@ namespace ChargifyNET
         /// <returns></returns>
         public int CompareTo(IPublicSignupPage other)
         {
-            return this.ID.CompareTo(other.ID);
+            return ID.CompareTo(other.ID);
         }
         #endregion
 
@@ -213,7 +205,7 @@ namespace ChargifyNET
         /// <returns></returns>
         public int CompareTo(PublicSignupPage other)
         {
-            return this.ID.CompareTo(other.ID);
+            return ID.CompareTo(other.ID);
         }
         #endregion
     }

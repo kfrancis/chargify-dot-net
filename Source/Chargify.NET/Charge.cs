@@ -33,7 +33,7 @@ namespace ChargifyNET
     #region Imports
     using System;
     using System.Xml;
-    using ChargifyNET.Json;
+    using Json;
     #endregion
 
     /// <summary>
@@ -47,14 +47,14 @@ namespace ChargifyNET
         private const string AmountInCentsKey = "amount_in_cents";
         private const string CreatedAtKey = "created_at";
         private const string EndingBalanceInCentsKey = "ending_balance_in_cents";
-        private const string IDKey = "id";
+        private const string IdKey = "id";
         private const string KindKey = "kind";
-        private const string PaymentIDKey = "payment_id";
-        private const string ProductIDKey = "product_id";
-        private const string SubscriptionIDKey = "subscription_id";
+        private const string PaymentIdKey = "payment_id";
+        private const string ProductIdKey = "product_id";
+        private const string SubscriptionIdKey = "subscription_id";
         private const string TypeKey = "type";
         private const string TransactionTypeKey = "transaction_type";
-        private const string GatewayTransactionIDKey = "gateway_transaction_id";
+        private const string GatewayTransactionIdKey = "gateway_transaction_id";
         #endregion
 
         #region Constructors
@@ -62,30 +62,30 @@ namespace ChargifyNET
         /// <summary>
         /// Constructor.  Values set to default
         /// </summary>
-        public Charge() : base() { }
+        public Charge()
+        { }
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="chargeXml">XML containing charge info (in expected format)</param>
         public Charge(string chargeXml)
-            : base()
         {
             // get the XML into an XML document
             XmlDocument doc = new XmlDocument();
             doc.LoadXml(chargeXml);
-            if (doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", "chargeXml");
+            if (doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(chargeXml));
             // loop through the child nodes of this node
             foreach (XmlNode elementNode in doc.ChildNodes)
             {
                 if (elementNode.Name == "charge")
                 {
-                    this.LoadFromNode(elementNode);
+                    LoadFromNode(elementNode);
                     return;
                 }
             }
             // if we get here, then no info was found
-            throw new ArgumentException("XML does not contain charge information", "ChargeXML");
+            throw new ArgumentException("XML does not contain charge information", nameof(chargeXml));
         }
 
         /// <summary>
@@ -93,26 +93,25 @@ namespace ChargifyNET
         /// </summary>
         /// <param name="chargeNode">XML containing charge info (in expected format)</param>
         internal Charge(XmlNode chargeNode)
-            : base()
         {
-            if (chargeNode == null) throw new ArgumentNullException("ChargeNode");
-            if (chargeNode.Name != "charge") throw new ArgumentException("Not a vaild charge node", "chargeNode");
-            if (chargeNode.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", "chargeNode");
-            this.LoadFromNode(chargeNode);
+            if (chargeNode == null) throw new ArgumentNullException(nameof(chargeNode));
+            if (chargeNode.Name != "charge") throw new ArgumentException("Not a vaild charge node", nameof(chargeNode));
+            if (chargeNode.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(chargeNode));
+            LoadFromNode(chargeNode);
         }
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="chargeObject">Json containing charge info (in expected format)</param>
-        public Charge(JsonObject chargeObject) : base()
+        public Charge(JsonObject chargeObject)
         {
-            if (chargeObject == null) throw new ArgumentNullException("chargeObject");
-            if (chargeObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild charge object", "chargeObject");
-            this.LoadFromJSON(chargeObject);
+            if (chargeObject == null) throw new ArgumentNullException(nameof(chargeObject));
+            if (chargeObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild charge object", nameof(chargeObject));
+            LoadFromJson(chargeObject);
         }
 
-        private void LoadFromJSON(JsonObject obj)
+        private void LoadFromJson(JsonObject obj)
         {
             foreach (string key in obj.Keys)
             {
@@ -133,20 +132,20 @@ namespace ChargifyNET
                     case EndingBalanceInCentsKey:
                         _endingBalanceInCents = obj.GetJSONContentAsInt(key);
                         break;
-                    case IDKey:
+                    case IdKey:
                         _id = obj.GetJSONContentAsInt(key);
                         break;
                     case KindKey:
                         _kind = obj.GetJSONContentAsString(key);
                         break;
-                    case PaymentIDKey:
-                        _paymentID = obj.GetJSONContentAsNullableInt(key);
+                    case PaymentIdKey:
+                        _paymentId = obj.GetJSONContentAsNullableInt(key);
                         break;
-                    case ProductIDKey:
-                        _productID = obj.GetJSONContentAsInt(key);
+                    case ProductIdKey:
+                        _productId = obj.GetJSONContentAsInt(key);
                         break;
-                    case SubscriptionIDKey:
-                        _subscriptionID = obj.GetJSONContentAsInt(key);
+                    case SubscriptionIdKey:
+                        _subscriptionId = obj.GetJSONContentAsInt(key);
                         break;
                     case TypeKey:
                         _chargeType = obj.GetJSONContentAsString(key);
@@ -154,10 +153,8 @@ namespace ChargifyNET
                     case TransactionTypeKey:
                         _transactionType = obj.GetJSONContentAsString(key);
                         break;
-                    case GatewayTransactionIDKey:
-                        _gatewayTransactionID = obj.GetJSONContentAsNullableInt(key);
-                        break;
-                    default:
+                    case GatewayTransactionIdKey:
+                        _gatewayTransactionId = obj.GetJSONContentAsNullableInt(key);
                         break;
                 }
             }
@@ -188,20 +185,20 @@ namespace ChargifyNET
                     case EndingBalanceInCentsKey:
                         _endingBalanceInCents = dataNode.GetNodeContentAsInt();
                         break;
-                    case IDKey:
+                    case IdKey:
                         _id = dataNode.GetNodeContentAsInt();
                         break;
                     case KindKey:
                         _kind = dataNode.GetNodeContentAsString();
                         break;
-                    case PaymentIDKey:
-                        _paymentID = dataNode.GetNodeContentAsNullableInt();
+                    case PaymentIdKey:
+                        _paymentId = dataNode.GetNodeContentAsNullableInt();
                         break;
-                    case ProductIDKey:
-                        _productID = dataNode.GetNodeContentAsInt();
+                    case ProductIdKey:
+                        _productId = dataNode.GetNodeContentAsInt();
                         break;
-                    case SubscriptionIDKey:
-                        _subscriptionID = dataNode.GetNodeContentAsInt();
+                    case SubscriptionIdKey:
+                        _subscriptionId = dataNode.GetNodeContentAsInt();
                         break;
                     case TypeKey:
                         _chargeType = dataNode.GetNodeContentAsString();
@@ -209,10 +206,8 @@ namespace ChargifyNET
                     case TransactionTypeKey:
                         _transactionType = dataNode.GetNodeContentAsString();
                         break;
-                    case GatewayTransactionIDKey:
-                        _gatewayTransactionID = dataNode.GetNodeContentAsNullableInt();
-                        break;
-                    default:
+                    case GatewayTransactionIdKey:
+                        _gatewayTransactionId = dataNode.GetNodeContentAsNullableInt();
                         break;
                 }
             }
@@ -231,7 +226,7 @@ namespace ChargifyNET
         {
             get { return _success; }
         }
-        private bool _success = false;
+        private bool _success;
 
         /// <summary>
         /// Get the amount (in cents)
@@ -247,7 +242,7 @@ namespace ChargifyNET
         /// </summary>
         public decimal Amount
         {
-            get { return Convert.ToDecimal(this._amountInCents) / 100;  }
+            get { return Convert.ToDecimal(_amountInCents) / 100; }
         }
 
         /// <summary>
@@ -262,67 +257,67 @@ namespace ChargifyNET
         /// <summary>
         /// The date the charge was created
         /// </summary>
-        public DateTime CreatedAt { get { return this._createdAt; } }
+        public DateTime CreatedAt { get { return _createdAt; } }
         private DateTime _createdAt = DateTime.MinValue;
 
         /// <summary>
         /// The ending balance of the subscription, in cents
         /// </summary>
-        public int EndingBalanceInCents { get { return this._endingBalanceInCents; } }
+        public int EndingBalanceInCents { get { return _endingBalanceInCents; } }
         private int _endingBalanceInCents = int.MinValue;
 
         /// <summary>
         /// The ending balance of the subscription, in dollars and cents (formatted as decimal)
         /// </summary>
-        public decimal EndingBalance { get { return Convert.ToDecimal(this._endingBalanceInCents) / 100; } }
+        public decimal EndingBalance { get { return Convert.ToDecimal(_endingBalanceInCents) / 100; } }
 
         /// <summary>
         /// The ID of the charge
         /// </summary>
-        public int ID { get { return this._id; } }
+        public int ID { get { return _id; } }
         private int _id = int.MinValue;
 
         /// <summary>
         /// The kind of charge
         /// </summary>
-        public string Kind { get { return this._kind; } }
+        public string Kind { get { return _kind; } }
         private string _kind = string.Empty;
 
         /// <summary>
         /// The ID of the payment associated with this charge
         /// </summary>
-        public int? PaymentID { get { return this._paymentID; } }
-        private int? _paymentID = null;
+        public int? PaymentID { get { return _paymentId; } }
+        private int? _paymentId;
 
         /// <summary>
         /// The product ID the subscription was subscribed to at the time of the charge
         /// </summary>
-        public int ProductID { get { return this._productID; } }
-        private int _productID = int.MinValue;
+        public int ProductID { get { return _productId; } }
+        private int _productId = int.MinValue;
 
         /// <summary>
         /// The subscription ID that this charge was applied to
         /// </summary>
-        public int SubscriptionID { get { return this._subscriptionID; } }
-        private int _subscriptionID = int.MinValue;
+        public int SubscriptionID { get { return _subscriptionId; } }
+        private int _subscriptionId = int.MinValue;
 
         /// <summary>
         /// The type of charge
         /// </summary>
-        public string ChargeType { get { return this._chargeType; } }
+        public string ChargeType { get { return _chargeType; } }
         private string _chargeType = string.Empty;
 
         /// <summary>
         /// The type of transaction
         /// </summary>
-        public string TransactionType { get { return this._transactionType; } }
+        public string TransactionType { get { return _transactionType; } }
         private string _transactionType = string.Empty;
 
         /// <summary>
         /// The ID of the gateway transaction, useful for debugging.
         /// </summary>
-        public int? GatewayTransactionID { get { return this._gatewayTransactionID; } }
-        private int? _gatewayTransactionID = null;
+        public int? GatewayTransactionID { get { return _gatewayTransactionId; } }
+        private int? _gatewayTransactionId;
 
         #endregion
 
@@ -335,7 +330,7 @@ namespace ChargifyNET
         /// <returns>The result of the comparison</returns>
         public int CompareTo(ICharge other)
         {
-            return this.AmountInCents.CompareTo(other.AmountInCents);
+            return AmountInCents.CompareTo(other.AmountInCents);
         }
 
         #endregion
@@ -349,7 +344,7 @@ namespace ChargifyNET
         /// <returns>The result of the comparison</returns>
         public int CompareTo(Charge other)
         {
-            return this.AmountInCents.CompareTo(other.AmountInCents);
+            return AmountInCents.CompareTo(other.AmountInCents);
         }
 
         #endregion

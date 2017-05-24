@@ -66,7 +66,7 @@ namespace ChargifyNET
         /// </summary>
         public void ProcessRequest(HttpContext context)
         {
-            string possibleData = string.Empty;
+            string possibleData;
             using (StreamReader sr = new StreamReader(context.Request.InputStream))
             {
                 possibleData = sr.ReadToEnd();
@@ -79,20 +79,20 @@ namespace ChargifyNET
                     signature = context.Request.QueryString[SignatureQueryStringHandle];
                 }
                 // Grab the webhook id as well, since it'll be used for validation.
-                int webhookID = int.Parse(context.Request.Headers[WebhookIdHandle]);
+                int webhookId = int.Parse(context.Request.Headers[WebhookIdHandle]);
 
                 // Now that we have data, signature and webhook id, pass it back.
-                OnChargifyUpdate(webhookID, signature, possibleData);
+                OnChargifyUpdate(webhookId, signature, possibleData);
             }
         }
 
         /// <summary>
         /// Method that gets called when Chargify sends a webhook response to this handler
         /// </summary>
-        /// <param name="webhookID">The webhook ID (used for verification)</param>
+        /// <param name="webhookId">The webhook ID (used for verification)</param>
         /// <param name="signature">The signature that was passed with the data</param>
         /// <param name="data">They data they are sending</param>
-        public abstract void OnChargifyUpdate(int webhookID, string signature, string data);
+        protected abstract void OnChargifyUpdate(int webhookId, string signature, string data);
 
         #endregion
     }

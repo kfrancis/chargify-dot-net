@@ -28,19 +28,46 @@
 //
 #endregion
 
+// ReSharper disable once CheckNamespace
 namespace ChargifyNET
 {
     #region Imports
     using System;
     #endregion
 
+    /// <summary>
+    /// Notes allow you to record information about a particular Subscription in a free text format.
+    /// </summary>
     public interface INote : IComparable<INote>
     {
+        /// <summary>
+        /// The note's unique ID
+        /// </summary>
         int ID { get; }
-        string Body { get; }
-        int SubscriptionID { get; }
+
+        /// <summary>
+        /// The main text context of the note
+        /// </summary>
+        string Body { get; set; }
+
+        /// <summary>
+        /// The ID of the related subscription
+        /// </summary>
+        int SubscriptionID { get; set; }
+
+        /// <summary>
+        /// The date and time the note was created
+        /// </summary>
         DateTime CreatedAt { get; }
+
+        /// <summary>
+        /// Last update timestamp
+        /// </summary>
         DateTime UpdatedAt { get; }
-        bool Sticky { get; }
+
+        /// <summary>
+        /// Whether or not it is pinned to the top of the list of notes
+        /// </summary>
+        bool Sticky { get; set; }
     }
 }

@@ -32,10 +32,10 @@ namespace ChargifyNET
 {
     #region Imports
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.Xml;
-    using ChargifyNET.Json;
-    using System.Collections.Generic;
+    using Json;
     #endregion
 
     /// <summary>
@@ -49,21 +49,21 @@ namespace ChargifyNET
         /// <summary>
         /// Constructor
         /// </summary>
-        public Product() : base() { }
+        public Product()
+        { }
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="ProductXML">An XML string containing a product node</param>
-        public Product(string ProductXML)
-            : base()
+        /// <param name="productXml">An XML string containing a product node</param>
+        public Product(string productXml)
         {
             // get the XML into an XML document
-            XmlDocument Doc = new XmlDocument();
-            Doc.LoadXml(ProductXML);
-            if (Doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", "ProductXML");
+            XmlDocument doc = new XmlDocument();
+            doc.LoadXml(productXml);
+            if (doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(productXml));
             // loop through the child nodes of this node
-            foreach (XmlNode elementNode in Doc.ChildNodes)
+            foreach (XmlNode elementNode in doc.ChildNodes)
             {
                 if (elementNode.Name == "product")
                 {
@@ -72,7 +72,7 @@ namespace ChargifyNET
                 }
             }
             // if we get here, then no customer info was found
-            throw new ArgumentException("XML does not contain product information", "ProductXML");
+            throw new ArgumentException("XML does not contain product information", nameof(productXml));
         }
 
         /// <summary>
@@ -80,11 +80,10 @@ namespace ChargifyNET
         /// </summary>
         /// <param name="productNode">An aml node with product information</param>
         internal Product(XmlNode productNode)
-            : base()
         {
-            if (productNode == null) throw new ArgumentNullException("productNode");
-            if (productNode.Name != "product") throw new ArgumentException("Not a vaild product node", "productNode");
-            if (productNode.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", "productNode");
+            if (productNode == null) throw new ArgumentNullException(nameof(productNode));
+            if (productNode.Name != "product") throw new ArgumentException("Not a vaild product node", nameof(productNode));
+            if (productNode.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(productNode));
             LoadFromNode(productNode);
         }
 
@@ -93,18 +92,17 @@ namespace ChargifyNET
         /// </summary>
         /// <param name="productObject">JsonObject containing product info (in expected format)</param>
         public Product(JsonObject productObject)
-            : base()
         {
-            if (productObject == null) throw new ArgumentNullException("productObject");
-            if (productObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild product object", "productObject");
-            this.LoadFromJSON(productObject);
+            if (productObject == null) throw new ArgumentNullException(nameof(productObject));
+            if (productObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild product object", nameof(productObject));
+            LoadFromJson(productObject);
         }
 
         /// <summary>
         /// Load data from a JsonObject
         /// </summary>
         /// <param name="obj">The JsonObject containing product data</param>
-        private void LoadFromJSON(JsonObject obj)
+        private void LoadFromJson(JsonObject obj)
         {
             foreach (string key in obj.Keys)
             {
@@ -158,7 +156,7 @@ namespace ChargifyNET
                         break;
                     case "return_url":
                     case "update_return_url":
-                        _returnURL = obj.GetJSONContentAsString(key);
+                        _returnUrl = obj.GetJSONContentAsString(key);
                         break;
                     case "return_params":
                     case "update_return_params":
@@ -184,8 +182,6 @@ namespace ChargifyNET
                         break;
                     case "public_signup_pages":
                         _publicSignupPages = obj.GetJSONContentAsPublicSignupPages(key);
-                        break;
-                    default:
                         break;
                 }
             }
@@ -246,7 +242,7 @@ namespace ChargifyNET
                         break;
                     case "return_url":
                     case "update_return_url":
-                        _returnURL = dataNode.GetNodeContentAsString();
+                        _returnUrl = dataNode.GetNodeContentAsString();
                         break;
                     case "return_params":
                     case "update_return_params":
@@ -273,8 +269,6 @@ namespace ChargifyNET
                     case "public_signup_pages":
                         _publicSignupPages = dataNode.GetNodeContentAsPublicSignupPages();
                         break;
-                    default:
-                        break;
                 }
             }
         }
@@ -297,7 +291,7 @@ namespace ChargifyNET
                 _priceInCents = value;
             }
         }
-        private int _priceInCents = 0;
+        private int _priceInCents;
 
         /// <summary>
         /// Get the price, in dollars and cents.
@@ -306,7 +300,7 @@ namespace ChargifyNET
         {
             get
             {
-                return Convert.ToDecimal(this._priceInCents) / 100;
+                return Convert.ToDecimal(_priceInCents) / 100;
             }
         }
 
@@ -333,7 +327,7 @@ namespace ChargifyNET
         {
             get { return _id; }
         }
-        private int _id = 0;
+        private int _id;
 
         /// <summary>
         /// Get the handle to this product
@@ -377,7 +371,7 @@ namespace ChargifyNET
                 return _productFamily;
             }
         }
-        private IProductFamily _productFamily = null;
+        private IProductFamily _productFamily;
 
         /// <summary>
         /// Get the accounting code for this product
@@ -425,7 +419,7 @@ namespace ChargifyNET
                 _interval = value;
             }
         }
-        private int _interval = 0;
+        private int _interval;
 
         /// <summary>
         /// Get the up front charge you have specified, in cents. 
@@ -438,7 +432,7 @@ namespace ChargifyNET
                 _initialChargeInCents = value;
             }
         }
-        private int _initialChargeInCents = 0;
+        private int _initialChargeInCents;
 
         /// <summary>
         /// Get the up front charge for this product, in dollars and cents.
@@ -447,7 +441,7 @@ namespace ChargifyNET
         {
             get
             {
-                return Convert.ToDecimal(this._initialChargeInCents) / 100;
+                return Convert.ToDecimal(_initialChargeInCents) / 100;
             }
         }
 
@@ -462,7 +456,7 @@ namespace ChargifyNET
                 _trialPriceInCents = value;
             }
         }
-        private int _trialPriceInCents = 0;
+        private int _trialPriceInCents;
 
         /// <summary>
         /// Get the price of the trial period for a subscription to this product, in dollars and cents.
@@ -471,7 +465,7 @@ namespace ChargifyNET
         {
             get
             {
-                return Convert.ToDecimal(this._trialPriceInCents) / 100; ;
+                return Convert.ToDecimal(_trialPriceInCents) / 100;
             }
         }
 
@@ -486,7 +480,7 @@ namespace ChargifyNET
                 _trialInterval = value;
             }
         }
-        private int _trialInterval = 0;
+        private int _trialInterval;
 
         /// <summary>
         /// A string representing the trial interval unit for this product, either "month" or "day"
@@ -512,7 +506,7 @@ namespace ChargifyNET
                 _expirationInterval = value;
             }
         }
-        private int _expirationInterval = 0;
+        private int _expirationInterval;
 
         /// <summary>
         /// A string representing the expiration interval for this product, either "month" or "day"
@@ -532,26 +526,26 @@ namespace ChargifyNET
         /// </summary>
         public string ReturnURL
         {
-            get { return _returnURL; }
+            get { return _returnUrl; }
             set
             {
-                _returnURL = value;
+                _returnUrl = value;
             }
         }
-        private string _returnURL = string.Empty;
+        private string _returnUrl = string.Empty;
 
         /// <summary>
         /// The URL the buyer is returned to after successful purchase.
         /// </summary>
-        public string UpdateReturnURL
+        public string UpdateReturnUrl
         {
-            get { return _returnURL; }
+            get { return _returnUrl; }
             set
             {
-                _returnURL = value;
+                _returnUrl = value;
             }
         }
-        
+
         /// <summary>
         /// The parameter string chargify will use in constructing the return URL.
         /// </summary>
@@ -576,7 +570,7 @@ namespace ChargifyNET
                 _requireCreditCard = value;
             }
         }
-        private bool _requireCreditCard = false;
+        private bool _requireCreditCard;
 
         /// <summary>
         /// This product requests a credit card
@@ -589,7 +583,7 @@ namespace ChargifyNET
                 _requestCreditCard = value;
             }
         }
-        private bool _requestCreditCard = false;
+        private bool _requestCreditCard;
 
         /// <summary>
         /// Timestamp indicating when this product was created.
@@ -624,6 +618,9 @@ namespace ChargifyNET
         public List<IPublicSignupPage> PublicSignupPages { get { return _publicSignupPages; } }
         private List<IPublicSignupPage> _publicSignupPages = new List<IPublicSignupPage>();
 
+        /// <summary>
+        /// The product version number
+        /// </summary>
         public int ProductVersion
         {
             get { return _productVersion; }
@@ -640,10 +637,10 @@ namespace ChargifyNET
         public static bool operator ==(Product a, Product b)
         {
             // If both are null, or both are same instance, return true.
-            if (System.Object.ReferenceEquals(a, b)) { return true; }
+            if (ReferenceEquals(a, b)) { return true; }
 
             // If one is null, but not both, return false.
-            if (((object)a == null) || ((object)b == null)) { return false; }
+            if (((object) a == null) || ((object) b == null)) { return false; }
 
             return (a.Handle == b.Handle);
         }
@@ -664,10 +661,10 @@ namespace ChargifyNET
         public static bool operator ==(Product a, IProduct b)
         {
             // If both are null, or both are same instance, return true.
-            if (System.Object.ReferenceEquals(a, b)) { return true; }
+            if (ReferenceEquals(a, b)) { return true; }
 
             // If one is null, but not both, return false.
-            if (((object)a == null) || ((object)b == null)) { return false; }
+            if (((object) a == null) || (b == null)) { return false; }
 
             return (a.Handle == b.Handle);
         }
@@ -688,10 +685,10 @@ namespace ChargifyNET
         public static bool operator ==(IProduct a, Product b)
         {
             // If both are null, or both are same instance, return true.
-            if (System.Object.ReferenceEquals(a, b)) { return true; }
+            if (ReferenceEquals(a, b)) { return true; }
 
             // If one is null, but not both, return false.
-            if (((object)a == null) || ((object)b == null)) { return false; }
+            if ((a == null) || ((object) b == null)) { return false; }
 
             return (a.Handle == b.Handle);
         }
@@ -725,14 +722,11 @@ namespace ChargifyNET
         {
             if (obj == null) return false;
 
-            if (typeof(IProduct).IsAssignableFrom(obj.GetType()))
+            if (obj is IProduct)
             {
-                return (this.Handle == (obj as IProduct).Handle);
+                return (Handle == ((IProduct) obj).Handle);
             }
-            else
-            {
-                return base.Equals(obj);
-            }
+            return ReferenceEquals(this, obj);
         }
 
         /// <summary>
@@ -741,7 +735,7 @@ namespace ChargifyNET
         /// <returns>The string representation of the object</returns>
         public override string ToString()
         {
-            return this.Name;
+            return Name;
         }
 
         #endregion
@@ -755,7 +749,7 @@ namespace ChargifyNET
         /// <returns>The result of the comparison</returns>
         public int CompareTo(IProductFamily other)
         {
-            return this.Name.CompareTo(other.Name);
+            return string.Compare(Name, other.Name, StringComparison.InvariantCultureIgnoreCase);
         }
 
         #endregion
@@ -769,7 +763,7 @@ namespace ChargifyNET
         /// <returns>The result of the comparison</returns>
         public int CompareTo(Product other)
         {
-            return this.Name.CompareTo(other.Name);
+            return string.Compare(Name, other.Name, StringComparison.InvariantCultureIgnoreCase);
         }
 
         #endregion

@@ -33,9 +33,9 @@ namespace ChargifyNET
     #region Imports
     using System;
     using System.Collections.Generic;
-    using System.Xml;
-    using ChargifyNET.Json;
     using System.Diagnostics;
+    using System.Xml;
+    using Json;
     #endregion
 
     /// <summary>
@@ -50,10 +50,10 @@ namespace ChargifyNET
         private const string ClosedAtKey = "closed_at";
         private const string CreatedAtKey = "created_at";
         private const string HtmlViewKey = "html_view";
-        private const string IDKey = "id";
+        private const string IdKey = "id";
         private const string OpenedAtKey = "opened_at";
         private const string SettledAtKey = "settled_at";
-        private const string SubscriptionIDKey = "subscription_id";
+        private const string SubscriptionIdKey = "subscription_id";
         private const string TextViewKey = "text_view";
         private const string UpdatedAtKey = "updated_at";
         private const string FuturePaymentsKey = "future_payments";
@@ -83,30 +83,30 @@ namespace ChargifyNET
         /// <summary>
         /// Constructor.  Values set to default
         /// </summary>
-        public Statement() : base() { }
+        public Statement()
+        { }
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="StatementXML">XML containing statement info (in expected format)</param>
-        public Statement(string StatementXML)
-            : base()
+        /// <param name="statementXml">XML containing statement info (in expected format)</param>
+        public Statement(string statementXml)
         {
             // get the XML into an XML document
-            XmlDocument Doc = new XmlDocument();
-            Doc.LoadXml(StatementXML);
-            if (Doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", "StatementXML");
+            XmlDocument doc = new XmlDocument();
+            doc.LoadXml(statementXml);
+            if (doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(statementXml));
             // loop through the child nodes of this node
-            foreach (XmlNode elementNode in Doc.ChildNodes)
+            foreach (XmlNode elementNode in doc.ChildNodes)
             {
                 if (elementNode.Name == "statement")
                 {
-                    this.LoadFromNode(elementNode);
+                    LoadFromNode(elementNode);
                     return;
                 }
             }
             // if we get here, then no info was found
-            throw new ArgumentException("XML does not contain charge information", "StatementXML");
+            throw new ArgumentException("XML does not contain charge information", nameof(statementXml));
         }
 
         /// <summary>
@@ -114,30 +114,29 @@ namespace ChargifyNET
         /// </summary>
         /// <param name="statementNode">XML containing statement info (in expected format)</param>
         internal Statement(XmlNode statementNode)
-            : base()
         {
-            if (statementNode == null) throw new ArgumentNullException("statementNode");
-            if (statementNode.Name != "statement") throw new ArgumentException("Not a vaild statement node", "statementNode");
-            if (statementNode.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", "statementNode");
-            this.LoadFromNode(statementNode);
+            if (statementNode == null) throw new ArgumentNullException(nameof(statementNode));
+            if (statementNode.Name != "statement") throw new ArgumentException("Not a vaild statement node", nameof(statementNode));
+            if (statementNode.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(statementNode));
+            LoadFromNode(statementNode);
         }
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="statementObject">Json containing statement info (in expected format)</param>
-        public Statement(JsonObject statementObject) : base()
+        public Statement(JsonObject statementObject)
         {
-            if (statementObject == null) throw new ArgumentNullException("statementObject");
-            if (statementObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild statement object", "statementObject");
-            this.LoadFromJSON(statementObject);
+            if (statementObject == null) throw new ArgumentNullException(nameof(statementObject));
+            if (statementObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild statement object", nameof(statementObject));
+            LoadFromJson(statementObject);
         }
 
         /// <summary>
         /// Loads the values for this object from the Json
         /// </summary>
         /// <param name="obj">The JsonObject to retrieve the values from</param>
-        private void LoadFromJSON(JsonObject obj)
+        private void LoadFromJson(JsonObject obj)
         {
             foreach (string key in obj.Keys)
             {
@@ -155,7 +154,7 @@ namespace ChargifyNET
                     case HtmlViewKey:
                         _htmlView = obj.GetJSONContentAsString(key);
                         break;
-                    case IDKey:
+                    case IdKey:
                         _id = obj.GetJSONContentAsInt(key);
                         break;
                     case OpenedAtKey:
@@ -164,8 +163,8 @@ namespace ChargifyNET
                     case SettledAtKey:
                         _settledAt = obj.GetJSONContentAsDateTime(key);
                         break;
-                    case SubscriptionIDKey:
-                        _subscriptionID = obj.GetJSONContentAsInt(key);
+                    case SubscriptionIdKey:
+                        _subscriptionId = obj.GetJSONContentAsInt(key);
                         break;
                     case TextViewKey:
                         _textView = obj.GetJSONContentAsString(key);
@@ -175,7 +174,7 @@ namespace ChargifyNET
                         break;
                     case FuturePaymentsKey:
                         // TODO: Correct this when the output is corrected
-                        _futurePayments = (object)obj.GetJSONContentAsString(key);
+                        _futurePayments = obj.GetJSONContentAsString(key);
                         break;
                     case StartingBalanceKey:
                         _startingBalanceInCents = obj.GetJSONContentAsInt(key);
@@ -185,7 +184,7 @@ namespace ChargifyNET
                         break;
                     case EventsKey:
                         // TODO: Correct this when the output is corrected
-                        _events = (object)obj.GetJSONContentAsString(key);
+                        _events = obj.GetJSONContentAsString(key);
                         break;
                     case CustomerFirstNameKey:
                         _customerFirstName = obj.GetJSONContentAsString(key);
@@ -237,18 +236,17 @@ namespace ChargifyNET
                         JsonArray transactionsArray = obj[key] as JsonArray;
                         if (transactionsArray != null)
                         {
-                            foreach (JsonObject transaction in transactionsArray.Items)
+                            foreach (var jsonValue in transactionsArray.Items)
                             {
+                                var transaction = (JsonObject) jsonValue;
                                 _transactions.Add(new Transaction(transaction));
                             }
                         }
                         // Sanity check, should be equal.
-                        if (transactionsArray.Length != _transactions.Count)
+                        if (transactionsArray != null && transactionsArray.Length != _transactions.Count)
                         {
                             throw new JsonParseException(string.Format("Unable to parse transactions ({0} != {1})", transactionsArray.Length, _transactions.Count));
                         }
-                        break;
-                    default:
                         break;
                 }
             }
@@ -276,7 +274,7 @@ namespace ChargifyNET
                     case HtmlViewKey:
                         _htmlView = dataNode.GetNodeContentAsString();
                         break;
-                    case IDKey:
+                    case IdKey:
                         _id = dataNode.GetNodeContentAsInt();
                         break;
                     case OpenedAtKey:
@@ -285,8 +283,8 @@ namespace ChargifyNET
                     case SettledAtKey:
                         _settledAt = dataNode.GetNodeContentAsDateTime();
                         break;
-                    case SubscriptionIDKey:
-                        _subscriptionID = dataNode.GetNodeContentAsInt();
+                    case SubscriptionIdKey:
+                        _subscriptionId = dataNode.GetNodeContentAsInt();
                         break;
                     case TextViewKey:
                         _textView = dataNode.GetNodeContentAsString();
@@ -296,7 +294,7 @@ namespace ChargifyNET
                         break;
                     case FuturePaymentsKey:
                         // TODO: Correct this when the output is corrected
-                        _futurePayments = (object)dataNode.GetNodeContentAsString();
+                        _futurePayments = dataNode.GetNodeContentAsString();
                         break;
                     case StartingBalanceKey:
                         _startingBalanceInCents = dataNode.GetNodeContentAsInt();
@@ -306,7 +304,7 @@ namespace ChargifyNET
                         break;
                     case EventsKey:
                         // TODO: Correct this when the output is corrected
-                        _events = (object)dataNode.GetNodeContentAsString();
+                        _events = dataNode.GetNodeContentAsString();
                         break;
                     case CustomerFirstNameKey:
                         _customerFirstName = dataNode.GetNodeContentAsString();
@@ -362,12 +360,8 @@ namespace ChargifyNET
                                 case "transaction":
                                     _transactions.Add(childNode.GetNodeContentAsTransaction());
                                     break;
-                                default:
-                                    break;
                             }
                         }
-                        break;
-                    default:
                         break;
                 }
             }
@@ -391,9 +385,9 @@ namespace ChargifyNET
         /// </summary>
         public int SubscriptionID
         {
-            get { return _subscriptionID; }
+            get { return _subscriptionId; }
         }
-        private int _subscriptionID = int.MinValue;
+        private int _subscriptionId = int.MinValue;
 
         /// <summary>
         /// The date that the statement was opened
@@ -456,7 +450,7 @@ namespace ChargifyNET
         {
             get { return _futurePayments; }
         }
-        private object _futurePayments = null;
+        private object _futurePayments;
 
         /// <summary>
         /// The subscription's balance at the time the statement was opened (in cents)
@@ -472,7 +466,7 @@ namespace ChargifyNET
         /// </summary>
         public decimal StartingBalance
         {
-            get { return Convert.ToDecimal(this._startingBalanceInCents) / 100; }
+            get { return Convert.ToDecimal(_startingBalanceInCents) / 100; }
         }
 
         /// <summary>
@@ -489,7 +483,7 @@ namespace ChargifyNET
         /// </summary>
         public decimal EndingBalance
         {
-            get { return Convert.ToDecimal(this._endingBalanceInCents) / 100; }
+            get { return Convert.ToDecimal(_endingBalanceInCents) / 100; }
         }
 
         /// <summary>
@@ -643,7 +637,7 @@ namespace ChargifyNET
         {
             get { return _events; }
         }
-        private object _events = null;
+        private object _events;
 
         /// <summary>
         /// The creation date for this statement
@@ -674,7 +668,7 @@ namespace ChargifyNET
         /// <returns>The result of the comparison</returns>
         public int CompareTo(IStatement other)
         {
-            return this.ID.CompareTo(other.ID);
+            return ID.CompareTo(other.ID);
         }
 
         #endregion
@@ -688,7 +682,7 @@ namespace ChargifyNET
         /// <returns>The result of the comparison</returns>
         public int CompareTo(Statement other)
         {
-            return this.ID.CompareTo(other.ID);
+            return ID.CompareTo(other.ID);
         }
 
         #endregion

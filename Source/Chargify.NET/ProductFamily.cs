@@ -34,7 +34,7 @@ namespace ChargifyNET
     using System;
     using System.Diagnostics;
     using System.Xml;
-using ChargifyNET.Json;
+    using Json;
     #endregion
 
     /// <summary>
@@ -48,53 +48,54 @@ using ChargifyNET.Json;
         /// <summary>
         /// Constructor
         /// </summary>
-        public ProductFamily() : base() { }
+        public ProductFamily()
+        { }
 
         /// <summary>
         /// Constructor, values specified.
         /// </summary>
-        /// <param name="Name">The name of the product family</param>
-        /// <param name="Description">The description of the product family</param>
-        /// <param name="AccountingCode">The accounting number of the product family</param>
-        /// <param name="Handle">The handle of the product family</param>
-        public ProductFamily(string Name, string Description, string AccountingCode, string Handle)
-            : base(Name, Description, AccountingCode, Handle)
+        /// <param name="name">The name of the product family</param>
+        /// <param name="description">The description of the product family</param>
+        /// <param name="accountingCode">The accounting number of the product family</param>
+        /// <param name="handle">The handle of the product family</param>
+        public ProductFamily(string name, string description, string accountingCode, string handle)
+            : base(name, description, accountingCode, handle)
         {
         }
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="ProductFamilyXML">The xml data containing information about the product family (to be parsed)</param>
-        public ProductFamily(string ProductFamilyXML)
+        /// <param name="productFamilyXml">The xml data containing information about the product family (to be parsed)</param>
+        public ProductFamily(string productFamilyXml)
         {
             // get the XML into an XML document
-            XmlDocument Doc = new XmlDocument();
-            Doc.LoadXml(ProductFamilyXML);
-            if (Doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", "ProductFamilyXML");
+            XmlDocument doc = new XmlDocument();
+            doc.LoadXml(productFamilyXml);
+            if (doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(productFamilyXml));
             // loop through the child nodes of this node
-            foreach (XmlNode elementNode in Doc.ChildNodes)
+            foreach (XmlNode elementNode in doc.ChildNodes)
             {
                 if (elementNode.Name == "product_family")
                 {
-                    this.LoadNodeData(elementNode);
+                    LoadNodeData(elementNode);
                     return;
                 }
             }
             // if we get here, then no product family data was found
-            throw new ArgumentException("XML does not contain product family information", "ProductFamilyXML");
+            throw new ArgumentException("XML does not contain product family information", nameof(productFamilyXml));
         }
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="productFamilyNode">An xml node containing product family information</param>
-        internal ProductFamily(XmlNode productFamilyNode) : base()
+        internal ProductFamily(XmlNode productFamilyNode)
         {
-            if (productFamilyNode == null) throw new ArgumentNullException("productFamilyNode");
-            if (productFamilyNode.Name != "product_family") throw new ArgumentException("Not a vaild product family node", "productFamilyNode");
-            if (productFamilyNode.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", "productFamilyNode");
-            this.LoadNodeData(productFamilyNode);
+            if (productFamilyNode == null) throw new ArgumentNullException(nameof(productFamilyNode));
+            if (productFamilyNode.Name != "product_family") throw new ArgumentException("Not a vaild product family node", nameof(productFamilyNode));
+            if (productFamilyNode.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(productFamilyNode));
+            LoadNodeData(productFamilyNode);
         }
 
         /// <summary>
@@ -102,39 +103,36 @@ using ChargifyNET.Json;
         /// </summary>
         /// <param name="productFamilyObject">JsonObject containing product family info (in expected format)</param>
         public ProductFamily(JsonObject productFamilyObject)
-            : base()
         {
-            if (productFamilyObject == null) throw new ArgumentNullException("productFamilyObject");
-            if (productFamilyObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild product family object. No keys!", "productFamilyObject");
-            this.LoadJSONData(productFamilyObject);
+            if (productFamilyObject == null) throw new ArgumentNullException(nameof(productFamilyObject));
+            if (productFamilyObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild product family object. No keys!", nameof(productFamilyObject));
+            LoadJsonData(productFamilyObject);
         }
 
         /// <summary>
         /// Load product family data from a JsonObject
         /// </summary>
         /// <param name="obj">The JsonObject containing product family data</param>
-        private void LoadJSONData(JsonObject obj)
+        private void LoadJsonData(JsonObject obj)
         {
             foreach (string key in obj.Keys)
             {
                 switch (key)
                 {
                     case "accounting_code":
-                        this.AccountingCode = obj.GetJSONContentAsString(key);
+                        AccountingCode = obj.GetJSONContentAsString(key);
                         break;
                     case "description":
-                        this.Description = obj.GetJSONContentAsString(key);
+                        Description = obj.GetJSONContentAsString(key);
                         break;
                     case "id":
                         _id = obj.GetJSONContentAsInt(key);
                         break;
                     case "handle":
-                        this.Handle = obj.GetJSONContentAsString(key);
+                        Handle = obj.GetJSONContentAsString(key);
                         break;
                     case "name":
-                        this.Name = obj.GetJSONContentAsString(key);
-                        break;
-                    default:
+                        Name = obj.GetJSONContentAsString(key);
                         break;
                 }
             }
@@ -148,21 +146,19 @@ using ChargifyNET.Json;
                 switch (dataNode.Name)
                 {
                     case "accounting_code":
-                        this.AccountingCode = dataNode.GetNodeContentAsString();
+                        AccountingCode = dataNode.GetNodeContentAsString();
                         break;
                     case "description":
-                        this.Description = dataNode.GetNodeContentAsString();
+                        Description = dataNode.GetNodeContentAsString();
                         break;
                     case "id":
                         _id = dataNode.GetNodeContentAsInt();
                         break;
                     case "handle":
-                        this.Handle = dataNode.GetNodeContentAsString();
+                        Handle = dataNode.GetNodeContentAsString();
                         break;
                     case "name":
-                        this.Name = dataNode.GetNodeContentAsString();
-                        break;
-                    default:
+                        Name = dataNode.GetNodeContentAsString();
                         break;
                 }
             }
@@ -180,7 +176,7 @@ using ChargifyNET.Json;
         {
             get { return _id; }
         }
-        private int _id = 0;
+        private int _id;
 
 
         #endregion
@@ -194,10 +190,10 @@ using ChargifyNET.Json;
         public static bool operator ==(ProductFamily a, ProductFamily b)
         {
             // If both are null, or both are same instance, return true.
-            if (System.Object.ReferenceEquals(a, b)) { return true; }
+            if (ReferenceEquals(a, b)) { return true; }
 
             // If one is null, but not both, return false.
-            if (((object)a == null) || ((object)b == null)) { return false; }
+            if (((object) a == null) || ((object) b == null)) { return false; }
 
             return (a.Handle == b.Handle);
         }
@@ -209,10 +205,10 @@ using ChargifyNET.Json;
         public static bool operator ==(ProductFamily a, IProductFamily b)
         {
             // If both are null, or both are same instance, return true.
-            if (System.Object.ReferenceEquals(a, b)) { return true; }
+            if (ReferenceEquals(a, b)) { return true; }
 
             // If one is null, but not both, return false.
-            if (((object)a == null) || ((object)b == null)) { return false; }
+            if (((object) a == null) || (b == null)) { return false; }
 
             return (a.Handle == b.Handle);
         }
@@ -224,10 +220,10 @@ using ChargifyNET.Json;
         public static bool operator ==(IProductFamily a, ProductFamily b)
         {
             // If both are null, or both are same instance, return true.
-            if (System.Object.ReferenceEquals(a, b)) { return true; }
+            if (ReferenceEquals(a, b)) { return true; }
 
             // If one is null, but not both, return false.
-            if (((object)a == null) || ((object)b == null)) { return false; }
+            if ((a == null) || ((object) b == null)) { return false; }
 
             return (a.Handle == b.Handle);
         }
@@ -279,14 +275,11 @@ using ChargifyNET.Json;
         {
             if (obj == null) return false;
 
-            if (typeof(IProductFamily).IsAssignableFrom(obj.GetType()))
+            if (obj is IProductFamily)
             {
-                return (this.Handle == (obj as IProductFamily).Handle);
+                return Handle == ((IProductFamily)obj).Handle;
             }
-            else
-            {
-                return base.Equals(obj);
-            }
+            return ReferenceEquals(this, obj);
         }
 
         /// <summary>
@@ -295,7 +288,7 @@ using ChargifyNET.Json;
         /// <returns>The string representation of the object</returns>
         public override string ToString()
         {
-            return this.Name;
+            return Name;
         }
 
         #endregion
@@ -309,7 +302,7 @@ using ChargifyNET.Json;
         /// <returns>The result of the comparison</returns>
         public int CompareTo(IProductFamily other)
         {
-            return this.Handle.CompareTo(other.Handle);
+            return string.Compare(Handle, other.Handle, StringComparison.InvariantCultureIgnoreCase);
         }
 
         #endregion
@@ -323,7 +316,7 @@ using ChargifyNET.Json;
         /// <returns>The result of the comparison</returns>
         public int CompareTo(ProductFamily other)
         {
-            return this.Handle.CompareTo(other.Handle);
+            return string.Compare(Handle, other.Handle, StringComparison.InvariantCultureIgnoreCase);
         }
 
         #endregion

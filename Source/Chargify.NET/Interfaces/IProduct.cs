@@ -1,4 +1,5 @@
-﻿#region License, Terms and Conditions
+﻿
+#region License, Terms and Conditions
 //
 // IProduct.cs
 //
@@ -26,6 +27,8 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 #endregion
+
+// ReSharper disable once CheckNamespace
 namespace ChargifyNET
 {
     #region Imports

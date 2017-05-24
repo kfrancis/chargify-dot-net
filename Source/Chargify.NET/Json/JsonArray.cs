@@ -14,7 +14,7 @@ namespace ChargifyNET.Json
         /// </summary>
         public JsonValue[] Items
         {
-            get { return (JsonValue[])_items.ToArray(); }
+            get { return _items.ToArray(); }
         }
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace ChargifyNET.Json
                 position++;
 
                 // Check for empty array
-                if (firstItem == true)
+                if (firstItem)
                 {
                     firstItem = false;
                     EatSpaces(str, ref position);

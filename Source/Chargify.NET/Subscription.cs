@@ -28,14 +28,18 @@
 //
 #endregion
 
+using System;
+using System.Diagnostics;
+using System.Text;
+using System.Xml;
+using ChargifyNET.Json;
+
 namespace ChargifyNET
 {
     #region Imports
-    using System;
-    using System.Diagnostics;
-    using System.Text;
-    using System.Xml;
-    using ChargifyNET.Json;
+
+
+
     #endregion
 
     /// <summary>
@@ -53,7 +57,7 @@ namespace ChargifyNET
         private const string CreatedAtKey = "created_at";
         private const string CurrentPeriodEndsAtKey = "current_period_ends_at";
         private const string ExpiresAtKey = "expires_at";
-        private const string IDKey = "id";
+        private const string IdKey = "id";
         private const string NextAssessmentAtKey = "next_assessment_at";
         private const string PaymentCollectionMethodKey = "payment_collection_method";
         private const string StateKey = "state";
@@ -62,7 +66,7 @@ namespace ChargifyNET
         private const string UpdatedAtKey = "updated_at";
         private const string CurrentPeriodStartedAtKey = "current_period_started_at";
         private const string PreviousStateKey = "previous_state";
-        private const string SignupPaymentIDKey = "signup_payment_id";
+        private const string SignupPaymentIdKey = "signup_payment_id";
         private const string SignupRevenueKey = "signup_revenue";
         private const string DelayedCancelAtKey = "delayed_cancel_at";
         private const string CouponCodeKey = "coupon_code";
@@ -75,6 +79,7 @@ namespace ChargifyNET
         private const string ProductVersionNumberKey = "product_version_number";
         private const string ProductPriceInCentsKey = "product_price_in_cents";
         private const string NextProductIdKey = "next_product_id";
+        private const string ReferralCodeKey = "referral_code";
         #endregion
 
         #region Constructors
@@ -82,43 +87,43 @@ namespace ChargifyNET
         /// <summary>
         /// Constructor.  Values set to default
         /// </summary>
-        public Subscription() : base()
+        public Subscription()
         {
         }
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="SubscriptionXML">XML containing subscription info (in expected format)</param>
-        public Subscription(string SubscriptionXML) : base()
+        /// <param name="subscriptionXml">XML containing subscription info (in expected format)</param>
+        public Subscription(string subscriptionXml)
         {
             // get the XML into an XML document
-            XmlDocument Doc = new XmlDocument();
-            Doc.LoadXml(SubscriptionXML);
-            if (Doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", "SubscriptionXML");
+            XmlDocument doc = new XmlDocument();
+            doc.LoadXml(subscriptionXml);
+            if (doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(subscriptionXml));
             // loop through the child nodes of this node
-            foreach (XmlNode elementNode in Doc.ChildNodes)
+            foreach (XmlNode elementNode in doc.ChildNodes)
             {
                 if (elementNode.Name == "subscription")
                 {
-                    this.LoadFromNode(elementNode);
+                    LoadFromNode(elementNode);
                     return;
                 }
             }
             // if we get here, then no customer info was found
-            throw new ArgumentException("XML does not contain subscription information", "SubscriptionXML");
+            throw new ArgumentException("XML does not contain subscription information", nameof(subscriptionXml));
         }
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="subscriptionNode">XML containing subscription info (in expected format)</param>
-        internal Subscription(XmlNode subscriptionNode) : base()
+        internal Subscription(XmlNode subscriptionNode)
         {
-            if (subscriptionNode == null) throw new ArgumentNullException("SubscriptionNode");
-            if (subscriptionNode.Name != "subscription") throw new ArgumentException("Not a vaild subscription node", "subscriptionNode");
-            if (subscriptionNode.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", "subscriptionNode");
-            this.LoadFromNode(subscriptionNode);
+            if (subscriptionNode == null) throw new ArgumentNullException(nameof(subscriptionNode));
+            if (subscriptionNode.Name != "subscription") throw new ArgumentException("Not a vaild subscription node", nameof(subscriptionNode));
+            if (subscriptionNode.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(subscriptionNode));
+            LoadFromNode(subscriptionNode);
         }
 
         /// <summary>
@@ -126,25 +131,24 @@ namespace ChargifyNET
         /// </summary>
         /// <param name="subscriptionObject">JsonObject containing subscription info (in expected format)</param>
         public Subscription(JsonObject subscriptionObject)
-            : base()
         {
-            if (subscriptionObject == null) throw new ArgumentNullException("subscriptionObject");
-            if (subscriptionObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild subscription node", "subscriptionObject");
-            this.LoadFromJSON(subscriptionObject);
+            if (subscriptionObject == null) throw new ArgumentNullException(nameof(subscriptionObject));
+            if (subscriptionObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild subscription node", nameof(subscriptionObject));
+            LoadFromJson(subscriptionObject);
         }
 
         /// <summary>
         /// Load data from a JsonObject
         /// </summary>
         /// <param name="obj">The JsonObject containing subscription data</param>
-        private void LoadFromJSON(JsonObject obj)
+        private void LoadFromJson(JsonObject obj)
         {
             foreach (string key in obj.Keys)
             {
                 switch (key)
                 {
-                    case IDKey:
-                        _subscriptionID = obj.GetJSONContentAsInt(key);
+                    case IdKey:
+                        _subscriptionId = obj.GetJSONContentAsInt(key);
                         break;
                     case StateKey:
                         _state = obj.GetJSONContentAsSubscriptionState(key);
@@ -185,8 +189,8 @@ namespace ChargifyNET
                     case CancelAtEndOfPeriodKey:
                         _cancelAtEndOfPeriod = obj.GetJSONContentAsBoolean(key);
                         break;
-                    case SignupPaymentIDKey:
-                        _signupPaymentID = obj.GetJSONContentAsInt(key);
+                    case SignupPaymentIdKey:
+                        _signupPaymentId = obj.GetJSONContentAsInt(key);
                         break;
                     case SignupRevenueKey:
                         _signupRevenue = obj.GetJSONContentAsDecimal(key);
@@ -230,7 +234,8 @@ namespace ChargifyNET
                     case NextProductIdKey:
                         _nextProductId = obj.GetJSONContentAsInt(key);
                         break;
-                    default:
+                    case ReferralCodeKey:
+                        _referralCode = obj.GetJSONContentAsString(key);
                         break;
                 }
             }
@@ -246,8 +251,8 @@ namespace ChargifyNET
             {
                 switch (dataNode.Name)
                 {
-                    case IDKey:
-                        _subscriptionID = dataNode.GetNodeContentAsInt();
+                    case IdKey:
+                        _subscriptionId = dataNode.GetNodeContentAsInt();
                         break;
                     case StateKey:
                         _state = dataNode.GetNodeContentAsSubscriptionState();
@@ -288,8 +293,8 @@ namespace ChargifyNET
                     case CancelAtEndOfPeriodKey:
                         _cancelAtEndOfPeriod = dataNode.GetNodeContentAsBoolean();
                         break;
-                    case SignupPaymentIDKey:
-                        _signupPaymentID = dataNode.GetNodeContentAsInt();
+                    case SignupPaymentIdKey:
+                        _signupPaymentId = dataNode.GetNodeContentAsInt();
                         break;
                     case SignupRevenueKey:
                         _signupRevenue = dataNode.GetNodeContentAsDecimal();
@@ -332,9 +337,9 @@ namespace ChargifyNET
                     case NextProductIdKey:
                         _nextProductId = dataNode.GetNodeContentAsInt();
                         break;
-                    default:
+                    case ReferralCodeKey:
+                        _referralCode = dataNode.GetNodeContentAsString();
                         break;
-
                 }
             }
         }
@@ -343,6 +348,15 @@ namespace ChargifyNET
 
         #region ISubscription Members
 
+        public string ReferralCode
+        {
+            get
+            {
+                return _referralCode;
+            }
+        }
+        private string _referralCode = string.Empty;
+
         /// <summary>
         /// The subscription unique ID within Chargify
         /// </summary>
@@ -350,10 +364,10 @@ namespace ChargifyNET
         {
             get
             {
-                return _subscriptionID;
+                return _subscriptionId;
             }
         }
-        private int _subscriptionID;
+        private int _subscriptionId;
 
         /// <summary>
         /// The current state of the subscription. 
@@ -387,7 +401,7 @@ namespace ChargifyNET
         {
             get
             {
-                return Convert.ToDecimal(this._balanceInCents) / 100;
+                return Convert.ToDecimal(_balanceInCents) / 100;
             }
         }
 
@@ -547,7 +561,7 @@ namespace ChargifyNET
                 return _product;
             }
         }
-        private IProduct _product = null;
+        private IProduct _product;
 
         /// <summary>
         /// Get the credit card information for this subscription
@@ -559,7 +573,7 @@ namespace ChargifyNET
                 return _paymentProfile;
             }
         }
-        private IPaymentProfileView _paymentProfile = null;
+        private IPaymentProfileView _paymentProfile;
 
         /// <summary>
         /// Get the customer information for this subscription
@@ -571,7 +585,7 @@ namespace ChargifyNET
                 return _customer;
             }
         }
-        private ICustomer _customer = null;
+        private ICustomer _customer;
 
         /// <summary>
         /// Is this subscription going to automatically cancel at the end of the current period?
@@ -580,16 +594,16 @@ namespace ChargifyNET
         {
             get { return _cancelAtEndOfPeriod; }
         }
-        private bool _cancelAtEndOfPeriod = false;
+        private bool _cancelAtEndOfPeriod;
 
         /// <summary>
         /// The ID of the corresponding payment transaction
         /// </summary>
         public int SignupPaymentID
         {
-            get { return _signupPaymentID; }
+            get { return _signupPaymentId; }
         }
-        private int _signupPaymentID = int.MinValue;
+        private int _signupPaymentId = int.MinValue;
 
         /// <summary>
         /// The revenue accepted upon signup
@@ -623,7 +637,7 @@ namespace ChargifyNET
         /// </summary>
         public decimal TotalRevenue
         {
-            get { return Convert.ToDecimal(this._totalRevenueInCents) / 100; }
+            get { return Convert.ToDecimal(_totalRevenueInCents) / 100; }
         }
         /// <summary>
         /// The total subscription revenue (in cents)
@@ -637,7 +651,7 @@ namespace ChargifyNET
         /// <summary>
         /// The type of billing used for this subscription
         /// </summary>
-        public PaymentCollectionMethod PaymentCollectionMethod { get { return this._paymentCollectionMethod; } }
+        public PaymentCollectionMethod PaymentCollectionMethod { get { return _paymentCollectionMethod; } }
         private PaymentCollectionMethod _paymentCollectionMethod = PaymentCollectionMethod.Unknown;
 
         /// <summary>
@@ -650,7 +664,7 @@ namespace ChargifyNET
         {
             get
             {
-                return this._productVersionNumber;
+                return _productVersionNumber;
             }
         }
 
@@ -670,7 +684,7 @@ namespace ChargifyNET
         /// </summary>
         public decimal ProductPrice
         {
-            get { return Convert.ToDecimal(this._productPriceInCents) / 100; }
+            get { return Convert.ToDecimal(_productPriceInCents) / 100; }
         }
 
         /// <summary>
@@ -691,10 +705,10 @@ namespace ChargifyNET
         public static bool operator ==(Subscription a, Subscription b)
         {
             // If both are null, or both are same instance, return true.
-            if (System.Object.ReferenceEquals(a, b)) { return true; }
+            if (ReferenceEquals(a, b)) { return true; }
 
             // If one is null, but not both, return false.
-            if (((object)a == null) || ((object)b == null)) { return false; }
+            if (((object) a == null) || ((object) b == null)) { return false; }
 
             return (a.SubscriptionID == b.SubscriptionID);
         }
@@ -706,10 +720,10 @@ namespace ChargifyNET
         public static bool operator ==(Subscription a, ISubscription b)
         {
             // If both are null, or both are same instance, return true.
-            if (System.Object.ReferenceEquals(a, b)) { return true; }
+            if (ReferenceEquals(a, b)) { return true; }
 
             // If one is null, but not both, return false.
-            if (((object)a == null) || ((object)b == null)) { return false; }
+            if (((object) a == null) || (b == null)) { return false; }
 
             return (a.SubscriptionID == b.SubscriptionID);
         }
@@ -721,10 +735,10 @@ namespace ChargifyNET
         public static bool operator ==(ISubscription a, Subscription b)
         {
             // If both are null, or both are same instance, return true.
-            if (System.Object.ReferenceEquals(a, b)) { return true; }
+            if (ReferenceEquals(a, b)) { return true; }
 
             // If one is null, but not both, return false.
-            if (((object)a == null) || ((object)b == null)) { return false; }
+            if ((a == null) || ((object) b == null)) { return false; }
 
             return (a.SubscriptionID == b.SubscriptionID);
         }
@@ -776,14 +790,11 @@ namespace ChargifyNET
         {
             if (obj == null) return false;
 
-            if (typeof(ISubscription).IsAssignableFrom(obj.GetType()))
+            if (obj is ISubscription)
             {
-                return (this.SubscriptionID == (obj as ISubscription).SubscriptionID);
+                return (SubscriptionID == (obj as ISubscription).SubscriptionID);
             }
-            else
-            {
-                return base.Equals(obj);
-            }
+            return ReferenceEquals(this, obj);
         }
 
         /// <summary>
@@ -791,17 +802,17 @@ namespace ChargifyNET
         /// </summary>
         public override string ToString()
         {
-            StringBuilder MyString = new StringBuilder();
-            if (this.Customer != null)
+            StringBuilder myString = new StringBuilder();
+            if (Customer != null)
             {
-                MyString.AppendFormat("Customer: {0}", this.Customer.FullName);
+                myString.AppendFormat("Customer: {0}", Customer.FullName);
             }
-            if (this.Product != null)
+            if (Product != null)
             {
-                MyString.AppendFormat("{0}Product: {1}", (MyString.Length > 0 ? "\n" : ""), this.Product.Name);
+                myString.AppendFormat("{0}Product: {1}", (myString.Length > 0 ? "\n" : ""), Product.Name);
             }
-            if (!string.IsNullOrEmpty(this.State.ToString())) MyString.AppendFormat("{0}State: {1}", (MyString.Length > 0 ? "\n" : ""), this.State.ToString());
-            return MyString.ToString();
+            if (!string.IsNullOrEmpty(State.ToString())) myString.AppendFormat("{0}State: {1}", (myString.Length > 0 ? "\n" : ""), State);
+            return myString.ToString();
         }
 
         #endregion
@@ -815,7 +826,7 @@ namespace ChargifyNET
         /// <returns>The result of the comparison</returns>
         public int CompareTo(ISubscription other)
         {
-            return this.SubscriptionID.CompareTo(other.SubscriptionID);
+            return SubscriptionID.CompareTo(other.SubscriptionID);
         }
 
         #endregion
@@ -829,7 +840,7 @@ namespace ChargifyNET
         /// <returns>The result of the comparison</returns>
         public int CompareTo(Subscription other)
         {
-            return this.SubscriptionID.CompareTo(other.SubscriptionID);
+            return SubscriptionID.CompareTo(other.SubscriptionID);
         }
 
         #endregion

@@ -29,7 +29,7 @@ namespace ChargifyNET.Json
         /// <returns>The JsonValue if parsed, null otherwise.</returns>
         protected static JsonValue ParseValue(string str, ref int position)
         {
-            JsonString.EatSpaces(str, ref position);
+            EatSpaces(str, ref position);
 
             char ch = str[position];
 

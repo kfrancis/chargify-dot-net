@@ -13,13 +13,7 @@ namespace ChargifyNET
         /// <summary>
         /// The unique id within Chargify
         /// </summary>
-        public int ID
-        {
-            get
-            {
-                return this.m_id;
-            }
-        }
+        public int ID => m_id;
 
         /// <summary>
         /// The id value

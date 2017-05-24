@@ -33,10 +33,10 @@ namespace ChargifyNET
     #region Imports
     using System;
     using System.Diagnostics;
-    using System.Xml;
-    using ChargifyNET.Json;
     using System.Web;
+    using System.Xml;
     using System.Xml.Serialization;
+    using Json;
     #endregion
 
     /// <summary>
@@ -54,7 +54,7 @@ namespace ChargifyNET
         internal const string OrganizationKey = "organization";
         internal const string VatNumberKey = "vat_number";
         internal const string ReferenceKey = "reference";
-        internal const string IDKey = "id";
+        internal const string IdKey = "id";
         internal const string CreatedAtKey = "created_at";
         internal const string UpdatedAtKey = "updated_at";
         internal const string ShippingAddressKey = "address";
@@ -70,85 +70,79 @@ namespace ChargifyNET
         /// <summary>
         /// Constructor.  Values set to default
         /// </summary>
-        public CustomerAttributes() : base()
+        public CustomerAttributes()
         {
         }
 
         /// <summary>
         /// Constructor.  Values specified
         /// </summary>
-        /// <param name="FirstName">The customer's first name</param>
-        /// <param name="LastName">The customer's last name</param>
-        /// <param name="Email">The customer's email address</param>
-        /// <param name="Organization">The customer's organization</param>
-        /// <param name="SystemID">The customer's system ID</param>
-        public CustomerAttributes(string FirstName, string LastName, string Email, string Organization, string SystemID) : base()
+        /// <param name="firstName">The customer's first name</param>
+        /// <param name="lastName">The customer's last name</param>
+        /// <param name="email">The customer's email address</param>
+        /// <param name="organization">The customer's organization</param>
+        /// <param name="systemId">The customer's system ID</param>
+        public CustomerAttributes(string firstName, string lastName, string email, string organization, string systemId)
         {
-            this.FirstName = FirstName;
-            this.LastName = LastName;
-            this.Email = Email;
-            this.Organization = Organization;
-            this.SystemID = SystemID;
+            FirstName = firstName;
+            LastName = lastName;
+            Email = email;
+            Organization = organization;
+            SystemID = systemId;
         }
 
         /// <summary>
         /// Constructor.  Values specified
         /// </summary>
-        /// <param name="FirstName">The customer's first name</param>
-        /// <param name="LastName">The customer's last name</param>
-        /// <param name="Email">The customer's email address</param>
-        /// <param name="Phone">The customer's phone number</param>
-        /// <param name="Organization">The customer's organization</param>
-        /// <param name="SystemID">The customer's system ID</param>
-        public CustomerAttributes(string FirstName, string LastName, string Email, string Phone, string Organization, string SystemID)
-            : base()
+        /// <param name="firstName">The customer's first name</param>
+        /// <param name="lastName">The customer's last name</param>
+        /// <param name="email">The customer's email address</param>
+        /// <param name="phone">The customer's phone number</param>
+        /// <param name="organization">The customer's organization</param>
+        /// <param name="systemId">The customer's system ID</param>
+        public CustomerAttributes(string firstName, string lastName, string email, string phone, string organization, string systemId)
         {
-            this.FirstName = FirstName;
-            this.LastName = LastName;
-            this.Email = Email;
-            this.Phone = Phone;
-            this.Organization = Organization;
-            this.SystemID = SystemID;
+            FirstName = firstName;
+            LastName = lastName;
+            Email = email;
+            Phone = phone;
+            Organization = organization;
+            SystemID = systemId;
         }
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="CustomerAttributesXML">XML containing customer info (in expected format)</param>
-        public CustomerAttributes(string CustomerAttributesXML)
-            : base()
-        { 
+        /// <param name="customerAttributesXml">XML containing customer info (in expected format)</param>
+        public CustomerAttributes(string customerAttributesXml)
+        {
             // get the XML into an XML document
-            XmlDocument Doc = new XmlDocument();
-            Doc.LoadXml(CustomerAttributesXML);
-            if (Doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", "CustomerAttributesXML");
+            XmlDocument doc = new XmlDocument();
+            doc.LoadXml(customerAttributesXml);
+            if (doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(customerAttributesXml));
             // loop through the child nodes of this node
-            foreach (XmlNode elementNode in Doc.ChildNodes)
+            foreach (XmlNode elementNode in doc.ChildNodes)
             {
                 switch (elementNode.Name)
                 {
                     case "customer_attributes":
                     case "customer":
-                        this.LoadFromNode(elementNode);
-                        break;
-                    default:
+                        LoadFromNode(elementNode);
                         break;
                 }
             }
-
-            return;
         }
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="customerAttributesNode">XML node containing customer info (in expected format)</param>
-        internal CustomerAttributes(XmlNode customerAttributesNode) : base()
+        internal CustomerAttributes(XmlNode customerAttributesNode)
         {
-            if (customerAttributesNode == null) throw new ArgumentNullException("CustomerAttributesNode");
-            if (customerAttributesNode.Name != "customer_attributes") throw new ArgumentException("Not a vaild customer attributes node", "customerAttributesNode");
-            if (customerAttributesNode.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", "customerAttributesNode");
-            this.LoadFromNode(customerAttributesNode);
+            if (customerAttributesNode == null) throw new ArgumentNullException(nameof(customerAttributesNode));
+            if (customerAttributesNode.Name != "customer_attributes") throw new ArgumentException("Not a vaild customer attributes node", nameof(customerAttributesNode));
+            if (customerAttributesNode.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(customerAttributesNode));
+            LoadFromNode(customerAttributesNode);
         }
 
         /// <summary>
@@ -156,59 +150,56 @@ namespace ChargifyNET
         /// </summary>
         /// <param name="customerAttributesObject">JsonObject containing customer info (in expected format)</param>
         public CustomerAttributes(JsonObject customerAttributesObject)
-            : base()
         {
-            if (customerAttributesObject == null) throw new ArgumentNullException("customerAttributesObject");
-            if (customerAttributesObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild customer attributes object", "customerAttributesObject");
+            if (customerAttributesObject == null) throw new ArgumentNullException(nameof(customerAttributesObject));
+            if (customerAttributesObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild customer attributes object", nameof(customerAttributesObject));
         }
 
         /// <summary>
         /// Load data from a JsonObject
         /// </summary>
         /// <param name="obj">The JsonObject containing customer attribute data</param>
-        private void LoadFromJSON(JsonObject obj)
+        private void LoadFromJson(JsonObject obj)
         {
             foreach (string key in obj.Keys)
             {
                 switch (key)
                 {
                     case FirstNameKey:
-                        this.FirstName = obj.GetJSONContentAsString(key);
+                        FirstName = obj.GetJSONContentAsString(key);
                         break;
                     case LastNameKey:
-                        this.LastName = obj.GetJSONContentAsString(key);
+                        LastName = obj.GetJSONContentAsString(key);
                         break;
                     case EmailKey:
-                        this.Email = obj.GetJSONContentAsString(key);
+                        Email = obj.GetJSONContentAsString(key);
                         break;
                     case PhoneKey:
-                        this.Phone = obj.GetJSONContentAsString(key);
+                        Phone = obj.GetJSONContentAsString(key);
                         break;
                     case OrganizationKey:
-                        this.Organization = HttpUtility.HtmlDecode(obj.GetJSONContentAsString(key));
+                        Organization = HttpUtility.HtmlDecode(obj.GetJSONContentAsString(key));
                         break;
                     case ReferenceKey:
-                        _systemID = obj.GetJSONContentAsString(key);
+                        _systemId = obj.GetJSONContentAsString(key);
                         break;
                     case ShippingAddressKey:
-                        this.ShippingAddress = obj.GetJSONContentAsString(key);
+                        ShippingAddress = obj.GetJSONContentAsString(key);
                         break;
                     case ShippingAddress2Key:
-                        this.ShippingAddress2 = obj.GetJSONContentAsString(key);
+                        ShippingAddress2 = obj.GetJSONContentAsString(key);
                         break;
                     case ShippingCityKey:
-                        this.ShippingCity = obj.GetJSONContentAsString(key);
+                        ShippingCity = obj.GetJSONContentAsString(key);
                         break;
                     case ShippingStateKey:
-                        this.ShippingState = obj.GetJSONContentAsString(key);
+                        ShippingState = obj.GetJSONContentAsString(key);
                         break;
                     case ShippingZipKey:
-                        this.ShippingZip = obj.GetJSONContentAsString(key);
+                        ShippingZip = obj.GetJSONContentAsString(key);
                         break;
                     case ShippingCountryKey:
-                        this.ShippingCountry = obj.GetJSONContentAsString(key);
-                        break;
-                    default:
+                        ShippingCountry = obj.GetJSONContentAsString(key);
                         break;
                 }
             }
@@ -225,42 +216,40 @@ namespace ChargifyNET
                 switch (dataNode.Name)
                 {
                     case FirstNameKey:
-                        this.FirstName = dataNode.GetNodeContentAsString();
+                        FirstName = dataNode.GetNodeContentAsString();
                         break;
                     case LastNameKey:
-                        this.LastName = dataNode.GetNodeContentAsString();
+                        LastName = dataNode.GetNodeContentAsString();
                         break;
                     case EmailKey:
-                        this.Email = dataNode.GetNodeContentAsString();
+                        Email = dataNode.GetNodeContentAsString();
                         break;
                     case PhoneKey:
-                        this.Phone = dataNode.GetNodeContentAsString();
+                        Phone = dataNode.GetNodeContentAsString();
                         break;
                     case OrganizationKey:
-                        this.Organization = HttpUtility.HtmlDecode(dataNode.GetNodeContentAsString());
+                        Organization = HttpUtility.HtmlDecode(dataNode.GetNodeContentAsString());
                         break;
                     case ReferenceKey:
-                        _systemID = dataNode.GetNodeContentAsString();
+                        _systemId = dataNode.GetNodeContentAsString();
                         break;
                     case ShippingAddressKey:
-                        this.ShippingAddress = dataNode.GetNodeContentAsString();
+                        ShippingAddress = dataNode.GetNodeContentAsString();
                         break;
                     case ShippingAddress2Key:
-                        this.ShippingAddress2 = dataNode.GetNodeContentAsString();
+                        ShippingAddress2 = dataNode.GetNodeContentAsString();
                         break;
                     case ShippingCityKey:
-                        this.ShippingCity = dataNode.GetNodeContentAsString();
+                        ShippingCity = dataNode.GetNodeContentAsString();
                         break;
                     case ShippingStateKey:
-                        this.ShippingState = dataNode.GetNodeContentAsString();
+                        ShippingState = dataNode.GetNodeContentAsString();
                         break;
                     case ShippingZipKey:
-                        this.ShippingZip = dataNode.GetNodeContentAsString();
+                        ShippingZip = dataNode.GetNodeContentAsString();
                         break;
                     case ShippingCountryKey:
-                        this.ShippingCountry = dataNode.GetNodeContentAsString();
-                        break;
-                    default:
+                        ShippingCountry = dataNode.GetNodeContentAsString();
                         break;
                 }
             }
@@ -338,7 +327,7 @@ namespace ChargifyNET
         /// <summary>
         /// The customers vat number
         /// </summary>
-        [XmlIgnore()]
+        [XmlIgnore]
         public string VatNumber { get; set; }
         /// <summary>
         /// Ignore, used for determining if the value should be serialized
@@ -434,18 +423,18 @@ namespace ChargifyNET
         {
             get
             {
-                return _systemID;
+                return _systemId;
             }
             set
             {
-                _systemID = value;
+                _systemId = value;
             }
         }
-        private string _systemID = string.Empty;
+        private string _systemId = string.Empty;
         /// <summary>
         /// Ignore, used for determining if the value should be serialized
         /// </summary>
-        public bool ShouldSerializeSystemID()
+        public bool ShouldSerializeSystemId()
         {
             return !string.IsNullOrEmpty(SystemID);
         }
@@ -458,7 +447,7 @@ namespace ChargifyNET
         {
             get
             {
-                return string.Format("{0} {1}", this.LastName, this.FirstName).Trim();
+                return string.Format("{0} {1}", LastName, FirstName).Trim();
             }
         }
 
@@ -473,7 +462,7 @@ namespace ChargifyNET
         /// <returns>The result of the comparison</returns>
         public int CompareTo(ICustomerAttributes other)
         {
-            return this.FullName.CompareTo(other.FullName);
+            return string.Compare(FullName, other.FullName, StringComparison.InvariantCultureIgnoreCase);
         }
 
         #endregion
@@ -487,7 +476,7 @@ namespace ChargifyNET
         /// <returns>The result of the comparison</returns>
         public int CompareTo(CustomerAttributes other)
         {
-            return this.FullName.CompareTo(other.FullName);
+            return string.Compare(FullName, other.FullName, StringComparison.InvariantCultureIgnoreCase);
         }
 
         #endregion
@@ -500,7 +489,7 @@ namespace ChargifyNET
         /// <returns>The full name of the customer</returns>
         public override string ToString()
         {
-            return this.FullName;
+            return FullName;
         }
 
         #endregion

@@ -34,15 +34,15 @@ namespace ChargifyNET
     using System;
     using System.Diagnostics;
     using System.Xml;
-    using ChargifyNET.Json;
+    using Json;
     #endregion
 
     /// <summary>
     /// Class representing basic attributes for a customer
     /// </summary>
-    [DebuggerDisplay("Name: {Name}, SystemID: {SystemID}")]
+    [DebuggerDisplay("Name: {Name}, Handle: {Handle}")]
     [Serializable]
-    public class ProductFamilyAttributes : ChargifyBase, IProductFamilyAttributes, IComparable<IProductFamilyAttributes>
+    public class ProductFamilyAttributes : ChargifyBase, IProductFamilyAttributes
     {
         #region Field Keys
         internal const string NameKey = "name";
@@ -55,50 +55,49 @@ namespace ChargifyNET
         /// <summary>
         /// Default constructor
         /// </summary>
-        public ProductFamilyAttributes() : base()
+        public ProductFamilyAttributes()
         {
         }
 
         /// <summary>
         /// Constructor, all values specified.
         /// </summary>
-        /// <param name="Name">The name of the product family</param>
-        /// <param name="Description">The description of the product family</param>
-        /// <param name="AccountingCode">The accounting code of the product family</param>
-        /// <param name="Handle">The handle of the product family</param>
-        public ProductFamilyAttributes(string Name, string Description, string AccountingCode, string Handle)
+        /// <param name="name">The name of the product family</param>
+        /// <param name="description">The description of the product family</param>
+        /// <param name="accountingCode">The accounting code of the product family</param>
+        /// <param name="handle">The handle of the product family</param>
+        public ProductFamilyAttributes(string name, string description, string accountingCode, string handle)
             : this()
         {
-            this.Description = Description;
-            this.AccountingCode = AccountingCode;
-            this.Handle = Handle;
+            Name = name;
+            Description = description;
+            AccountingCode = accountingCode;
+            Handle = handle;
         }
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="ProductFamilyAttributesXML">The XML which corresponds to this classes members, to be parsed</param>
-        public ProductFamilyAttributes(string ProductFamilyAttributesXML)
+        /// <param name="productFamilyAttributesXml">The XML which corresponds to this classes members, to be parsed</param>
+        public ProductFamilyAttributes(string productFamilyAttributesXml)
         {
             // get the XML into an XML document
-            XmlDocument Doc = new XmlDocument();
-            Doc.LoadXml(ProductFamilyAttributesXML);
-            if (Doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", "ProductFamilyAttributesXML");
+            XmlDocument doc = new XmlDocument();
+            doc.LoadXml(productFamilyAttributesXml);
+            if (doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(productFamilyAttributesXml));
             // loop through the child nodes of this node
-            foreach (XmlNode elementNode in Doc.ChildNodes)
+            foreach (XmlNode elementNode in doc.ChildNodes)
             {
                 switch (elementNode.Name)
                 {
                     case "product_family_attributes":
                     case "product_family":
-                        this.LoadFromNode(elementNode);
-                        break;
-                    default:
+                        LoadFromNode(elementNode);
                         break;
                 }
             }
-
-            return;
+            // if we get here, then no info was found
+            throw new ArgumentException("XML does not contain information", nameof(productFamilyAttributesXml));
         }
 
         /// <summary>
@@ -106,48 +105,45 @@ namespace ChargifyNET
         /// </summary>
         /// <param name="productFamilyAttributesNode">The product family XML node</param>
         internal ProductFamilyAttributes(XmlNode productFamilyAttributesNode)
-            : base()
         {
-            if (productFamilyAttributesNode == null) throw new ArgumentNullException("productFamilyAttributesNode");
-            if (productFamilyAttributesNode.Name != "product_family") throw new ArgumentException("Not a vaild product family attributes node", "productFamilyAttributesNode");
-            if (productFamilyAttributesNode.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", "productFamilyAttributesNode");
-            this.LoadFromNode(productFamilyAttributesNode);
+            if (productFamilyAttributesNode == null) throw new ArgumentNullException(nameof(productFamilyAttributesNode));
+            if (productFamilyAttributesNode.Name != "product_family") throw new ArgumentException("Not a vaild product family attributes node", nameof(productFamilyAttributesNode));
+            if (productFamilyAttributesNode.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(productFamilyAttributesNode));
+            LoadFromNode(productFamilyAttributesNode);
         }
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="productFamilyAttributesObject">The product family JSON object</param>
-        public ProductFamilyAttributes(JsonObject productFamilyAttributesObject): base()
-        { 
-            if (productFamilyAttributesObject == null) throw new ArgumentNullException("productFamilyAttributesObject");
-            if (productFamilyAttributesObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild product family attributes object", "productFamilyAttributesObject");
-            this.LoadFromJSON(productFamilyAttributesObject);
+        public ProductFamilyAttributes(JsonObject productFamilyAttributesObject)
+        {
+            if (productFamilyAttributesObject == null) throw new ArgumentNullException(nameof(productFamilyAttributesObject));
+            if (productFamilyAttributesObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild product family attributes object", nameof(productFamilyAttributesObject));
+            LoadFromJson(productFamilyAttributesObject);
         }
 
         /// <summary>
         /// Load data from a JsonObject
         /// </summary>
         /// <param name="obj">The JsonObject containing product family attribute data</param>
-        private void LoadFromJSON(JsonObject obj)
+        private void LoadFromJson(JsonObject obj)
         {
             foreach (string key in obj.Keys)
             {
                 switch (key)
                 {
                     case NameKey:
-                        this.Name = obj.GetJSONContentAsString(key);
+                        Name = obj.GetJSONContentAsString(key);
                         break;
                     case DescriptionKey:
-                        this.Description = obj.GetJSONContentAsString(key);
+                        Description = obj.GetJSONContentAsString(key);
                         break;
                     case HandleKey:
-                        this.Handle = obj.GetJSONContentAsString(key);
+                        Handle = obj.GetJSONContentAsString(key);
                         break;
                     case AccountingCodeKey:
-                        this.AccountingCode = obj.GetJSONContentAsString(key);
-                        break;
-                    default:
+                        AccountingCode = obj.GetJSONContentAsString(key);
                         break;
                 }
             }
@@ -164,23 +160,21 @@ namespace ChargifyNET
                 switch (dataNode.Name)
                 {
                     case NameKey:
-                        this.Name = dataNode.GetNodeContentAsString();
+                        Name = dataNode.GetNodeContentAsString();
                         break;
                     case DescriptionKey:
-                        this.Description = dataNode.GetNodeContentAsString();
+                        Description = dataNode.GetNodeContentAsString();
                         break;
                     case HandleKey:
-                        this.Handle = dataNode.GetNodeContentAsString();
+                        Handle = dataNode.GetNodeContentAsString();
                         break;
                     case AccountingCodeKey:
-                        this.AccountingCode = dataNode.GetNodeContentAsString();
-                        break;
-                    default:
+                        AccountingCode = dataNode.GetNodeContentAsString();
                         break;
                 }
             }
-        } 
-        
+        }
+
         #endregion
 
         #region IComparable<IProductFamilyAttributes> Members
@@ -191,7 +185,7 @@ namespace ChargifyNET
         /// <returns>The result of the comparison</returns>
         public int CompareTo(IProductFamilyAttributes other)
         {
-            return this.Handle.CompareTo(other.Handle);
+            return string.Compare(Handle, other.Handle, StringComparison.InvariantCultureIgnoreCase);
         }
         #endregion
 
@@ -203,7 +197,7 @@ namespace ChargifyNET
         /// <returns>The result of the comparison</returns>
         public int CompareTo(ProductFamilyAttributes other)
         {
-            return this.Handle.CompareTo(other.Handle);
+            return string.Compare(Handle, other.Handle, StringComparison.InvariantCultureIgnoreCase);
         }
         #endregion
 

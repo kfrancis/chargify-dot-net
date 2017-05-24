@@ -31,16 +31,15 @@
 namespace ChargifyNET
 {
     #region Imports
-    using System.Web.UI;
     using System.Configuration;
-    using ChargifyNET.Configuration;
-
+    using System.Web.UI;
+    using Configuration;
     #endregion
 
     /// <summary>
     /// Base Web.UI.Page that contains the Chargify property accessor
     /// </summary>
-    public partial class ChargifyPage : Page
+    public class ChargifyPage : Page
     {
         /// <summary>
         /// The ChargifyConnect object that allows you to make API calls via Chargify.NET
@@ -49,42 +48,45 @@ namespace ChargifyNET
         {
             get
             {
-                if (this._chargify == null)
+                if (_chargify == null)
                 {
                     // new instance
-                    this._chargify = new ChargifyConnect();
+                    _chargify = new ChargifyConnect();
                     bool azureDeployed = UsefulExtensions.IsRunningAzure();
                     if (!azureDeployed)
                     {
                         ChargifyAccountRetrieverSection config = ConfigurationManager.GetSection("chargify") as ChargifyAccountRetrieverSection;
-                        ChargifyAccountElement accountInfo = config.GetDefaultOrFirst();
-                        this._chargify.apiKey = accountInfo.ApiKey;
-                        this._chargify.Password = accountInfo.ApiPassword;
-                        this._chargify.URL = accountInfo.Site;
-                        this._chargify.SharedKey = accountInfo.SharedKey;
-                        this._chargify.UseJSON = config.UseJSON;
+                        if (config != null)
+                        {
+                            ChargifyAccountElement accountInfo = config.GetDefaultOrFirst();
+                            _chargify.apiKey = accountInfo.ApiKey;
+                            _chargify.Password = accountInfo.ApiPassword;
+                            _chargify.URL = accountInfo.Site;
+                            _chargify.SharedKey = accountInfo.SharedKey;
+                            _chargify.UseJSON = config.UseJSON;
+                        }
                     }
                     else
                     {
                         // Is azure deployed
-                        this._chargify.apiKey = UsefulExtensions.GetLateBoundRoleEnvironmentValue("CHARGIFY_API_KEY");
-                        this._chargify.Password = UsefulExtensions.GetLateBoundRoleEnvironmentValue("CHARGIFY_API_PASSWORD");
-                        this._chargify.URL = UsefulExtensions.GetLateBoundRoleEnvironmentValue("CHARGIFY_SITE_URL");
-                        this._chargify.SharedKey = UsefulExtensions.GetLateBoundRoleEnvironmentValue("CHARGIFY_SHARED_KEY");
+                        _chargify.apiKey = UsefulExtensions.GetLateBoundRoleEnvironmentValue("CHARGIFY_API_KEY");
+                        _chargify.Password = UsefulExtensions.GetLateBoundRoleEnvironmentValue("CHARGIFY_API_PASSWORD");
+                        _chargify.URL = UsefulExtensions.GetLateBoundRoleEnvironmentValue("CHARGIFY_SITE_URL");
+                        _chargify.SharedKey = UsefulExtensions.GetLateBoundRoleEnvironmentValue("CHARGIFY_SHARED_KEY");
                         if (!string.IsNullOrEmpty(UsefulExtensions.GetLateBoundRoleEnvironmentValue("CHARGIFY_USE_JSON")))
                         {
-                            this._chargify.UseJSON = bool.Parse(UsefulExtensions.GetLateBoundRoleEnvironmentValue("CHARGIFY_USE_JSON"));
+                            _chargify.UseJSON = bool.Parse(UsefulExtensions.GetLateBoundRoleEnvironmentValue("CHARGIFY_USE_JSON"));
                         }
                         else
                         {
-                            this._chargify.UseJSON = false;
+                            _chargify.UseJSON = false;
                         }
                     }
-                    
+
                 }
-                return this._chargify;
+                return _chargify;
             }
         }
-        private ChargifyConnect _chargify = null;
+        private ChargifyConnect _chargify;
     }
 }

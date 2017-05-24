@@ -22,10 +22,10 @@ namespace ChargifyNET.Json
                 if (key == null)
                     throw new NullReferenceException("key");
 
-                if (this.ContainsKey(key) == false)
+                if (ContainsKey(key) == false)
                     throw new JsonException("Key does not exists: " + key);
 
-                return (JsonValue)_value[key];
+                return _value[key];
             }
         }
 
@@ -58,7 +58,7 @@ namespace ChargifyNET.Json
             if (key == null)
                 throw new NullReferenceException("key");
 
-            if (this.ContainsKey(key) == false)
+            if (ContainsKey(key) == false)
                 return false;
 
             value = this[key];
@@ -84,7 +84,7 @@ namespace ChargifyNET.Json
             if (key == null)
                 throw new NullReferenceException("key");
 
-            if (ContainsKey(key) == true)
+            if (ContainsKey(key))
                 throw new JsonException(string.Format("Key '{0}' already exists in JsonObject", key));
 
             _value.Add(key, value);
@@ -109,7 +109,7 @@ namespace ChargifyNET.Json
 
         internal static JsonObject Parse(string str, ref int position)
         {
-            JsonString.EatSpaces(str, ref position);
+            EatSpaces(str, ref position);
 
             if (position >= str.Length)
                 return null;
@@ -124,9 +124,9 @@ namespace ChargifyNET.Json
 
             // Read starting '{'
             position++;
-            while (continueReading == true)
+            while (continueReading)
             {
-                JsonString.EatSpaces(str, ref position);
+                EatSpaces(str, ref position);
                 if (str[position] != '}')
                 {
                     // Read string
@@ -134,7 +134,7 @@ namespace ChargifyNET.Json
                     string key = jsonString.Value;
 
                     // Read seperator ':'
-                    JsonString.EatSpaces(str, ref position);
+                    EatSpaces(str, ref position);
                     if (str[position] != ':')
                         throw new JsonParseException(str, position);
                     position++;
@@ -145,7 +145,7 @@ namespace ChargifyNET.Json
                     jsonObject.Add(key, value);
                 }
 
-                JsonString.EatSpaces(str, ref position);
+                EatSpaces(str, ref position);
                 if (str[position] == '}')
                     continueReading = false;
                 else if (str[position] != ',')

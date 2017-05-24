@@ -30,7 +30,7 @@
         /// <returns></returns>
         public override string ToString()
         {
-            return this.Value.ToString();
+            return Value.ToString();
         }
     }
 }
