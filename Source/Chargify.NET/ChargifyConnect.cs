@@ -1690,7 +1690,7 @@ namespace ChargifyNET
             if (creditCardAttributes == null) throw new ArgumentNullException("creditCardAttributes");
             if (chargifyId == int.MinValue) throw new ArgumentException("Invalid Customer ID detected", "chargifyId");
 
-            return CreateSubscription(new SubscriptionCreateOptions() { ProductHandle = productHandle, CustomerID = chargifyId, CreditCardAttributes = (CreditCardAttributes) creditCardAttributes, NextBillingAt = nextBillingAt });
+            return CreateSubscription(new SubscriptionCreateOptions() { ProductHandle = productHandle, CustomerID = chargifyId, CreditCardAttributes = (CreditCardAttributes)creditCardAttributes, NextBillingAt = nextBillingAt });
         }
 
         /// <summary>
@@ -3320,6 +3320,71 @@ namespace ChargifyNET
             {
                 // now make the request
                 string response = DoRequest(string.Format("subscriptions/{0}.{1}", subscriptionId, GetMethodExtension()), HttpRequestMethod.Put, subscriptionXml.ToString());
+                // change the response to the object
+                return response.ConvertResponseTo<Subscription>("subscription");
+            }
+            catch (ChargifyException cex)
+            {
+                if (cex.StatusCode == HttpStatusCode.NotFound) throw new InvalidOperationException("Subscription not found");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// This will place the subscription in the on_hold state and it will not renew.
+        /// </summary>
+        /// <param name="subscriptionId">The (chargify) id of the subscription</param>
+        /// <param name="automaticResumeDate">The date the subscription will automatically resume, if applicable</param>
+        /// <returns>The subscription data, if successful</returns>
+        /// <remarks>https://reference.chargify.com/v1/subscriptions/hold-subscription</remarks>
+        public ISubscription PauseSubscription(int subscriptionId, DateTime? automaticResumeDate = null)
+        {
+            if (subscriptionId == int.MinValue) throw new ArgumentNullException("subscriptionId");
+
+            // create XML for creation of customer
+            StringBuilder subscriptionXml = new StringBuilder(GetXmlStringIfApplicable());
+
+            if (automaticResumeDate.HasValue)
+            {
+                subscriptionXml.Append("<hold>");
+                subscriptionXml.AppendFormat("<automatically_resume_at>{0}</automatically_resume_at>", automaticResumeDate.Value.ToString("o"));
+                subscriptionXml.Append("</hold>");
+            }
+            else
+            {
+                subscriptionXml.Clear();
+            }
+
+            try
+            {
+                // now make the request
+                string response = DoRequest(string.Format("subscriptions/{0}/hold.{1}", subscriptionId, GetMethodExtension()), HttpRequestMethod.Post, subscriptionXml.Length > 0 ? subscriptionXml.ToString() : null);
+                // change the response to the object
+                return response.ConvertResponseTo<Subscription>("subscription");
+            }
+            catch (ChargifyException cex)
+            {
+                if (cex.StatusCode == HttpStatusCode.NotFound) throw new InvalidOperationException("Subscription not found");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Resume a paused (on-hold) subscription. If the normal next renewal date has not passed, 
+        /// the subscription will return to active and will renew on that date. Otherwise, it will 
+        /// behave like a reactivation, setting the billing date to 'now' and charging the subscriber.
+        /// </summary>
+        /// <param name="subscriptionId">The (Chargify) id of the subscription</param>
+        /// <returns>The subscription data, if successful</returns>
+        /// <remarks>https://reference.chargify.com/v1/subscriptions/resume-subscription</remarks>
+        public ISubscription ResumeSubscription(int subscriptionId)
+        {
+            if (subscriptionId == int.MinValue) throw new ArgumentNullException("subscriptionId");
+
+            try
+            {
+                // now make the request
+                string response = DoRequest(string.Format("subscriptions/{0}/resume.{1}", subscriptionId, GetMethodExtension()), HttpRequestMethod.Post, string.Empty);
                 // change the response to the object
                 return response.ConvertResponseTo<Subscription>("subscription");
             }
@@ -5686,7 +5751,7 @@ namespace ChargifyNET
                 if (jsonObject != null && jsonObject.ContainsKey(key))
                 {
                     JsonObject jsonObj = (array.Items[i] as JsonObject)[key] as JsonObject;
-                    T value = (T) Activator.CreateInstance(typeof(T), jsonObj);
+                    T value = (T)Activator.CreateInstance(typeof(T), jsonObj);
                     if (!retValue.ContainsKey(value.ID))
                     {
                         retValue.Add(value.ID, value);
@@ -5720,7 +5785,7 @@ namespace ChargifyNET
                     {
                         if (childNode.Name == key)
                         {
-                            T value = (T) Activator.CreateInstance(typeof(T), childNode);
+                            T value = (T)Activator.CreateInstance(typeof(T), childNode);
                             if (!retValue.ContainsKey(value.ID))
                             {
                                 retValue.Add(value.ID, value);
@@ -5798,7 +5863,7 @@ namespace ChargifyNET
             Uri address = uriBuilder.Uri;
 
             // Create the web request
-            HttpWebRequest request = (HttpWebRequest) WebRequest.Create(address);
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(address);
             request.Timeout = 180000;
             string credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes(apiKey + ":" + Password));
             request.Headers[HttpRequestHeader.Authorization] = "Basic " + credentials;
@@ -5893,7 +5958,7 @@ namespace ChargifyNET
                 // build exception and set last response
                 if (wex.Response != null)
                 {
-                    using (HttpWebResponse errorResponse = (HttpWebResponse) wex.Response)
+                    using (HttpWebResponse errorResponse = (HttpWebResponse)wex.Response)
                     {
                         newException = new ChargifyException(errorResponse, wex, postData);
                         _lastResponse = errorResponse;
@@ -5951,7 +6016,7 @@ namespace ChargifyNET
             Uri address = uriBuilder.Uri;
 
             // Create the web request
-            HttpWebRequest request = (HttpWebRequest) WebRequest.Create(address);
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(address);
             request.Timeout = _timeout;
             string credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes(apiKey + ":" + Password));
             request.Headers[HttpRequestHeader.Authorization] = "Basic " + credentials;
@@ -6036,7 +6101,7 @@ namespace ChargifyNET
                 // build exception and set last response
                 if (wex.Response != null)
                 {
-                    using (HttpWebResponse errorResponse = (HttpWebResponse) wex.Response)
+                    using (HttpWebResponse errorResponse = (HttpWebResponse)wex.Response)
                     {
                         newException = new ChargifyException(errorResponse, wex, postData);
                         _lastResponse = errorResponse;

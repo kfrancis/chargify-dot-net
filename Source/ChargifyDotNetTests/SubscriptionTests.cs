@@ -4,6 +4,7 @@ using System.Linq;
 using ChargifyNET;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading;
 #if NUNIT
 using NUnit.Framework;
 #else
@@ -20,6 +21,57 @@ namespace ChargifyDotNetTests
     public class SubscriptionTests : ChargifyTestBase
     {
         #region Tests
+
+        [Test]
+        public void Subscription_Can_Pause_Indefinately()
+        {
+            // Arrange
+            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value as Subscription;
+
+            // Act
+            var result = Chargify.PauseSubscription(subscription.SubscriptionID);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(SubscriptionState.On_Hold, result.State);
+            result = Chargify.ResumeSubscription(subscription.SubscriptionID);
+            Assert.AreEqual(SubscriptionState.Active, result.State);
+        }
+
+        [Test]
+        public void Subscription_Can_Pause_FixedTime()
+        {
+            // Arrange
+            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value as Subscription;
+            var testMinutes = 5;
+
+            // Act
+            var result = Chargify.PauseSubscription(subscription.SubscriptionID, DateTime.Now.AddMinutes(testMinutes));
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(SubscriptionState.On_Hold, result.State);
+            var totalWait = Convert.ToInt32(Math.Ceiling(1000 * 60 * testMinutes + (testMinutes * 0.10f)));
+            Debug.WriteLine($"Waiting {TimeSpan.FromMilliseconds(totalWait).TotalMinutes} minutes to test a delay of {testMinutes} minutes ...");
+            Thread.Sleep(totalWait);
+            result = Chargify.LoadSubscription(subscription.SubscriptionID);
+            Assert.AreEqual(SubscriptionState.Active, result.State);
+        }
+
+        [Test]
+        public void Subscription_Can_Resume()
+        {
+            // Arrange
+            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.On_Hold).Value as Subscription;
+            Assert.IsNotNull(subscription, "Can't find any 'on_hold' subscriptions");
+
+            // Act
+            var result = Chargify.ResumeSubscription(subscription.SubscriptionID);
+                
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(SubscriptionState.Active, result.State);
+        }
 
         [Test]
         public void Subscription_Can_Cancel_Delayed_Product_Change()

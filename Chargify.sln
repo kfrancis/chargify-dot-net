@@ -35,8 +35,6 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "ChargifyNetSample.Web", "So
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChargifyNetSample.MVC", "Source\ChargifyNetSample.MVC\ChargifyNetSample.MVC.csproj", "{C618CDC0-A9D1-4FF0-93A8-5A46848BFE14}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MigrationApplication", "..\..\..\Dropbox\Work\Chekit\MigrationApplication\MigrationApplication\MigrationApplication.csproj", "{45623F1B-C39D-4964-ABA8-6B4F4180BD7A}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -100,18 +98,6 @@ Global
 		{C618CDC0-A9D1-4FF0-93A8-5A46848BFE14}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{C618CDC0-A9D1-4FF0-93A8-5A46848BFE14}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{C618CDC0-A9D1-4FF0-93A8-5A46848BFE14}.Release|x86.ActiveCfg = Release|Any CPU
-		{45623F1B-C39D-4964-ABA8-6B4F4180BD7A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{45623F1B-C39D-4964-ABA8-6B4F4180BD7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{45623F1B-C39D-4964-ABA8-6B4F4180BD7A}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{45623F1B-C39D-4964-ABA8-6B4F4180BD7A}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{45623F1B-C39D-4964-ABA8-6B4F4180BD7A}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{45623F1B-C39D-4964-ABA8-6B4F4180BD7A}.Debug|x86.Build.0 = Debug|Any CPU
-		{45623F1B-C39D-4964-ABA8-6B4F4180BD7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{45623F1B-C39D-4964-ABA8-6B4F4180BD7A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{45623F1B-C39D-4964-ABA8-6B4F4180BD7A}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{45623F1B-C39D-4964-ABA8-6B4F4180BD7A}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{45623F1B-C39D-4964-ABA8-6B4F4180BD7A}.Release|x86.ActiveCfg = Release|Any CPU
-		{45623F1B-C39D-4964-ABA8-6B4F4180BD7A}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -123,7 +109,6 @@ Global
 		{F4C6848A-523E-4895-831B-BEB20D9F9965} = {B1023B37-8D93-4B15-80DB-4C99742E26EE}
 		{CD8E53D2-B177-494B-AE08-1CEEF98E43D7} = {D741C8EB-46FE-477B-97D2-5D2463EA6BDC}
 		{C618CDC0-A9D1-4FF0-93A8-5A46848BFE14} = {D741C8EB-46FE-477B-97D2-5D2463EA6BDC}
-		{45623F1B-C39D-4964-ABA8-6B4F4180BD7A} = {D741C8EB-46FE-477B-97D2-5D2463EA6BDC}
 	EndGlobalSection
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = Chargify.vsmdi

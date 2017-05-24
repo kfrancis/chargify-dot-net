@@ -1154,6 +1154,23 @@ namespace ChargifyNET
         /// <param name="SubscriptionID">The ID of the subscription to update</param>
         /// <returns>The secure url of the update page</returns>
         string GetSubscriptionUpdateURL(int SubscriptionID);
+        /// <summary>
+        /// Resume a paused (on-hold) subscription. If the normal next renewal date has not passed, 
+        /// the subscription will return to active and will renew on that date. Otherwise, it will 
+        /// behave like a reactivation, setting the billing date to 'now' and charging the subscriber.
+        /// </summary>
+        /// <param name="subscriptionId">The (Chargify) id of the subscription</param>
+        /// <returns>The subscription data, if successful</returns>
+        /// <remarks>https://reference.chargify.com/v1/subscriptions/resume-subscription</remarks>
+        ISubscription ResumeSubscription(int subscriptionId);
+        /// <summary>
+        /// This will place the subscription in the on_hold state and it will not renew.
+        /// </summary>
+        /// <param name="subscriptionId">The (chargify) id of the subscription</param>
+        /// <param name="automaticResumeDate">The date the subscription will automatically resume, if applicable</param>
+        /// <returns>The subscription data, if successful</returns>
+        /// <remarks>https://reference.chargify.com/v1/subscriptions/hold-subscription</remarks>
+        ISubscription PauseSubscription(int subscriptionId, DateTime? automaticResumeDate = null);
         #endregion
 
         #region Transactions
