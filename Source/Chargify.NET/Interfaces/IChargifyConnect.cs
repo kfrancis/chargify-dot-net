@@ -214,6 +214,20 @@ namespace ChargifyNET
         ISubscription AddCoupon(int SubscriptionID, string CouponCode);
 
         /// <summary>
+
+        /// Method for retrieving information about a coupon using the ID of that coupon.
+        /// </summary>
+        /// <param name="ProductFamilyID">The ID of the product family that the coupon belongs to</param>
+        /// <returns>A dictionary of objects if found, empty collection otherwise.</returns>
+        IDictionary<int, ICoupon> GetAllCoupons(int ProductFamilyID);
+
+        /// <summary>
+        /// Method for retrieving information about a coupon usage using the ID of that coupon.
+        /// </summary>
+        /// <param name="CouponID">The ID of the coupon</param>
+        /// <returns>The object if found, null otherwise.</returns>
+        IDictionary<int, ICouponUsage> GetCouponUsage(int CouponID);
+
         /// Method to remove a coupon to a subscription using the API
         /// </summary>
         /// <param name="SubscriptionID">The ID of the subscription to modify</param>

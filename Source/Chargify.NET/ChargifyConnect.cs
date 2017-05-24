@@ -3495,6 +3495,166 @@ namespace ChargifyNET
         }
 
         /// <summary>
+        /// Method for retrieving information about a coupon using the ID of that coupon.
+        /// </summary>
+        /// <param name="ProductFamilyID">The ID of the product family that the coupon belongs to</param>
+        /// <returns>A dictionary of objects if found, empty collection otherwise.</returns>
+        public IDictionary<int, ICoupon> GetAllCoupons(int ProductFamilyID)
+        {
+            var coupons = new Dictionary<int, ICoupon>();
+
+            try
+            {
+                // make sure data is valid
+                if (ProductFamilyID < 0) throw new ArgumentException("Invalid ProductFamilyID");
+                // now make the request
+                string response = this.DoRequest(string.Format("product_families/{0}/coupons.{1}", ProductFamilyID, GetMethodExtension()));
+
+                if (response.IsXml())
+                {
+                    // now build a product list based on response XML
+                    XmlDocument doc = new XmlDocument();
+                    doc.LoadXml(response); // get the XML into an XML document
+                    if (doc.ChildNodes.Count == 0) throw new InvalidOperationException("Returned XML not valid");
+                    // loop through the child nodes of this node
+
+                    foreach (XmlNode elementNode in doc.ChildNodes)
+                    {
+                        if (elementNode.Name == "coupons")
+                        {
+                            foreach (XmlNode couponNode in elementNode.ChildNodes)
+                            {
+                                if (couponNode.Name == "coupon")
+                                {
+                                    ICoupon LoadedCoupon = new Coupon(couponNode);
+                                    if (!coupons.ContainsKey(LoadedCoupon.ID))
+                                    {
+                                        coupons.Add(LoadedCoupon.ID, LoadedCoupon);
+                                    }
+                                    else
+                                    {
+                                        throw new InvalidOperationException("Duplicate Coupon ID values detected");
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                else if (response.IsJSON())
+                {
+                    // should be expecting an array
+                    int position = 0;
+                    JsonArray array = JsonArray.Parse(response, ref position);
+                    for (int i = 0; i <= array.Length - 1; i++)
+                    {
+                        if ((array.Items[i] as JsonObject).ContainsKey("coupon"))
+                        {
+                            JsonObject couponObj = (array.Items[i] as JsonObject)["coupon"] as JsonObject;
+                            ICoupon loadedCooupon = new Coupon(couponObj);
+                            if (!coupons.ContainsKey(loadedCooupon.ID))
+                            {
+                                coupons.Add(loadedCooupon.ID, loadedCooupon);
+                            }
+                            else
+                            {
+                                throw new InvalidOperationException("Duplicate Coupon ID values detected");
+                            }
+                        }
+                    }
+                }
+            }
+            catch (ChargifyException cex)
+            {
+                // Throw if anything but not found, since not found is telling us that it's working correctly
+                // but that there just isn't a coupon with that ID.
+                if (cex.StatusCode == HttpStatusCode.NotFound) return null;
+                throw cex;
+            }
+
+            return coupons;
+        }
+
+        /// <summary>
+        /// Method for retrieving information about a coupon usage using the ID of that coupon.
+        /// </summary>
+        /// <param name="CouponID">The ID of the coupon</param>
+        /// <returns>The object if found, null otherwise.</returns>
+        public IDictionary<int, ICouponUsage> GetCouponUsage(int CouponID)
+        {
+            var coupons = new Dictionary<int, ICouponUsage>();
+
+            try
+            {
+                // make sure data is valid
+                if (CouponID < 0) throw new ArgumentException("Invalid CouponID");
+                // now make the request
+                string response = this.DoRequest(string.Format("coupons/{0}/usage.{1}", CouponID, GetMethodExtension()));
+
+                if (response.IsXml())
+                {
+                    // now build a product list based on response XML
+                    XmlDocument doc = new XmlDocument();
+                    doc.LoadXml(response); // get the XML into an XML document
+                    if (doc.ChildNodes.Count == 0) throw new InvalidOperationException("Returned XML not valid");
+                    // loop through the child nodes of this node
+
+                    foreach (XmlNode elementNode in doc.ChildNodes)
+                    {
+                        if (elementNode.Name == "objects")
+                        {
+                            foreach (XmlNode couponNode in elementNode.ChildNodes)
+                            {
+                                if (couponNode.Name == "object")
+                                {
+                                    ICouponUsage LoadedCoupon = new CouponUsage(couponNode);
+                                    if (!coupons.ContainsKey(LoadedCoupon.ProductId))
+                                    {
+                                        coupons.Add(LoadedCoupon.ProductId, LoadedCoupon);
+                                    }
+                                    else
+                                    {
+                                        throw new InvalidOperationException("Duplicate Product ID values detected");
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                else if (response.IsJSON())
+                {
+                    // should be expecting an array
+                    int position = 0;
+                    JsonArray array = JsonArray.Parse(response, ref position);
+                    for (int i = 0; i <= array.Length - 1; i++)
+                    {
+                        if ((array.Items[i] as JsonObject).ContainsKey("name"))
+                        {
+                            JsonObject couponUsageObj = (array.Items[i] as JsonObject) as JsonObject;
+                            ICouponUsage loadedCoouponUsage = new CouponUsage(couponUsageObj);
+                            if (!coupons.ContainsKey(loadedCoouponUsage.ProductId))
+                            {
+                                coupons.Add(loadedCoouponUsage.ProductId, loadedCoouponUsage);
+                            }
+                            else
+                            {
+                                throw new InvalidOperationException("Duplicate Coupon ID values detected");
+                            }
+                        }
+                    }
+                }
+            }
+            catch (ChargifyException cex)
+            {
+                // Throw if anything but not found, since not found is telling us that it's working correctly
+                // but that there just isn't a coupon with that ID.
+                if (cex.StatusCode == HttpStatusCode.NotFound) return null;
+                throw cex;
+            }
+
+            return coupons;
+        }
+
+        /// <summary>
         /// Retrieve the coupon corresponding to the coupon code, useful for coupon validation.
         /// </summary>
         /// <param name="productFamilyId">The ID of the product family the coupon belongs to</param>
