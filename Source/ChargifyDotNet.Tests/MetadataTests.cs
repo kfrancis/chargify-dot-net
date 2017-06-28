@@ -84,7 +84,6 @@ namespace ChargifyDotNetTests
             var subscription = Chargify.Find<Subscription>(18218142);
             SetJson(true);
 
-            // TODO: Fix this call
             var result = Chargify.GetMetadataFor<Subscription>(subscription.SubscriptionID, null);
 
             Assert.IsNotNull(result);
@@ -93,7 +92,7 @@ namespace ChargifyDotNetTests
             Assert.IsTrue(result.TotalCount != int.MinValue);
             Assert.IsTrue(result.TotalPages != int.MinValue);
             Assert.AreEqual(result.TotalCount, result.Metadata.Count);
-            Assert.AreEqual(3, result.Metadata.Where(m => !string.IsNullOrEmpty(m.Name)));
+            Assert.AreEqual(3, result.Metadata.Where(m => !string.IsNullOrEmpty(m.Name)).Count());
 
             TestContext.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(result));
 

@@ -210,15 +210,15 @@ namespace ChargifyNET
                                     {
                                         case "resource_id":
                                             hasData = true;
-                                            newObj.ResourceID = obj.GetJSONContentAsInt(subItemKey);
+                                            newObj.ResourceID = itemObj.GetJSONContentAsInt(subItemKey);
                                             break;
                                         case "name":
                                             hasData = true;
-                                            newObj.Name = obj.GetJSONContentAsString(subItemKey);
+                                            newObj.Name = itemObj.GetJSONContentAsString(subItemKey);
                                             break;
                                         case "value":
                                             hasData = true;
-                                            newObj.Value = obj.GetJSONContentAsString(subItemKey);
+                                            newObj.Value = itemObj.GetJSONContentAsString(subItemKey);
                                             break;
                                     }
                                 }
