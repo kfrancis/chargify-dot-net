@@ -206,7 +206,6 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Chargify.NET.nuspec" />
     <None Include="packages.config" />
     <None Include="web.config.transform" />
   </ItemGroup>

@@ -16,7 +16,7 @@
     <AssemblyVersion>1.2.1</AssemblyVersion>
     <FileVersion>1.2.1</FileVersion>
     <VersionPrefix>1.2.1</VersionPrefix>
-    <VersionSuffix>beta1</VersionSuffix>
+    <!--<VersionSuffix>beta1</VersionSuffix>-->
     <IncludeSource>true</IncludeSource>
     <IncludeSymbols>true</IncludeSymbols>
   </PropertyGroup>
