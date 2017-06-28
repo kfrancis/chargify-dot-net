@@ -31,9 +31,109 @@
 // ReSharper disable once CheckNamespace
 namespace ChargifyNET
 {
+    using Newtonsoft.Json;
     #region Imports
     using System;
+    using System.Xml.Serialization;
     #endregion
+
+
+    public interface IChargeCreateOptions
+    {
+        decimal? Amount { get; set; }
+        int? AmountInCents { get; set; }
+        string Memo { get; set; }
+        bool? UseNegativeBalance { get; set; }
+        bool? DelayCapture { get; set; }
+        bool? AccrueOnFailure { get; set; }
+        bool? Taxable { get; set; }
+        PaymentCollectionMethod PaymentCollectionMethod { get; set; }
+    }
+
+    [XmlType("charge"), JsonObject("charge")]
+    [Serializable]
+    public class ChargeCreateOptions : IChargeCreateOptions
+    {
+        [XmlElement("amount"), JsonProperty("amount")]
+        public decimal? Amount { get; set; }
+        /// <summary>
+        /// Ignore, used to determine if the field should be serialized
+        /// </summary>
+        public bool ShouldSerializeAmount()
+        {
+            return Amount.HasValue && !AmountInCents.HasValue;
+        }
+
+        [XmlElement("amount_in_cents"), JsonProperty("amount_in_cents")]
+        public int? AmountInCents { get; set; }
+        /// <summary>
+        /// Ignore, used to determine if the field should be serialized
+        /// </summary>
+        public bool ShouldSerializeAmountInCents()
+        {
+            return AmountInCents.HasValue && !Amount.HasValue;
+        }
+
+        [XmlElement("memo"), JsonProperty("memo")]
+        public string Memo { get; set; }
+        /// <summary>
+        /// Ignore, used to determine if the field should be serialized
+        /// </summary>
+        public bool ShouldSerializeMemo()
+        {
+            return !string.IsNullOrWhiteSpace(Memo);
+        }
+
+        [XmlElement("use_negative_balance"), JsonProperty("use_negative_balance")]
+        public bool? UseNegativeBalance { get; set; }
+        /// <summary>
+        /// Ignore, used to determine if the field should be serialized
+        /// </summary>
+        public bool ShouldSerializeUseNegativeBalance()
+        {
+            return UseNegativeBalance.HasValue;
+        }
+
+        [XmlElement("delay_capture"), JsonProperty("delay_capture")]
+        public bool? DelayCapture { get; set; }
+        /// <summary>
+        /// Ignore, used to determine if the field should be serialized
+        /// </summary>
+        public bool ShouldSerializeDelayCapture()
+        {
+            return DelayCapture.HasValue;
+        }
+
+        [XmlElement("accrue_on_failure"), JsonProperty("accrue_on_failure")]
+        public bool? AccrueOnFailure { get; set; }
+        /// <summary>
+        /// Ignore, used to determine if the field should be serialized
+        /// </summary>
+        public bool ShouldSerializeAccrueOnFailure()
+        {
+            return AccrueOnFailure.HasValue;
+        }
+
+        [XmlElement("taxable"), JsonProperty("taxable")]
+        public bool? Taxable { get; set; }
+        /// <summary>
+        /// Ignore, used to determine if the field should be serialized
+        /// </summary>
+        public bool ShouldSerializeTaxable()
+        {
+            return Taxable.HasValue;
+        }
+
+        [XmlElement("payment_collection_method"), JsonProperty("payment_collection_method")]
+        public PaymentCollectionMethod PaymentCollectionMethod { get; set; }
+        /// <summary>
+        /// Ignore, used to determine if the field should be serialized
+        /// </summary>
+        public bool ShouldSerializePaymentCollectionMethod()
+        {
+            return PaymentCollectionMethod != PaymentCollectionMethod.Unknown;
+        }
+    }
 
     /// <summary>
     /// The one time charge class

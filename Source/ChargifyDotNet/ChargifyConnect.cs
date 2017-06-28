@@ -3883,6 +3883,32 @@ namespace ChargifyNET
         /// Create a new one-time charge
         /// </summary>
         /// <param name="subscriptionId">The subscription that will be charged</param>
+        /// <param name="options">The charge parameters</param>
+        /// <returns></returns>
+        public ICharge CreateCharge(int subscriptionId, IChargeCreateOptions options)
+        {
+            // make sure data is valid
+            if (options == null) throw new ArgumentNullException(nameof(options));
+
+            // create XML for creation of a charge
+            var xml = new StringBuilder();
+            var serializer = new System.Xml.Serialization.XmlSerializer(options.GetType());
+            using (StringWriter textWriter = new Utf8StringWriter())
+            {
+                serializer.Serialize(textWriter, options);
+                xml.Append(textWriter);
+            }
+
+            // now make the request
+            string response = DoRequest(string.Format("subscriptions/{0}/charges.{1}", subscriptionId, GetMethodExtension()), HttpRequestMethod.Post, xml.ToString());
+            // change the response to the object
+            return response.ConvertResponseTo<Charge>("charge");
+        }
+
+        /// <summary>
+        /// Create a new one-time charge
+        /// </summary>
+        /// <param name="subscriptionId">The subscription that will be charged</param>
         /// <param name="charge">The charge parameters</param>
         /// <returns></returns>
         public ICharge CreateCharge(int subscriptionId, ICharge charge)
@@ -3891,21 +3917,6 @@ namespace ChargifyNET
             if (charge == null) throw new ArgumentNullException("charge");
             return CreateCharge(subscriptionId, charge.Amount, charge.Memo);
         }
-
-        ///// <summary>
-        ///// Create a new one-time charge
-        ///// </summary>
-        ///// <param name="SubscriptionID">The subscription that will be charged</param>
-        ///// <param name="amount">The amount to charge the customer</param>
-        ///// <param name="memo"></param>
-        ///// <returns></returns>
-        //public ICharge CreateCharge(int SubscriptionID, decimal amount, string memo)
-        //{
-        //    // make sure data is valid
-        //    if (amount < 0) throw new ArgumentNullException("Amount"); // Chargify will throw a 422 if a negative number is in this field.
-        //    if (string.IsNullOrEmpty(memo)) throw new ArgumentNullException("Memo");
-        //    return CreateCharge(SubscriptionID, amount, memo, true, false);
-        //}
 
         /// <summary>
         /// Create a new one-time charge, with options

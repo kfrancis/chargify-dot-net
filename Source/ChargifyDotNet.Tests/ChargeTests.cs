@@ -2,12 +2,30 @@
 using ChargifyDotNetTests.Base;
 using ChargifyNET;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 
 namespace ChargifyDotNetTests
 {
     [TestClass]
     public class ChargeTests : ChargifyTestBase
     {
+
+        [TestMethod]
+        public void Charges_Can_Charge_With_Tax()
+        {
+            // Arrange
+            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active && s.Value.PaymentProfile.MaskedCardNumber.EndsWith("1") && s.Value.Balance == 0m).Value as Subscription;
+            if (subscription == null) Assert.Inconclusive("A valid subscription could not be found.");
+            var chargeOptions = new ChargeCreateOptions() { Amount = 1.23m, Taxable = true, Memo = Guid.NewGuid().ToString() };
+
+            // Act
+            var result = Chargify.CreateCharge(subscription.SubscriptionID, chargeOptions);
+
+            // Assert
+            Assert.AreEqual(true, result.Success);
+            Assert.AreEqual(chargeOptions.Amount, result.Amount);
+        }
+
         [TestMethod]
         public void Charges_Can_Charge_Successfully()
         {
