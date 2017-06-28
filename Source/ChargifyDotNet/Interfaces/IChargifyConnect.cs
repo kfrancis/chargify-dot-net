@@ -251,6 +251,22 @@ namespace ChargifyNET
         /// </summary>
         /// <returns></returns>
         IDictionary<int, Invoice> GetInvoiceList();
+        /// <summary>
+        /// Add a payment to a specific invoice
+        /// </summary>
+        /// <param name="invoiceId">The id of the invoice</param>
+        /// <param name="amount">The amount of the payment (in dollars and cents)</param>
+        /// <param name="memo">A memo, if applicable</param>
+        /// <returns>Payment details, if successful. Null otherwise.</returns>
+        IPayment AddInvoicePayment(int invoiceId, decimal amount, string memo);
+        /// <summary>
+        /// Add a payment to a specific invoice
+        /// </summary>
+        /// <param name="invoiceId">The id of the invoice</param>
+        /// <param name="amountInCents">The amount of the payment (in cents)</param>
+        /// <param name="memo">A memo, if applicable</param>
+        /// <returns>Payment details, if successful. Null otherwise.</returns>
+        IPayment AddInvoicePayment(int invoiceId, int amountInCents, string memo);
         #endregion
 
         #region Metadata

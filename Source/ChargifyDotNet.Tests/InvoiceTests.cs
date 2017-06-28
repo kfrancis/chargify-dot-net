@@ -93,5 +93,45 @@ namespace ChargifyDotNetTests
             // Cleanup
             Assert.IsTrue(Chargify.DeleteSubscription(newSubscription.SubscriptionID, "Automatic cancel due to test"));
         }
+
+        [TestMethod]
+        public void Invoice_Can_Add_Payment()
+        {
+            // Arrange
+            var invoices = Chargify.GetInvoiceList().Values;
+            if (!invoices.Any()) Assert.Inconclusive("There are no valid invoices for use in this test.");
+            var invoice = invoices.FirstOrDefault(i => i.AmountDue > 0);
+            var memo = Guid.NewGuid().ToString();
+
+            // Act
+            var result = Chargify.AddInvoicePayment(invoice.ID, invoice.AmountDue, memo);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOfType(result, typeof(IPayment));
+            Assert.AreEqual(memo, result.Memo);
+            Assert.AreEqual(invoice.AmountDue, result.Amount);
+            Assert.AreEqual(invoice.AmountDueInCents, result.AmountInCents);
+        }
+
+        [TestMethod]
+        public void Invoice_Can_Add_Payment_Cents()
+        {
+            // Arrange
+            var invoices = Chargify.GetInvoiceList().Values;
+            if (!invoices.Any()) Assert.Inconclusive("There are no valid invoices for use in this test.");
+            var invoice = invoices.FirstOrDefault(i => i.AmountDueInCents > 0);
+            var memo = Guid.NewGuid().ToString();
+
+            // Act
+            var result = Chargify.AddInvoicePayment(invoice.ID, invoice.AmountDueInCents, memo);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOfType(result, typeof(IPayment));
+            Assert.AreEqual(memo, result.Memo);
+            Assert.AreEqual(invoice.AmountDue, result.Amount);
+            Assert.AreEqual(invoice.AmountDueInCents, result.AmountInCents);
+        }
     }
 }

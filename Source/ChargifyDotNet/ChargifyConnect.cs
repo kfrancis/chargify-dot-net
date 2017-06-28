@@ -5331,6 +5331,46 @@ namespace ChargifyNET
             }
             return retValue;
         }
+
+        /// <summary>
+        /// Add a payment to a specific invoice
+        /// </summary>
+        /// <param name="invoiceId">The id of the invoice</param>
+        /// <param name="amount">The amount of the payment (in dollars and cents)</param>
+        /// <param name="memo">A memo, if applicable</param>
+        /// <returns>Payment details, if successful. Null otherwise.</returns>
+        public IPayment AddInvoicePayment(int invoiceId, decimal amount, string memo)
+        {
+            return AddInvoicePayment(invoiceId, Convert.ToInt32(amount * 100), memo);
+        }
+
+        /// <summary>
+        /// Add a payment to a specific invoice
+        /// </summary>
+        /// <param name="invoiceId">The id of the invoice</param>
+        /// <param name="amountInCents">The amount of the payment (in cents)</param>
+        /// <param name="memo">A memo, if applicable</param>
+        /// <returns>Payment details, if successful. Null otherwise.</returns>
+        public IPayment AddInvoicePayment(int invoiceId, int amountInCents, string memo)
+        {
+            // make sure data is valid
+            if (string.IsNullOrEmpty(memo)) throw new ArgumentNullException("memo");
+            // make sure that the SubscriptionID is unique
+            //if ((subscriptionId) == null) throw new ArgumentException("Not an SubscriptionID", "subscriptionId");
+
+            // create XML for creation of a payment
+            var paymentXml = new StringBuilder(GetXmlStringIfApplicable());
+            paymentXml.Append("<payment>");
+            paymentXml.AppendFormat("<amount_in_cents>{0}</amount_in_cents>", amountInCents);
+            paymentXml.AppendFormat("<memo>{0}</memo>", PCLWebUtility.WebUtility.HtmlEncode(memo));
+            paymentXml.Append("</payment>");
+
+            // now make the request
+            string response = DoRequest(string.Format("invoices/{0}/payments.{1}", invoiceId, GetMethodExtension()), HttpRequestMethod.Post, paymentXml.ToString());
+
+            // change the response to the object
+            return response.ConvertResponseTo<Payment>("payment");
+        }
         #endregion
 
         #region Sites
