@@ -21,6 +21,8 @@
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
     <WebGreaseLibPath>..\..\packages\WebGrease.1.5.2\lib</WebGreaseLibPath>
+    <Use64BitIISExpress />
+    <UseGlobalApplicationHostFile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -167,9 +169,9 @@
     <None Include="Project_Readme.html" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Chargify.NET\Chargify.NET.csproj">
-      <Project>{a4e445a8-21c9-445b-a3a0-d18a4cbd0f0b}</Project>
-      <Name>Chargify.NET</Name>
+    <ProjectReference Include="..\ChargifyDotNet\ChargifyDotNet.csproj">
+      <Project>{61707a83-dffc-4cbf-bb4c-0d41b21f94a7}</Project>
+      <Name>ChargifyDotNet</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
