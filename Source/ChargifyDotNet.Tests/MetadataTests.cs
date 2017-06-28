@@ -78,6 +78,29 @@ namespace ChargifyDotNetTests
         }
 
         [TestMethod]
+        public void Metadata_Can_Read_Specific_Subscription()
+        {
+            // Arrange
+            var subscription = Chargify.Find<Subscription>(18218142);
+            SetJson(true);
+
+            // TODO: Fix this call
+            var result = Chargify.GetMetadataFor<Subscription>(subscription.SubscriptionID, null);
+
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result.CurrentPage != int.MinValue);
+            Assert.IsTrue(result.PerPage != int.MinValue);
+            Assert.IsTrue(result.TotalCount != int.MinValue);
+            Assert.IsTrue(result.TotalPages != int.MinValue);
+            Assert.AreEqual(result.TotalCount, result.Metadata.Count);
+            Assert.AreEqual(3, result.Metadata.Where(m => !string.IsNullOrEmpty(m.Name)));
+
+            TestContext.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(result));
+
+            SetJson(false);
+        }
+
+        [TestMethod]
         public void Metadata_Can_Read_Subscription()
         {
             // Arrange
