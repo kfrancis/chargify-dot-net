@@ -81,7 +81,8 @@ namespace ChargifyDotNetTests
         public void Metadata_Can_Read_Specific_Subscription()
         {
             // Arrange
-            var subscription = Chargify.Find<Subscription>(18218142);
+            var subscription = Chargify.GetSubscriptionList().Values.FirstOrDefault(s => Chargify.GetMetadataFor<Subscription>(s.SubscriptionID, null).TotalCount > 0) as Subscription;
+            if (subscription == null) Assert.Inconclusive("No valid subscription with metadata found for this test.");
             SetJson(true);
 
             var result = Chargify.GetMetadataFor<Subscription>(subscription.SubscriptionID, null);
