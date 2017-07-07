@@ -5568,12 +5568,19 @@ namespace ChargifyNET
         /// Create a note
         /// </summary>
         /// <param name="note">The note to create</param>
-        /// <returns></returns>
+        /// <returns>The note details, if successful. Null otherwise.</returns>
         public INote CreateNote(INote note)
         {
             return CreateNote(note.SubscriptionID, note.Body, note.Sticky);
         }
 
+        /// <summary>
+        /// Create a note
+        /// </summary>
+        /// <param name="subscriptionId">The subscription to add the note to</param>
+        /// <param name="body">The note content</param>
+        /// <param name="sticky">Is the note "sticky"</param>
+        /// <returns>The note details, if successful. Null otherwise.</returns>
         public INote CreateNote(int subscriptionId, string body, bool sticky = false)
         {
             // make sure data is valid

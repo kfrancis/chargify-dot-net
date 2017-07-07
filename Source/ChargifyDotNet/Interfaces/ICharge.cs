@@ -38,22 +38,55 @@ namespace ChargifyNET
     #endregion
 
 
+    /// <summary>
+    /// Charge create/input options
+    /// </summary>
     public interface IChargeCreateOptions
     {
+        /// <summary>
+        /// The amount of the charge
+        /// </summary>
         decimal? Amount { get; set; }
+        /// <summary>
+        /// The amount of the charge (in cents)
+        /// </summary>
         int? AmountInCents { get; set; }
+        /// <summary>
+        /// The charge memo/description
+        /// </summary>
         string Memo { get; set; }
+        /// <summary>
+        /// Should the negative balance be used when processing this charge?
+        /// </summary>
         bool? UseNegativeBalance { get; set; }
+        /// <summary>
+        /// Should the charge be delayed until the next assessment date?
+        /// </summary>
         bool? DelayCapture { get; set; }
+        /// <summary>
+        /// Should the charge accrue on the balance if the charge failed now
+        /// </summary>
         bool? AccrueOnFailure { get; set; }
+        /// <summary>
+        /// Is the charge taxable?
+        /// </summary>
         bool? Taxable { get; set; }
+        /// <summary>
+        /// The collection method for this charge
+        /// </summary>
         PaymentCollectionMethod PaymentCollectionMethod { get; set; }
     }
 
+    /// <summary>
+    /// The charge create/input options
+    /// </summary>
     [XmlType("charge"), JsonObject("charge")]
     [Serializable]
     public class ChargeCreateOptions : IChargeCreateOptions
     {
+        /// <summary>
+        /// The amount of the charge
+        /// </summary>
         [XmlElement("amount"), JsonProperty("amount")]
         public decimal? Amount { get; set; }
         /// <summary>
@@ -64,6 +97,9 @@ namespace ChargifyNET
             return Amount.HasValue && !AmountInCents.HasValue;
         }
 
+        /// <summary>
+        /// The amount of the charge (in cents)
+        /// </summary>
         [XmlElement("amount_in_cents"), JsonProperty("amount_in_cents")]
         public int? AmountInCents { get; set; }
         /// <summary>
@@ -74,8 +110,12 @@ namespace ChargifyNET
             return AmountInCents.HasValue && !Amount.HasValue;
         }
 
+        /// <summary>
+        /// The charge memo/description
+        /// </summary>
         [XmlElement("memo"), JsonProperty("memo")]
         public string Memo { get; set; }
+
         /// <summary>
         /// Ignore, used to determine if the field should be serialized
         /// </summary>
@@ -84,8 +124,12 @@ namespace ChargifyNET
             return !string.IsNullOrWhiteSpace(Memo);
         }
 
+        /// <summary>
+        /// Should the negative balance be used when processing this charge?
+        /// </summary>
         [XmlElement("use_negative_balance"), JsonProperty("use_negative_balance")]
         public bool? UseNegativeBalance { get; set; }
+
         /// <summary>
         /// Ignore, used to determine if the field should be serialized
         /// </summary>
@@ -94,8 +138,12 @@ namespace ChargifyNET
             return UseNegativeBalance.HasValue;
         }
 
+        /// <summary>
+        /// Should the charge be delayed until the next assessment date?
+        /// </summary>
         [XmlElement("delay_capture"), JsonProperty("delay_capture")]
         public bool? DelayCapture { get; set; }
+
         /// <summary>
         /// Ignore, used to determine if the field should be serialized
         /// </summary>
@@ -104,8 +152,12 @@ namespace ChargifyNET
             return DelayCapture.HasValue;
         }
 
+        /// <summary>
+        /// Should the charge accrue on the balance if the charge failed now
+        /// </summary>
         [XmlElement("accrue_on_failure"), JsonProperty("accrue_on_failure")]
         public bool? AccrueOnFailure { get; set; }
+
         /// <summary>
         /// Ignore, used to determine if the field should be serialized
         /// </summary>
@@ -114,8 +166,12 @@ namespace ChargifyNET
             return AccrueOnFailure.HasValue;
         }
 
+        /// <summary>
+        /// Is the charge taxable?
+        /// </summary>
         [XmlElement("taxable"), JsonProperty("taxable")]
         public bool? Taxable { get; set; }
+
         /// <summary>
         /// Ignore, used to determine if the field should be serialized
         /// </summary>
@@ -124,8 +180,12 @@ namespace ChargifyNET
             return Taxable.HasValue;
         }
 
+        /// <summary>
+        /// The collection method for this charge
+        /// </summary>
         [XmlElement("payment_collection_method"), JsonProperty("payment_collection_method")]
         public PaymentCollectionMethod PaymentCollectionMethod { get; set; }
+
         /// <summary>
         /// Ignore, used to determine if the field should be serialized
         /// </summary>
