@@ -19,6 +19,7 @@
     <!--<VersionSuffix>beta1</VersionSuffix>-->
     <IncludeSource>true</IncludeSource>
     <IncludeSymbols>true</IncludeSymbols>
+    <Version>1.2.2</Version>
   </PropertyGroup>
 
   <ItemGroup>

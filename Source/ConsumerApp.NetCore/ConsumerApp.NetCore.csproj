@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="chargify" Version="1.2.1-beta1" />
+    <PackageReference Include="chargify" Version="1.2.2" />
   </ItemGroup>
 
 </Project>
