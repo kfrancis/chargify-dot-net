@@ -206,6 +206,20 @@ namespace ChargifyNET
             return AllocatedQuantity.HasValue;
         }
 
+        /// <summary>
+        /// The Unit Balance
+        /// </summary>
+        [XmlElement("unit_balance")]
+        public int? UnitBalance { get; set; }
+
+        /// <summary>
+        /// Ignore, used to determine if the field should be serialized
+        /// </summary>
+        public bool ShouldSerializeUnitBalance()
+        {
+            return UnitBalance.HasValue;
+        }
+        
         ///// <summary>
         ///// The scheme used if the proration was an upgrade. This is only present when the allocation was created mid-period.
         ///// </summary>

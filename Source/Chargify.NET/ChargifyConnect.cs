@@ -1635,9 +1635,9 @@ namespace ChargifyNET
                 serializer.Serialize(textWriter, options);
                 subscriptionXml.Append(textWriter);
             }
-
+            var subscriptionXmlstring =subscriptionXml.Replace("<components>", "<components type=\"array\">").ToString();
             // now make the request
-            string response = DoRequest(string.Format("subscriptions.{0}", GetMethodExtension()), HttpRequestMethod.Post, subscriptionXml.ToString());
+            string response = DoRequest(string.Format("subscriptions.{0}", GetMethodExtension()), HttpRequestMethod.Post, subscriptionXmlstring);
             // change the response to the object
             return response.ConvertResponseTo<Subscription>("subscription");
         }
