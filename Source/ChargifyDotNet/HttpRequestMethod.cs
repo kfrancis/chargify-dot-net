@@ -27,6 +27,8 @@
 //
 #endregion
 
+using System.Xml.Serialization;
+
 namespace ChargifyNET
 {
     /// <summary>
@@ -60,14 +62,17 @@ namespace ChargifyNET
         /// <summary>
         /// Credit card
         /// </summary>
+        [XmlEnum(Name = "credit_card")]
         Credit_Card,
         /// <summary>
         /// Direct bank account
         /// </summary>
+        [XmlEnum(Name = "bank_account")]
         Bank_Account,
         /// <summary>
         /// Paypal account
         /// </summary>
+        [XmlEnum(Name = "paypal")]
         PayPal_Account
     }
 }
