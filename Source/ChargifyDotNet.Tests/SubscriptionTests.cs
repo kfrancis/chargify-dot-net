@@ -604,7 +604,7 @@ namespace ChargifyDotNetTests
 
             // Act
             Assert.IsNotNull(product, "Product couldn't be found");
-            var newSubscription = Chargify.CreateSubscription(product.Handle, newCustomer, newPaymentInfo, componentsToUse);
+          var newSubscription = Chargify.CreateSubscription(product.Handle, newCustomer, newPaymentInfo, componentsToUse);
             var subComponents = Chargify.GetComponentsForSubscription(newSubscription.SubscriptionID);
             var usedComponents = from c in subComponents
                                  where componentsToUse.ContainsKey(c.Value.ComponentID)

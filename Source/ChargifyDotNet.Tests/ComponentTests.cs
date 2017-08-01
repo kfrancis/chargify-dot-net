@@ -2,6 +2,7 @@
 using System.Linq;
 using ChargifyNET;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 
 namespace ChargifyDotNetTests
 {
@@ -65,6 +66,92 @@ namespace ChargifyDotNetTests
             //Assert.IsInstanceOfType(usageResult, typeof(IUsage));
             Assert.IsTrue(usageResult.Memo == usageDescription);
             Assert.IsTrue(usageResult.Quantity == usageQuantity);
+        }
+
+        /// <summary>
+        /// For @praveen-prakash
+        /// </summary>
+        [TestMethod]
+        public void Components_Create_Subscription_Multiple_Components()
+        {
+            // Arrange
+            var product = Chargify.GetProductList().Values.FirstOrDefault();
+            Assert.IsNotNull(product, "Product couldn't be found");
+            var referenceId = Guid.NewGuid().ToString();
+            var newCustomer = new CustomerAttributes("Scott", "Pilgrim", "demonhead_sucks@scottpilgrim.com", "Chargify", referenceId);
+            var newPaymentInfo = GetTestPaymentMethod(newCustomer);
+            // Find components that allow for a simple allocated_quantity = 1 to work for this simple test
+            var components = Chargify.GetComponentsForProductFamily(product.ProductFamily.ID).Values.Where(c => c.Kind == ComponentType.Quantity_Based_Component || c.Kind == ComponentType.On_Off_Component);
+            var componentsToUse = components.Take(2).ToList();
+            var options = new SubscriptionCreateOptions()
+            {
+                CustomerAttributes = newCustomer,
+                CreditCardAttributes = newPaymentInfo,
+                ProductHandle = product.Handle,
+                Components = new System.Collections.Generic.List<ComponentDetails>
+                {
+                    new ComponentDetails() { ComponentID = componentsToUse.First().ID, AllocatedQuantity = 1 },
+                    new ComponentDetails() { ComponentID = componentsToUse.Last().ID, AllocatedQuantity = 1 }
+                }
+            };
+
+            // Act            
+            var newSubscription = Chargify.CreateSubscription(options);
+            var subComponents = Chargify.GetComponentsForSubscription(newSubscription.SubscriptionID);
+            var usedComponents = from c in subComponents
+                                 where componentsToUse.Any(x => x.ID == c.Value.ComponentID)
+                                 select c;
+
+            // Assert
+            Assert.IsInstanceOfType(newSubscription, typeof(Subscription));
+            Assert.IsNotNull(newSubscription);
+            Assert.IsNotNull(newSubscription.Customer);
+            Assert.IsNotNull(newSubscription.PaymentProfile);
+            Assert.IsTrue(newSubscription.SubscriptionID > int.MinValue);
+            Assert.IsTrue(newSubscription.Customer.ChargifyID > int.MinValue);
+            Assert.IsTrue(newSubscription.Customer.FirstName == newCustomer.FirstName);
+            Assert.IsTrue(newSubscription.Customer.LastName == newCustomer.LastName);
+            Assert.IsTrue(newSubscription.Customer.Email == newCustomer.Email);
+            Assert.IsTrue(newSubscription.Customer.Organization == newCustomer.Organization);
+            Assert.IsTrue(newSubscription.Customer.SystemID == referenceId);
+            Assert.IsTrue(newSubscription.PaymentProfile.FirstName == newPaymentInfo.FirstName);
+            Assert.IsTrue(newSubscription.PaymentProfile.LastName == newPaymentInfo.LastName);
+            Assert.IsTrue(newSubscription.PaymentProfile.ExpirationMonth == newPaymentInfo.ExpirationMonth);
+            Assert.IsTrue(newSubscription.PaymentProfile.ExpirationYear == newPaymentInfo.ExpirationYear);
+            Assert.IsTrue(newSubscription.PaymentProfile.BillingAddress == newPaymentInfo.BillingAddress);
+            //Assert.IsTrue(newSubscription.PaymentProfile.BillingAddress2 == newPaymentInfo.BillingAddress2);
+            Assert.IsTrue(newSubscription.PaymentProfile.BillingCity == newPaymentInfo.BillingCity);
+            Assert.IsTrue(newSubscription.PaymentProfile.BillingCountry == newPaymentInfo.BillingCountry);
+            Assert.IsTrue(newSubscription.PaymentProfile.BillingState == newPaymentInfo.BillingState);
+            Assert.IsTrue(newSubscription.PaymentProfile.BillingZip == newPaymentInfo.BillingZip);
+            Assert.IsTrue(usedComponents.Count() == componentsToUse.Count);
+            foreach (var component in usedComponents)
+            {
+                Assert.IsTrue(componentsToUse.Any(x => x.ID == component.Key));
+                //Assert.AreEqual(decimal.Parse(componentsToUse[component.Key]), component.Value.AllocatedQuantity);
+            }
+
+            // Cleanup
+            Assert.IsTrue(Chargify.DeleteSubscription(newSubscription.SubscriptionID, "Automatic cancel due to test"));
+        }
+
+        private CreditCardAttributes GetTestPaymentMethod(CustomerAttributes customer)
+        {
+            var retVal = new CreditCardAttributes()
+            {
+                FirstName = customer.FirstName,
+                LastName = customer.LastName,
+                ExpirationMonth = 1,
+                ExpirationYear = 2020,
+                FullNumber = "1",
+                CVV = "123",
+                BillingAddress = "123 Main St.",
+                BillingCity = "New York",
+                BillingCountry = "US",
+                BillingState = "New York",
+                BillingZip = "10001"
+            };
+            return retVal;
         }
     }
 }
