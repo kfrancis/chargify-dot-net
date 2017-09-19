@@ -1162,10 +1162,10 @@ namespace ChargifyNET
 
             string message = UpdateShortName + "--" + subscriptionId + "--" + SharedKey;
             string token = message.GetChargifyHostedToken();
-            string prettyId = string.Format("{0}-{1}-{2}", subscriptionId, firstName.Trim().ToLower(), lastName.Trim().ToLower());
+            string prettyId = string.Format("{0}-{1}-{2}", subscriptionId, PCLWebUtility.WebUtility.UrlEncode(firstName.Trim().ToLower()), PCLWebUtility.WebUtility.UrlEncode(lastName.Trim().ToLower()));
             string methodString = string.Format("{0}/{1}/{2}", UpdateShortName, prettyId, token);
             // just in case?
-            methodString = PCLWebUtility.WebUtility.UrlEncode(methodString);
+            // methodString = PCLWebUtility.WebUtility.UrlEncode(methodString);
             string updateUrl = string.Format("{0}{1}{2}", URL, (URL.EndsWith("/") ? "" : "/"), methodString);
             return updateUrl;
         }
@@ -1182,7 +1182,7 @@ namespace ChargifyNET
             string message = UpdateShortName + "--" + subscriptionId + "--" + SharedKey;
             string token = message.GetChargifyHostedToken();
             string methodString = string.Format("{0}/{1}/{2}", UpdateShortName, subscriptionId, token);
-            methodString = PCLWebUtility.WebUtility.UrlEncode(methodString);
+            // methodString = PCLWebUtility.WebUtility.UrlEncode(methodString);
             string updateUrl = string.Format("{0}{1}{2}", URL, (URL.EndsWith("/") ? "" : "/"), methodString);
             return updateUrl;
         }
