@@ -13,13 +13,13 @@
     <Company>Clinical Support Systems</Company>
     <Product>Chargify.NET</Product>
     <Description>Chargify.NET is a comprehensive .NET API wrapper library for accessing Chargify.com, using XML or JSON to read/write.</Description>
-    <AssemblyVersion>1.2.1</AssemblyVersion>
-    <FileVersion>1.2.1</FileVersion>
+    <AssemblyVersion>1.2.3</AssemblyVersion>
+    <FileVersion>1.2.3</FileVersion>
     <VersionPrefix>1.2.1</VersionPrefix>
     <!--<VersionSuffix>beta1</VersionSuffix>-->
     <IncludeSource>true</IncludeSource>
     <IncludeSymbols>true</IncludeSymbols>
-    <Version>1.2.2</Version>
+    <Version>1.2.3</Version>
   </PropertyGroup>
 
   <ItemGroup>
