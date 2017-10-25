@@ -1344,7 +1344,7 @@ namespace ChargifyNET
 
                     // Append the kind to the query string ...
                     if (qs.Length > 0) { qs += "&"; }
-                    qs += string.Format("kinds[]={0}", state.ToString().ToLower());
+                    qs += string.Format("state[]={0}", state.ToString().ToLower());
                 }
             }
 
