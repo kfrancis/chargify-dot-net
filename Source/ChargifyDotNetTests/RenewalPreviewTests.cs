@@ -14,6 +14,7 @@ namespace ChargifyDotNetTests
         {
             // Arrange
             var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value as Subscription;
+            Assert.IsNotNull(subscription, "No suitable subscription could be found.");
 
             // Act
             var result = Chargify.PreviewRenewal(subscription.SubscriptionID);
@@ -23,7 +24,6 @@ namespace ChargifyDotNetTests
             Assert.IsInstanceOfType(result, typeof(IRenewalDetails));
             Assert.AreNotEqual(DateTime.MinValue, result.NextAssessmentAt);
             Assert.AreNotEqual(int.MinValue, result.ExistingBalanceInCents);
-            Assert.IsFalse(result.ExistingBalance < 0);
             Assert.AreNotEqual(int.MinValue, result.SubtotalInCents);
             Assert.AreNotEqual(int.MinValue, result.TotalDiscountInCents);
             Assert.AreNotEqual(int.MinValue, result.TotalTaxInCents);

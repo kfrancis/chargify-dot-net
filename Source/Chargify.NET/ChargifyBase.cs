@@ -30,7 +30,7 @@
 
 //setting CLSCompliant attribute to true
 using System;
-[assembly:CLSCompliant(true)]
+[assembly: CLSCompliant(true)]
 
 namespace ChargifyNET
 {
@@ -56,14 +56,16 @@ namespace ChargifyNET
         /// <returns>The object represented as an HTML formatted string</returns>
         public virtual string ToHTMLString()
         {
+
+#if !DOTNET
             if (HttpContext.Current != null)
             {
-                return HttpContext.Current.Server.HtmlEncode(this.ToString()).Replace("\n\t", "<br>&nbsp;&nbsp;&nbsp;&middot;&nbsp;").Replace("\n", "<br>").Replace(" ", "&nbsp;");
+                return HttpContext.Current.Server.HtmlEncode(ToString()).Replace("\n\t", "<br>&nbsp;&nbsp;&nbsp;&middot;&nbsp;").Replace("\n", "<br>").Replace(" ", "&nbsp;");
             }
-            else
-            {
-                return this.ToString().Replace("\n\t", "<br>&nbsp;&nbsp;&nbsp;&middot;&nbsp;").Replace("\n", "<br>").Replace(" ", "&nbsp;");
-            }
+            return ToString().Replace("\n\t", "<br>&nbsp;&nbsp;&nbsp;&middot;&nbsp;").Replace("\n", "<br>").Replace(" ", "&nbsp;");
+#else
+            return this.ToString().Replace("\n\t", "<br>&nbsp;&nbsp;&nbsp;&middot;&nbsp;").Replace("\n", "<br>").Replace(" ", "&nbsp;");
+#endif
         }
     }
 }

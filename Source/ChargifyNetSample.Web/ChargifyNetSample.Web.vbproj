@@ -29,6 +29,8 @@
     <SccProvider>
     </SccProvider>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
+    <Use64BitIISExpress />
+    <UseGlobalApplicationHostFile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -51,6 +53,9 @@
   <ItemGroup>
     <Reference Include="Elmah">
       <HintPath>..\..\packages\elmah.corelibrary.1.2.2\lib\Elmah.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -94,10 +99,6 @@
     <Reference Include="Antlr3.Runtime">
       <Private>True</Private>
       <HintPath>..\..\packages\Antlr.3.4.1.9004\lib\Antlr3.Runtime.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <Private>True</Private>
-      <HintPath>..\..\packages\Newtonsoft.Json.5.0.6\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.AspNet.Web.Optimization.WebForms">
       <Private>True</Private>
@@ -406,9 +407,9 @@
     <Folder Include="Controllers\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Chargify.NET\Chargify.NET.csproj">
-      <Project>{a4e445a8-21c9-445b-a3a0-d18a4cbd0f0b}</Project>
-      <Name>Chargify.NET</Name>
+    <ProjectReference Include="..\ChargifyDotNet\ChargifyDotNet.csproj">
+      <Project>{61707a83-dffc-4cbf-bb4c-0d41b21f94a7}</Project>
+      <Name>ChargifyDotNet</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>

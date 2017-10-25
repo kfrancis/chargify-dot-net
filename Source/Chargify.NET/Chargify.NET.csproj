@@ -65,9 +65,8 @@
     <ApplicationIcon>wallet.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.8.0.2\lib\net40\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.10.0.3\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
@@ -96,16 +95,20 @@
     <Compile Include="Configuration\ChargifyAccountElement.cs" />
     <Compile Include="Configuration\ChargifyAccountElementCollection.cs" />
     <Compile Include="Configuration\ChargifyAccountRetrieverSection.cs" />
+    <Compile Include="CouponUsage.cs" />
     <Compile Include="Data\Controls\CountryDropDownList.cs" />
     <Compile Include="Coupon.cs" />
     <Compile Include="Credit.cs" />
     <Compile Include="CreditCardAttributes.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="HttpRequestMethod.cs" />
+    <Compile Include="Interfaces\ICouponUsage.cs" />
     <Compile Include="Interfaces\IMetadata.cs" />
     <Compile Include="Interfaces\IMetadataResult.cs" />
     <Compile Include="Interfaces\INote.cs" />
     <Compile Include="Interfaces\IPublicSignupPage.cs" />
     <Compile Include="Interfaces\IPayment.cs" />
+    <Compile Include="Interfaces\IReferralCode.cs" />
     <Compile Include="Interfaces\IRenewalDetails.cs" />
     <Compile Include="Interfaces\ISubscriptionCreateOptions.cs" />
     <Compile Include="Interfaces\ISubscriptionOverride.cs" />
@@ -164,6 +167,7 @@
     <Compile Include="ProductFamilyAttributes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PublicSignupPage.cs" />
+    <Compile Include="RefferalCode.cs" />
     <Compile Include="Refund.cs" />
     <Compile Include="RenewalDetails.cs" />
     <Compile Include="Sites.cs" />
@@ -201,7 +205,6 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Chargify.NET.nuspec" />
     <None Include="packages.config" />
     <None Include="web.config.transform" />
   </ItemGroup>

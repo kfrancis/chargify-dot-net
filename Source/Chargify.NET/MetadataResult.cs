@@ -27,13 +27,17 @@
 //
 #endregion
 
+using System;
+using System.Collections.Generic;
+using System.Xml;
+using ChargifyNET.Json;
+
 namespace ChargifyNET
 {
     #region Imports
-    using System;
-    using System.Collections.Generic;
-    using System.Xml;
-    using ChargifyNET.Json;
+
+
+
     #endregion
 
     /// <summary>
@@ -57,22 +61,20 @@ namespace ChargifyNET
         /// Constructor
         /// </summary>
         public MetadataResult()
-            : base()
         {
         }
 
         /// <summary>
         /// Constructor (xml)
         /// </summary>
-        /// <param name="MetadataResultXML"></param>
-        public MetadataResult(string MetadataResultXML)
-            : base()
+        /// <param name="metadataResultXml"></param>
+        public MetadataResult(string metadataResultXml)
         {
             // get the XML into an XML document
             XmlDocument doc = new XmlDocument();
-            doc.LoadXml(MetadataResultXML);
+            doc.LoadXml(metadataResultXml);
             if (doc.ChildNodes.Count == 0)
-                throw new ArgumentException("XML not valid", "MetadataResultXML");
+                throw new ArgumentException("XML not valid", nameof(metadataResultXml));
             // loop through the child nodes of this node
             foreach (XmlNode elementNode in doc.ChildNodes)
             {
@@ -83,37 +85,35 @@ namespace ChargifyNET
                 }
             }
             // if we get here, then no metadata result data was found
-            throw new ArgumentException("XML does not contain metadata result information", "MetadataResultXML");
+            throw new ArgumentException("XML does not contain metadata result information", nameof(metadataResultXml));
         }
 
         /// <summary>
         /// Constructor (xml)
         /// </summary>
-        /// <param name="MetadataResultNode"></param>
-        public MetadataResult(XmlNode MetadataResultNode)
-            : base()
+        /// <param name="metadataResultNode"></param>
+        public MetadataResult(XmlNode metadataResultNode)
         {
-            if (MetadataResultNode == null)
-                throw new ArgumentNullException("MetadataResultNode");
-            if (MetadataResultNode.Name != "results")
-                throw new ArgumentException("Not a vaild metadata results node", "MetadataResultNode");
-            if (MetadataResultNode.ChildNodes.Count == 0)
-                throw new ArgumentException("XML not valid", "MetadataResultNode");
-            LoadFromNode(MetadataResultNode);
+            if (metadataResultNode == null)
+                throw new ArgumentNullException(nameof(metadataResultNode));
+            if (metadataResultNode.Name != "results")
+                throw new ArgumentException("Not a vaild metadata results node", nameof(metadataResultNode));
+            if (metadataResultNode.ChildNodes.Count == 0)
+                throw new ArgumentException("XML not valid", nameof(metadataResultNode));
+            LoadFromNode(metadataResultNode);
         }
 
         /// <summary>
         /// Constructor (json)
         /// </summary>
-        /// <param name="MetadataResultObject"></param>
-        public MetadataResult(JsonObject MetadataResultObject)
-            : base()
+        /// <param name="metadataResultObject"></param>
+        public MetadataResult(JsonObject metadataResultObject)
         {
-            if (MetadataResultObject == null)
-                throw new ArgumentNullException("MetadataResultObject");
-            if (MetadataResultObject.Keys.Count <= 0)
-                throw new ArgumentException("Not a vaild metadata results object", "MetadataResultObject");
-            LoadFromJSON(MetadataResultObject);
+            if (metadataResultObject == null)
+                throw new ArgumentNullException(nameof(metadataResultObject));
+            if (metadataResultObject.Keys.Count <= 0)
+                throw new ArgumentException("Not a vaild metadata results object", nameof(metadataResultObject));
+            LoadFromJson(metadataResultObject);
         }
 
         private void LoadFromNode(XmlNode parentNode)
@@ -159,8 +159,6 @@ namespace ChargifyNET
                                             hasData = true;
                                             newObj.Value = metadatumNode.GetNodeContentAsString();
                                             break;
-                                        default:
-                                            break;
                                     }
                                 }
                                 if (hasData)
@@ -171,13 +169,11 @@ namespace ChargifyNET
 
                         }
                         break;
-                    default:
-                        break;
                 }
             }
         }
 
-        private void LoadFromJSON(JsonObject obj)
+        private void LoadFromJson(JsonObject obj)
         {
             foreach (string key in obj.Keys)
             {
@@ -201,7 +197,7 @@ namespace ChargifyNET
                     case MetadataKey:
                         _metadata = new List<IMetadata>();
                         JsonArray viewObj = obj[key] as JsonArray;
-                        if (viewObj != null && viewObj.Items != null && viewObj.Length > 0)
+                        if (viewObj?.Items != null && viewObj.Length > 0)
                         {
                             foreach (JsonValue item in viewObj.Items)
                             {
@@ -224,8 +220,6 @@ namespace ChargifyNET
                                             hasData = true;
                                             newObj.Value = obj.GetJSONContentAsString(subItemKey);
                                             break;
-                                        default:
-                                            break;
                                     }
                                 }
                                 if (hasData)
@@ -234,8 +228,6 @@ namespace ChargifyNET
                                 }
                             }
                         }
-                        break;
-                    default:
                         break;
                 }
             }
@@ -252,7 +244,7 @@ namespace ChargifyNET
         {
             get
             {
-                return this._totalCount;
+                return _totalCount;
             }
         }
 
@@ -265,7 +257,7 @@ namespace ChargifyNET
         {
             get
             {
-                return this._currentPage;
+                return _currentPage;
             }
         }
 
@@ -278,7 +270,7 @@ namespace ChargifyNET
         {
             get
             {
-                return this._totalPages;
+                return _totalPages;
             }
         }
 
@@ -291,7 +283,7 @@ namespace ChargifyNET
         {
             get
             {
-                return this._perPage;
+                return _perPage;
             }
         }
 
@@ -304,7 +296,7 @@ namespace ChargifyNET
         {
             get
             {
-                return this._metadata;
+                return _metadata;
             }
         }
 

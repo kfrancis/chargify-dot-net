@@ -52,10 +52,22 @@ namespace ChargifyNET
         Delete
     }
 
+    /// <summary>
+    /// The type of payment profile
+    /// </summary>
     public enum PaymentProfileType
     {
+        /// <summary>
+        /// Credit card
+        /// </summary>
         Credit_Card,
+        /// <summary>
+        /// Direct bank account
+        /// </summary>
         Bank_Account,
+        /// <summary>
+        /// Paypal account
+        /// </summary>
         PayPal_Account
     }
 }

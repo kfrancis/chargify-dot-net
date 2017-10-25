@@ -27,6 +27,7 @@
 //
 #endregion
 
+// ReSharper disable once CheckNamespace
 namespace ChargifyNET
 {
     #region Imports
@@ -158,6 +159,9 @@ namespace ChargifyNET
 
     }
 
+    /// <summary>
+    /// Components
+    /// </summary>
     [XmlType("component")]
     [Serializable]
     public class ComponentDetails
@@ -175,6 +179,9 @@ namespace ChargifyNET
             return ComponentID.HasValue;
         }
 
+        /// <summary>
+        /// Enabled?
+        /// </summary>
         [XmlElement("enabled")]
         public bool? Enabled { get; set; }
         /// <summary>
@@ -185,8 +192,12 @@ namespace ChargifyNET
             return Enabled.HasValue;
         }
 
+        /// <summary>
+        /// The allocated quantity
+        /// </summary>
         [XmlElement("allocated_quantity")]
         public int? AllocatedQuantity { get; set; }
+
         /// <summary>
         /// Ignore, used to determine if the field should be serialized
         /// </summary>
@@ -216,10 +227,16 @@ namespace ChargifyNET
         //}
     }
 
+    /// <summary>
+    /// Calendar billing
+    /// </summary>
     [XmlType("calendar_billing")]
     [Serializable]
     public class CalendarBillingAttributes
     {
+        /// <summary>
+        /// The day that processing is performed
+        /// </summary>
         [XmlElement("snap_day")]
         public string SnapDay { get; set; }
         /// <summary>
@@ -231,6 +248,9 @@ namespace ChargifyNET
         }
     }
 
+    /// <summary>
+    /// Subscription creation options
+    /// </summary>
     [XmlType("subscription")]
     [Serializable]
     public class SubscriptionCreateOptions: ISubscriptionCreateOptions

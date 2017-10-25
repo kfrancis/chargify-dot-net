@@ -5,6 +5,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using ChargifyNET.Data;
 
+// ReSharper disable once CheckNamespace
 namespace ChargifyNET.Controls
 {
     /// <summary>
@@ -26,7 +27,7 @@ namespace ChargifyNET.Controls
                 {
                     // Since the data comes in as Unicode, we need to ASCII encode it for HTML.                    
                     string countryName = Encoding.ASCII.GetString(Encoding.Unicode.GetBytes(country.Value));
-                    this.Items.Add(new ListItem(countryName, country.Key));
+                    Items.Add(new ListItem(countryName, country.Key));
                 }
             }
             base.OnLoad(e);

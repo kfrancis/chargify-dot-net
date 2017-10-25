@@ -89,10 +89,12 @@
     <Compile Include="Base\ChargifyTestBase.cs" />
     <Compile Include="Base\RandomProvider.cs" />
     <Compile Include="CustomerTests.cs" />
+    <Compile Include="ReferralCodeTests.cs" />
     <Compile Include="PortalTests.cs" />
     <Compile Include="PaymentProfileTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ProductTests.cs" />
+    <Compile Include="NoteTests.cs" />
     <Compile Include="SubscriptionTests.cs" />
     <Compile Include="CouponTests.cs" />
     <Compile Include="ComponentTests.cs" />

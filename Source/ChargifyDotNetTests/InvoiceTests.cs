@@ -39,7 +39,9 @@ namespace ChargifyDotNetTests
             var customers = Chargify.GetCustomerList().Keys;
             var referenceValue = customers.FirstOrDefault(systemID => !string.IsNullOrWhiteSpace(systemID));
             ICustomer customer = Chargify.LoadCustomer(referenceValue);
-            var product = Chargify.GetProductList().Values.FirstOrDefault(p => p.PriceInCents > 0);
+            var products = Chargify.GetProductList().Values;
+            var product = products.FirstOrDefault(p => p.PriceInCents > 0 && !p.RequireCreditCard);
+            Assert.IsNotNull(product, "No valid product was found.");
 
             // Act
             var result = Chargify.CreateSubscription(product.Handle, customer.ChargifyID, PaymentCollectionMethod.Invoice);

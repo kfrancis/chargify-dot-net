@@ -1,4 +1,5 @@
-﻿#region License, Terms and Conditions
+﻿
+#region License, Terms and Conditions
 //
 // IChargifyConnect.cs
 //
@@ -26,6 +27,8 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 #endregion
+
+// ReSharper disable once CheckNamespace
 namespace ChargifyNET
 {
     #region Imports
@@ -112,6 +115,93 @@ namespace ChargifyNET
         /// <param name="SetEnabled">True if wanting to turn the component "on", false otherwise.</param>
         /// <returns>IComponentAttributes object if successful, null otherwise.</returns>
         IComponentAttributes SetComponent(int SubscriptionID, int ComponentID, bool SetEnabled);
+        /// <summary>
+        /// Method for getting a list of component usages for a specific subscription
+        /// </summary>
+        /// <param name="SubscriptionID">The subscription ID to examine</param>
+        /// <param name="ComponentID">The ID of the component to examine</param>
+        /// <returns>A dictionary of usages if there are results, null otherwise.</returns>
+        IDictionary<string, IComponent> GetComponentList(int SubscriptionID, int ComponentID);
+        /// <summary>
+        /// Method for getting a list of components for a specific product family
+        /// </summary>
+        /// <param name="ChargifyID">The product family ID</param>
+        /// <returns>A dictionary of components if there are results, null otherwise.</returns>
+        IDictionary<int, IComponentInfo> GetComponentsForProductFamily(int ChargifyID);
+        /// <summary>
+        /// Method for getting a list of components for a specific product family
+        /// </summary>
+        /// <param name="ChargifyID">The product family ID</param>
+        /// <param name="includeArchived">Filter flag for archived components</param>
+        /// <returns>A dictionary of components if there are results, null otherwise.</returns>
+        IDictionary<int, IComponentInfo> GetComponentsForProductFamily(int ChargifyID, bool includeArchived);
+        /// <summary>
+        /// Returns all components "attached" to that subscription.
+        /// </summary>
+        /// <param name="SubscriptionID">The ID of the subscription to query about</param>
+        /// <returns>A dictionary of components, if applicable.</returns>
+        IDictionary<int, IComponentAttributes> GetComponentsForSubscription(int SubscriptionID);
+         /// <summary>
+        /// Method to update the allocated amount of a component for a subscription
+        /// </summary>
+        /// <param name="SubscriptionID">The ID of the subscription to modify the allocation for</param>
+        /// <param name="ComponentID">The ID of the component</param>
+        /// <param name="NewAllocatedQuantity">The quantity of component to allocate to the subscription</param>
+        IComponentAttributes UpdateComponentAllocationForSubscription(int SubscriptionID, int ComponentID, int NewAllocatedQuantity);
+        /// <summary>
+        /// Method to retrieve the current information (including allocation) of a component against a subscription
+        /// </summary>
+        /// <param name="SubscriptionID">The ID of the subscription in question</param>
+        /// <param name="ComponentID">The ID of the component</param>
+        /// <returns>The ComponentAttributes object, null otherwise.</returns>
+        IComponentAttributes GetComponentInfoForSubscription(int SubscriptionID, int ComponentID);
+        /// <summary>
+        /// Returns the 50 most recent Allocations, ordered by most recent first.
+        /// </summary>
+        /// <param name="SubscriptionID">The subscriptionID to scope this request</param>
+        /// <param name="ComponentID">The componentID to scope this request</param>
+        /// <param name="Page">Pass an integer in the page parameter via the query string to access subsequent pages of 50 transactions</param>
+        /// <returns>A dictionary of allocation objects keyed by ComponentID, or null.</returns>
+        IDictionary<int, List<IComponentAllocation>> GetAllocationListForSubscriptionComponent(int SubscriptionID, int ComponentID, int? Page = 0);
+        /// <summary>
+        /// Creates a new Allocation, setting the current allocated quantity for the component and recording a memo.
+        /// </summary>
+        /// <param name="SubscriptionID"></param>
+        /// <param name="ComponentID"></param>
+        /// <param name="Allocation"></param>
+        /// <returns></returns>
+        IComponentAllocation CreateComponentAllocation(int SubscriptionID, int ComponentID, ComponentAllocation Allocation);
+
+        /// <summary>
+        /// Creates a new Allocation, setting the current allocated quantity for the component and recording a memo.
+        /// </summary>
+        /// <param name="SubscriptionID">The ID of the subscription to apply this quantity allocation to</param>
+        /// <param name="ComponentID">The ID of the component to apply this quantity allocation to</param>
+        /// <param name="Quantity">The allocated quantity to which to set the line-items allocated quantity. This should always be an integer. For On/Off components, use 1 for on and 0 for off.</param>
+        /// <returns></returns>
+        IComponentAllocation CreateComponentAllocation(int SubscriptionID, int ComponentID, int Quantity);
+
+        /// <summary>
+        /// Creates a new Allocation, setting the current allocated quantity for the component and recording a memo.
+        /// </summary>
+        /// <param name="SubscriptionID">The ID of the subscription to apply this quantity allocation to</param>
+        /// <param name="ComponentID">The ID of the component to apply this quantity allocation to</param>
+        /// <param name="Quantity">The allocated quantity to which to set the line-items allocated quantity. This should always be an integer. For On/Off components, use 1 for on and 0 for off.</param>
+        /// <param name="Memo">(optional) A memo to record along with the allocation</param>
+        /// <returns></returns>
+        IComponentAllocation CreateComponentAllocation(int SubscriptionID, int ComponentID, int Quantity, string Memo);
+
+        /// <summary>
+        /// Creates a new Allocation, setting the current allocated quantity for the component and recording a memo.
+        /// </summary>
+        /// <param name="SubscriptionID">The ID of the subscription to apply this quantity allocation to</param>
+        /// <param name="ComponentID">The ID of the component to apply this quantity allocation to</param>
+        /// <param name="Quantity">The allocated quantity to which to set the line-items allocated quantity. This should always be an integer. For On/Off components, use 1 for on and 0 for off.</param>
+        /// <param name="Memo">(optional) A memo to record along with the allocation</param>
+        /// <param name="UpgradeScheme">(optional) The scheme used if the proration is an upgrade. Defaults to the site setting if one is not provided.</param>
+        /// <param name="DowngradeScheme">(optional) The scheme used if the proration is a downgrade. Defaults to the site setting if one is not provided.</param>
+        /// <returns>The component allocation object, null otherwise.</returns>
+        IComponentAllocation CreateComponentAllocation(int SubscriptionID, int ComponentID, int Quantity, string Memo, ComponentUpgradeProrationScheme UpgradeScheme, ComponentDowngradeProrationScheme DowngradeScheme);
         #endregion
 
         #region Coupons
@@ -122,6 +212,28 @@ namespace ChargifyNET
         /// <param name="CouponCode">The code of the coupon to apply to the subscription</param>
         /// <returns>The subscription details if successful, null otherwise.</returns>
         ISubscription AddCoupon(int SubscriptionID, string CouponCode);
+
+        /// <summary>
+
+        /// Method for retrieving information about a coupon using the ID of that coupon.
+        /// </summary>
+        /// <param name="ProductFamilyID">The ID of the product family that the coupon belongs to</param>
+        /// <returns>A dictionary of objects if found, empty collection otherwise.</returns>
+        IDictionary<int, ICoupon> GetAllCoupons(int ProductFamilyID);
+
+        /// <summary>
+        /// Method for retrieving information about a coupon usage using the ID of that coupon.
+        /// </summary>
+        /// <param name="CouponID">The ID of the coupon</param>
+        /// <returns>The object if found, null otherwise.</returns>
+        IDictionary<int, ICouponUsage> GetCouponUsage(int CouponID);
+
+        /// Method to remove a coupon to a subscription using the API
+        /// </summary>
+        /// <param name="SubscriptionID">The ID of the subscription to modify</param>
+        /// <param name="CouponCode">The code of the coupon to remove from the subscription</param>
+        /// <returns>True if successful, false otherwise.</returns>
+        bool RemoveCoupon(int SubscriptionID, string CouponCode);
         #endregion
 
         #region Billing Portal
@@ -315,13 +427,55 @@ namespace ChargifyNET
         #endregion
 
         #region Notes
+        /// <summary>
+        /// Create note
+        /// </summary>
+        /// <param name="NewNote">The new note information</param>
+        /// <returns>The note (with id) if successful, null otherwise.</returns>
         INote CreateNote(INote NewNote);
+        /// <summary>
+        /// Create note
+        /// </summary>
+        /// <param name="subscriptionId">The id of the subscription</param>
+        /// <param name="body">The note body</param>
+        /// <param name="sticky">Is the note sticky?</param>
+        /// <returns>The note, if successful. Null otherwise</returns>
+        INote CreateNote(int subscriptionId, string body, bool sticky = false);
+        /// <summary>
+        /// Gets the notes for a particular subscription
+        /// </summary>
+        /// <param name="SubscriptionID">The id of the subscription</param>
+        /// <returns>The collection of notes, keyed by note id. Empty collection otherwise.</returns>
         IDictionary<int, INote> GetNotesForSubscription(int SubscriptionID);
+        /// <summary>
+        /// Load a particular note
+        /// </summary>
+        /// <param name="SubscriptionID">The related subscription id</param>
+        /// <param name="NoteID">The id of the ntoe</param>
+        /// <returns></returns>
         INote LoadNote(int SubscriptionID, int NoteID);
+
+        /// <summary>
+        /// Delete a note
+        /// </summary>
+        /// <param name="SubscriptionID">The related subscription id</param>
+        /// <param name="NoteID">The id of the ntoe</param>
+        /// <returns>True if successful, false otherwise.</returns>
         bool DeleteNote(int SubscriptionID, int NoteID);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="SubscriptionID">The related subscription id</param>
+        /// <param name="UpdatedNote">The updated note information</param>
+        /// <returns>The updated note, if successful. Null otherwise.</returns>
         INote UpdateNote(int SubscriptionID, INote UpdatedNote);
         #endregion
 
+        #region Referral Codes
+        IReferralCode ValidateReferralCode(string ReferralCode);
+        #endregion
+
+        #region Usage
         /// <summary>
         /// Method for adding a metered component usage to the subscription
         /// </summary>
@@ -331,11 +485,9 @@ namespace ChargifyNET
         /// <param name="Memo">The memo for the usage</param>
         /// <returns>The usage added if successful, otherwise null.</returns>
         IUsage AddUsage(int SubscriptionID, int ComponentID, int Quantity, string Memo);
-        /// <summary>
-        /// Get or set the API key
-        /// </summary>
-        string apiKey { get; set; }
+        #endregion
 
+        #region Product Families
         /// <summary>
         /// Method for creating a new product family via the API
         /// </summary>
@@ -359,6 +511,9 @@ namespace ChargifyNET
         /// <param name="ID">The Chargify ID of the product</param>
         /// <returns>The product family with the specified chargify ID</returns>
         IProductFamily LoadProductFamily(int ID);
+        #endregion
+
+        #region Charges
         /// <summary>
         /// Create a new one-time charge
         /// </summary>
@@ -366,14 +521,7 @@ namespace ChargifyNET
         /// <param name="Charge">The charge parameters</param>
         /// <returns></returns>
         ICharge CreateCharge(int SubscriptionID, ICharge Charge);
-        ///// <summary>
-        ///// Create a new one-time charge
-        ///// </summary>
-        ///// <param name="SubscriptionID">The subscription that will be charged</param>
-        ///// <param name="amount">The amount to charge the customer</param>
-        ///// <param name="memo">A description of the charge</param>
-        ///// <returns>The charge details</returns>
-        //ICharge CreateCharge(int SubscriptionID, decimal amount, string memo);
+
         /// <summary>
         /// Create a new one-time charge
         /// </summary>
@@ -384,6 +532,9 @@ namespace ChargifyNET
         /// <param name="useNegativeBalance">(Optional) Should the subscription balance be taken into consideration? Default = false</param>
         /// <returns>The charge details</returns>
         ICharge CreateCharge(int SubscriptionID, decimal amount, string memo, bool useNegativeBalance = false, bool delayCharge = false);
+        #endregion
+
+        #region Coupons
         /// <summary>
         /// Create a new one-time credit
         /// </summary>
@@ -391,12 +542,35 @@ namespace ChargifyNET
         /// <param name="ProductFamilyID">The ID of the product family to add this coupon to.</param>
         /// <returns>The object if successful, null otherwise.</returns>
         ICoupon CreateCoupon(ICoupon Coupon, int ProductFamilyID);
+
         /// <summary>
         /// Update an existing coupon
         /// </summary>
         /// <param name="Coupon">Coupon object</param>
         /// <returns>The updated coupon if successful, null otherwise.</returns>
         ICoupon UpdateCoupon(ICoupon Coupon);
+        /// <summary>
+        /// Retrieve the coupon corresponding to the coupon code, useful for coupon validation.
+        /// </summary>
+        /// <param name="ProductFamilyID">The ID of the product family the coupon belongs to</param>
+        /// <param name="CouponCode">The code used to represent the coupon</param>
+        /// <returns>The object if found, otherwise null.</returns>
+        ICoupon FindCoupon(int ProductFamilyID, string CouponCode);
+        /// <summary>
+        /// Method for retrieving information about a coupon using the ID of that coupon.
+        /// </summary>
+        /// <param name="ProductFamilyID">The ID of the product family that the coupon belongs to</param>
+        /// <param name="CouponID">The ID of the coupon</param>
+        /// <returns>The object if found, null otherwise.</returns>
+        ICoupon LoadCoupon(int ProductFamilyID, int CouponID);
+        /// <summary>
+        /// Load the requested customer from chargify
+        /// </summary>
+        /// <param name="ChargifyID">The chargify ID of the customer</param>
+        /// <returns>The customer with the specified chargify ID</returns>
+        #endregion
+
+        #region Credit
         /// <summary>
         /// Create a new one-time credit
         /// </summary>
@@ -412,8 +586,15 @@ namespace ChargifyNET
         /// <param name="memo">A note regarding the reason for the credit</param>
         /// <returns>The object if successful, null otherwise.</returns>
         ICredit CreateCredit(int SubscriptionID, decimal amount, string memo);
+        #endregion
 
         #region Customer
+        /// <summary>
+        /// Update the specified chargify customer
+        /// </summary>
+        /// <param name="Customer">The customer to update</param>
+        /// <returns>The updated customer, null otherwise.</returns>
+        ICustomer UpdateCustomer(ICustomer Customer);
         /// <summary>
         /// Create a new chargify customer
         /// </summary>
@@ -447,9 +628,225 @@ namespace ChargifyNET
         /// <returns>True if the customer was deleted, false otherwise.</returns>
         /// <remarks>This method does not currently work, but it will once they open up the API. This will always return false, as Chargify will send a Http Forbidden everytime.</remarks>
         bool DeleteCustomer(string SystemID);
+        /// <summary>
+        /// Get a list of all customers.  Be careful calling this method because a large number of
+        /// customers will result in multiple calls to Chargify
+        /// </summary>
+        /// <returns>A list of customers</returns>
+        IDictionary<string, ICustomer> GetCustomerList();
+        /// <summary>
+        /// Get a list of all customers.  Be careful calling this method because a large number of
+        /// customers will result in multiple calls to Chargify
+        /// </summary>
+        /// <param name="keyByChargifyID">If true, the key will be the ChargifyID, otherwise it will be the reference value</param>
+        /// <returns>A list of customers</returns>
+        IDictionary<string, ICustomer> GetCustomerList(bool keyByChargifyID);
+        /// <summary>
+        /// Get a list of customers (will return 50 for each page)
+        /// </summary>
+        /// <param name="PageNumber">The page number to load</param>
+        /// <returns>A list of customers for the specified page</returns>
+        IDictionary<string, ICustomer> GetCustomerList(int PageNumber);
+        /// <summary>
+        /// Get a list of customers (will return 50 for each page)
+        /// </summary>
+        /// <param name="PageNumber">The page number to load</param>
+        /// /// <param name="keyByChargifyID">If true, the key will be the ChargifyID, otherwise it will be the reference value</param>
+        /// <returns>A list of customers for the specified page</returns>
+        IDictionary<string, ICustomer> GetCustomerList(int PageNumber, bool keyByChargifyID);
+        /// <summary>
+        /// Load the requested customer from chargify
+        /// </summary>
+        /// <param name="ChargifyID">The chargify id of the customer</param>
+        /// <returns>The requested customer, null otherwise</returns>
+        ICustomer LoadCustomer(int ChargifyID);
+        /// <summary>
+        /// Load the requested customer from chargify
+        /// </summary>
+        /// <param name="SystemID">The system ID of the customer</param>
+        /// <returns>The customer with the specified chargify ID</returns>
+        ICustomer LoadCustomer(string SystemID);
         #endregion
 
         #region Subscriptions
+        /// <summary>
+        /// Update the credit card information for an existing subscription
+        /// </summary>
+        /// <param name="Subscription">The subscription to update credit card info for</param>
+        /// <param name="CreditCardAttributes">The attributes for the updated credit card</param>
+        /// <returns>The new subscription resulting from the change</returns>
+        ISubscription UpdateSubscriptionCreditCard(ISubscription Subscription, ICreditCardAttributes CreditCardAttributes);
+        /// <summary>
+        /// Update the credit card information for an existing subscription
+        /// </summary>
+        /// <param name="Subscription">The subscription to update credit card info for</param>
+        /// <param name="FullNumber">The full number of the credit card (optional - set to null if not required)</param>
+        /// <param name="ExpirationMonth">The expiration month of the credit card (optional - set to null if not required)</param>
+        /// <param name="ExpirationYear">The expiration year of the credit card (optional - set to null if not required)</param>
+        /// <param name="CVV">The CVV for the credit card (optional - set to null if not required)</param>
+        /// <param name="BillingAddress">The billing address (optional - set to null if not required)</param>
+        /// <param name="BillingCity">The billing city (optional - set to null if not required)</param>
+        /// <param name="BillingState">The billing state or province (optional - set to null if not required)</param>
+        /// <param name="BillingZip">The billing zip code or postal code (optional - set to null if not required)</param>
+        /// <param name="BillingCountry">The billing country (optional - set to null if not required)</param>
+        /// <returns>The new subscription resulting from the change</returns>
+        ISubscription UpdateSubscriptionCreditCard(ISubscription Subscription, string FullNumber, int? ExpirationMonth, int? ExpirationYear, string CVV, string BillingAddress, string BillingCity, string BillingState, string BillingZip, string BillingCountry);
+        /// <summary>
+        /// Update the credit card information for an existing subscription
+        /// </summary>
+        /// <param name="SubscriptionID">The ID of the suscription to update</param>
+        /// <param name="CreditCardAttributes">The attributes for the update credit card</param>
+        /// <returns>The new subscription resulting from the change</returns>
+        ISubscription UpdateSubscriptionCreditCard(int SubscriptionID, ICreditCardAttributes CreditCardAttributes);
+        /// <summary>
+        /// Update the credit card information for an existing subscription
+        /// </summary>
+        /// <param name="SubscriptionID">The ID of the suscription to update</param>
+        /// <param name="FullNumber">The full number of the credit card (optional - set to null if not required)</param>
+        /// <param name="ExpirationMonth">The expiration month of the credit card (optional - set to null if not required)</param>
+        /// <param name="ExpirationYear">The expiration year of the credit card (optional - set to null if not required)</param>
+        /// <param name="CVV">The CVV for the credit card (optional - set to null if not required)</param>
+        /// <param name="BillingAddress">The billing address (optional - set to null if not required)</param>
+        /// <param name="BillingCity">The billing city (optional - set to null if not required)</param>
+        /// <param name="BillingState">The billing state or province (optional - set to null if not required)</param>
+        /// <param name="BillingZip">The billing zip code or postal code (optional - set to null if not required)</param>
+        /// <param name="BillingCountry">The billing country (optional - set to null if not required)</param>
+        /// <returns>The new subscription resulting from the change</returns>
+        ISubscription UpdateSubscriptionCreditCard(int SubscriptionID, string FullNumber, int? ExpirationMonth, int? ExpirationYear, string CVV, string BillingAddress, string BillingCity, string BillingState, string BillingZip, string BillingCountry);
+        /// <summary>
+        /// Update the credit card information for an existing subscription
+        /// </summary>
+        /// <param name="SubscriptionID">The ID of the suscription to update</param>
+        /// <param name="FirstName">The first name on the credit card</param>
+        /// <param name="LastName">The last name on the credit card</param>
+        /// <param name="FullNumber">The full number of the credit card (optional - set to null if not required)</param>
+        /// <param name="ExpirationMonth">The expiration month of the credit card (optional - set to null if not required)</param>
+        /// <param name="ExpirationYear">The expiration year of the credit card (optional - set to null if not required)</param>
+        /// <param name="CVV">The CVV for the credit card (optional - set to null if not required)</param>
+        /// <param name="BillingAddress">The billing address (optional - set to null if not required)</param>
+        /// <param name="BillingCity">The billing city (optional - set to null if not required)</param>
+        /// <param name="BillingState">The billing state or province (optional - set to null if not required)</param>
+        /// <param name="BillingZip">The billing zip code or postal code (optional - set to null if not required)</param>
+        /// <param name="BillingCountry">The billing country (optional - set to null if not required)</param>
+        /// <returns>The new subscription resulting from the change</returns>
+        ISubscription UpdateSubscriptionCreditCard(int SubscriptionID, string FirstName, string LastName, string FullNumber, int? ExpirationMonth, int? ExpirationYear, string CVV, string BillingAddress, string BillingCity, string BillingState, string BillingZip, string BillingCountry);
+        /// <summary>
+        /// Update the specified chargify subscription
+        /// </summary>
+        /// <param name="Subscription">The subscription to update</param>
+        /// <returns>The updated subscriptionn, null otherwise.</returns>
+        ISubscription UpdateSubscription(ISubscription Subscription);
+        /// <summary>
+        /// Update the collection method of the subscription
+        /// </summary>
+        /// <param name="SubscriptionID">The ID of the subscription to update</param>
+        /// <param name="PaymentCollectionMethod">The collection method to set</param>
+        /// <returns>The full details of the updated subscription</returns>
+        ISubscription UpdatePaymentCollectionMethod(int SubscriptionID, PaymentCollectionMethod PaymentCollectionMethod);
+        /// <summary>
+        /// Chargify offers the ability to reactivate a previously canceled subscription. For details
+        /// on how reactivation works, and how to reactivate subscriptions through the Admin interface, see
+        /// http://support.chargify.com/faqs/features/reactivation
+        /// </summary>
+        /// <param name="SubscriptionID">The ID of the subscription to reactivate</param>
+        /// <returns>The newly reactivated subscription, or nothing.</returns>
+        ISubscription ReactivateSubscription(int SubscriptionID);
+        /// <summary>
+        /// Chargify offers the ability to reactivate a previously canceled subscription. For details
+        /// on how reactivation works, and how to reactivate subscriptions through the Admin interface, see
+        /// http://support.chargify.com/faqs/features/reactivation
+        /// </summary>
+        /// <param name="SubscriptionID">The ID of the subscription to reactivate</param>
+        /// <param name="includeTrial">If true, the reactivated subscription will include a trial if one is available.</param>
+        /// <returns>The newly reactivated subscription, or nothing.</returns>
+        ISubscription ReactivateSubscription(int SubscriptionID, bool includeTrial);
+        /// <summary>
+        /// Chargify offers the ability to reactivate a previously canceled subscription. For details
+        /// on how reactivation works, and how to reactivate subscriptions through the Admin interface, see
+        /// http://support.chargify.com/faqs/features/reactivation
+        /// </summary>
+        /// <param name="SubscriptionID">The ID of the subscription to reactivate</param>
+        /// <param name="includeTrial">If true, the reactivated subscription will include a trial if one is available.</param>
+        /// <param name="preserveBalance">If true, the existing subscription balance will NOT be cleared/reset before adding the additional reactivation charges.</param>
+        /// <param name="couponCode">The coupon code to be applied during reactivation.</param>
+        /// <returns>The newly reactivated subscription, or nothing.</returns>
+        ISubscription ReactivateSubscription(int SubscriptionID, bool includeTrial, bool? preserveBalance, string couponCode);
+        /// <summary>
+        /// Method for reseting a subscription balance to zero (removes outstanding balance). 
+        /// Useful when reactivating subscriptions, and making sure not to charge the user
+        /// their existing balance when then cancelled.
+        /// </summary>
+        /// <param name="SubscriptionID">The ID of the subscription to modify.</param>
+        /// <returns>True if successful, false otherwise.</returns>
+        bool ResetSubscriptionBalance(int SubscriptionID);
+        /// <summary>
+        /// Method that returns a list of subscriptions.
+        /// </summary>
+        /// <returns>Null if there are no results, object otherwise.</returns>
+        IDictionary<int, ISubscription> GetSubscriptionList();
+        /// <summary>
+        /// Method that returns a list of subscriptions.
+        /// </summary>
+        /// <param name="states">A list of the states of subscriptions to return</param>
+        /// <returns>Null if there are no results, object otherwise.</returns>
+        IDictionary<int, ISubscription> GetSubscriptionList(List<SubscriptionState> states);
+        /// <summary>
+        /// Method that returns a list of subscriptions.
+        /// </summary>
+        /// <param name="page">The page number</param>
+        /// <param name="per_page">The number of results per page (used for pagination)</param>
+        /// <returns>Null if there are no results, object otherwise.</returns>
+        IDictionary<int, ISubscription> GetSubscriptionList(int page, int per_page);
+        /// <summary>
+        /// Method to change the subscription product WITH proration.
+        /// </summary>
+        /// <param name="Subscription">The subscription to migrate</param>
+        /// <param name="Product">The product to migrate the subscription to</param>
+        /// <param name="IncludeTrial">Boolean, default false. If true, the customer will migrate to the new product
+        /// if one is available. If false, the trial period will be ignored.</param>
+        /// <param name="IncludeInitialCharge">Boolean, default false. If true, initial charges will be assessed.
+        /// If false, initial charges will be ignored.</param>
+        /// <returns></returns>
+        ISubscription MigrateSubscriptionProduct(ISubscription Subscription, IProduct Product, bool IncludeTrial, bool IncludeInitialCharge);
+        /// <summary>
+        /// Method to change the subscription product WITH proration.
+        /// </summary>
+        /// <param name="Subscription">The subscription to migrate</param>
+        /// <param name="ProductHandle">The product handle of the product to migrate to</param>
+        /// <param name="IncludeTrial">Boolean, default false. If true, the customer will migrate to the new product
+        /// if one is available. If false, the trial period will be ignored.</param>
+        /// <param name="IncludeInitialCharge">Boolean, default false. If true, initial charges will be assessed.
+        /// If false, initial charges will be ignored.</param>
+        /// <returns>The completed subscription if migrated successfully, null otherwise.</returns>
+        ISubscription MigrateSubscriptionProduct(ISubscription Subscription, string ProductHandle, bool IncludeTrial, bool IncludeInitialCharge);
+        /// <summary>
+        /// Method to change the subscription product WITH proration.
+        /// </summary>
+        /// <param name="SubscriptionID">The subscription to migrate</param>
+        /// <param name="Product">The product to migrate to</param>
+        /// <param name="IncludeTrial">Boolean, default false. If true, the customer will migrate to the new product
+        /// if one is available. If false, the trial period will be ignored.</param>
+        /// <param name="IncludeInitialCharge">Boolean, default false. If true, initial charges will be assessed.
+        /// If false, initial charges will be ignored.</param>
+        /// <returns>The completed subscription if migrated successfully, null otherwise.</returns>
+        ISubscription MigrateSubscriptionProduct(int SubscriptionID, IProduct Product, bool IncludeTrial, bool IncludeInitialCharge);
+        /// <summary>
+        /// Method to change the subscription product WITH proration.
+        /// </summary>
+        /// <param name="SubscriptionID">The subscription to migrate</param>
+        /// <param name="ProductHandle">The product handle of the product to migrate to</param>
+        /// <param name="IncludeTrial">Boolean, default false. If true, the customer will migrate to the new product
+        /// if one is available. If false, the trial period will be ignored.</param>
+        /// <param name="IncludeInitialCharge">Boolean, default false. If true, initial charges will be assessed.
+        /// If false, initial charges will be ignored.</param>
+        /// <returns>The completed subscription if migrated successfully, null otherwise.</returns>
+        ISubscription MigrateSubscriptionProduct(int SubscriptionID, string ProductHandle, bool IncludeTrial, bool IncludeInitialCharge);
+        /// <summary>
+        /// Load the requested subscription from chargify
+        /// </summary>
+        /// <param name="SubscriptionID">The ID of the subscription</param>
+        /// <returns>The subscription with the specified ID</returns>
+        ISubscription LoadSubscription(int SubscriptionID);
         /// <summary>
         /// Create a subscription
         /// </summary>
@@ -679,8 +1076,6 @@ namespace ChargifyNET
         /// <param name="CouponCode">The discount coupon code</param>
         /// <returns>The xml describing the new subscription</returns>
         ISubscription CreateSubscriptionUsingCoupon(string ProductHandle, string SystemID, string CouponCode);
-        #endregion
-
         /// <summary>
         /// Delete a subscription
         /// </summary>
@@ -694,6 +1089,7 @@ namespace ChargifyNET
         /// <remarks>Does NOT prorate. Use MigrateSubscriptionProduct to get proration to work.</remarks>
         /// <param name="Subscription">The suscription to update</param>
         /// <param name="Product">The new product</param>
+        /// <param name="ProductChangeDelayed">Should the product change be delayed?</param>
         /// <returns>The new subscription resulting from the change</returns>
         ISubscription EditSubscriptionProduct(ISubscription Subscription, IProduct Product, bool? ProductChangeDelayed = null);
         /// <summary>
@@ -702,6 +1098,7 @@ namespace ChargifyNET
         /// <remarks>Does NOT prorate. Use MigrateSubscriptionProduct to get proration to work.</remarks>
         /// <param name="Subscription">The suscription to update</param>
         /// <param name="ProductHandle">The handle to the new product</param>
+        /// <param name="ProductChangeDelayed">Should the product change be delayed?</param>
         /// <returns>The new subscription resulting from the change</returns>
         ISubscription EditSubscriptionProduct(ISubscription Subscription, string ProductHandle, bool? ProductChangeDelayed = null);
         /// <summary>
@@ -710,6 +1107,7 @@ namespace ChargifyNET
         /// <remarks>Does NOT prorate. Use MigrateSubscriptionProduct to get proration to work.</remarks>
         /// <param name="SubscriptionID">The ID of the suscription to update</param>
         /// <param name="Product">The new product</param>
+        /// <param name="ProductChangeDelayed">Should the product change be delayed?</param>
         /// <returns>The new subscription resulting from the change</returns>
         ISubscription EditSubscriptionProduct(int SubscriptionID, IProduct Product, bool? ProductChangeDelayed = null);
         /// <summary>
@@ -737,65 +1135,6 @@ namespace ChargifyNET
         /// <returns>Subscription if successful, null otherwise.</returns>
         ISubscription UpdateDelayedCancelForSubscription(int SubscriptionID, bool CancelAtEndOfPeriod, string CancellationMessage);
         /// <summary>
-        /// Retrieve the coupon corresponding to the coupon code, useful for coupon validation.
-        /// </summary>
-        /// <param name="ProductFamilyID">The ID of the product family the coupon belongs to</param>
-        /// <param name="CouponCode">The code used to represent the coupon</param>
-        /// <returns>The object if found, otherwise null.</returns>
-        ICoupon FindCoupon(int ProductFamilyID, string CouponCode);
-        /// <summary>
-        /// Method for getting a list of component usages for a specific subscription
-        /// </summary>
-        /// <param name="SubscriptionID">The subscription ID to examine</param>
-        /// <param name="ComponentID">The ID of the component to examine</param>
-        /// <returns>A dictionary of usages if there are results, null otherwise.</returns>
-        IDictionary<string, IComponent> GetComponentList(int SubscriptionID, int ComponentID);
-        /// <summary>
-        /// Method for getting a list of components for a specific product family
-        /// </summary>
-        /// <param name="ChargifyID">The product family ID</param>
-        /// <returns>A dictionary of components if there are results, null otherwise.</returns>
-        IDictionary<int, IComponentInfo> GetComponentsForProductFamily(int ChargifyID);
-        /// <summary>
-        /// Method for getting a list of components for a specific product family
-        /// </summary>
-        /// <param name="ChargifyID">The product family ID</param>
-        /// <param name="includeArchived">Filter flag for archived components</param>
-        /// <returns>A dictionary of components if there are results, null otherwise.</returns>
-        IDictionary<int, IComponentInfo> GetComponentsForProductFamily(int ChargifyID, bool includeArchived);
-        /// <summary>
-        /// Returns all components "attached" to that subscription.
-        /// </summary>
-        /// <param name="SubscriptionID">The ID of the subscription to query about</param>
-        /// <returns>A dictionary of components, if applicable.</returns>
-        IDictionary<int, IComponentAttributes> GetComponentsForSubscription(int SubscriptionID);
-        /// <summary>
-        /// Get a list of all customers.  Be careful calling this method because a large number of
-        /// customers will result in multiple calls to Chargify
-        /// </summary>
-        /// <returns>A list of customers</returns>
-        IDictionary<string, ICustomer> GetCustomerList();
-        /// <summary>
-        /// Get a list of all customers.  Be careful calling this method because a large number of
-        /// customers will result in multiple calls to Chargify
-        /// </summary>
-        /// <param name="keyByChargifyID">If true, the key will be the ChargifyID, otherwise it will be the reference value</param>
-        /// <returns>A list of customers</returns>
-        IDictionary<string, ICustomer> GetCustomerList(bool keyByChargifyID);
-        /// <summary>
-        /// Get a list of customers (will return 50 for each page)
-        /// </summary>
-        /// <param name="PageNumber">The page number to load</param>
-        /// <returns>A list of customers for the specified page</returns>
-        IDictionary<string, ICustomer> GetCustomerList(int PageNumber);
-        /// <summary>
-        /// Get a list of customers (will return 50 for each page)
-        /// </summary>
-        /// <param name="PageNumber">The page number to load</param>
-        /// /// <param name="keyByChargifyID">If true, the key will be the ChargifyID, otherwise it will be the reference value</param>
-        /// <returns>A list of customers for the specified page</returns>
-        IDictionary<string, ICustomer> GetCustomerList(int PageNumber, bool keyByChargifyID);
-        /// <summary>
         /// Method to get the secure URL (with pretty id) for updating the payment details for a subscription.
         /// </summary>
         /// <param name="FirstName">The first name of the customer to add to the pretty url</param>
@@ -816,24 +1155,54 @@ namespace ChargifyNET
         /// <returns>The secure url of the update page</returns>
         string GetSubscriptionUpdateURL(int SubscriptionID);
         /// <summary>
+        /// Resume a paused (on-hold) subscription. If the normal next renewal date has not passed, 
+        /// the subscription will return to active and will renew on that date. Otherwise, it will 
+        /// behave like a reactivation, setting the billing date to 'now' and charging the subscriber.
+        /// </summary>
+        /// <param name="subscriptionId">The (Chargify) id of the subscription</param>
+        /// <returns>The subscription data, if successful</returns>
+        /// <remarks>https://reference.chargify.com/v1/subscriptions/resume-subscription</remarks>
+        ISubscription ResumeSubscription(int subscriptionId);
+        /// <summary>
+        /// This will place the subscription in the on_hold state and it will not renew.
+        /// </summary>
+        /// <param name="subscriptionId">The (chargify) id of the subscription</param>
+        /// <param name="automaticResumeDate">The date the subscription will automatically resume, if applicable</param>
+        /// <returns>The subscription data, if successful</returns>
+        /// <remarks>https://reference.chargify.com/v1/subscriptions/hold-subscription</remarks>
+        ISubscription PauseSubscription(int subscriptionId, DateTime? automaticResumeDate = null);
+        #endregion
+
+        #region Transactions
+        /// <summary>
+        /// Load the requested transaction from Chargify
+        /// </summary>
+        /// <param name="ID">The ID of the transaction</param>
+        /// <returns>The transaction with the specified ID</returns>
+        /// <remarks>Unfortunately, this resource isn't yet available.</remarks>
+        ITransaction LoadTransaction(int ID);
+        /// <summary>
         /// Method for getting a list of transactions
         /// </summary>
+        /// <param name="descending">Should the results in in descending order?</param>
         /// <returns>The dictionary of transaction records if successful, otherwise null.</returns>
-        IDictionary<int, ITransaction> GetTransactionList();
+        IDictionary<int, ITransaction> GetTransactionList(bool descending = true);
         /// <summary>
         /// Method for getting a list of transactions
         /// </summary>
         /// <param name="kinds">A list of the types of transactions to return.</param>
+        /// <param name="descending">Should the results in in descending order?</param>
         /// <returns>The dictionary of transaction records if successful, otherwise null.</returns>
-        IDictionary<int, ITransaction> GetTransactionList(List<TransactionType> kinds);
+        IDictionary<int, ITransaction> GetTransactionList(List<TransactionType> kinds, bool descending = true);
         /// <summary>
         /// Method for getting a list of transactions
         /// </summary>
         /// <param name="kinds">A list of transaction types to return.</param>
         /// <param name="since_id">Returns transactions with an ID greater than or equal to the one specified. Use int.MinValue to not specify a since_id.</param>
         /// <param name="max_id">Returns transactions with an id less than or equal to the one specified. Use int.MinValue to not specify a max_id.</param>
+        /// <param name="descending">Should the results in in descending order?</param>
         /// <returns>The dictionary of transaction records if successful, otherwise null.</returns>
-        IDictionary<int, ITransaction> GetTransactionList(List<TransactionType> kinds, int since_id, int max_id);
+        IDictionary<int, ITransaction> GetTransactionList(List<TransactionType> kinds, int since_id, int max_id, bool descending = true);
         /// <summary>
         /// Method for getting a list of transactions
         /// </summary>
@@ -842,23 +1211,26 @@ namespace ChargifyNET
         /// <param name="max_id">Returns transactions with an id less than or equal to the one specified. Use int.MinValue to not specify a max_id.</param>
         /// <param name="since_date">Returns transactions with a created_at date greater than or equal to the one specified. Use DateTime.MinValue to not specify a since_date.</param>
         /// <param name="until_date">Returns transactions with a created_at date less than or equal to the one specified. Use DateTime.MinValue to not specify an until_date.</param>
+        /// <param name="descending">Should the results in in descending order?</param>
         /// <returns>The dictionary of transaction records if successful, otherwise null.</returns>
-        IDictionary<int, ITransaction> GetTransactionList(List<TransactionType> kinds, int since_id, int max_id, DateTime since_date, DateTime until_date);
+        IDictionary<int, ITransaction> GetTransactionList(List<TransactionType> kinds, int since_id, int max_id, DateTime since_date, DateTime until_date, bool descending = true);
         /// <summary>
         /// Method for getting a list of transactions
         /// </summary>
         /// <param name="page">The page number</param>
         /// <param name="per_page">The number of results per page (used for pagination)</param>
+        /// <param name="descending">Should the results in in descending order?</param>
         /// <returns>The dictionary of transaction records if successful, otherwise null.</returns>
-        IDictionary<int, ITransaction> GetTransactionList(int page, int per_page);
+        IDictionary<int, ITransaction> GetTransactionList(int page, int per_page, bool descending = true);
         /// <summary>
         /// Method for getting a list of transactions
         /// </summary>
         /// <param name="page">The page number</param>
         /// <param name="per_page">The number of results per page (used for pagination)</param>
         /// <param name="kinds">A list of the types of transactions to return.</param>
+        /// <param name="descending">Should the results in in descending order?</param>
         /// <returns>The dictionary of transaction records if successful, otherwise null.</returns>
-        IDictionary<int, ITransaction> GetTransactionList(int page, int per_page, List<TransactionType> kinds);
+        IDictionary<int, ITransaction> GetTransactionList(int page, int per_page, List<TransactionType> kinds, bool descending = true);
         /// <summary>
         /// Method for getting a list of transactions
         /// </summary>
@@ -867,8 +1239,9 @@ namespace ChargifyNET
         /// <param name="kinds">A list of transaction types to return.</param>
         /// <param name="since_id">Returns transactions with an ID greater than or equal to the one specified. Use int.MinValue to not specify a since_id.</param>
         /// <param name="max_id">Returns transactions with an id less than or equal to the one specified. Use int.MinValue to not specify a max_id.</param>
+        /// <param name="descending">Should the results in in descending order?</param>
         /// <returns>The dictionary of transaction records if successful, otherwise null.</returns>
-        IDictionary<int, ITransaction> GetTransactionList(int page, int per_page, List<TransactionType> kinds, int since_id, int max_id);
+        IDictionary<int, ITransaction> GetTransactionList(int page, int per_page, List<TransactionType> kinds, int since_id, int max_id, bool descending = true);
         /// <summary>
         /// Method for getting a list of transactions
         /// </summary>
@@ -879,8 +1252,9 @@ namespace ChargifyNET
         /// <param name="max_id">Returns transactions with an id less than or equal to the one specified. Use int.MinValue to not specify a max_id.</param>
         /// <param name="since_date">Returns transactions with a created_at date greater than or equal to the one specified. Use DateTime.MinValue to not specify a since_date.</param>
         /// <param name="until_date">Returns transactions with a created_at date less than or equal to the one specified. Use DateTime.MinValue to not specify an until_date.</param>
+        /// <param name="descending">Should the results in in descending order?</param>
         /// <returns>The dictionary of transaction records if successful, otherwise null.</returns>
-        IDictionary<int, ITransaction> GetTransactionList(int page, int per_page, List<TransactionType> kinds, int since_id, int max_id, DateTime since_date, DateTime until_date);
+        IDictionary<int, ITransaction> GetTransactionList(int page, int per_page, List<TransactionType> kinds, int since_id, int max_id, DateTime since_date, DateTime until_date, bool descending = true);
         /// <summary>
         /// Method for getting the list of transactions for a subscription
         /// </summary>
@@ -955,269 +1329,9 @@ namespace ChargifyNET
         /// <param name="until_date">Returns transactions with a created_at date less than or equal to the one specified. Use DateTime.MinValue to not specify an until_date.</param>
         /// <returns>A dictionary of transactions if successful, otherwise null.</returns>
         IDictionary<int, ITransaction> GetTransactionsForSubscription(int SubscriptionID, int page, int per_page, List<TransactionType> kinds, int since_id, int max_id, DateTime since_date, DateTime until_date);
-        /// <summary>
-        /// Method for determining if the properties have been set to allow this instance to connect correctly.
-        /// </summary>
-        bool HasConnected { get; }
-        /// <summary>
-        /// Get a reference to the last Http Response from the chargify server. This is set after every call to
-        /// a Chargify Connect method
-        /// </summary>
-        HttpWebResponse LastResponse { get; }
-        /// <summary>
-        /// Method for retrieving information about a coupon using the ID of that coupon.
-        /// </summary>
-        /// <param name="ProductFamilyID">The ID of the product family that the coupon belongs to</param>
-        /// <param name="CouponID">The ID of the coupon</param>
-        /// <returns>The object if found, null otherwise.</returns>
-        ICoupon LoadCoupon(int ProductFamilyID, int CouponID);
-        /// <summary>
-        /// Load the requested customer from chargify
-        /// </summary>
-        /// <param name="ChargifyID">The chargify ID of the customer</param>
-        /// <returns>The customer with the specified chargify ID</returns>
-        ICustomer LoadCustomer(int ChargifyID);
-        /// <summary>
-        /// Load the requested customer from chargify
-        /// </summary>
-        /// <param name="SystemID">The system ID of the customer</param>
-        /// <returns>The customer with the specified chargify ID</returns>
-        ICustomer LoadCustomer(string SystemID);
-        /// <summary>
-        /// Load the requested customer from chargify
-        /// </summary>
-        /// <param name="SubscriptionID">The ID of the subscription</param>
-        /// <returns>The subscription with the specified ID</returns>
-        ISubscription LoadSubscription(int SubscriptionID);
-        /// <summary>
-        /// Load the requested transaction from Chargify
-        /// </summary>
-        /// <param name="ID">The ID of the transaction</param>
-        /// <returns>The transaction with the specified ID</returns>
-        /// <remarks>Unfortunately, this resource isn't yet available.</remarks>
-        ITransaction LoadTransaction(int ID);
-        /// <summary>
-        /// Method that returns a list of subscriptions.
-        /// </summary>
-        /// <returns>Null if there are no results, object otherwise.</returns>
-        IDictionary<int, ISubscription> GetSubscriptionList();
-        /// <summary>
-        /// Method that returns a list of subscriptions.
-        /// </summary>
-        /// <param name="states">A list of the states of subscriptions to return</param>
-        /// <returns>Null if there are no results, object otherwise.</returns>
-        IDictionary<int, ISubscription> GetSubscriptionList(List<SubscriptionState> states);
-        /// <summary>
-        /// Method that returns a list of subscriptions.
-        /// </summary>
-        /// <param name="page">The page number</param>
-        /// <param name="per_page">The number of results per page (used for pagination)</param>
-        /// <returns>Null if there are no results, object otherwise.</returns>
-        IDictionary<int, ISubscription> GetSubscriptionList(int page, int per_page);
-        /// <summary>
-        /// Method to change the subscription product WITH proration.
-        /// </summary>
-        /// <param name="Subscription">The subscription to migrate</param>
-        /// <param name="Product">The product to migrate the subscription to</param>
-        /// <param name="IncludeTrial">Boolean, default false. If true, the customer will migrate to the new product
-        /// if one is available. If false, the trial period will be ignored.</param>
-        /// <param name="IncludeInitialCharge">Boolean, default false. If true, initial charges will be assessed.
-        /// If false, initial charges will be ignored.</param>
-        /// <returns></returns>
-        ISubscription MigrateSubscriptionProduct(ISubscription Subscription, IProduct Product, bool IncludeTrial, bool IncludeInitialCharge);
-        /// <summary>
-        /// Method to change the subscription product WITH proration.
-        /// </summary>
-        /// <param name="Subscription">The subscription to migrate</param>
-        /// <param name="ProductHandle">The product handle of the product to migrate to</param>
-        /// <param name="IncludeTrial">Boolean, default false. If true, the customer will migrate to the new product
-        /// if one is available. If false, the trial period will be ignored.</param>
-        /// <param name="IncludeInitialCharge">Boolean, default false. If true, initial charges will be assessed.
-        /// If false, initial charges will be ignored.</param>
-        /// <returns>The completed subscription if migrated successfully, null otherwise.</returns>
-        ISubscription MigrateSubscriptionProduct(ISubscription Subscription, string ProductHandle, bool IncludeTrial, bool IncludeInitialCharge);
-        /// <summary>
-        /// Method to change the subscription product WITH proration.
-        /// </summary>
-        /// <param name="SubscriptionID">The subscription to migrate</param>
-        /// <param name="Product">The product to migrate to</param>
-        /// <param name="IncludeTrial">Boolean, default false. If true, the customer will migrate to the new product
-        /// if one is available. If false, the trial period will be ignored.</param>
-        /// <param name="IncludeInitialCharge">Boolean, default false. If true, initial charges will be assessed.
-        /// If false, initial charges will be ignored.</param>
-        /// <returns>The completed subscription if migrated successfully, null otherwise.</returns>
-        ISubscription MigrateSubscriptionProduct(int SubscriptionID, IProduct Product, bool IncludeTrial, bool IncludeInitialCharge);
-        /// <summary>
-        /// Method to change the subscription product WITH proration.
-        /// </summary>
-        /// <param name="SubscriptionID">The subscription to migrate</param>
-        /// <param name="ProductHandle">The product handle of the product to migrate to</param>
-        /// <param name="IncludeTrial">Boolean, default false. If true, the customer will migrate to the new product
-        /// if one is available. If false, the trial period will be ignored.</param>
-        /// <param name="IncludeInitialCharge">Boolean, default false. If true, initial charges will be assessed.
-        /// If false, initial charges will be ignored.</param>
-        /// <returns>The completed subscription if migrated successfully, null otherwise.</returns>
-        ISubscription MigrateSubscriptionProduct(int SubscriptionID, string ProductHandle, bool IncludeTrial, bool IncludeInitialCharge);
-        /// <summary>
-        /// Get or set the password
-        /// </summary>
-        string Password { get; set; }
-        /// <summary>
-        /// Chargify offers the ability to reactivate a previously canceled subscription. For details
-        /// on how reactivation works, and how to reactivate subscriptions through the Admin interface, see
-        /// http://support.chargify.com/faqs/features/reactivation
-        /// </summary>
-        /// <param name="SubscriptionID">The ID of the subscription to reactivate</param>
-        /// <returns>The newly reactivated subscription, or nothing.</returns>
-        ISubscription ReactivateSubscription(int SubscriptionID);
-        /// <summary>
-        /// Chargify offers the ability to reactivate a previously canceled subscription. For details
-        /// on how reactivation works, and how to reactivate subscriptions through the Admin interface, see
-        /// http://support.chargify.com/faqs/features/reactivation
-        /// </summary>
-        /// <param name="SubscriptionID">The ID of the subscription to reactivate</param>
-        /// <param name="includeTrial">If true, the reactivated subscription will include a trial if one is available.</param>
-        /// <returns>The newly reactivated subscription, or nothing.</returns>
-        ISubscription ReactivateSubscription(int SubscriptionID, bool includeTrial);
-        /// <summary>
-        /// Chargify offers the ability to reactivate a previously canceled subscription. For details
-        /// on how reactivation works, and how to reactivate subscriptions through the Admin interface, see
-        /// http://support.chargify.com/faqs/features/reactivation
-        /// </summary>
-        /// <param name="SubscriptionID">The ID of the subscription to reactivate</param>
-        /// <param name="includeTrial">If true, the reactivated subscription will include a trial if one is available.</param>
-        /// <param name="preserveBalance">If true, the existing subscription balance will NOT be cleared/reset before adding the additional reactivation charges.</param>
-        /// <param name="couponCode">The coupon code to be applied during reactivation.</param>
-        /// <returns>The newly reactivated subscription, or nothing.</returns>
-        ISubscription ReactivateSubscription(int SubscriptionID, bool includeTrial, bool? preserveBalance, string couponCode);
-        /// <summary>
-        /// Method for reseting a subscription balance to zero (removes outstanding balance). 
-        /// Useful when reactivating subscriptions, and making sure not to charge the user
-        /// their existing balance when then cancelled.
-        /// </summary>
-        /// <param name="SubscriptionID">The ID of the subscription to modify.</param>
-        /// <returns>True if successful, false otherwise.</returns>
-        bool ResetSubscriptionBalance(int SubscriptionID);
-        /// <summary>
-        /// SharedKey used for url generation
-        /// </summary>
-        string SharedKey { get; set; }
-        /// <summary>
-        /// Update the specified chargify customer
-        /// </summary>
-        /// <param name="Customer">The customer to update</param>
-        /// <returns>The updated customer, null otherwise.</returns>
-        ICustomer UpdateCustomer(ICustomer Customer);
-        /// <summary>
-        /// Update the credit card information for an existing subscription
-        /// </summary>
-        /// <param name="Subscription">The subscription to update credit card info for</param>
-        /// <param name="CreditCardAttributes">The attributes for the updated credit card</param>
-        /// <returns>The new subscription resulting from the change</returns>
-        ISubscription UpdateSubscriptionCreditCard(ISubscription Subscription, ICreditCardAttributes CreditCardAttributes);
-        /// <summary>
-        /// Update the credit card information for an existing subscription
-        /// </summary>
-        /// <param name="Subscription">The subscription to update credit card info for</param>
-        /// <param name="FullNumber">The full number of the credit card (optional - set to null if not required)</param>
-        /// <param name="ExpirationMonth">The expiration month of the credit card (optional - set to null if not required)</param>
-        /// <param name="ExpirationYear">The expiration year of the credit card (optional - set to null if not required)</param>
-        /// <param name="CVV">The CVV for the credit card (optional - set to null if not required)</param>
-        /// <param name="BillingAddress">The billing address (optional - set to null if not required)</param>
-        /// <param name="BillingCity">The billing city (optional - set to null if not required)</param>
-        /// <param name="BillingState">The billing state or province (optional - set to null if not required)</param>
-        /// <param name="BillingZip">The billing zip code or postal code (optional - set to null if not required)</param>
-        /// <param name="BillingCountry">The billing country (optional - set to null if not required)</param>
-        /// <returns>The new subscription resulting from the change</returns>
-        ISubscription UpdateSubscriptionCreditCard(ISubscription Subscription, string FullNumber, int? ExpirationMonth, int? ExpirationYear, string CVV, string BillingAddress, string BillingCity, string BillingState, string BillingZip, string BillingCountry);
-        /// <summary>
-        /// Update the credit card information for an existing subscription
-        /// </summary>
-        /// <param name="SubscriptionID">The ID of the suscription to update</param>
-        /// <param name="CreditCardAttributes">The attributes for the update credit card</param>
-        /// <returns>The new subscription resulting from the change</returns>
-        ISubscription UpdateSubscriptionCreditCard(int SubscriptionID, ICreditCardAttributes CreditCardAttributes);
-        /// <summary>
-        /// Update the credit card information for an existing subscription
-        /// </summary>
-        /// <param name="SubscriptionID">The ID of the suscription to update</param>
-        /// <param name="FullNumber">The full number of the credit card (optional - set to null if not required)</param>
-        /// <param name="ExpirationMonth">The expiration month of the credit card (optional - set to null if not required)</param>
-        /// <param name="ExpirationYear">The expiration year of the credit card (optional - set to null if not required)</param>
-        /// <param name="CVV">The CVV for the credit card (optional - set to null if not required)</param>
-        /// <param name="BillingAddress">The billing address (optional - set to null if not required)</param>
-        /// <param name="BillingCity">The billing city (optional - set to null if not required)</param>
-        /// <param name="BillingState">The billing state or province (optional - set to null if not required)</param>
-        /// <param name="BillingZip">The billing zip code or postal code (optional - set to null if not required)</param>
-        /// <param name="BillingCountry">The billing country (optional - set to null if not required)</param>
-        /// <returns>The new subscription resulting from the change</returns>
-        ISubscription UpdateSubscriptionCreditCard(int SubscriptionID, string FullNumber, int? ExpirationMonth, int? ExpirationYear, string CVV, string BillingAddress, string BillingCity, string BillingState, string BillingZip, string BillingCountry);
-        /// <summary>
-        /// Update the credit card information for an existing subscription
-        /// </summary>
-        /// <param name="SubscriptionID">The ID of the suscription to update</param>
-        /// <param name="FirstName">The first name on the credit card</param>
-        /// <param name="LastName">The last name on the credit card</param>
-        /// <param name="FullNumber">The full number of the credit card (optional - set to null if not required)</param>
-        /// <param name="ExpirationMonth">The expiration month of the credit card (optional - set to null if not required)</param>
-        /// <param name="ExpirationYear">The expiration year of the credit card (optional - set to null if not required)</param>
-        /// <param name="CVV">The CVV for the credit card (optional - set to null if not required)</param>
-        /// <param name="BillingAddress">The billing address (optional - set to null if not required)</param>
-        /// <param name="BillingCity">The billing city (optional - set to null if not required)</param>
-        /// <param name="BillingState">The billing state or province (optional - set to null if not required)</param>
-        /// <param name="BillingZip">The billing zip code or postal code (optional - set to null if not required)</param>
-        /// <param name="BillingCountry">The billing country (optional - set to null if not required)</param>
-        /// <returns>The new subscription resulting from the change</returns>
-        ISubscription UpdateSubscriptionCreditCard(int SubscriptionID, string FirstName, string LastName, string FullNumber, int? ExpirationMonth, int? ExpirationYear, string CVV, string BillingAddress, string BillingCity, string BillingState, string BillingZip, string BillingCountry);
-        /// <summary>
-        /// Update the specified chargify subscription
-        /// </summary>
-        /// <param name="Subscription">The subscription to update</param>
-        /// <returns>The updated subscriptionn, null otherwise.</returns>
-        ISubscription UpdateSubscription(ISubscription Subscription);
-        /// <summary>
-        /// Update the collection method of the subscription
-        /// </summary>
-        /// <param name="SubscriptionID">The ID of the subscription to update</param>
-        /// <param name="PaymentCollectionMethod">The collection method to set</param>
-        /// <returns>The full details of the updated subscription</returns>
-        ISubscription UpdatePaymentCollectionMethod(int SubscriptionID, PaymentCollectionMethod PaymentCollectionMethod);
-        /// <summary>
-        /// Get or set the URL for chargify
-        /// </summary>
-        string URL { get; set; }
-        /// <summary>
-        /// Should Chargify.NET use JSON for output? XML by default.
-        /// </summary>
-        bool UseJSON { get; set; }
-        /// <summary>
-        /// The timeout (in milliseconds) for any call to Chargify. The default is 180000
-        /// </summary>
-        int Timeout { get; set; }
-        /// <summary>
-        /// Caller can plug in a delegate for logging raw Chargify requests.
-        /// Method, URL, and Data are the parameters.
-        /// </summary>
-        Action<HttpRequestMethod, string, string> LogRequest { get; set; }
-        /// <summary>
-        /// Caller can plug in a delegate for logging raw Chargify responses (including errors)
-        /// Http Status, URL, and response body are the parameters.
-        /// </summary>
-        Action<HttpStatusCode, string, string> LogResponse { get; set; }
-        /// <summary>
-        /// Method to update the allocated amount of a component for a subscription
-        /// </summary>
-        /// <param name="SubscriptionID">The ID of the subscription to modify the allocation for</param>
-        /// <param name="ComponentID">The ID of the component</param>
-        /// <param name="NewAllocatedQuantity">The quantity of component to allocate to the subscription</param>
-        IComponentAttributes UpdateComponentAllocationForSubscription(int SubscriptionID, int ComponentID, int NewAllocatedQuantity);
-        /// <summary>
-        /// Method to retrieve the current information (including allocation) of a component against a subscription
-        /// </summary>
-        /// <param name="SubscriptionID">The ID of the subscription in question</param>
-        /// <param name="ComponentID">The ID of the component</param>
-        /// <returns>The ComponentAttributes object, null otherwise.</returns>
-        IComponentAttributes GetComponentInfoForSubscription(int SubscriptionID, int ComponentID);
+        #endregion
+
+        #region Refunds
         /// <summary>
         /// Create a refund
         /// </summary>
@@ -1236,6 +1350,64 @@ namespace ChargifyNET
         /// <param name="Memo">A helpful explanation for the refund.</param>
         /// <returns>The IRefund object indicating successful, or unsuccessful.</returns>
         IRefund CreateRefund(int SubscriptionID, int PaymentID, int AmountInCents, string Memo);
+        #endregion
+
+        #region Members
+        /// <summary>
+        /// Get or set the API key
+        /// </summary>
+        string apiKey { get; set; }
+
+        /// <summary>
+        /// Method for determining if the properties have been set to allow this instance to connect correctly.
+        /// </summary>
+        bool HasConnected { get; }
+
+        /// <summary>
+        /// Get a reference to the last Http Response from the chargify server. This is set after every call to
+        /// a Chargify Connect method
+        /// </summary>
+        HttpWebResponse LastResponse { get; }
+                
+        /// <summary>
+        /// Get or set the password
+        /// </summary>
+        string Password { get; set; }
+        
+        /// <summary>
+        /// SharedKey used for url generation
+        /// </summary>
+        string SharedKey { get; set; }
+        
+        /// <summary>
+        /// Get or set the URL for chargify
+        /// </summary>
+        string URL { get; set; }
+
+        /// <summary>
+        /// Should Chargify.NET use JSON for output? XML by default.
+        /// </summary>
+        bool UseJSON { get; set; }
+
+        /// <summary>
+        /// The timeout (in milliseconds) for any call to Chargify. The default is 180000
+        /// </summary>
+        int Timeout { get; set; }
+
+        /// <summary>
+        /// Caller can plug in a delegate for logging raw Chargify requests.
+        /// Method, URL, and Data are the parameters.
+        /// </summary>
+        Action<HttpRequestMethod, string, string> LogRequest { get; set; }
+
+        /// <summary>
+        /// Caller can plug in a delegate for logging raw Chargify responses (including errors)
+        /// Http Status, URL, and response body are the parameters.
+        /// </summary>
+        Action<HttpStatusCode, string, string> LogResponse { get; set; }
+        #endregion
+
+        #region Statements
         /// <summary>
         /// Method for getting a specific statement
         /// </summary>
@@ -1276,52 +1448,6 @@ namespace ChargifyNET
         /// <param name="per_page">The number of results to return per page</param>
         /// <returns>The list of statements, an empty dictionary otherwise.</returns>
         IDictionary<int, IStatement> GetStatementList(int SubscriptionID, int page, int per_page);
-        /// <summary>
-        /// Returns the 50 most recent Allocations, ordered by most recent first.
-        /// </summary>
-        /// <param name="SubscriptionID">The subscriptionID to scope this request</param>
-        /// <param name="ComponentID">The componentID to scope this request</param>
-        /// <param name="Page">Pass an integer in the page parameter via the query string to access subsequent pages of 50 transactions</param>
-        /// <returns>A dictionary of allocation objects keyed by ComponentID, or null.</returns>
-        IDictionary<int, List<IComponentAllocation>> GetAllocationListForSubscriptionComponent(int SubscriptionID, int ComponentID, int? Page = 0);
-        /// <summary>
-        /// Creates a new Allocation, setting the current allocated quantity for the component and recording a memo.
-        /// </summary>
-        /// <param name="SubscriptionID"></param>
-        /// <param name="ComponentID"></param>
-        /// <param name="Allocation"></param>
-        /// <returns></returns>
-        IComponentAllocation CreateComponentAllocation(int SubscriptionID, int ComponentID, ComponentAllocation Allocation);
-
-        /// <summary>
-        /// Creates a new Allocation, setting the current allocated quantity for the component and recording a memo.
-        /// </summary>
-        /// <param name="SubscriptionID">The ID of the subscription to apply this quantity allocation to</param>
-        /// <param name="ComponentID">The ID of the component to apply this quantity allocation to</param>
-        /// <param name="Quantity">The allocated quantity to which to set the line-items allocated quantity. This should always be an integer. For On/Off components, use 1 for on and 0 for off.</param>
-        /// <returns></returns>
-        IComponentAllocation CreateComponentAllocation(int SubscriptionID, int ComponentID, int Quantity);
-
-        /// <summary>
-        /// Creates a new Allocation, setting the current allocated quantity for the component and recording a memo.
-        /// </summary>
-        /// <param name="SubscriptionID">The ID of the subscription to apply this quantity allocation to</param>
-        /// <param name="ComponentID">The ID of the component to apply this quantity allocation to</param>
-        /// <param name="Quantity">The allocated quantity to which to set the line-items allocated quantity. This should always be an integer. For On/Off components, use 1 for on and 0 for off.</param>
-        /// <param name="Memo">(optional) A memo to record along with the allocation</param>
-        /// <returns></returns>
-        IComponentAllocation CreateComponentAllocation(int SubscriptionID, int ComponentID, int Quantity, string Memo);
-
-        /// <summary>
-        /// Creates a new Allocation, setting the current allocated quantity for the component and recording a memo.
-        /// </summary>
-        /// <param name="SubscriptionID">The ID of the subscription to apply this quantity allocation to</param>
-        /// <param name="ComponentID">The ID of the component to apply this quantity allocation to</param>
-        /// <param name="Quantity">The allocated quantity to which to set the line-items allocated quantity. This should always be an integer. For On/Off components, use 1 for on and 0 for off.</param>
-        /// <param name="Memo">(optional) A memo to record along with the allocation</param>
-        /// <param name="UpgradeScheme">(optional) The scheme used if the proration is an upgrade. Defaults to the site setting if one is not provided.</param>
-        /// <param name="DowngradeScheme">(optional) The scheme used if the proration is a downgrade. Defaults to the site setting if one is not provided.</param>
-        /// <returns>The component allocation object, null otherwise.</returns>
-        IComponentAllocation CreateComponentAllocation(int SubscriptionID, int ComponentID, int Quantity, string Memo, ComponentUpgradeProrationScheme UpgradeScheme, ComponentDowngradeProrationScheme DowngradeScheme);
+        #endregion
     }
 }
