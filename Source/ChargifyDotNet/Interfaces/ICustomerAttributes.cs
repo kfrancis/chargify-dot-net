@@ -100,6 +100,6 @@ namespace ChargifyNET
         /// <summary>
         /// Get or Set the customer's tax exemption status
         /// </summary>
-        bool? TaxExempt { get; set; }
+        bool TaxExempt { get; set; }
     }
 }

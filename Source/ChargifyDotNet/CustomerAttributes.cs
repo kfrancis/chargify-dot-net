@@ -426,13 +426,13 @@ namespace ChargifyNET
         /// Get or Set the customer's tax exemption status
         /// </summary>
         [XmlElement("tax_exempt")]
-        public bool? TaxExempt { get; set; }
+        public bool TaxExempt { get; set; }
         /// <summary>
         /// Ignore, used for determining if the value should be serialized
         /// </summary>
         public bool ShouldSerializeTaxExempt()
         {
-            return TaxExempt.HasValue;
+            return true;
         }
 
         /// <summary>
