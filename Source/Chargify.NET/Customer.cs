@@ -171,6 +171,9 @@ namespace ChargifyNET
                     case VatNumberKey:
                         VatNumber = obj.GetJSONContentAsString(key);
                         break;
+                    case TaxExemptKey:
+                        TaxExempt = obj.GetJSONContentAsBoolean(key);
+                        break;
                 }
             }
         }
@@ -232,6 +235,9 @@ namespace ChargifyNET
                         break;
                     case VatNumberKey:
                         VatNumber = dataNode.GetNodeContentAsString();
+                        break;
+                    case TaxExemptKey:
+                        TaxExempt = dataNode.GetNodeContentAsBoolean();
                         break;
                 }
             }
@@ -319,6 +325,7 @@ namespace ChargifyNET
                    a.ShippingCountry == b.ShippingCountry &&
                    a.ShippingState == b.ShippingState &&
                    a.ShippingZip == b.ShippingZip &&
+                   a.TaxExempt == b.TaxExempt &&
                    a.SystemID == b.SystemID;
         }
 
@@ -350,6 +357,7 @@ namespace ChargifyNET
                    a.ShippingCountry == b.ShippingCountry &&
                    a.ShippingState == b.ShippingState &&
                    a.ShippingZip == b.ShippingZip &&
+                   a.TaxExempt == b.TaxExempt &&
                    a.SystemID == b.SystemID;
         }
 
@@ -381,6 +389,7 @@ namespace ChargifyNET
                    a.ShippingCountry == b.ShippingCountry &&
                    a.ShippingState == b.ShippingState &&
                    a.ShippingZip == b.ShippingZip &&
+                   a.TaxExempt == b.TaxExempt &&
                    a.SystemID == b.SystemID;
         }
 
@@ -451,6 +460,7 @@ namespace ChargifyNET
                    ShippingCountry == ((Customer) obj).ShippingCountry &&
                    ShippingState == ((Customer) obj).ShippingState &&
                    ShippingZip == ((Customer) obj).ShippingZip &&
+                   TaxExempt == ((Customer) obj).TaxExempt &&
                    SystemID == ((Customer) obj).SystemID;
         }
 
