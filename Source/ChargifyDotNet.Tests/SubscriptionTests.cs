@@ -179,6 +179,19 @@ namespace ChargifyDotNetTests
         }
 
         [TestMethod]
+        public void Subscription_Can_Load_By_State()
+        {
+            // Arrange
+            var subscriptions = Chargify.GetSubscriptionList().Where(s => s.Value.State == SubscriptionState.Active);
+
+            // Act
+            var result = Chargify.GetSubscriptionList(SubscriptionState.Active);
+
+            // Assert
+            Assert.AreEqual(result.Count(), subscriptions.Count());
+        }
+
+        [TestMethod]
         public void Subscription_Can_Get_PaymentProfile_Id()
         {
             // Arrange
