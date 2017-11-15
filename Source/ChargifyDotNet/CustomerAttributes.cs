@@ -63,7 +63,7 @@ namespace ChargifyNET
         internal const string ShippingStateKey = "state";
         internal const string ShippingZipKey = "zip";
         internal const string ShippingCountryKey = "country";
-        internal const string TaxExemptKey = "tax_exempt ";
+        internal const string TaxExemptKey = "tax_exempt";
         #endregion
 
         #region Constructors
