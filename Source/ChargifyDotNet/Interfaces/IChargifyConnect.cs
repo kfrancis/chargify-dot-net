@@ -805,7 +805,7 @@ namespace ChargifyNET
         /// </summary>
         /// <param name="states">A list of the states of subscriptions to return</param>
         /// <returns>Null if there are no results, object otherwise.</returns>
-        IDictionary<int, ISubscription> GetSubscriptionList(List<SubscriptionState> states);
+        IDictionary<int, ISubscription> GetSubscriptionList(SubscriptionState state);
         /// <summary>
         /// Method that returns a list of subscriptions.
         /// </summary>

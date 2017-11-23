@@ -1332,23 +1332,17 @@ namespace ChargifyNET
         /// <summary>
         /// Method that returns a list of subscriptions.
         /// </summary>
-        /// <param name="states">A list of the states of subscriptions to return</param>
+        /// <param name="state">The state of subscriptions to return</param>
         /// <returns>Null if there are no results, object otherwise.</returns>
-        public IDictionary<int, ISubscription> GetSubscriptionList(List<SubscriptionState> states)
+        public IDictionary<int, ISubscription> GetSubscriptionList(SubscriptionState state)
         {
             string qs = "";
 
-            if (states != null)
+            if (state != SubscriptionState.Unknown)
             {
-                foreach (SubscriptionState state in states)
-                {
-                    // Iterate through them all, except for Unknown - which isn't supported, just used internally.
-                    if (state == SubscriptionState.Unknown) break;
-
-                    // Append the kind to the query string ...
-                    if (qs.Length > 0) { qs += "&"; }
-                    qs += string.Format("state[]={0}", state.ToString().ToLower());
-                }
+                // Append the kind to the query string ...
+                if (qs.Length > 0) { qs += "&"; }
+                qs += string.Format("state={0}", state.ToString().ToLower());
             }
 
             string url = string.Format("subscriptions.{0}", GetMethodExtension());
