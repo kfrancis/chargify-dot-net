@@ -63,6 +63,7 @@ namespace ChargifyNET
         internal const string ShippingStateKey = "state";
         internal const string ShippingZipKey = "zip";
         internal const string ShippingCountryKey = "country";
+        internal const string TaxExemptKey = "tax_exempt ";
         #endregion
 
         #region Constructors
@@ -201,6 +202,9 @@ namespace ChargifyNET
                     case ShippingCountryKey:
                         ShippingCountry = obj.GetJSONContentAsString(key);
                         break;
+                    case TaxExemptKey:
+                        TaxExempt = obj.GetJSONContentAsBoolean(key);
+                        break;
                 }
             }
         }
@@ -250,6 +254,9 @@ namespace ChargifyNET
                         break;
                     case ShippingCountryKey:
                         ShippingCountry = dataNode.GetNodeContentAsString();
+                        break;
+                    case TaxExemptKey:
+                        TaxExempt = dataNode.GetNodeContentAsBoolean();
                         break;
                 }
             }
@@ -413,6 +420,19 @@ namespace ChargifyNET
         public bool ShouldSerializeShippingCountry()
         {
             return !string.IsNullOrEmpty(ShippingCountry);
+        }
+
+        /// <summary>
+        /// Get or Set the customer's tax exemption status
+        /// </summary>
+        [XmlElement("tax_exempt")]
+        public bool TaxExempt { get; set; }
+        /// <summary>
+        /// Ignore, used for determining if the value should be serialized
+        /// </summary>
+        public bool ShouldSerializeTaxExempt()
+        {
+            return true;
         }
 
         /// <summary>

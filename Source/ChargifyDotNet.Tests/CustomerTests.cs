@@ -54,7 +54,8 @@ namespace ChargifyDotNetTests
                 ShippingCity = Faker.Address.City(),
                 ShippingState = Faker.Address.StateAbbr(),
                 ShippingZip = Faker.Address.ZipCode(),
-                ShippingCountry = "US"
+                ShippingCountry = "US",
+                TaxExempt = true
             };
 
             // Act
@@ -75,6 +76,7 @@ namespace ChargifyDotNetTests
             Assert.IsTrue(createdCustomer.ShippingState == customer.ShippingState);
             Assert.IsTrue(createdCustomer.ShippingZip == customer.ShippingZip);
             Assert.IsTrue(createdCustomer.ShippingCountry == customer.ShippingCountry);
+            Assert.IsTrue(createdCustomer.TaxExempt);
 
             // Can't cleanup, Chargify doesn't support customer deletions
         }

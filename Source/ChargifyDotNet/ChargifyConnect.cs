@@ -482,7 +482,7 @@ namespace ChargifyNET
             if (customer.IsSaved) throw new ArgumentException("Customer already saved", "customer");
             return CreateCustomer(customer.FirstName, customer.LastName, customer.Email, customer.Phone, customer.Organization, customer.SystemID,
                                   customer.ShippingAddress, customer.ShippingAddress2, customer.ShippingCity, customer.ShippingState,
-                                  customer.ShippingZip, customer.ShippingCountry);
+                                  customer.ShippingZip, customer.ShippingCountry, customer.TaxExempt);
         }
 
         /// <summary>
@@ -500,10 +500,11 @@ namespace ChargifyNET
         /// <param name="shippingState">The shipping state of the customer, if applicable.</param>
         /// <param name="shippingZip">The shipping zip of the customer, if applicable.</param>
         /// <param name="shippingCountry">The shipping country of the customer, if applicable.</param>
+        /// <param name="taxExempt">The tax exemption status of the customer, if applicable.</param>
         /// <returns>The created chargify customer</returns>
         public ICustomer CreateCustomer(string firstName, string lastName, string emailAddress, string phone, string organization, string systemId,
                                         string shippingAddress, string shippingAddress2, string shippingCity, string shippingState,
-                                        string shippingZip, string shippingCountry)
+                                        string shippingZip, string shippingCountry, bool taxExempt = false)
         {
             // make sure data is valid
             if (string.IsNullOrEmpty(firstName)) throw new ArgumentNullException(nameof(firstName));
@@ -529,6 +530,7 @@ namespace ChargifyNET
             if (!string.IsNullOrEmpty(shippingState)) customerXml.AppendFormat("<state>{0}</state>", shippingState);
             if (!string.IsNullOrEmpty(shippingZip)) customerXml.AppendFormat("<zip>{0}</zip>", shippingZip);
             if (!string.IsNullOrEmpty(shippingCountry)) customerXml.AppendFormat("<country>{0}</country>", shippingCountry);
+            if (taxExempt) customerXml.AppendFormat("<tax_exempt>{0}</tax_exempt>", taxExempt.ToString().ToLowerInvariant());
             customerXml.Append("</customer>");
             // now make the request
             string response = DoRequest(string.Format("customers.{0}", GetMethodExtension()), HttpRequestMethod.Post, customerXml.ToString());
@@ -603,6 +605,7 @@ namespace ChargifyNET
                 if (oldCust.ShippingState != customer.ShippingState) { customerXml.AppendFormat("<state>{0}</state>", PCLWebUtility.WebUtility.HtmlEncode(customer.ShippingState)); isUpdateRequired = true; }
                 if (oldCust.ShippingZip != customer.ShippingZip) { customerXml.AppendFormat("<zip>{0}</zip>", customer.ShippingZip); isUpdateRequired = true; }
                 if (oldCust.ShippingCountry != customer.ShippingCountry) { customerXml.AppendFormat("<country>{0}</country>", PCLWebUtility.WebUtility.HtmlEncode(customer.ShippingCountry)); isUpdateRequired = true; }
+                if (oldCust.TaxExempt != customer.TaxExempt) { customerXml.AppendFormat("<tax_exempt>{0}</tax_exempt>", customer.TaxExempt.ToString().ToLowerInvariant()); isUpdateRequired = true; }
             }
             customerXml.Append("</customer>");
 
