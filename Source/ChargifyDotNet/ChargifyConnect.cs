@@ -206,6 +206,32 @@ namespace ChargifyNET
 
         #endregion
 
+        #region Metafield
+        /// <summary>
+        /// Returns a list of all metadata for a resource.
+        /// </summary>
+        /// <typeparam name="T">The type of resource. Currently either Subscription or Customer</typeparam>
+        /// <returns>The metadata result containing the response</returns>
+        public IMetafield GetMetafields<T>() where T : ChargifyBase
+        {
+            string response;
+            switch (typeof(T).Name.ToLowerInvariant())
+            {
+                case "customer":
+                    response = DoRequest(string.Format("customers/metafields.{0}", GetMethodExtension()), HttpRequestMethod.Get, null);
+                    break;
+                case "subscription":
+                    response = DoRequest(string.Format("subscriptions/metafields.{0}", GetMethodExtension()), HttpRequestMethod.Get, null);
+                    break;
+                default:
+                    throw new Exception(string.Format("Must be of type '{0}'", string.Join(", ", _metafieldTypes.ToArray())));
+            }
+            // change the response to the object
+            return response.ConvertResponseTo<Metafield>("metafield");
+        }
+        private static List<string> _metafieldTypes = new List<string> { "Customer", "Subscription" };
+        #endregion
+
         #region Metadata
         /// <summary>
         /// Allows you to set a group of metadata for a specific resource
@@ -1989,7 +2015,8 @@ namespace ChargifyNET
         /// <param name="couponCode">The coupon to use</param>
         /// <param name="componentsWithQuantity">Components to set on the subscription initially</param>
         /// <returns>Details about the subscription</returns>
-        public ISubscription CreateSubscriptionUsingCoupon(string productHandle, ICustomerAttributes customerAttributes, ICreditCardAttributes creditCardAttributes, string couponCode, Dictionary<int, string> componentsWithQuantity)
+        public ISubscription CreateSubscriptionUsingCoupon
+            (string productHandle, ICustomerAttributes customerAttributes, ICreditCardAttributes creditCardAttributes, string couponCode, Dictionary<int, string> componentsWithQuantity)
         {
             // make sure data is valid
             if (creditCardAttributes == null) throw new ArgumentNullException("creditCardAttributes");
@@ -3388,6 +3415,61 @@ namespace ChargifyNET
             catch (ChargifyException cex)
             {
                 if (cex.StatusCode == HttpStatusCode.NotFound) throw new InvalidOperationException("Subscription not found");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Return a preview of charges for a subscription creation
+        /// </summary>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        public ISubscriptionPreview CreateSubscriptionPreview(ISubscriptionCreateOptions options)
+        {
+            if (options == null) throw new ArgumentNullException(nameof(options));
+
+            // Customer
+            bool customerSpecifiedAlready = options.CustomerID.HasValue;
+
+            if (!string.IsNullOrEmpty(options.CustomerReference))
+            {
+                if (customerSpecifiedAlready) { throw new ArgumentException("Customer information should only be specified once", nameof(options)); }
+                customerSpecifiedAlready = true;
+            }
+            if (options.CustomerAttributes != null)
+            {
+                if (customerSpecifiedAlready) throw new ArgumentException("Customer information should only be specified once", nameof(options));
+                customerSpecifiedAlready = true;
+            }
+            if (!customerSpecifiedAlready) { throw new ArgumentException("No customer information was specified. Please specify either the CustomerID, CustomerReference or CustomerAttributes and try again.", "options"); }
+
+            // Product
+            bool productSpecifiedAlready = options.ProductID.HasValue;
+            if (!string.IsNullOrEmpty(options.ProductHandle))
+            {
+                if (productSpecifiedAlready) { throw new ArgumentException("Product information should only be specified once", nameof(options)); }
+                productSpecifiedAlready = true;
+            }
+            if (!productSpecifiedAlready) { throw new ArgumentException("No product information was specified. Please specify either the ProductID or ProductHandle and try again.", "options"); }
+
+            var subscriptionXml = new StringBuilder();
+            var serializer = new System.Xml.Serialization.XmlSerializer(options.GetType());
+            using (StringWriter textWriter = new Utf8StringWriter())
+            {
+                serializer.Serialize(textWriter, options);
+                subscriptionXml.Append(textWriter);
+            }
+
+            try
+            {
+                // now make the request
+                string response = DoRequest(string.Format("subscriptions/preview.{0}", GetMethodExtension()), HttpRequestMethod.Post, subscriptionXml.ToString());
+                // change the response to the object
+                return response.ConvertResponseTo<SubscriptionPreview>("subscription_preview");
+            }
+            catch (ChargifyException cex)
+            {
+                if (cex.StatusCode == HttpStatusCode.NotFound) throw new InvalidOperationException("Migration not found");
                 throw;
             }
         }

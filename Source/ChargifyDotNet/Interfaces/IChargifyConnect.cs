@@ -1187,6 +1187,13 @@ namespace ChargifyNET
         /// <returns>The subscription data, if successful</returns>
         /// <remarks>https://reference.chargify.com/v1/subscriptions/hold-subscription</remarks>
         ISubscription PauseSubscription(int subscriptionId, DateTime? automaticResumeDate = null);
+
+        /// <summary>
+        /// Return a preview of charges for a subscription creation
+        /// </summary>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        ISubscriptionPreview CreateSubscriptionPreview(ISubscriptionCreateOptions options);
         #endregion
 
         #region Transactions
