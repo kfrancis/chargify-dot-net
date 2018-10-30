@@ -193,12 +193,12 @@ namespace ChargifyNET
         /// <param name="errorResponse">The response that caused the exception</param>
         /// <param name="wex">The original web exception.  This becomes the inner exception of ths exception</param>
         public ChargifyException(HttpWebResponse errorResponse, WebException wex) :
-            base(string.Format("The server returned '{0}' with the status code {1} ({1:d}).", errorResponse.StatusDescription, errorResponse.StatusCode), wex)
+            base($"The server returned '{errorResponse.StatusDescription}' with the status code {errorResponse.StatusCode} ({errorResponse.StatusCode:d}).", wex)
         {
-            _statusDescription = errorResponse.StatusDescription;
-            _statusCode = errorResponse.StatusCode;
+            StatusDescription = errorResponse.StatusDescription;
+            StatusCode = errorResponse.StatusCode;
             // if there are any errors, parse them for user consumption
-            _errors = ChargifyError.ParseChargifyErrors(errorResponse);
+            ErrorMessages = ChargifyError.ParseChargifyErrors(errorResponse);
         }
 
         /// <summary>
@@ -208,62 +208,34 @@ namespace ChargifyNET
         /// <param name="wex">The original web exception.  This becomes the inner exception of ths exception</param>
         /// <param name="postData">The data posted that could have potentially caused the exception.</param>
         public ChargifyException(HttpWebResponse errorResponse, WebException wex, string postData) :
-            base(string.Format("The server returned '{0}' with the status code {1} ({1:d}) when posting '{2}'.", errorResponse.StatusDescription, errorResponse.StatusCode, postData), wex)
+            base($"The server returned '{errorResponse.StatusDescription}' with the status code {errorResponse.StatusCode} ({errorResponse.StatusCode:d}) to the last request.", wex)
         {
-            _statusDescription = errorResponse.StatusDescription;
-            _statusCode = errorResponse.StatusCode;
-            _postData = postData;
+            StatusDescription = errorResponse.StatusDescription;
+            StatusCode = errorResponse.StatusCode;
+            LastDataPosted = postData;
             // if there are any errors, parse them for user consumption
-            _errors = ChargifyError.ParseChargifyErrors(errorResponse);
+            ErrorMessages = ChargifyError.ParseChargifyErrors(errorResponse);
         }
 
         /// <summary>
         /// Get the status description
         /// </summary>
-        public string StatusDescription
-        {
-            get
-            {
-                return _statusDescription;
-            }
-        }
-        private string _statusDescription;
+        public string StatusDescription { get; private set; }
 
         /// <summary>
         /// Get the status code
         /// </summary>
-        public HttpStatusCode StatusCode
-        {
-            get
-            {
-                return _statusCode;
-            }
-        }
-        private HttpStatusCode _statusCode;
+        public HttpStatusCode StatusCode { get; private set; }
 
         /// <summary>
         /// Get the last data posted that potentially caused the exception
         /// </summary>
-        public string LastDataPosted
-        {
-            get
-            {
-                return _postData;
-            }
-        }
-        private string _postData = string.Empty;
+        public string LastDataPosted { get; private set; } = string.Empty;
 
         /// <summary>
         /// List of ChargifyErrors returned from Chargify.
         /// </summary>
-        public List<ChargifyError> ErrorMessages
-        {
-            get
-            {
-                return _errors;
-            }
-        }
-        private List<ChargifyError> _errors;
+        public List<ChargifyError> ErrorMessages { get; private set; }
 
         ///// <summary>
         ///// Get object data
@@ -280,11 +252,24 @@ namespace ChargifyNET
         /// <returns>Request, response and errors</returns>
         public override string ToString()
         {
+            if (!string.IsNullOrEmpty(LastDataPosted))
+            {
+                if (LastDataPosted.Contains("<full_number>"))
+                {
+                    var xdoc = XDocument.Parse(LastDataPosted);
+                    var fullNumberElement = xdoc.Element("subscription")?.Element("credit_card_attributes")?.Element("full_number");
+                    if (fullNumberElement != null)
+                    {
+                        fullNumberElement.Value = fullNumberElement.Value.Mask('X', 4);
+                        LastDataPosted = xdoc.ToString();
+                    }
+                }
+            }
             // Used for the LogResponse Action
             string retVal = string.Empty;
             retVal += string.Format("Request: {0}\n", LastDataPosted);
             retVal += string.Format("Response: {0} {1}\n", StatusCode, StatusDescription);
-            retVal += string.Format("Errors: {0}\n", string.Join(", ", _errors.ToList().Select(e => e.Message).ToArray()));
+            retVal += string.Format("Errors: {0}\n", string.Join(", ", ErrorMessages.ToList().Select(e => e.Message).ToArray()));
             return retVal;
         }
     }

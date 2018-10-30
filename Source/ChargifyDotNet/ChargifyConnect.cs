@@ -39,6 +39,7 @@ namespace ChargifyNET
     using System.Web;
     using System.Xml;
     using System.Globalization;
+    using System.Xml.Linq;
     #endregion
 
     /// <summary>
@@ -6097,7 +6098,23 @@ namespace ChargifyNET
                 {
                     using (HttpWebResponse errorResponse = (HttpWebResponse)wex.Response)
                     {
-                        newException = new ChargifyException(errorResponse, wex, postData);
+                        var sanitizedPostData = postData;
+
+                        if (!string.IsNullOrEmpty(sanitizedPostData))
+                        {   
+                            if (sanitizedPostData.Contains("<full_number>"))
+                            {
+                                var xdoc = XDocument.Parse(sanitizedPostData);
+                                var fullNumberElement = xdoc.Element("subscription")?.Element("credit_card_attributes")?.Element("full_number");
+                                if (fullNumberElement != null)
+                                {
+                                    fullNumberElement.Value = fullNumberElement.Value.Mask('X', 4);
+                                    sanitizedPostData = xdoc.ToString();
+                                }
+                            }
+                        }
+
+                        newException = new ChargifyException(errorResponse, wex, sanitizedPostData);
                         _lastResponse = errorResponse;
 
                         if (LogResponse != null)
@@ -6240,7 +6257,23 @@ namespace ChargifyNET
                 {
                     using (HttpWebResponse errorResponse = (HttpWebResponse)wex.Response)
                     {
-                        newException = new ChargifyException(errorResponse, wex, postData);
+                        var sanitizedPostData = postData;
+
+                        if (!string.IsNullOrEmpty(sanitizedPostData))
+                        {
+                            if (sanitizedPostData.Contains("<full_number>"))
+                            {
+                                var xdoc = XDocument.Parse(sanitizedPostData);
+                                var fullNumberElement = xdoc.Element("subscription")?.Element("credit_card_attributes")?.Element("full_number");
+                                if (fullNumberElement != null)
+                                {
+                                    fullNumberElement.Value = fullNumberElement.Value.Mask('X', 4);
+                                    sanitizedPostData = xdoc.ToString();
+                                }
+                            }
+                        }
+
+                        newException = new ChargifyException(errorResponse, wex, sanitizedPostData);
                         _lastResponse = errorResponse;
 
                         if (LogResponse != null)

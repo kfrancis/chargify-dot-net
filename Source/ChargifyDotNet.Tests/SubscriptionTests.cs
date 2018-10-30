@@ -1,12 +1,9 @@
-﻿using System;
+﻿using Bogus;
 using ChargifyDotNetTests.Base;
-using System.Linq;
 using ChargifyNET;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Threading;
-using Bogus;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.Linq;
 
 namespace ChargifyDotNetTests
 {
@@ -108,45 +105,45 @@ namespace ChargifyDotNetTests
         public void Subscription_Create_UsingOptions_TooManyProducts()
         {
             // Arrange
-                var exampleCustomer = Chargify.GetCustomerList().Values.DefaultIfEmpty(defaultValue: null).FirstOrDefault();
-                var paymentInfo = GetTestPaymentMethod(exampleCustomer.ToCustomerAttributes() as CustomerAttributes);
-                var product = Chargify.GetProductList().Values.FirstOrDefault();
-                var options = new SubscriptionCreateOptions()
-                {
-                    CustomerID = exampleCustomer.ChargifyID,
-                    CreditCardAttributes = paymentInfo,
-                    ProductHandle = product.Handle,
-                    ProductID = product.ID
-                };
+            var exampleCustomer = Chargify.GetCustomerList().Values.DefaultIfEmpty(defaultValue: null).FirstOrDefault();
+            var paymentInfo = GetTestPaymentMethod(exampleCustomer.ToCustomerAttributes() as CustomerAttributes);
+            var product = Chargify.GetProductList().Values.FirstOrDefault();
+            var options = new SubscriptionCreateOptions()
+            {
+                CustomerID = exampleCustomer.ChargifyID,
+                CreditCardAttributes = paymentInfo,
+                ProductHandle = product.Handle,
+                ProductID = product.ID
+            };
 
-                // Act
-                var result = Chargify.CreateSubscription(options);
+            // Act
+            var result = Chargify.CreateSubscription(options);
         }
 
         [TestMethod, ExpectedException(typeof(ArgumentException))]
         public void Subscription_Create_UsingOptions_MissingProduct()
-        { 
-// Arrange
-                var exampleCustomer = Chargify.GetCustomerList().Values.DefaultIfEmpty(defaultValue: null).FirstOrDefault();
-                var paymentInfo = GetTestPaymentMethod(exampleCustomer.ToCustomerAttributes() as CustomerAttributes);
-                var options = new SubscriptionCreateOptions()
-                {
-                    CustomerID = exampleCustomer.ChargifyID,
-                    CreditCardAttributes = paymentInfo
-                };
+        {
+            // Arrange
+            var exampleCustomer = Chargify.GetCustomerList().Values.DefaultIfEmpty(defaultValue: null).FirstOrDefault();
+            var paymentInfo = GetTestPaymentMethod(exampleCustomer.ToCustomerAttributes() as CustomerAttributes);
+            var options = new SubscriptionCreateOptions()
+            {
+                CustomerID = exampleCustomer.ChargifyID,
+                CreditCardAttributes = paymentInfo
+            };
 
-                // Act
-                var result = Chargify.CreateSubscription(options);
+            // Act
+            var result = Chargify.CreateSubscription(options);
         }
 
         [TestMethod, ExpectedException(typeof(ArgumentException))]
         public void Subscription_Create_UsingOptions_MissingAllDetails()
         {
             // Arrange
-                var options = new SubscriptionCreateOptions();
+            var options = new SubscriptionCreateOptions();
 
-                // Act
-                var result = Chargify.CreateSubscription(options);
+            // Act
+            var result = Chargify.CreateSubscription(options);
         }
 
         [TestMethod, ExpectedException(typeof(ArgumentNullException))]
@@ -494,6 +491,37 @@ namespace ChargifyDotNetTests
         }
 
         [TestMethod]
+        public void Subscription_Create_IsFullNumberMasked()
+        {
+            // Arrange
+            var product = Chargify.GetProductList().Values.FirstOrDefault();
+            var referenceId = Guid.NewGuid().ToString();
+            var expMonth = DateTime.Now.AddMonths(1).Month;
+            var expYear = DateTime.Now.AddMonths(12).Year;
+            var newCustomer = new CustomerAttributes(Faker.Name.FirstName(), Faker.Name.LastName(), Faker.Internet.Email(), Faker.Phone.PhoneNumber(), Faker.Company.CompanyName(), referenceId);
+            var newPaymentInfo = GetTestPaymentMethod(newCustomer);
+            newPaymentInfo.FullNumber = "4444444444444444";
+
+            // Act
+            try
+            {
+                string data = string.Empty;
+                Chargify.LogRequest = (requestMethod, address, postedData) =>
+                {
+                    data = postedData;
+                };
+                var newSubscription = Chargify.CreateSubscription(product.Handle, newCustomer, newPaymentInfo);
+
+                Assert.Fail("Subscription should not have been created, since credit card number is not 1, 2 or 3 ending");
+            }
+            catch (ChargifyException chEx)
+            {
+                Assert.IsFalse(chEx.LastDataPosted.Contains(newPaymentInfo.FullNumber), chEx.LastDataPosted);
+                Assert.IsTrue(chEx.LastDataPosted.Contains(newPaymentInfo.FullNumber.Mask('X', 4)));
+            }
+        }
+
+        [TestMethod]
         public void Subscription_Create()
         {
             // Arrange
@@ -617,7 +645,7 @@ namespace ChargifyDotNetTests
 
             // Act
             Assert.IsNotNull(product, "Product couldn't be found");
-          var newSubscription = Chargify.CreateSubscription(product.Handle, newCustomer, newPaymentInfo, componentsToUse);
+            var newSubscription = Chargify.CreateSubscription(product.Handle, newCustomer, newPaymentInfo, componentsToUse);
             var subComponents = Chargify.GetComponentsForSubscription(newSubscription.SubscriptionID);
             var usedComponents = from c in subComponents
                                  where componentsToUse.ContainsKey(c.Value.ComponentID)
