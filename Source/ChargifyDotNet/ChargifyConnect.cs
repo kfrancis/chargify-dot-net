@@ -1196,7 +1196,7 @@ namespace ChargifyNET
             string methodString = string.Format("{0}/{1}/{2}", UpdateShortName, prettyId, token);
             // just in case?
             // methodString = PCLWebUtility.WebUtility.UrlEncode(methodString);
-            string updateUrl = string.Format("{0}{1}{2}", URL, (URL.EndsWith("/") ? "" : "/"), methodString);
+            string updateUrl = string.Format("{0}{1}{2}", URL?.Replace("chargify.com", "chargifypay.com"), (URL.EndsWith(" / ") ? "" : "/"), methodString);
             return updateUrl;
         }
 
