@@ -54,6 +54,7 @@ namespace ChargifyNET
         internal const string OrganizationKey = "organization";
         internal const string VatNumberKey = "vat_number";
         internal const string ReferenceKey = "reference";
+        internal const string CCEmailsKey = "cc_emails";
         internal const string IdKey = "id";
         internal const string CreatedAtKey = "created_at";
         internal const string UpdatedAtKey = "updated_at";
@@ -184,6 +185,9 @@ namespace ChargifyNET
                     case ReferenceKey:
                         _systemId = obj.GetJSONContentAsString(key);
                         break;
+                    case CCEmailsKey:
+                        CCEmails = obj.GetJSONContentAsString(key);
+                        break;
                     case ShippingAddressKey:
                         ShippingAddress = obj.GetJSONContentAsString(key);
                         break;
@@ -236,6 +240,9 @@ namespace ChargifyNET
                         break;
                     case ReferenceKey:
                         _systemId = dataNode.GetNodeContentAsString();
+                        break;
+                    case CCEmailsKey:
+                        CCEmails = dataNode.GetNodeContentAsString();
                         break;
                     case ShippingAddressKey:
                         ShippingAddress = dataNode.GetNodeContentAsString();
@@ -457,6 +464,19 @@ namespace ChargifyNET
         public bool ShouldSerializeSystemId()
         {
             return !string.IsNullOrEmpty(SystemID);
+        }
+
+        /// <summary>
+        /// Get or set the customer's cc emails
+        /// </summary>
+        [XmlElement("cc_emails")]
+        public string CCEmails { get; set; }
+        /// <summary>
+        /// Ignore, used for determining if the value should be serialized
+        /// </summary>
+        public bool ShouldSerializeCCEmails()
+        {
+            return !string.IsNullOrEmpty(CCEmails);
         }
 
         /// <summary>
