@@ -52,6 +52,11 @@ namespace ChargifyNET
         [XmlEnum("invoice")]
         Invoice,
         /// <summary>
+        /// Introduced with Relationship Invoicing, Remittances are issued to users, paid and organized by staff
+        /// </summary>
+        [XmlEnum("remittance")]
+        Remittance,
+        /// <summary>
         /// The default state if the value could not be parsed, or wasn't sent.
         /// </summary>
         [XmlIgnore]
