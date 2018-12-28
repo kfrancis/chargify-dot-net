@@ -661,27 +661,13 @@ namespace ChargifyNET
         }
 
         /// <summary>
-        /// Get a list of customers (will return 50 for each page)
+        /// Processes a list of customers from string response into a dictionary
         /// </summary>
-        /// <param name="pageNumber">The page number to load</param>
-        /// <returns>A list of customers for the specified page</returns>
-        public IDictionary<string, ICustomer> GetCustomerList(int pageNumber)
-        {
-            return GetCustomerList(pageNumber, false);
-        }
-
-        /// <summary>
-        /// Get a list of customers (will return 50 for each page)
-        /// </summary>
-        /// <param name="pageNumber">The page number to load</param>
+        /// <param name="response">The API response</param>
         /// <param name="keyByChargifyId">If true, the dictionary will be keyed by Chargify ID and not the reference value.</param>
-        /// <returns>A list of customers for the specified page</returns>
-        public IDictionary<string, ICustomer> GetCustomerList(int pageNumber, bool keyByChargifyId)
+        /// <returns>A list of customers contained in the string response</returns>
+        private IDictionary<string, ICustomer> ProcessCustomerListResponse(string response, bool keyByChargifyId)
         {
-            // make sure data is valid
-            if (pageNumber < 1) throw new ArgumentException("Page number must be greater than 1", "pageNumber");
-            // now make the request
-            string response = DoRequest(string.Format("customers.{0}?page={1}", GetMethodExtension(), pageNumber));
             var retValue = new Dictionary<string, ICustomer>();
             if (response.IsXml())
             {
@@ -742,6 +728,31 @@ namespace ChargifyNET
         }
 
         /// <summary>
+        /// Get a list of customers (will return 50 for each page)
+        /// </summary>
+        /// <param name="pageNumber">The page number to load</param>
+        /// <returns>A list of customers for the specified page</returns>
+        public IDictionary<string, ICustomer> GetCustomerList(int pageNumber)
+        {
+            return GetCustomerList(pageNumber, false);
+        }
+
+        /// <summary>
+        /// Get a list of customers (will return 50 for each page)
+        /// </summary>
+        /// <param name="pageNumber">The page number to load</param>
+        /// <param name="keyByChargifyId">If true, the dictionary will be keyed by Chargify ID and not the reference value.</param>
+        /// <returns>A list of customers for the specified page</returns>
+        public IDictionary<string, ICustomer> GetCustomerList(int pageNumber, bool keyByChargifyId)
+        {
+            // make sure data is valid
+            if (pageNumber < 1) throw new ArgumentException("Page number must be greater than 1", "pageNumber");
+            // now make the request
+            string response = DoRequest(string.Format("customers.{0}?page={1}", GetMethodExtension(), pageNumber));
+            return ProcessCustomerListResponse(response, keyByChargifyId);
+        }        
+
+        /// <summary>
         /// Get a list of all customers.  Be careful calling this method because a large number of
         /// customers will result in multiple calls to Chargify
         /// </summary>
@@ -779,6 +790,18 @@ namespace ChargifyNET
                 pageCount = pageList.Count;
             }
             return retValue;
+        }
+
+        /// <summary>
+        /// Search the customers
+        /// </summary>
+        /// <param name="query">The search string (Email, Chargify ID, Reference, Organization)</param>
+        /// <returns>A list of customers that satisfy the search query</returns>
+        public IDictionary<string, ICustomer> SearchCustomers(string query)
+        {
+            // make the request
+            string response = DoRequest(string.Format("customers.{0}?q={1}", GetMethodExtension(), query));
+            return ProcessCustomerListResponse(response, true);
         }
 
         /// <summary>
