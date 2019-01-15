@@ -39,6 +39,7 @@ namespace ChargifyNET
     using System.Web;
     using System.Xml;
     using System.Globalization;
+    using Newtonsoft.Json;
     #endregion
 
     /// <summary>
@@ -5333,6 +5334,25 @@ namespace ChargifyNET
                 retValue = GetListedJsonResponse<Invoice>("invoice", response);
             }
             return retValue;
+        }
+
+        public ICollection<RelationshipInvoice> GetRelationshipInvoiceList(int subscriptionId, int page = 1, int perPage = 20)
+        {
+            // Construct the url to access Chargify
+            string url = string.Format("invoices.{0}?subscription_id={1}&page={2}&per_page={3}", GetMethodExtension(), subscriptionId, page, perPage);
+            string response = DoRequest(url);
+            if (response.IsXml())
+            {
+                // now build an invoice list based on response XML
+                throw new NotImplementedException("Can't be arsed doing xml deserialization");
+            }
+            else if (response.IsJSON())
+            {
+                // now build an invoice list based on response JSON
+                GetRelationshipInvoiceListResponse responseObj = JsonConvert.DeserializeObject<GetRelationshipInvoiceListResponse>(response);
+                return responseObj.Invoices;
+            }
+            throw new Exception("invalid response from server");
         }
         #endregion
 
