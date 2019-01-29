@@ -5349,8 +5349,15 @@ namespace ChargifyNET
             else if (response.IsJSON())
             {
                 // now build an invoice list based on response JSON
-                GetRelationshipInvoiceListResponse responseObj = JsonConvert.DeserializeObject<GetRelationshipInvoiceListResponse>(response);
-                return responseObj.Invoices;
+                try
+                {
+                    GetRelationshipInvoiceListResponse responseObj = JsonConvert.DeserializeObject<GetRelationshipInvoiceListResponse>(response);
+                    return responseObj.Invoices;
+                }
+                catch (Exception e)
+                {
+                    return new List<RelationshipInvoice>();
+                }
             }
             throw new Exception("invalid response from server");
         }
