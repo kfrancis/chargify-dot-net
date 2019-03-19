@@ -192,11 +192,15 @@ namespace ChargifyDotNetTests
         [TestMethod]
         public void Subscription_Can_Load_many_results_By_State()
         {
+            // Arrange
+            var state = SubscriptionState.Active;
+
             // Act
-            var result = Chargify.GetSubscriptionList(SubscriptionState.Active);
+            var result = Chargify.GetSubscriptionList(state);
 
             // Assert
-            Assert.IsTrue(result.Count() >= 50);
+            Assert.IsTrue(result.Any());
+            Assert.IsTrue(result.All(s => s.Value.State == state));
         }
 
 
