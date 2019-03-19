@@ -507,8 +507,8 @@ namespace ChargifyNET
             // make sure data is valid
             if (customer == null) throw new ArgumentNullException("customer");
             if (customer.IsSaved) throw new ArgumentException("Customer already saved", "customer");
-            return CreateCustomer(customer.FirstName, customer.LastName, customer.Email, customer.Phone, customer.Organization, customer.SystemID,
-                                  customer.ShippingAddress, customer.ShippingAddress2, customer.ShippingCity, customer.ShippingState,
+            return CreateCustomer(customer.FirstName, customer.LastName, customer.Email, customer.Phone, customer.Organization, customer.SystemID, 
+                                  customer.CCEmails, customer.ShippingAddress, customer.ShippingAddress2, customer.ShippingCity, customer.ShippingState,
                                   customer.ShippingZip, customer.ShippingCountry, customer.TaxExempt);
         }
 
@@ -521,6 +521,7 @@ namespace ChargifyNET
         /// <param name="phone">The phone number of the customer</param>
         /// <param name="organization">The organization of the customer</param>
         /// <param name="systemId">The system ID of the customer</param>
+        /// <param name="ccEmails">The CC Emails of the customer</param>
         /// <param name="shippingAddress">The shipping address of the customer, if applicable.</param>
         /// <param name="shippingAddress2">The shipping address (line 2) of the customer, if applicable.</param>
         /// <param name="shippingCity">The shipping city of the customer, if applicable.</param>
@@ -529,8 +530,8 @@ namespace ChargifyNET
         /// <param name="shippingCountry">The shipping country of the customer, if applicable.</param>
         /// <param name="taxExempt">The tax exemption status of the customer, if applicable.</param>
         /// <returns>The created chargify customer</returns>
-        public ICustomer CreateCustomer(string firstName, string lastName, string emailAddress, string phone, string organization, string systemId,
-                                        string shippingAddress, string shippingAddress2, string shippingCity, string shippingState,
+        public ICustomer CreateCustomer(string firstName, string lastName, string emailAddress, string phone, string organization, string systemId, 
+                                        string ccEmails, string shippingAddress, string shippingAddress2, string shippingCity, string shippingState,
                                         string shippingZip, string shippingCountry, bool taxExempt = false)
         {
             // make sure data is valid
@@ -551,6 +552,7 @@ namespace ChargifyNET
             if (!string.IsNullOrEmpty(lastName)) customerXml.AppendFormat("<last_name>{0}</last_name>", lastName);
             if (!string.IsNullOrEmpty(organization)) customerXml.AppendFormat("<organization>{0}</organization>", WebUtility.HtmlEncode(organization));
             if (!string.IsNullOrEmpty(systemId)) customerXml.AppendFormat("<reference>{0}</reference>", systemId);
+            if (!string.IsNullOrEmpty(ccEmails)) customerXml.AppendFormat("<cc_emails>{0}</cc_emails>", ccEmails);
             if (!string.IsNullOrEmpty(shippingAddress)) customerXml.AppendFormat("<address>{0}</address>", shippingAddress);
             if (!string.IsNullOrEmpty(shippingAddress2)) customerXml.AppendFormat("<address_2>{0}</address_2>", shippingAddress2);
             if (!string.IsNullOrEmpty(shippingCity)) customerXml.AppendFormat("<city>{0}</city>", shippingCity);
@@ -626,6 +628,7 @@ namespace ChargifyNET
                 if (oldCust.Organization != customer.Organization) { customerXml.AppendFormat("<organization>{0}</organization>", PCLWebUtility.WebUtility.HtmlEncode(customer.Organization)); isUpdateRequired = true; }
                 if (oldCust.Phone != customer.Phone) { customerXml.AppendFormat("<phone>{0}</phone>", PCLWebUtility.WebUtility.HtmlEncode(customer.Phone)); isUpdateRequired = true; }
                 if (oldCust.SystemID != customer.SystemID) { customerXml.AppendFormat("<reference>{0}</reference>", customer.SystemID); isUpdateRequired = true; }
+                if (oldCust.CCEmails != customer.CCEmails) { customerXml.AppendFormat("<cc_emails>{0}</cc_emails>", customer.CCEmails); isUpdateRequired = true; }
                 if (oldCust.ShippingAddress != customer.ShippingAddress) { customerXml.AppendFormat("<address>{0}</address>", PCLWebUtility.WebUtility.HtmlEncode(customer.ShippingAddress)); isUpdateRequired = true; }
                 if (oldCust.ShippingAddress2 != customer.ShippingAddress2) { customerXml.AppendFormat("<address_2>{0}</address_2>", PCLWebUtility.WebUtility.HtmlEncode(customer.ShippingAddress2)); isUpdateRequired = true; }
                 if (oldCust.ShippingCity != customer.ShippingCity) { customerXml.AppendFormat("<city>{0}</city>", PCLWebUtility.WebUtility.HtmlEncode(customer.ShippingCity)); isUpdateRequired = true; }
@@ -658,27 +661,13 @@ namespace ChargifyNET
         }
 
         /// <summary>
-        /// Get a list of customers (will return 50 for each page)
+        /// Processes a list of customers from string response into a dictionary
         /// </summary>
-        /// <param name="pageNumber">The page number to load</param>
-        /// <returns>A list of customers for the specified page</returns>
-        public IDictionary<string, ICustomer> GetCustomerList(int pageNumber)
-        {
-            return GetCustomerList(pageNumber, false);
-        }
-
-        /// <summary>
-        /// Get a list of customers (will return 50 for each page)
-        /// </summary>
-        /// <param name="pageNumber">The page number to load</param>
+        /// <param name="response">The API response</param>
         /// <param name="keyByChargifyId">If true, the dictionary will be keyed by Chargify ID and not the reference value.</param>
-        /// <returns>A list of customers for the specified page</returns>
-        public IDictionary<string, ICustomer> GetCustomerList(int pageNumber, bool keyByChargifyId)
+        /// <returns>A list of customers contained in the string response</returns>
+        private IDictionary<string, ICustomer> ProcessCustomerListResponse(string response, bool keyByChargifyId)
         {
-            // make sure data is valid
-            if (pageNumber < 1) throw new ArgumentException("Page number must be greater than 1", "pageNumber");
-            // now make the request
-            string response = DoRequest(string.Format("customers.{0}?page={1}", GetMethodExtension(), pageNumber));
             var retValue = new Dictionary<string, ICustomer>();
             if (response.IsXml())
             {
@@ -739,6 +728,31 @@ namespace ChargifyNET
         }
 
         /// <summary>
+        /// Get a list of customers (will return 50 for each page)
+        /// </summary>
+        /// <param name="pageNumber">The page number to load</param>
+        /// <returns>A list of customers for the specified page</returns>
+        public IDictionary<string, ICustomer> GetCustomerList(int pageNumber)
+        {
+            return GetCustomerList(pageNumber, false);
+        }
+
+        /// <summary>
+        /// Get a list of customers (will return 50 for each page)
+        /// </summary>
+        /// <param name="pageNumber">The page number to load</param>
+        /// <param name="keyByChargifyId">If true, the dictionary will be keyed by Chargify ID and not the reference value.</param>
+        /// <returns>A list of customers for the specified page</returns>
+        public IDictionary<string, ICustomer> GetCustomerList(int pageNumber, bool keyByChargifyId)
+        {
+            // make sure data is valid
+            if (pageNumber < 1) throw new ArgumentException("Page number must be greater than 1", "pageNumber");
+            // now make the request
+            string response = DoRequest(string.Format("customers.{0}?page={1}", GetMethodExtension(), pageNumber));
+            return ProcessCustomerListResponse(response, keyByChargifyId);
+        }        
+
+        /// <summary>
         /// Get a list of all customers.  Be careful calling this method because a large number of
         /// customers will result in multiple calls to Chargify
         /// </summary>
@@ -776,6 +790,18 @@ namespace ChargifyNET
                 pageCount = pageList.Count;
             }
             return retValue;
+        }
+
+        /// <summary>
+        /// Search the customers
+        /// </summary>
+        /// <param name="query">The search string (Email, Chargify ID, Reference, Organization)</param>
+        /// <returns>A list of customers that satisfy the search query</returns>
+        public IDictionary<string, ICustomer> SearchCustomers(string query)
+        {
+            // make the request
+            string response = DoRequest(string.Format("customers.{0}?q={1}", GetMethodExtension(), query));
+            return ProcessCustomerListResponse(response, true);
         }
 
         /// <summary>

@@ -141,6 +141,9 @@ namespace ChargifyNET
                     case ReferenceKey:
                         SystemID = obj.GetJSONContentAsString(key);
                         break;
+                    case CCEmailsKey:
+                        CCEmails = obj.GetJSONContentAsString(key);
+                        break;
                     case IdKey:
                         _chargifyId = obj.GetJSONContentAsInt(key);
                         break;
@@ -205,6 +208,9 @@ namespace ChargifyNET
                         break;
                     case ReferenceKey:
                         SystemID = dataNode.GetNodeContentAsString();
+                        break;
+                    case CCEmailsKey:
+                        CCEmails = dataNode.GetNodeContentAsString();
                         break;
                     case IdKey:
                         _chargifyId = dataNode.GetNodeContentAsInt();
