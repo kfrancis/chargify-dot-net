@@ -188,6 +188,18 @@ namespace ChargifyDotNetTests
             Assert.AreEqual(result.Count(), subscriptions.Count());
         }
 
+
+        [TestMethod]
+        public void Subscription_Can_Load_many_results_By_State()
+        {
+            // Act
+            var result = Chargify.GetSubscriptionList(SubscriptionState.Active);
+
+            // Assert
+            Assert.IsTrue(result.Count() >= 50);
+        }
+
+
         [TestMethod]
         public void Subscription_Can_Get_PaymentProfile_Id()
         {

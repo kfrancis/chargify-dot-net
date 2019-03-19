@@ -1361,75 +1361,27 @@ namespace ChargifyNET
         /// </summary>
         /// <param name="state">The state of subscriptions to return</param>
         /// <returns>Null if there are no results, object otherwise.</returns>
-        public IDictionary<int, ISubscription> GetSubscriptionList(SubscriptionState state)
+
+        public IDictionary<int, ISubscription> GetSubscriptionList(SubscriptionState state) 
         {
-            string qs = "";
-
-            if (state != SubscriptionState.Unknown)
-            {
-                // Append the kind to the query string ...
-                if (qs.Length > 0) { qs += "&"; }
-                qs += string.Format("state={0}", state.ToString().ToLower());
-            }
-
-            string url = string.Format("subscriptions.{0}", GetMethodExtension());
-            if (!string.IsNullOrEmpty(qs)) { url += "?" + qs; }
-            string response = DoRequest(url);
-
             var retValue = new Dictionary<int, ISubscription>();
-            if (response.IsXml())
+            int pageCount = 1000;
+            for (int page = 1; pageCount > 0; page++)
             {
-                // now build a transaction list based on response XML
-                XmlDocument doc = new XmlDocument();
-                doc.LoadXml(response);
-                if (doc.ChildNodes.Count == 0) throw new InvalidOperationException("Returned XML not valid");
-                // loop through the child nodes of this node
-                foreach (XmlNode elementNode in doc.ChildNodes)
+                IDictionary<int, ISubscription> pageList = GetSubscriptionList(page, 50, state);
+                foreach (ISubscription subscription in pageList.Values)
                 {
-                    if (elementNode.Name == "subscriptions")
+                    if (!retValue.ContainsKey(subscription.SubscriptionID))
                     {
-                        foreach (XmlNode subscriptionNode in elementNode.ChildNodes)
-                        {
-                            if (subscriptionNode.Name == "subscription")
-                            {
-                                ISubscription loadedSubscription = new Subscription(subscriptionNode);
-                                if (!retValue.ContainsKey(loadedSubscription.SubscriptionID))
-                                {
-                                    retValue.Add(loadedSubscription.SubscriptionID, loadedSubscription);
-                                }
-                                else
-                                {
-                                    throw new InvalidOperationException("Duplicate SubscriptionID values detected");
-                                }
-                            }
-                        }
+                        retValue.Add(subscription.SubscriptionID, subscription);
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException("Duplicate subscriptionID values detected");
                     }
                 }
+                pageCount = pageList.Count;
             }
-            else if (response.IsJSON())
-            {
-                // should be expecting an array
-                int position = 0;
-                JsonArray array = JsonArray.Parse(response, ref position);
-                for (int i = 0; i <= array.Length - 1; i++)
-                {
-                    var jsonObject = array.Items[i] as JsonObject;
-                    if (jsonObject != null && jsonObject.ContainsKey("subscription"))
-                    {
-                        JsonObject subscriptionObj = (array.Items[i] as JsonObject)["subscription"] as JsonObject;
-                        ISubscription loadedSubscription = new Subscription(subscriptionObj);
-                        if (!retValue.ContainsKey(loadedSubscription.SubscriptionID))
-                        {
-                            retValue.Add(loadedSubscription.SubscriptionID, loadedSubscription);
-                        }
-                        else
-                        {
-                            throw new InvalidOperationException("Duplicate SubscriptionID values detected");
-                        }
-                    }
-                }
-            }
-            // return the list
             return retValue;
         }
 
@@ -1469,6 +1421,11 @@ namespace ChargifyNET
         /// <returns>Null if there are no results, object otherwise.</returns>
         public IDictionary<int, ISubscription> GetSubscriptionList(int page, int perPage)
         {
+            return GetSubscriptionList(page, perPage, SubscriptionState.Unknown);
+        }
+
+        private IDictionary<int, ISubscription> GetSubscriptionList(int page, int perPage, SubscriptionState state) 
+        {
             string qs = string.Empty;
 
             if (page != int.MinValue)
@@ -1482,7 +1439,12 @@ namespace ChargifyNET
                 if (qs.Length > 0) { qs += "&"; }
                 qs += string.Format("per_page={0}", perPage);
             }
-
+            if (state != SubscriptionState.Unknown)
+            {
+                // Append the kind to the query string ...
+                if (qs.Length > 0) { qs += "&"; }
+                qs += string.Format("state={0}", state.ToString().ToLower());
+            }
             string url = string.Format("subscriptions.{0}", GetMethodExtension());
             if (!string.IsNullOrEmpty(qs)) { url += "?" + qs; }
             string response = DoRequest(url);
