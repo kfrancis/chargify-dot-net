@@ -5309,6 +5309,89 @@ namespace ChargifyNET
                 throw;
             }
         }
+        /// <summary>
+        /// From http://docs.chargify.com/api-billing-portal
+        /// </summary>
+        /// <param name="chargifyId">The chargify ID of the customer</param>
+        /// <param name="autoInvite">Should an email be automatically sent to customer with billing portal link</param>
+        /// <returns>True if success, otherwise error is thrown</returns>
+        public bool EnableBillingPortalAccess(int chargifyId, bool autoInvite = false)
+        {
+            try
+            {
+                // make sure data is valid
+                if (chargifyId < 0) throw new ArgumentNullException("chargifyId");
+
+                // now make the request
+                string response = DoRequest(string.Format("portal/customers/{0}/enable.{1}?auto_invite={2}", chargifyId, GetMethodExtension(), autoInvite ? 1 : 0), HttpRequestMethod.POST);
+
+                return true;
+                // Convert the Chargify response into the object we're looking for
+                return response.ConvertResponseTo<BillingManagementInfo>("management_link");
+            }
+            catch (ChargifyException cex)
+            {
+                if (cex.StatusCode == HttpStatusCode.NotFound) return null;
+                throw;
+            }
+        }
+        /// <summary>
+        /// From http://docs.chargify.com/api-billing-portal
+        /// </summary>
+        /// <param name="systemId">The system ID of the customer</param>
+        /// <param name="autoInvite">Should an email be automatically sent to customer with billing portal link</param>
+        /// <returns>True if success, otherwise error is thrown</returns>
+
+        public bool EnableBillingPortalAccess(string systemId, bool autoInvite = false)
+        {
+                // make sure data is valid
+                if (systemId == string.Empty) throw new ArgumentException("Empty SystemID not allowed", "systemId");
+                var customer = LoadCustomer(systemId);
+                if (customer == null) throw new ArgumentException("Customer does not exist");
+
+                return EnableBillingPortalAccess(customer.ChargifyID, autoInvite);
+        }
+
+        /// <summary>
+        /// From http://docs.chargify.com/api-billing-portal
+        /// </summary>
+        /// <param name="chargifyId">The chargify ID of the customer</param>
+        /// <returns>True if success, otherwise error is thrown</returns>
+        public bool RevokeBillingPortalAccess(int chargifyId)
+        {
+            try
+            {
+                // make sure data is valid
+                if (chargifyId < 0) throw new ArgumentNullException("chargifyId");
+
+                // now make the request
+                string response = DoRequest(string.Format("portal/customers/{0}/invitations/revoke.{1}", chargifyId, GetMethodExtension()), HttpRequestMethod.DELETE);
+
+                // Convert the Chargify response into the object we're looking for
+                return response.ConvertResponseTo<BillingManagementInfo>("management_link");
+            }
+            catch (ChargifyException cex)
+            {
+                if (cex.StatusCode == HttpStatusCode.NotFound) return null;
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// From http://docs.chargify.com/api-billing-portal
+        /// </summary>
+        /// <param name="systemId">The system ID of the customer</param>
+        /// <returns>True if success, otherwise error is thrown</returns>
+
+        public bool RevokeBillingPortalAccess(string systemId)
+        {
+                // make sure data is valid
+                if (systemId == string.Empty) throw new ArgumentException("Empty SystemID not allowed", "systemId");
+                var customer = LoadCustomer(systemId);
+                if (customer == null) throw new ArgumentException("Customer does not exist");
+
+                return RevokeBillingPortalAccess(customer.ChargifyID, autoInvite);
+        }
         #endregion
 
         #region Invoices
