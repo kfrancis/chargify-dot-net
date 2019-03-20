@@ -840,6 +840,7 @@ namespace ChargifyNET
                 }
             }
         }
+        
 
         #endregion
 
@@ -1330,6 +1331,38 @@ namespace ChargifyNET
             {
                 if (cex.StatusCode == HttpStatusCode.NotFound) return false;
                 throw; // otherwise
+            }
+        }
+
+        /// <summary>
+        /// Purge the specified subscription
+        /// * NOTE: Because this is is permanent, it requires special permissions from chargify. Please contact support to enable this feature.
+        /// ** CAUTION:  Permanently deletes subscription and all revenew, no way to undo this! **
+        /// </summary>'
+        /// https://SUBDOMAIN_HERE.chargify.com/subscriptions/SUBSCRIPTION_ID_HERE/purge.json?ack=CUSTOMER_ID_HERE
+        /// <param name="subscriptionId">The id of the subscription</param>
+        /// <returns>True if the subscription was purged, false otherwise.</returns>
+        public bool PurgeSubscription(int subscriptionId) 
+        {
+            try
+            {
+                var subscription = LoadSubscription(subscriptionId);
+                if (subscription == null) { throw new ArgumentException("Not a valid subscription", "subscriptionId"); }
+
+                // now make the request
+                DoRequest(string.Format("subscriptions/{0}/purge.{1}?ack={2}", subscriptionId, GetMethodExtension(), subscription.Customer.ChargifyID), HttpRequestMethod.Post, string.Empty);
+                return true;
+            }
+            catch (ChargifyException cex)
+            {
+                switch (cex.StatusCode)
+                {
+                    //case HttpStatusCode.Forbidden:
+                    //case HttpStatusCode.NotFound:
+                    //    return false;
+                    default:
+                        throw;
+                }
             }
         }
 
