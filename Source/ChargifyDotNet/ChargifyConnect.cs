@@ -1336,8 +1336,8 @@ namespace ChargifyNET
 
         /// <summary>
         /// Purge the specified subscription
-        /// * NOTE: Because this is is permanent, it requires special permissions from chargify. Please contact support to enable this feature.
-        /// ** CAUTION:  Permanently deletes subscription and all revenew, no way to undo this! **
+        /// * NOTE: Because this is is permanent, it requires special permissions from chargify. Please contact support to enable this feature. * 
+        /// ** CAUTION:  Permanently deletes subscription and all transactions. There is no way to undo this! **
         /// </summary>'
         /// https://SUBDOMAIN_HERE.chargify.com/subscriptions/SUBSCRIPTION_ID_HERE/purge.json?ack=CUSTOMER_ID_HERE
         /// <param name="subscriptionId">The id of the subscription</param>
