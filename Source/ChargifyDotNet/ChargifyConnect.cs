@@ -1365,7 +1365,7 @@ namespace ChargifyNET
 
         /// <summary>
         /// Purge the specified subscription
-        /// * NOTE: Because this is is permanent, it requires special permissions from chargify. Please contact support to enable this feature. * 
+        /// * This is undocumented behavior. It requires special permissions from chargify. Contact support to enable this feature. *
         /// ** CAUTION:  Permanently deletes subscription and all transactions. There is no way to undo this! **
         /// </summary>'
         /// https://SUBDOMAIN_HERE.chargify.com/subscriptions/SUBSCRIPTION_ID_HERE/purge.json?ack=CUSTOMER_ID_HERE
@@ -1379,7 +1379,8 @@ namespace ChargifyNET
                 if (subscription == null) { throw new ArgumentException("Not a valid subscription", "subscriptionId"); }
 
                 // now make the request
-                DoRequest(string.Format("subscriptions/{0}/purge.{1}?ack={2}", subscriptionId, GetMethodExtension(), subscription.Customer.ChargifyID), HttpRequestMethod.Post, string.Empty);
+                DoRequest(
+                    $"subscriptions/{subscriptionId}/purge.{GetMethodExtension()}?ack={subscription.Customer.ChargifyID}", HttpRequestMethod.Post, null);
                 return true;
             }
             catch (ChargifyException cex)
