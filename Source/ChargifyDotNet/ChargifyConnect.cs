@@ -27,6 +27,9 @@
 //
 #endregion
 
+using System.Xml.Serialization;
+using Newtonsoft.Json;
+
 namespace ChargifyNET
 {
     #region Imports
@@ -5875,6 +5878,21 @@ namespace ChargifyNET
         #endregion
 
         #region Utility Methods
+        private string GetBody(object obj)
+        {
+            if (UseJSON)
+                return JsonConvert.SerializeObject(obj);
+
+            var serializer = new XmlSerializer(typeof(object));
+            using (var stringWriter = new StringWriter())
+            {
+                using (var xmlWriter = XmlWriter.Create(stringWriter))
+                {
+                    serializer.Serialize(xmlWriter, obj);
+                    return stringWriter.ToString();
+                }
+            }
+        }
         private Dictionary<int, T> GetListedJsonResponse<T>(string key, string response)
             where T : class, IChargifyEntity
         {
@@ -6296,6 +6314,31 @@ namespace ChargifyNET
                 {
                     throw;
                 }
+            }
+        }
+        #endregion
+
+        #region Exception Handling
+
+        private bool AttemptThrowsNotFoundStatusCode(ChargifyException e)
+        {
+            return e.StatusCode == HttpStatusCode.NotFound;
+        }
+        private void HandleSubscriptionNotFound(ChargifyException e)
+        {
+            throw new InvalidOperationException("Subscription not found");
+        }
+        private T HandleExceptions<T>(Func<T> @if,
+            ExceptionHandler then)
+        {
+            try
+            {
+                return @if();
+            }
+            catch (ChargifyException e)
+            {
+                then.Evaluate(e);
+                throw;
             }
         }
         #endregion
