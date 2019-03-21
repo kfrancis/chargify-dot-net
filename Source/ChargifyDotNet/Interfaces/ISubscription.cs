@@ -109,13 +109,17 @@ namespace ChargifyNET
         /// </summary>
         Paid,
         /// <summary>
-        /// The 'parital' invoice state
+        /// The 'parital' subscription state
         /// </summary>
         Partial,
         /// <summary>
-        /// Subscription is 'paused', no further processing
+        /// The 'on_hold' subscription state
         /// </summary>
         On_Hold,
+        /// <summary>
+        /// The 'paused' subscription state
+        /// </summary>
+        Paused,
         /// <summary>
         /// The 'unknown' subscription state, only internal to this wrapper
         /// </summary>
