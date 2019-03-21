@@ -16,7 +16,7 @@ namespace ChargifyDotNetTests
             var productFamily = Chargify.GetProductFamilyList().Values.FirstOrDefault();
             if (productFamily == null) Assert.Inconclusive("A valid product family could not be found.");
             var familyComponents = Chargify.GetComponentsForProductFamily(productFamily.ID, false).Values;
-            if (familyComponents == null || !familyComponents.Any()) Assert.Inconclusive("Valid compontents could not be found.");
+            if (familyComponents == null || !familyComponents.Any()) Assert.Inconclusive("Valid components could not be found.");
 
             // Act
             var components = familyComponents.Where(c => c.PricingScheme != PricingSchemeType.Per_Unit && c.Prices != null && c.Prices.Count > 0).ToList();

@@ -70,6 +70,10 @@ namespace ChargifyNET
         /// </summary>
         string SystemID { get; set; }
         /// <summary>
+        /// Get or set the customer's cc emails
+        /// </summary>
+        string CCEmails { get; set; }
+        /// <summary>
         /// Get the full name LastName FirstName for the customer
         /// </summary>
         string FullName { get; }

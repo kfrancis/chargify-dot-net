@@ -16,16 +16,18 @@ namespace ChargifyDotNetTests
             // Arrange
             var productFamily = Chargify.GetProductFamilyList().Values.FirstOrDefault();
             if (productFamily == null) Assert.Inconclusive("A valid product family could not be found.");
+            var coupons = Chargify.GetAllCoupons(productFamily.ID);
+            var couponID = coupons.FirstOrDefault(c => c.Value.AmountInCents > 0).Key;
 
             // Act
-            var result = Chargify.LoadCoupon(productFamily.ID, 129307);
+            var result = Chargify.LoadCoupon(productFamily.ID, couponID);
 
             // Assert
             Assert.IsNotNull(result);
-            //Assert.IsInstanceOfType(result, typeof(ICoupon));
             Assert.IsTrue(result.AmountInCents != int.MinValue);
             Assert.IsTrue(result.AmountInCents > 0);
             Assert.IsTrue(result.Amount == (Convert.ToDecimal(result.AmountInCents)/100));
+            Assert.AreEqual(result.ID, couponID);
         }
         [TestMethod]
         public void Coupon_Create()
