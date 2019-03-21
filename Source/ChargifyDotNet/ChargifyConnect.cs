@@ -3296,15 +3296,19 @@ namespace ChargifyNET
         /// <param name="subscriptionId">The subscription to modify</param>
         /// <param name="cancelAtEndOfPeriod">True if the subscription should cancel at the end of the current period</param>
         /// <param name="cancellationMessage">The reason for cancelling the subscription</param>
-        /// <returns>True if successful, throws error otherwise.</returns>
-        /// <returns>True if successful, throws error otherwise.</returns>
-        public bool UpdateDelayedCancelForSubscription(int subscriptionId, bool cancelAtEndOfPeriod, string cancellationMessage)
+        /// <returns>Subscription if successful, null otherwise.</returns>
+        public ISubscription UpdateDelayedCancelForSubscription(int subscriptionId, bool cancelAtEndOfPeriod, string cancellationMessage)
         {
             if (subscriptionId == int.MinValue) throw new ArgumentNullException("subscriptionId");
 
-            if (cancelAtEndOfPeriod)
-                return ApplyDelayedCancelToSubscription(subscriptionId, cancellationMessage);
-            return RemoveDelayedCancelFromSubscription(subscriptionId);
+            bool isSuccessful = cancelAtEndOfPeriod
+                ? ApplyDelayedCancelToSubscription(subscriptionId, cancellationMessage)
+                : RemoveDelayedCancelFromSubscription(subscriptionId);
+          
+            if (isSuccessful)
+                return LoadSubscription(subscriptionId);
+            return null;
+
         }
 
         private bool ApplyDelayedCancelToSubscription(int subscriptionId, string cancellationMessage)
