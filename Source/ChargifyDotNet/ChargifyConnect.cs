@@ -3279,24 +3279,36 @@ namespace ChargifyNET
         {
             if (subscriptionId == int.MinValue) throw new ArgumentNullException("subscriptionId");
 
-            // create XML for creation of customer
-            StringBuilder subscriptionXml = new StringBuilder(GetXmlStringIfApplicable());
-            subscriptionXml.Append("<subscription>");
-            subscriptionXml.AppendFormat("<cancel_at_end_of_period>{0}</cancel_at_end_of_period>", cancelAtEndOfPeriod ? "1" : "0");
-            if (!String.IsNullOrEmpty(cancellationMessage)) { subscriptionXml.AppendFormat("<cancellation_message>{0}</cancellation_message>", cancellationMessage); }
-            subscriptionXml.Append("</subscription>");
-            try
-            {
-                // now make the request
-                string response = DoRequest(string.Format("subscriptions/{0}.{1}", subscriptionId, GetMethodExtension()), HttpRequestMethod.Put, subscriptionXml.ToString());
-                // change the response to the object
-                return response.ConvertResponseTo<Subscription>("subscription");
-            }
-            catch (ChargifyException cex)
-            {
-                if (cex.StatusCode == HttpStatusCode.NotFound) throw new InvalidOperationException("Subscription not found");
-                throw;
-            }
+            if (cancelAtEndOfPeriod)
+                return ApplyDelayedCancelToSubscription(subscriptionId, cancellationMessage);
+            return RemoveDelayedCancelFromSubscription(subscriptionId);
+        }
+
+        private ISubscription ApplyDelayedCancelToSubscription(int subscriptionId, string cancellationMessage)
+        {
+            return HandleExceptions(attempt: () =>
+                {
+                    string response = DoRequest($"subscriptions/{subscriptionId}/delayed_cancel.{GetMethodExtension()}",
+                        HttpRequestMethod.Post, GetBody(new
+                        {
+                            subscription = new
+                            {
+                                cancellation_message = cancellationMessage
+                            }
+                        }));
+                    return response.ConvertResponseTo<Subscription>("subscription");
+                },
+                uponFailure: new ExceptionHandler().Add(@if: AttemptThrowsNotFoundStatusCode, then: HandleSubscriptionNotFound));
+        }
+
+        private ISubscription RemoveDelayedCancelFromSubscription(int subscriptionId)
+        {
+            return HandleExceptions(attempt: () =>
+                {
+                    string response = DoRequest($"subscriptions/{subscriptionId}/delayed_cancel.{GetMethodExtension()}",HttpRequestMethod.Delete, null);
+                    return response.ConvertResponseTo<Subscription>("subscription");
+                },
+                uponFailure: new ExceptionHandler().Add(@if: AttemptThrowsNotFoundStatusCode, then: HandleSubscriptionNotFound));
         }
 
         /// <summary>
@@ -6328,16 +6340,16 @@ namespace ChargifyNET
         {
             throw new InvalidOperationException("Subscription not found");
         }
-        private T HandleExceptions<T>(Func<T> @if,
-            ExceptionHandler then)
+        private T HandleExceptions<T>(Func<T> attempt,
+            ExceptionHandler uponFailure)
         {
             try
             {
-                return @if();
+                return attempt();
             }
             catch (ChargifyException e)
             {
-                then.Evaluate(e);
+                uponFailure.Evaluate(e);
                 throw;
             }
         }
