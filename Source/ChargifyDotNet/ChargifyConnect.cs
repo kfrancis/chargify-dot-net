@@ -5892,18 +5892,12 @@ namespace ChargifyNET
         #region Utility Methods
         private string GetBody(object obj)
         {
+            var json = JsonConvert.SerializeObject(obj);
             if (UseJSON)
-                return JsonConvert.SerializeObject(obj);
+                return json;
 
-            var serializer = new XmlSerializer(typeof(object));
-            using (var stringWriter = new StringWriter())
-            {
-                using (var xmlWriter = XmlWriter.Create(stringWriter))
-                {
-                    serializer.Serialize(xmlWriter, obj);
-                    return stringWriter.ToString();
-                }
-            }
+            var xmlNode = JsonConvert.DeserializeXmlNode(json);
+            return xmlNode.InnerXml;
         }
         private Dictionary<int, T> GetListedJsonResponse<T>(string key, string response)
             where T : class, IChargifyEntity
