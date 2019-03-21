@@ -188,6 +188,22 @@ namespace ChargifyDotNetTests
             Assert.AreEqual(result.Count(), subscriptions.Count());
         }
 
+
+        [TestMethod]
+        public void Subscription_Can_Load_many_results_By_State()
+        {
+            // Arrange
+            var state = SubscriptionState.Active;
+
+            // Act
+            var result = Chargify.GetSubscriptionList(state);
+
+            // Assert
+            Assert.IsTrue(result.Any());
+            Assert.IsTrue(result.All(s => s.Value.State == state));
+        }
+
+
         [TestMethod]
         public void Subscription_Can_Get_PaymentProfile_Id()
         {
@@ -744,6 +760,70 @@ namespace ChargifyDotNetTests
             // Cleanup
             var restoredSubscription = Chargify.UpdateBillingDateForSubscription(updatedSubscription.SubscriptionID, billingDate);
             Assert.IsTrue(billingDate == restoredSubscription.NextAssessmentAt);
+        }
+
+        [TestMethod]
+        public void Can_create_delayed_cancel()
+        {
+            var existingSubscription = Chargify.GetSubscriptionList().Values.FirstOrDefault(s => s.State == SubscriptionState.Active && s.PaymentProfile != null && s.PaymentProfile.Id > 0) as Subscription;
+            ValidateRun(() => existingSubscription != null, "No applicable subscription found.");
+            ValidateRun(() => existingSubscription.PaymentProfile.Id > 0, "No payment profile found");
+
+            var newSubscription = Chargify.CreateSubscription(existingSubscription.Product.Handle, existingSubscription.Customer.ToCustomerAttributes(), DateTime.MinValue, existingSubscription.PaymentProfile.Id);
+            ValidateRun(() => newSubscription != null, "No new subscription was created. Cannot test cancellation");
+
+            var updatedSubscription = Chargify.UpdateDelayedCancelForSubscription(newSubscription.SubscriptionID, true, "Testing Delayed Cancel");
+
+            Assert.IsTrue(updatedSubscription.CancelAtEndOfPeriod);
+        }
+
+        [TestMethod]
+        public void Can_undo_delayed_cancel()
+        {
+            var existingSubscription = Chargify.GetSubscriptionList().Values.FirstOrDefault(s => s.State == SubscriptionState.Active && s.PaymentProfile != null && s.PaymentProfile.Id > 0) as Subscription;
+            ValidateRun(() => existingSubscription != null, "No applicable subscription found.");
+            ValidateRun(() => existingSubscription.PaymentProfile.Id > 0, "No payment profile found");
+
+            var newSubscription = Chargify.CreateSubscription(existingSubscription.Product.Handle, existingSubscription.Customer.ToCustomerAttributes(), DateTime.MinValue, existingSubscription.PaymentProfile.Id);
+            ValidateRun(() => newSubscription != null, "No new subscription was created. Cannot test cancellation");
+
+            var cancelledSubscription = Chargify.UpdateDelayedCancelForSubscription(newSubscription.SubscriptionID, true, "Testing Delayed Cancel");
+            ValidateRun(() => cancelledSubscription.CancelAtEndOfPeriod, "Subscription is not cancelled at end of period. No opportunity to test uncancel");
+
+            var updatedSubscription = Chargify.UpdateDelayedCancelForSubscription(cancelledSubscription.SubscriptionID,
+                false, "Testing Undo Delayed Cancel");
+
+            Assert.IsTrue(updatedSubscription.CancelAtEndOfPeriod);
+        }
+
+        [TestMethod]
+        public void Chargify_exception_is_thrown_when_setting_delayed_cancel_of_invalid_subscription_to_true()
+        {
+            AssertTheFollowingThrowsException(() =>
+            {
+                Chargify.UpdateDelayedCancelForSubscription(GetRandomNegativeInt(), true,
+                    "No subscription exists by this number");
+            },
+                e =>
+                {
+                    var exception = (ChargifyException)e;
+                    Assert.AreEqual(exception.ErrorMessages.First(), "Subscription not found");
+                });
+        }
+
+        [TestMethod]
+        public void Chargify_exception_is_thrown_when_setting_delayed_cancel_of_invalid_subscription_to_false()
+        {
+            AssertTheFollowingThrowsException(() =>
+            {
+                Chargify.UpdateDelayedCancelForSubscription(GetRandomNegativeInt(), false,
+                    "No subscription exists by this number");
+            },
+                e =>
+                {
+                    var exception = (ChargifyException)e;
+                    Assert.AreEqual(exception.ErrorMessages.First(), "Subscription not found");
+                });
         }
 
         [TestMethod, Ignore]

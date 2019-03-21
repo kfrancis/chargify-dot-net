@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net45;net40</TargetFrameworks>
@@ -19,9 +19,9 @@
     <!--<VersionSuffix>beta1</VersionSuffix>-->
     <IncludeSource>true</IncludeSource>
     <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <Version>1.2.5</Version>
   </PropertyGroup>
-
   <ItemGroup>
     <EmbeddedResource Include="Data\ISO_3166-1_list_en.xml" />
   </ItemGroup>
