@@ -378,7 +378,25 @@ namespace ChargifyDotNetTests
             Assert.IsNotNull(result);
             Assert.AreEqual(otherProduct.Handle, result.Product.Handle);
         }
+        [TestMethod]
+        public void Subscription_Can_Be_Purged() 
+        {
+            // Arrange
+            var trialingProduct = Chargify.GetProductList().Values.FirstOrDefault(p => p.TrialInterval > 0);
+            var referenceId = Guid.NewGuid().ToString();
+            var expMonth = DateTime.Now.AddMonths(1).Month;
+            var expYear = DateTime.Now.AddMonths(12).Year;
 
+            var newCustomer = new CustomerAttributes(Faker.Name.FirstName(), Faker.Name.LastName(), Faker.Internet.Email(), Faker.Phone.PhoneNumber(), Faker.Company.CompanyName(), referenceId);
+            var newPaymentInfo = GetTestPaymentMethod(newCustomer);
+            var createdSubscription = Chargify.CreateSubscription(trialingProduct.Handle, newCustomer, newPaymentInfo);
+            Assert.IsNotNull(createdSubscription);
+
+            Chargify.PurgeSubscription(createdSubscription.SubscriptionID);
+            var purgedSubscription = Chargify.Find<Subscription>(createdSubscription.SubscriptionID);
+
+            Assert.IsNull(purgedSubscription);
+        }
         [TestMethod]
         public void Subscription_Can_Reactivate_Without_Trial()
         {
