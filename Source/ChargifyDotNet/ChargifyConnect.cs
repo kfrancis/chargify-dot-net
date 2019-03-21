@@ -3296,8 +3296,9 @@ namespace ChargifyNET
         /// <param name="subscriptionId">The subscription to modify</param>
         /// <param name="cancelAtEndOfPeriod">True if the subscription should cancel at the end of the current period</param>
         /// <param name="cancellationMessage">The reason for cancelling the subscription</param>
-        /// <returns>Subscription if successful, null otherwise.</returns>
-        public ISubscription UpdateDelayedCancelForSubscription(int subscriptionId, bool cancelAtEndOfPeriod, string cancellationMessage)
+        /// <returns>True if successful, throws error otherwise.</returns>
+        /// <returns>True if successful, throws error otherwise.</returns>
+        public bool UpdateDelayedCancelForSubscription(int subscriptionId, bool cancelAtEndOfPeriod, string cancellationMessage)
         {
             if (subscriptionId == int.MinValue) throw new ArgumentNullException("subscriptionId");
 
@@ -3306,7 +3307,7 @@ namespace ChargifyNET
             return RemoveDelayedCancelFromSubscription(subscriptionId);
         }
 
-        private ISubscription ApplyDelayedCancelToSubscription(int subscriptionId, string cancellationMessage)
+        private bool ApplyDelayedCancelToSubscription(int subscriptionId, string cancellationMessage)
         {
             return HandleExceptions(attempt: () =>
                 {
@@ -3318,17 +3319,17 @@ namespace ChargifyNET
                                 cancellation_message = cancellationMessage
                             }
                         }));
-                    return response.ConvertResponseTo<Subscription>("subscription");
+                    return true;
                 },
                 uponFailure: new ExceptionHandler().Add(@if: AttemptThrowsNotFoundStatusCode, then: HandleSubscriptionNotFound));
         }
 
-        private ISubscription RemoveDelayedCancelFromSubscription(int subscriptionId)
+        private bool RemoveDelayedCancelFromSubscription(int subscriptionId)
         {
             return HandleExceptions(attempt: () =>
                 {
                     string response = DoRequest($"subscriptions/{subscriptionId}/delayed_cancel.{GetMethodExtension()}",HttpRequestMethod.Delete, null);
-                    return response.ConvertResponseTo<Subscription>("subscription");
+                    return true;
                 },
                 uponFailure: new ExceptionHandler().Add(@if: AttemptThrowsNotFoundStatusCode, then: HandleSubscriptionNotFound));
         }
