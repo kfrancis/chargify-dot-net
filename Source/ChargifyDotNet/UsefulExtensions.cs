@@ -671,6 +671,21 @@
         }
 
         /// <summary>
+        /// Method for getting the content of an XmlNode as an long
+        /// </summary>
+        /// <param name="node">The node whose value needs to be extracted</param>
+        /// <returns>The long value of the node</returns>
+        public static long GetNodeContentAsLong(this XmlNode node)
+        {
+            long result = 0;
+            if (node.FirstChild != null)
+            {
+                if (!long.TryParse(node.FirstChild.Value, NumberStyles.Number, CultureInfo.InvariantCulture, out result)) result = 0;
+            }
+            return result;
+        }
+
+        /// <summary>
         /// Method for getting the content of an XmlNode as an integer
         /// </summary>
         /// <param name="node">The node whose value needs to be extracted</param>
@@ -702,6 +717,29 @@
                     if (value != null)
                     {
                         result = value.IntValue;
+                    }
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Method for getting the content of a JsonObject as an integer
+        /// </summary>
+        /// <param name="obj">The object whose value/key needs to be extracted</param>
+        /// <param name="key">The key of the int to retrieve</param>
+        /// <returns>The integer value of the keyed object</returns>
+        public static long GetJSONContentAsLong(this JsonObject obj, string key)
+        {
+            long result = 0;
+            if (obj != null)
+            {
+                if (obj.ContainsKey(key))
+                {
+                    JsonNumber value = obj[key] as JsonNumber;
+                    if (value != null)
+                    {
+                        result = value.LongValue;
                     }
                 }
             }

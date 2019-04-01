@@ -105,19 +105,19 @@ namespace ChargifyDotNetTests
 
             // Act
             var createdCustomer = Chargify.CreateCustomer(customer);
-            Chargify.RevokeBillingPortalAccess(customer.ChargifyID);
+            Chargify.RevokeBillingPortalAccess(createdCustomer.ChargifyID);
             // Assert
             
             try
             {
-                Chargify.GetManagementLink(customer.ChargifyID);
+                Chargify.GetManagementLink(createdCustomer.ChargifyID);
                 Assert.Fail("Error was expected, but not received");
             }
             catch (ChargifyException chEx)
             {
                 Assert.IsNotNull(chEx.ErrorMessages);
                 Assert.AreEqual(1, chEx.ErrorMessages.Count);
-                Assert.IsTrue(chEx.ErrorMessages.Any(e => e.Message == "Billing Portal"));
+                Assert.IsTrue(chEx.ErrorMessages.Any(e => e.Message.Contains("Billing Portal")), $"Found '{string.Join(", ", chEx.ErrorMessages.Select(x => x.Message))}'");
                 //todo: Need to run test to find out the exact error message
             }
 
@@ -148,11 +148,11 @@ namespace ChargifyDotNetTests
 
             // Act
             var createdCustomer = Chargify.CreateCustomer(customer);
-            Chargify.RevokeBillingPortalAccess(customer.ChargifyID);
-            Chargify.EnableBillingPortalAccess(customer.ChargifyID);
+            Chargify.RevokeBillingPortalAccess(createdCustomer.ChargifyID);
+            Chargify.EnableBillingPortalAccess(createdCustomer.ChargifyID);
 
             // Assert
-            var managementLink = Chargify.GetManagementLink(customer.ChargifyID);
+            var managementLink = Chargify.GetManagementLink(createdCustomer.ChargifyID);
             Assert.IsNotNull(managementLink);
             
 
@@ -184,19 +184,19 @@ namespace ChargifyDotNetTests
 
             // Act
             var createdCustomer = Chargify.CreateCustomer(customer);
-            Chargify.RevokeBillingPortalAccess(customer.SystemID);
+            Chargify.RevokeBillingPortalAccess(createdCustomer.SystemID);
             // Assert
             
             try
             {
-                Chargify.GetManagementLink(customer.ChargifyID);
+                Chargify.GetManagementLink(createdCustomer.ChargifyID);
                 Assert.Fail("Error was expected, but not received");
             }
             catch (ChargifyException chEx)
             {
                 Assert.IsNotNull(chEx.ErrorMessages);
                 Assert.AreEqual(1, chEx.ErrorMessages.Count);
-                Assert.IsTrue(chEx.ErrorMessages.Any(e => e.Message == "Billing Portal"));
+                Assert.IsTrue(chEx.ErrorMessages.Any(e => e.Message.Contains("Billing Portal")));
                 //todo: Need to run test to find out the exact error message
             }
 
@@ -227,11 +227,11 @@ namespace ChargifyDotNetTests
 
             // Act
             var createdCustomer = Chargify.CreateCustomer(customer);
-            Chargify.RevokeBillingPortalAccess(customer.ChargifyID);
-            Chargify.EnableBillingPortalAccess(customer.SystemID);
+            Chargify.RevokeBillingPortalAccess(createdCustomer.ChargifyID);
+            Chargify.EnableBillingPortalAccess(createdCustomer.SystemID);
 
             // Assert
-            var managementLink = Chargify.GetManagementLink(customer.ChargifyID);
+            var managementLink = Chargify.GetManagementLink(createdCustomer.ChargifyID);
             Assert.IsNotNull(managementLink);
             
 

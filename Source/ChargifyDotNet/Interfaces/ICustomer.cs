@@ -43,7 +43,7 @@ namespace ChargifyNET
         /// <summary>
         /// Get the customer's chargify ID
         /// </summary>
-        int ChargifyID { get; }
+        long ChargifyID { get; }
         /// <summary>
         /// Get the date and time the customer was created a Chargify
         /// </summary>

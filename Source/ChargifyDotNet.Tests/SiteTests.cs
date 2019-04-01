@@ -41,7 +41,7 @@ namespace ChargifyDotNetTests
                 productHandle = productList.FirstOrDefault().Value.Handle;
             }
 
-            var customerId = int.MinValue;
+            var customerId = long.MinValue;
             var customerList = Chargify.GetCustomerList();
             string referenceID = Guid.NewGuid().ToString();
             Customer customer = null;
