@@ -27,6 +27,9 @@
 //
 #endregion
 
+using System.Xml.Serialization;
+using Newtonsoft.Json;
+
 namespace ChargifyNET
 {
     #region Imports
@@ -241,7 +244,7 @@ namespace ChargifyNET
         /// <param name="chargifyId">The Chargify identifier for the resource</param>
         /// <param name="metadatum">The list of metadatum to set</param>
         /// <returns>The metadata result containing the response</returns>
-        public List<IMetadata> SetMetadataFor<T>(int chargifyId, List<Metadata> metadatum)
+        public List<IMetadata> SetMetadataFor<T>(long chargifyId, List<Metadata> metadatum)
         {
             // make sure data is valid
             if (metadatum == null) { throw new ArgumentNullException("metadatum"); }
@@ -318,7 +321,7 @@ namespace ChargifyNET
         /// <param name="chargifyId">The Chargify identifier for the resource</param>
         /// <param name="metadata">The list of metadata to set</param>
         /// <returns>The metadata result containing the response</returns>
-        public List<IMetadata> SetMetadataFor<T>(int chargifyId, Metadata metadata)
+        public List<IMetadata> SetMetadataFor<T>(long chargifyId, Metadata metadata)
         {
             // make sure data is valid
             if (metadata == null) throw new ArgumentNullException(nameof(metadata));
@@ -394,7 +397,7 @@ namespace ChargifyNET
         /// <param name="resourceId">The Chargify identifier for the resource</param>
         /// <param name="page">Which page to return</param>
         /// <returns>The metadata result containing the response</returns>
-        public IMetadataResult GetMetadataFor<T>(int resourceId, int? page)
+        public IMetadataResult GetMetadataFor<T>(long resourceId, int? page)
         {
             string url;
             switch (typeof(T).Name.ToLowerInvariant())
@@ -454,7 +457,7 @@ namespace ChargifyNET
         /// </summary>
         /// <param name="chargifyId">The chargify ID of the customer</param>
         /// <returns>The customer with the specified chargify ID</returns>
-        public ICustomer LoadCustomer(int chargifyId)
+        public ICustomer LoadCustomer(long chargifyId)
         {
             try
             {
@@ -810,7 +813,7 @@ namespace ChargifyNET
         /// <param name="chargifyId">The integer identifier of the customer</param>
         /// <returns>True if the customer was deleted, false otherwise.</returns>
         /// <remarks>This method does not currently work, but it will once they open up the API. This will always return false, as Chargify will send a Http Forbidden everytime.</remarks>
-        public bool DeleteCustomer(int chargifyId)
+        public bool DeleteCustomer(long chargifyId)
         {
             try
             {
@@ -866,6 +869,7 @@ namespace ChargifyNET
                 }
             }
         }
+        
 
         #endregion
 
@@ -1360,6 +1364,39 @@ namespace ChargifyNET
         }
 
         /// <summary>
+        /// Purge the specified subscription
+        /// * This is undocumented behavior. It requires special permissions from chargify. Contact support to enable this feature. *
+        /// ** CAUTION:  Permanently deletes subscription and all transactions. There is no way to undo this! **
+        /// </summary>'
+        /// https://SUBDOMAIN_HERE.chargify.com/subscriptions/SUBSCRIPTION_ID_HERE/purge.json?ack=CUSTOMER_ID_HERE
+        /// <param name="subscriptionId">The id of the subscription</param>
+        /// <returns>True if the subscription was purged, false otherwise.</returns>
+        public bool PurgeSubscription(int subscriptionId) 
+        {
+            try
+            {
+                var subscription = LoadSubscription(subscriptionId);
+                if (subscription == null) { throw new ArgumentException("Not a valid subscription", "subscriptionId"); }
+
+                // now make the request
+                DoRequest(
+                    $"subscriptions/{subscriptionId}/purge.{GetMethodExtension()}?ack={subscription.Customer.ChargifyID}", HttpRequestMethod.Post, null);
+                return true;
+            }
+            catch (ChargifyException cex)
+            {
+                switch (cex.StatusCode)
+                {
+                    //case HttpStatusCode.Forbidden:
+                    //case HttpStatusCode.NotFound:
+                    //    return false;
+                    default:
+                        throw;
+                }
+            }
+        }
+
+        /// <summary>
         /// Load the requested customer from chargify
         /// </summary>
         /// <param name="subscriptionId">The ID of the subscription</param>
@@ -1537,7 +1574,7 @@ namespace ChargifyNET
         /// </summary>
         /// <param name="chargifyId">The ChargifyID of the customer</param>
         /// <returns>A list of subscriptions</returns>
-        public IDictionary<int, ISubscription> GetSubscriptionListForCustomer(int chargifyId)
+        public IDictionary<int, ISubscription> GetSubscriptionListForCustomer(long chargifyId)
         {
             try
             {
@@ -1661,7 +1698,7 @@ namespace ChargifyNET
         /// <param name="chargifyId">The Chargify ID of the customer</param>
         /// <param name="paymentCollectionMethod">Optional, type of payment collection method</param>
         /// <returns>The xml describing the new subsscription</returns>
-        public ISubscription CreateSubscription(string productHandle, int chargifyId, PaymentCollectionMethod? paymentCollectionMethod = PaymentCollectionMethod.Automatic)
+        public ISubscription CreateSubscription(string productHandle, long chargifyId, PaymentCollectionMethod? paymentCollectionMethod = PaymentCollectionMethod.Automatic)
         {
             // make sure data is valid
             if (chargifyId == int.MinValue) throw new ArgumentException("Invalid Customer ID detected", "chargifyId");
@@ -1676,7 +1713,7 @@ namespace ChargifyNET
         /// <param name="chargifyId">The Chargify ID of the customer</param>
         /// <param name="creditCardAttributes">The credit card attributes</param>
         /// <returns>The xml describing the new subsscription</returns>
-        public ISubscription CreateSubscription(string productHandle, int chargifyId, ICreditCardAttributes creditCardAttributes)
+        public ISubscription CreateSubscription(string productHandle, long chargifyId, ICreditCardAttributes creditCardAttributes)
         {
             // make sure data is valid
             if (creditCardAttributes == null) throw new ArgumentNullException("creditCardAttributes");
@@ -1696,7 +1733,7 @@ namespace ChargifyNET
         /// <param name="creditCardAttributes">The credit card attributes to use for the new subscription</param>
         /// <param name="nextBillingAt">The date that should be used for the next_billing_at</param>
         /// <returns>The new subscription, if successful. Null otherwise.</returns>
-        public ISubscription CreateSubscription(string productHandle, int chargifyId, ICreditCardAttributes creditCardAttributes, DateTime nextBillingAt)
+        public ISubscription CreateSubscription(string productHandle, long chargifyId, ICreditCardAttributes creditCardAttributes, DateTime nextBillingAt)
         {
             // make sure data is valid
             if (creditCardAttributes == null) throw new ArgumentNullException("creditCardAttributes");
@@ -1712,7 +1749,7 @@ namespace ChargifyNET
         /// <param name="chargifyId">The ID of the Customer to add the subscription for</param>
         /// <param name="couponCode">The discount coupon code</param>
         /// <returns>If sucessful, the subscription object. Otherwise null.</returns>
-        public ISubscription CreateSubscriptionUsingCoupon(string productHandle, int chargifyId, string couponCode)
+        public ISubscription CreateSubscriptionUsingCoupon(string productHandle, long chargifyId, string couponCode)
         {
             if (chargifyId == int.MinValue) throw new ArgumentException("Invalid Customer ID detected", "chargifyId");
             if (string.IsNullOrEmpty(couponCode)) throw new ArgumentException("CouponCode can't be empty", "couponCode");
@@ -1727,7 +1764,7 @@ namespace ChargifyNET
         /// <param name="creditCardAttributes">The credit card attributes to use for this transaction</param>
         /// <param name="couponCode">The discount coupon code</param>
         /// <returns></returns>
-        public ISubscription CreateSubscriptionUsingCoupon(string productHandle, int chargifyId, ICreditCardAttributes creditCardAttributes, string couponCode)
+        public ISubscription CreateSubscriptionUsingCoupon(string productHandle, long chargifyId, ICreditCardAttributes creditCardAttributes, string couponCode)
         {
             // make sure data is valid
             if (creditCardAttributes == null) throw new ArgumentNullException("creditCardAttributes");
@@ -2164,7 +2201,7 @@ namespace ChargifyNET
         /// <param name="couponCode">The discount coupon code</param>
         /// <param name="paymentCollectionMethod">Optional, type of payment collection method</param>
         /// <returns>The xml describing the new subsscription</returns>
-        public ISubscription CreateSubscription(string productHandle, int chargifyId, string couponCode, PaymentCollectionMethod? paymentCollectionMethod)
+        public ISubscription CreateSubscription(string productHandle, long chargifyId, string couponCode, PaymentCollectionMethod? paymentCollectionMethod)
         {
             // make sure data is valid
             if (string.IsNullOrEmpty(productHandle)) throw new ArgumentNullException(nameof(productHandle));
@@ -2218,7 +2255,7 @@ namespace ChargifyNET
         /// <param name="firstName">The first name, as it appears on the credit card</param>
         /// <param name="lastName">The last name, as it appears on the credit card</param>
         /// <returns>The xml describing the new subsscription</returns>
-        private ISubscription CreateSubscription(string productHandle, int chargifyId, string fullNumber, int expirationMonth, int expirationYear,
+        private ISubscription CreateSubscription(string productHandle, long chargifyId, string fullNumber, int expirationMonth, int expirationYear,
                                                         string cvv, string billingAddress, string billingCity, string billingState, string billingZip,
                                                         string billingCountry, string couponCode, string firstName, string lastName)
         {
@@ -2281,7 +2318,7 @@ namespace ChargifyNET
         /// <param name="billingCountry">The billing country</param>
         /// <param name="couponCode">The discount coupon code</param>
         /// <returns>The xml describing the new subsscription</returns>
-        private ISubscription CreateSubscription(string productHandle, int chargifyId, string fullNumber, int expirationMonth, int expirationYear,
+        private ISubscription CreateSubscription(string productHandle, long chargifyId, string fullNumber, int expirationMonth, int expirationYear,
                                                         string cvv, string billingAddress, string billingCity, string billingState, string billingZip,
                                                         string billingCountry, string couponCode)
         {
@@ -3264,24 +3301,41 @@ namespace ChargifyNET
         {
             if (subscriptionId == int.MinValue) throw new ArgumentNullException("subscriptionId");
 
-            // create XML for creation of customer
-            StringBuilder subscriptionXml = new StringBuilder(GetXmlStringIfApplicable());
-            subscriptionXml.Append("<subscription>");
-            subscriptionXml.AppendFormat("<cancel_at_end_of_period>{0}</cancel_at_end_of_period>", cancelAtEndOfPeriod ? "1" : "0");
-            if (!String.IsNullOrEmpty(cancellationMessage)) { subscriptionXml.AppendFormat("<cancellation_message>{0}</cancellation_message>", cancellationMessage); }
-            subscriptionXml.Append("</subscription>");
-            try
-            {
-                // now make the request
-                string response = DoRequest(string.Format("subscriptions/{0}.{1}", subscriptionId, GetMethodExtension()), HttpRequestMethod.Put, subscriptionXml.ToString());
-                // change the response to the object
-                return response.ConvertResponseTo<Subscription>("subscription");
-            }
-            catch (ChargifyException cex)
-            {
-                if (cex.StatusCode == HttpStatusCode.NotFound) throw new InvalidOperationException("Subscription not found");
-                throw;
-            }
+            bool isSuccessful = cancelAtEndOfPeriod
+                ? ApplyDelayedCancelToSubscription(subscriptionId, cancellationMessage)
+                : RemoveDelayedCancelFromSubscription(subscriptionId);
+          
+            if (isSuccessful)
+                return LoadSubscription(subscriptionId);
+            return null;
+
+        }
+
+        private bool ApplyDelayedCancelToSubscription(int subscriptionId, string cancellationMessage)
+        {
+            return HandleExceptions(attempt: () =>
+                {
+                    string response = DoRequest($"subscriptions/{subscriptionId}/delayed_cancel.{GetMethodExtension()}",
+                        HttpRequestMethod.Post, GetBody(new
+                        {
+                            subscription = new
+                            {
+                                cancellation_message = cancellationMessage
+                            }
+                        }));
+                    return true;
+                },
+                uponFailure: new ExceptionHandler().Add(@if: AttemptThrowsNotFoundStatusCode, then: HandleSubscriptionNotFound));
+        }
+
+        private bool RemoveDelayedCancelFromSubscription(int subscriptionId)
+        {
+            return HandleExceptions(attempt: () =>
+                {
+                    string response = DoRequest($"subscriptions/{subscriptionId}/delayed_cancel.{GetMethodExtension()}",HttpRequestMethod.Delete, null);
+                    return true;
+                },
+                uponFailure: new ExceptionHandler().Add(@if: AttemptThrowsNotFoundStatusCode, then: HandleSubscriptionNotFound));
         }
 
         /// <summary>
@@ -4180,7 +4234,7 @@ namespace ChargifyNET
         /// <param name="chargifyId">The product family ID</param>
         /// <param name="includeArchived">Filter flag for archived components</param>
         /// <returns>A dictionary of components if there are results, null otherwise.</returns>
-        public IDictionary<int, IComponentInfo> GetComponentsForProductFamily(int chargifyId, bool includeArchived)
+        public IDictionary<int, IComponentInfo> GetComponentsForProductFamily(long chargifyId, bool includeArchived)
         {
             // make sure data is valid
             if (chargifyId == int.MinValue) throw new ArgumentNullException("chargifyId");
@@ -4250,7 +4304,7 @@ namespace ChargifyNET
         /// </summary>
         /// <param name="chargifyId">The product family ID</param>
         /// <returns>A dictionary of components if there are results, null otherwise.</returns>
-        public IDictionary<int, IComponentInfo> GetComponentsForProductFamily(int chargifyId)
+        public IDictionary<int, IComponentInfo> GetComponentsForProductFamily(long chargifyId)
         {
             return GetComponentsForProductFamily(chargifyId, false);
         }
@@ -5366,7 +5420,7 @@ namespace ChargifyNET
         /// <summary>
         /// From http://docs.chargify.com/api-billing-portal
         /// </summary>
-        public IBillingManagementInfo GetManagementLink(int chargifyId)
+        public IBillingManagementInfo GetManagementLink(long chargifyId)
         {
             try
             {
@@ -5384,6 +5438,95 @@ namespace ChargifyNET
                 if (cex.StatusCode == HttpStatusCode.NotFound) return null;
                 throw;
             }
+        }
+
+        /// <summary>
+        /// From http://docs.chargify.com/api-billing-portal
+        /// </summary>
+        /// <param name="chargifyId">The chargify ID of the customer</param>
+        /// <param name="autoInvite">Should an email be automatically sent to customer with billing portal link</param>
+        /// <returns>True if success, otherwise error is thrown</returns>
+        public bool EnableBillingPortalAccess(long chargifyId, bool autoInvite = false)
+        {
+            try
+            {
+                // make sure data is valid
+                if (chargifyId < 0) throw new ArgumentNullException("chargifyId");
+
+                // now make the request
+                string response = DoRequest(string.Format("portal/customers/{0}/enable.{1}?auto_invite={2}", chargifyId, GetMethodExtension(), autoInvite ? 1 : 0), HttpRequestMethod.Post, null);
+
+                return true;
+            }
+            catch (ChargifyException cex)
+            {
+                if (cex.StatusCode == HttpStatusCode.NotFound)
+                    throw new InvalidOperationException("Subscription not found");
+                throw;
+            }
+        }
+        /// <summary>
+        /// From http://docs.chargify.com/api-billing-portal
+        /// </summary>
+        /// <param name="systemId">The system ID of the customer</param>
+        /// <param name="autoInvite">Should an email be automatically sent to customer with billing portal link</param>
+        /// <returns>True if success, otherwise error is thrown</returns>
+
+        public bool EnableBillingPortalAccess(string systemId, bool autoInvite = false)
+        {
+            // make sure data is valid
+            if (systemId == string.Empty) throw new ArgumentException("Empty SystemID not allowed", "systemId");
+            var customer = LoadCustomer(systemId);
+            if (customer == null) throw new ArgumentException("Customer does not exist");
+
+            return EnableBillingPortalAccess(customer.ChargifyID, autoInvite);
+        }
+
+        /// <summary>
+        /// From http://docs.chargify.com/api-billing-portal
+        /// </summary>
+        /// <param name="chargifyId">The chargify ID of the customer</param>
+        /// <returns>True if success, otherwise error is thrown</returns>
+        public bool RevokeBillingPortalAccess(long chargifyId)
+        {
+            try
+            {
+                // make sure data is valid
+                if (chargifyId < 0) throw new ArgumentNullException("chargifyId");
+
+                // now make the request
+                string response = DoRequest(string.Format("portal/customers/{0}/invitations/revoke.{1}", chargifyId, GetMethodExtension()), HttpRequestMethod.Delete, null);
+
+                // Convert the Chargify response into the object we're looking for
+                return true;
+            }
+            catch (ChargifyException cex)
+            {
+                if (cex.StatusCode == HttpStatusCode.NotFound)
+                    throw new InvalidOperationException("Subscription not found");
+
+                if (cex.StatusCode == (HttpStatusCode)422)
+                {
+                    return true;
+                }
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// From http://docs.chargify.com/api-billing-portal
+        /// </summary>
+        /// <param name="systemId">The system ID of the customer</param>
+        /// <returns>True if success, otherwise error is thrown</returns>
+
+        public bool RevokeBillingPortalAccess(string systemId)
+        {
+            // make sure data is valid
+            if (systemId == string.Empty) throw new ArgumentException("Empty SystemID not allowed", "systemId");
+            var customer = LoadCustomer(systemId);
+            if (customer == null) throw new ArgumentException("Customer does not exist");
+
+            return RevokeBillingPortalAccess(customer.ChargifyID);
         }
         #endregion
 
@@ -5863,6 +6006,15 @@ namespace ChargifyNET
         #endregion
 
         #region Utility Methods
+        private string GetBody(object obj)
+        {
+            var json = JsonConvert.SerializeObject(obj);
+            if (UseJSON)
+                return json;
+
+            var xmlNode = JsonConvert.DeserializeXmlNode(json);
+            return xmlNode.InnerXml;
+        }
         private Dictionary<int, T> GetListedJsonResponse<T>(string key, string response)
             where T : class, IChargifyEntity
         {
@@ -6284,6 +6436,31 @@ namespace ChargifyNET
                 {
                     throw;
                 }
+            }
+        }
+        #endregion
+
+        #region Exception Handling
+
+        private bool AttemptThrowsNotFoundStatusCode(ChargifyException e)
+        {
+            return e.StatusCode == HttpStatusCode.NotFound;
+        }
+        private void HandleSubscriptionNotFound(ChargifyException e)
+        {
+            throw new InvalidOperationException("Subscription not found");
+        }
+        private T HandleExceptions<T>(Func<T> attempt,
+            ExceptionHandler uponFailure)
+        {
+            try
+            {
+                return attempt();
+            }
+            catch (ChargifyException e)
+            {
+                uponFailure.Evaluate(e);
+                throw;
             }
         }
         #endregion

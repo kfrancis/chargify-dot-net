@@ -58,7 +58,7 @@ namespace ChargifyNET
         /// The ID of an existing customer within Chargify. Required, 
         /// unless a customer_reference or a set of customer_attributes is given.
         /// </summary>
-        int? CustomerID { get; set; }
+        long? CustomerID { get; set; }
 
         /// <summary>
         /// The reference value (provided by your app) of an existing customer 
@@ -347,7 +347,7 @@ namespace ChargifyNET
         /// unless a customer_reference or a set of customer_attributes is given.
         /// </summary>
         [XmlElement("customer_id")]
-        public int? CustomerID { get; set; }
+        public long? CustomerID { get; set; }
         /// <summary>
         /// Ignore, used to determine if the field should be serialized
         /// </summary>

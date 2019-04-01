@@ -85,5 +85,29 @@ namespace ChargifyDotNetTests.Base
                 _chargify.UseJSON = useJson;
             }
         }
+
+        internal int GetRandomNegativeInt()
+        {
+            return Math.Abs(Guid.NewGuid().GetHashCode()) * -1;
+        }
+        internal void ValidateRun(Func<bool> validation, string customFailureMessage = null)
+        {//To prevent "multiple asserts" in a single test class this masks the
+            //idea of having multiple asserts and allows us to verify all data is valid before running
+            if (!validation())
+                Assert.Fail(customFailureMessage ?? "The test setup resulted in invalid test data. Please resolve any issues before continuing");
+        }
+
+        internal void AssertTheFollowingThrowsException(Action runAttempt, Action<Exception> runAssertions)
+        {
+            try
+            {
+                runAttempt();
+                Assert.Fail("Attempt should have thrown an error but did not");
+            }
+            catch (Exception e)
+            {
+                runAssertions(e);
+            }
+        }
     }
 }

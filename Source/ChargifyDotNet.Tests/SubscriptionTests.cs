@@ -378,12 +378,30 @@ namespace ChargifyDotNetTests
             Assert.IsNotNull(result);
             Assert.AreEqual(otherProduct.Handle, result.Product.Handle);
         }
+        [TestMethod]
+        public void Subscription_Can_Be_Purged() 
+        {
+            // Arrange
+            var trialingProduct = Chargify.GetProductList().Values.FirstOrDefault(p => p.TrialInterval > 0);
+            var referenceId = Guid.NewGuid().ToString();
+            var expMonth = DateTime.Now.AddMonths(1).Month;
+            var expYear = DateTime.Now.AddMonths(12).Year;
 
+            var newCustomer = new CustomerAttributes(Faker.Name.FirstName(), Faker.Name.LastName(), Faker.Internet.Email(), Faker.Phone.PhoneNumber(), Faker.Company.CompanyName(), referenceId);
+            var newPaymentInfo = GetTestPaymentMethod(newCustomer);
+            var createdSubscription = Chargify.CreateSubscription(trialingProduct.Handle, newCustomer, newPaymentInfo);
+            Assert.IsNotNull(createdSubscription);
+
+            Chargify.PurgeSubscription(createdSubscription.SubscriptionID);
+            var purgedSubscription = Chargify.Find<Subscription>(createdSubscription.SubscriptionID);
+
+            Assert.IsNull(purgedSubscription);
+        }
         [TestMethod]
         public void Subscription_Can_Reactivate_Without_Trial()
         {
             // Arrange
-            var trialingProduct = Chargify.GetProductList().Values.FirstOrDefault(p => p.TrialInterval > 0);
+            var trialingProduct = Chargify.GetProductList().Values.FirstOrDefault(p => p.TrialInterval > 0 && !string.IsNullOrEmpty(p.Handle));
             var referenceId = Guid.NewGuid().ToString();
             var expMonth = DateTime.Now.AddMonths(1).Month;
             var expYear = DateTime.Now.AddMonths(12).Year;
@@ -411,7 +429,7 @@ namespace ChargifyDotNetTests
         public void Subscription_Can_Reactivate_With_Trial()
         {
             // Arrange
-            var trialingProduct = Chargify.GetProductList().Values.FirstOrDefault(p => p.TrialInterval > 0);
+            var trialingProduct = Chargify.GetProductList().Values.FirstOrDefault(p => p.TrialInterval > 0 && !string.IsNullOrEmpty(p.Handle));
             var referenceId = Guid.NewGuid().ToString();
             var expMonth = DateTime.Now.AddMonths(1).Month;
             var expYear = DateTime.Now.AddMonths(12).Year;
@@ -742,6 +760,70 @@ namespace ChargifyDotNetTests
             // Cleanup
             var restoredSubscription = Chargify.UpdateBillingDateForSubscription(updatedSubscription.SubscriptionID, billingDate);
             Assert.IsTrue(billingDate == restoredSubscription.NextAssessmentAt);
+        }
+
+        [TestMethod]
+        public void Can_create_delayed_cancel()
+        {
+            var existingSubscription = Chargify.GetSubscriptionList().Values.FirstOrDefault(s => s.State == SubscriptionState.Active && s.PaymentProfile != null && s.PaymentProfile.Id > 0) as Subscription;
+            ValidateRun(() => existingSubscription != null, "No applicable subscription found.");
+            ValidateRun(() => existingSubscription.PaymentProfile.Id > 0, "No payment profile found");
+
+            var newSubscription = Chargify.CreateSubscription(existingSubscription.Product.Handle, existingSubscription.Customer.ToCustomerAttributes(), DateTime.MinValue, existingSubscription.PaymentProfile.Id);
+            ValidateRun(() => newSubscription != null, "No new subscription was created. Cannot test cancellation");
+
+            var updatedSubscription = Chargify.UpdateDelayedCancelForSubscription(newSubscription.SubscriptionID, true, "Testing Delayed Cancel");
+
+            Assert.IsTrue(updatedSubscription.CancelAtEndOfPeriod);
+        }
+
+        [TestMethod]
+        public void Can_undo_delayed_cancel()
+        {
+            var existingSubscription = Chargify.GetSubscriptionList().Values.FirstOrDefault(s => s.State == SubscriptionState.Active && s.PaymentProfile != null && s.PaymentProfile.Id > 0) as Subscription;
+            ValidateRun(() => existingSubscription != null, "No applicable subscription found.");
+            ValidateRun(() => existingSubscription.PaymentProfile.Id > 0, "No payment profile found");
+
+            var newSubscription = Chargify.CreateSubscription(existingSubscription.Product.Handle, existingSubscription.Customer.ToCustomerAttributes(), DateTime.MinValue, existingSubscription.PaymentProfile.Id);
+            ValidateRun(() => newSubscription != null, "No new subscription was created. Cannot test cancellation");
+
+            var cancelledSubscription = Chargify.UpdateDelayedCancelForSubscription(newSubscription.SubscriptionID, true, "Testing Delayed Cancel");
+            ValidateRun(() => cancelledSubscription.CancelAtEndOfPeriod, "Subscription is not cancelled at end of period. No opportunity to test uncancel");
+
+            var updatedSubscription = Chargify.UpdateDelayedCancelForSubscription(cancelledSubscription.SubscriptionID,
+                false, "Testing Undo Delayed Cancel");
+
+            Assert.IsFalse(updatedSubscription.CancelAtEndOfPeriod);
+        }
+
+        [TestMethod]
+        public void Chargify_exception_is_thrown_when_setting_delayed_cancel_of_invalid_subscription_to_true()
+        {
+            AssertTheFollowingThrowsException(() =>
+            {
+                Chargify.UpdateDelayedCancelForSubscription(GetRandomNegativeInt(), true,
+                    "No subscription exists by this number");
+            },
+                e =>
+                {
+                    var exception = (ChargifyException)e;
+                    Assert.AreEqual(exception.ErrorMessages.First(), "Subscription not found");
+                });
+        }
+
+        [TestMethod]
+        public void Chargify_exception_is_thrown_when_setting_delayed_cancel_of_invalid_subscription_to_false()
+        {
+            AssertTheFollowingThrowsException(() =>
+            {
+                Chargify.UpdateDelayedCancelForSubscription(GetRandomNegativeInt(), false,
+                    "No subscription exists by this number");
+            },
+                e =>
+                {
+                    var exception = (ChargifyException)e;
+                    Assert.AreEqual(exception.ErrorMessages.First(), "Subscription not found");
+                });
         }
 
         [TestMethod, Ignore]
