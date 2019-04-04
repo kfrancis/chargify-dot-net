@@ -244,7 +244,7 @@ namespace ChargifyNET
         /// <param name="chargifyId">The Chargify identifier for the resource</param>
         /// <param name="metadatum">The list of metadatum to set</param>
         /// <returns>The metadata result containing the response</returns>
-        public List<IMetadata> SetMetadataFor<T>(int chargifyId, List<Metadata> metadatum)
+        public List<IMetadata> SetMetadataFor<T>(int chargifyId, IList<Metadata> metadatum)
         {
             // make sure data is valid
             if (metadatum == null) { throw new ArgumentNullException("metadatum"); }
@@ -254,6 +254,7 @@ namespace ChargifyNET
             //if (metadatum.Select(m => m.Value == null).Count() > 0) { throw new ArgumentNullException("Metadata.Value"); }
 
             // create XML for creation of metadata
+            
             var metadataXml = new StringBuilder(GetXmlStringIfApplicable());
             metadataXml.Append("<metadata type=\"array\">");
             foreach (var metadata in metadatum)
@@ -274,12 +275,14 @@ namespace ChargifyNET
             metadataXml.Append("</metadata>");
 
             string url;
-            switch (typeof(T).Name.ToLowerInvariant())
+            switch (typeof(T).Name)
             {
-                case "customer":
+                case nameof(Customer):
+                case nameof(ICustomer):
                     url = $"customers/{chargifyId}/metadata.{GetMethodExtension()}";
                     break;
-                case "subscription":
+                case nameof(Subscription):
+                case nameof(ISubscription):
                     url = $"subscriptions/{chargifyId}/metadata.{GetMethodExtension()}";
                     break;
                 default:
@@ -323,71 +326,7 @@ namespace ChargifyNET
         /// <returns>The metadata result containing the response</returns>
         public List<IMetadata> SetMetadataFor<T>(int chargifyId, Metadata metadata)
         {
-            // make sure data is valid
-            if (metadata == null) throw new ArgumentNullException(nameof(metadata));
-            //if (chargifyID < 0 || metadata.ResourceID < 0) throw new ArgumentOutOfRangeException("Metadata.ResourceID");
-            if (string.IsNullOrEmpty(metadata.Name)) throw new ArgumentNullException(nameof(metadata), "Metadata.Name");
-            if (metadata.Value == null) throw new ArgumentNullException(nameof(metadata), "Metadata.Value");
-
-            // create XML for creation of metadata
-            var metadataXml = new StringBuilder(GetXmlStringIfApplicable());
-            metadataXml.Append("<metadata>");
-            if (metadata.ResourceID > 0)
-            {
-                metadataXml.AppendFormat("<resource-id>{0}</resource-id>", metadata.ResourceID);
-            }
-            else
-            {
-                metadataXml.AppendFormat("<resource-id>{0}</resource-id>", chargifyId);
-            }
-            metadataXml.AppendFormat("<name>{0}</name>", metadata.Name);
-            metadataXml.AppendFormat("<value>{0}</value>", metadata.Value);
-            metadataXml.Append("</metadata>");
-
-            string url;
-            switch (typeof(T).Name.ToLowerInvariant())
-            {
-                case "customer":
-                    url = $"customers/{chargifyId}/metadata.{GetMethodExtension()}";
-                    break;
-                case "subscription":
-                    url = $"subscriptions/{chargifyId}/metadata.{GetMethodExtension()}";
-                    break;
-                default:
-                    throw new Exception($"Must be of type '{string.Join(", ", _metadataTypes.ToArray())}'");
-            }
-
-            // now make the request
-            string response = DoRequest(url, HttpRequestMethod.Post, metadataXml.ToString());
-
-            var retVal = new List<IMetadata>();
-
-            // now build the object based on response as XML
-            XmlDocument doc = new XmlDocument();
-            doc.LoadXml(response); // get the XML into an XML document
-            if (doc.ChildNodes.Count == 0) throw new InvalidOperationException("Returned XML not valid");
-            // loop through the child nodes of this node
-            foreach (XmlNode parentNode in doc.ChildNodes)
-            {
-                if (parentNode.Name == "metadata")
-                {
-                    foreach (XmlNode childNode in parentNode.ChildNodes)
-                    {
-                        if (childNode.Name == "metadatum")
-                        {
-                            IMetadata loadedNode = new Metadata(childNode);
-                            retVal.Add(loadedNode);
-                        }
-                    }
-                }
-                else if (parentNode.Name == "metadatum")
-                {
-                    IMetadata loadedNode = new Metadata(parentNode);
-                    retVal.Add(loadedNode);
-                }
-            }
-
-            return retVal;
+            return SetMetadataFor<T>(chargifyId, new [] {metadata});
         }
 
         /// <summary>
@@ -395,17 +334,19 @@ namespace ChargifyNET
         /// </summary>
         /// <typeparam name="T">The type of resource. Currently either Subscription or Customer</typeparam>
         /// <param name="resourceId">The Chargify identifier for the resource</param>
-        /// <param name="page">Which page to return</param>
+        /// <param name="page">Which page to return -- Chargify Indexes Metadata Page at 1</param>
         /// <returns>The metadata result containing the response</returns>
-        public IMetadataResult GetMetadataFor<T>(int resourceId, int? page)
+        public IMetadataResult GetMetadataFor<T>(int resourceId, int? page = null)
         {
             string url;
-            switch (typeof(T).Name.ToLowerInvariant())
+            switch (typeof(T).Name)
             {
-                case "customer":
+                case nameof(Customer):
+                case nameof(ICustomer):
                     url = string.Format("customers/{0}/metadata.{1}", resourceId, GetMethodExtension());
                     break;
-                case "subscription":
+                case nameof(Subscription):
+                case nameof(ISubscription):
                     url = string.Format("subscriptions/{0}/metadata.{1}", resourceId, GetMethodExtension());
                     break;
                 default:
@@ -415,7 +356,7 @@ namespace ChargifyNET
             string qs = string.Empty;
 
             // Add the transaction options to the query string ...
-            if (page.HasValue && page.Value != int.MinValue) { if (qs.Length > 0) { qs += "&"; } qs += string.Format("page={0}", page); }
+            if (page.HasValue && page.Value != 0) { if (qs.Length > 0) { qs += "&"; } qs += string.Format("page={0}", page); }
 
             // Construct the url to access Chargify
             if (!string.IsNullOrEmpty(qs)) { url += "?" + qs; }
@@ -433,21 +374,23 @@ namespace ChargifyNET
         public IMetadataResult GetMetadata<T>()
         {
             string response;
-            switch (typeof(T).Name.ToLowerInvariant())
+            switch (typeof(T).Name)
             {
-                case "customer":
+                case nameof(Customer):
+                case nameof(ICustomer):
                     response = DoRequest(string.Format("customers/metadata.{0}", GetMethodExtension()), HttpRequestMethod.Get, null);
                     break;
-                case "subscription":
+                case nameof(Subscription):
+                case nameof(ISubscription):
                     response = DoRequest(string.Format("subscriptions/metadata.{0}", GetMethodExtension()), HttpRequestMethod.Get, null);
                     break;
                 default:
-                    throw new Exception(string.Format("Must be of type '{0}'", string.Join(", ", _metadataTypes.ToArray())));
+                    throw new Exception(string.Format("Must be of type '{0}'", string.Join(", ", _metadataTypes)));
             }
             // change the response to the object
             return response.ConvertResponseTo<MetadataResult>("metadata");
         }
-        private static List<string> _metadataTypes = new List<string> { "Customer", "Subscription" };
+        private static List<string> _metadataTypes = new List<string> { nameof(ICustomer),nameof(Customer), nameof(ISubscription),nameof(Subscription) };
         #endregion
 
         #region Customers
