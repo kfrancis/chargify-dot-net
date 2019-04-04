@@ -10,6 +10,14 @@ namespace ChargifyNET.Json
         double _value;
 
         /// <summary>
+        /// The long value of this JsonNumber object (if applicable)
+        /// </summary>
+        public long LongValue
+        {
+            get { return (long)_value; }
+        }
+
+        /// <summary>
         /// The Integer value of this JsonNumber object (if applicable)
         /// </summary>
         public int IntValue

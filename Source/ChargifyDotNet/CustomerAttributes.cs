@@ -11,7 +11,7 @@
 //  Permission is hereby granted, free of charge, to any person obtaining a
 //  copy of this software and associated documentation files (the "Software"),
 //  to deal in the Software without restriction, including without limitation
-//  the rights to use, copy, modify, merge, publish, distribute, sublicense,
+//  the rights to use, copy, modify, merge, publish, distribute, sub license,
 //  and/or sell copies of the Software, and to permit persons to whom the
 //  Software is furnished to do so, subject to the following conditions:
 //
@@ -142,7 +142,7 @@ namespace ChargifyNET
         internal CustomerAttributes(XmlNode customerAttributesNode)
         {
             if (customerAttributesNode == null) throw new ArgumentNullException(nameof(customerAttributesNode));
-            if (customerAttributesNode.Name != "customer_attributes") throw new ArgumentException("Not a vaild customer attributes node", nameof(customerAttributesNode));
+            if (customerAttributesNode.Name != "customer_attributes") throw new ArgumentException("Not a valid customer attributes node", nameof(customerAttributesNode));
             if (customerAttributesNode.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(customerAttributesNode));
             LoadFromNode(customerAttributesNode);
         }
@@ -154,7 +154,7 @@ namespace ChargifyNET
         public CustomerAttributes(JsonObject customerAttributesObject)
         {
             if (customerAttributesObject == null) throw new ArgumentNullException(nameof(customerAttributesObject));
-            if (customerAttributesObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild customer attributes object", nameof(customerAttributesObject));
+            if (customerAttributesObject.Keys.Count <= 0) throw new ArgumentException("Not a valid customer attributes object", nameof(customerAttributesObject));
         }
 
         /// <summary>

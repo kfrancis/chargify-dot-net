@@ -401,7 +401,7 @@ namespace ChargifyDotNetTests
         public void Subscription_Can_Reactivate_Without_Trial()
         {
             // Arrange
-            var trialingProduct = Chargify.GetProductList().Values.FirstOrDefault(p => p.TrialInterval > 0);
+            var trialingProduct = Chargify.GetProductList().Values.FirstOrDefault(p => p.TrialInterval > 0 && !string.IsNullOrEmpty(p.Handle));
             var referenceId = Guid.NewGuid().ToString();
             var expMonth = DateTime.Now.AddMonths(1).Month;
             var expYear = DateTime.Now.AddMonths(12).Year;
@@ -429,7 +429,7 @@ namespace ChargifyDotNetTests
         public void Subscription_Can_Reactivate_With_Trial()
         {
             // Arrange
-            var trialingProduct = Chargify.GetProductList().Values.FirstOrDefault(p => p.TrialInterval > 0);
+            var trialingProduct = Chargify.GetProductList().Values.FirstOrDefault(p => p.TrialInterval > 0 && !string.IsNullOrEmpty(p.Handle));
             var referenceId = Guid.NewGuid().ToString();
             var expMonth = DateTime.Now.AddMonths(1).Month;
             var expYear = DateTime.Now.AddMonths(12).Year;
@@ -793,7 +793,7 @@ namespace ChargifyDotNetTests
             var updatedSubscription = Chargify.UpdateDelayedCancelForSubscription(cancelledSubscription.SubscriptionID,
                 false, "Testing Undo Delayed Cancel");
 
-            Assert.IsTrue(updatedSubscription.CancelAtEndOfPeriod);
+            Assert.IsFalse(updatedSubscription.CancelAtEndOfPeriod);
         }
 
         [TestMethod]

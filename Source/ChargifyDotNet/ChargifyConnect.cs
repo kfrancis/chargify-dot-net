@@ -244,7 +244,7 @@ namespace ChargifyNET
         /// <param name="chargifyId">The Chargify identifier for the resource</param>
         /// <param name="metadatum">The list of metadatum to set</param>
         /// <returns>The metadata result containing the response</returns>
-        public List<IMetadata> SetMetadataFor<T>(int chargifyId, IList<Metadata> metadatum)
+        public List<IMetadata> SetMetadataFor<T>(long chargifyId, IList<Metadata> metadatum)
         {
             // make sure data is valid
             if (metadatum == null) { throw new ArgumentNullException("metadatum"); }
@@ -324,7 +324,7 @@ namespace ChargifyNET
         /// <param name="chargifyId">The Chargify identifier for the resource</param>
         /// <param name="metadata">The list of metadata to set</param>
         /// <returns>The metadata result containing the response</returns>
-        public List<IMetadata> SetMetadataFor<T>(int chargifyId, Metadata metadata)
+        public List<IMetadata> SetMetadataFor<T>(long chargifyId, Metadata metadata)
         {
             return SetMetadataFor<T>(chargifyId, new [] {metadata});
         }
@@ -336,7 +336,7 @@ namespace ChargifyNET
         /// <param name="resourceId">The Chargify identifier for the resource</param>
         /// <param name="page">Which page to return -- Chargify Indexes Metadata Page at 1</param>
         /// <returns>The metadata result containing the response</returns>
-        public IMetadataResult GetMetadataFor<T>(int resourceId, int? page = null)
+        public IMetadataResult GetMetadataFor<T>(long resourceId, int? page = null)
         {
             string url;
             switch (typeof(T).Name)
@@ -400,7 +400,7 @@ namespace ChargifyNET
         /// </summary>
         /// <param name="chargifyId">The chargify ID of the customer</param>
         /// <returns>The customer with the specified chargify ID</returns>
-        public ICustomer LoadCustomer(int chargifyId)
+        public ICustomer LoadCustomer(long chargifyId)
         {
             try
             {
@@ -756,7 +756,7 @@ namespace ChargifyNET
         /// <param name="chargifyId">The integer identifier of the customer</param>
         /// <returns>True if the customer was deleted, false otherwise.</returns>
         /// <remarks>This method does not currently work, but it will once they open up the API. This will always return false, as Chargify will send a Http Forbidden everytime.</remarks>
-        public bool DeleteCustomer(int chargifyId)
+        public bool DeleteCustomer(long chargifyId)
         {
             try
             {
@@ -1517,7 +1517,7 @@ namespace ChargifyNET
         /// </summary>
         /// <param name="chargifyId">The ChargifyID of the customer</param>
         /// <returns>A list of subscriptions</returns>
-        public IDictionary<int, ISubscription> GetSubscriptionListForCustomer(int chargifyId)
+        public IDictionary<int, ISubscription> GetSubscriptionListForCustomer(long chargifyId)
         {
             try
             {
@@ -1641,7 +1641,7 @@ namespace ChargifyNET
         /// <param name="chargifyId">The Chargify ID of the customer</param>
         /// <param name="paymentCollectionMethod">Optional, type of payment collection method</param>
         /// <returns>The xml describing the new subsscription</returns>
-        public ISubscription CreateSubscription(string productHandle, int chargifyId, PaymentCollectionMethod? paymentCollectionMethod = PaymentCollectionMethod.Automatic)
+        public ISubscription CreateSubscription(string productHandle, long chargifyId, PaymentCollectionMethod? paymentCollectionMethod = PaymentCollectionMethod.Automatic)
         {
             // make sure data is valid
             if (chargifyId == int.MinValue) throw new ArgumentException("Invalid Customer ID detected", "chargifyId");
@@ -1656,7 +1656,7 @@ namespace ChargifyNET
         /// <param name="chargifyId">The Chargify ID of the customer</param>
         /// <param name="creditCardAttributes">The credit card attributes</param>
         /// <returns>The xml describing the new subsscription</returns>
-        public ISubscription CreateSubscription(string productHandle, int chargifyId, ICreditCardAttributes creditCardAttributes)
+        public ISubscription CreateSubscription(string productHandle, long chargifyId, ICreditCardAttributes creditCardAttributes)
         {
             // make sure data is valid
             if (creditCardAttributes == null) throw new ArgumentNullException("creditCardAttributes");
@@ -1676,7 +1676,7 @@ namespace ChargifyNET
         /// <param name="creditCardAttributes">The credit card attributes to use for the new subscription</param>
         /// <param name="nextBillingAt">The date that should be used for the next_billing_at</param>
         /// <returns>The new subscription, if successful. Null otherwise.</returns>
-        public ISubscription CreateSubscription(string productHandle, int chargifyId, ICreditCardAttributes creditCardAttributes, DateTime nextBillingAt)
+        public ISubscription CreateSubscription(string productHandle, long chargifyId, ICreditCardAttributes creditCardAttributes, DateTime nextBillingAt)
         {
             // make sure data is valid
             if (creditCardAttributes == null) throw new ArgumentNullException("creditCardAttributes");
@@ -1692,7 +1692,7 @@ namespace ChargifyNET
         /// <param name="chargifyId">The ID of the Customer to add the subscription for</param>
         /// <param name="couponCode">The discount coupon code</param>
         /// <returns>If sucessful, the subscription object. Otherwise null.</returns>
-        public ISubscription CreateSubscriptionUsingCoupon(string productHandle, int chargifyId, string couponCode)
+        public ISubscription CreateSubscriptionUsingCoupon(string productHandle, long chargifyId, string couponCode)
         {
             if (chargifyId == int.MinValue) throw new ArgumentException("Invalid Customer ID detected", "chargifyId");
             if (string.IsNullOrEmpty(couponCode)) throw new ArgumentException("CouponCode can't be empty", "couponCode");
@@ -1707,7 +1707,7 @@ namespace ChargifyNET
         /// <param name="creditCardAttributes">The credit card attributes to use for this transaction</param>
         /// <param name="couponCode">The discount coupon code</param>
         /// <returns></returns>
-        public ISubscription CreateSubscriptionUsingCoupon(string productHandle, int chargifyId, ICreditCardAttributes creditCardAttributes, string couponCode)
+        public ISubscription CreateSubscriptionUsingCoupon(string productHandle, long chargifyId, ICreditCardAttributes creditCardAttributes, string couponCode)
         {
             // make sure data is valid
             if (creditCardAttributes == null) throw new ArgumentNullException("creditCardAttributes");
@@ -2144,7 +2144,7 @@ namespace ChargifyNET
         /// <param name="couponCode">The discount coupon code</param>
         /// <param name="paymentCollectionMethod">Optional, type of payment collection method</param>
         /// <returns>The xml describing the new subsscription</returns>
-        public ISubscription CreateSubscription(string productHandle, int chargifyId, string couponCode, PaymentCollectionMethod? paymentCollectionMethod)
+        public ISubscription CreateSubscription(string productHandle, long chargifyId, string couponCode, PaymentCollectionMethod? paymentCollectionMethod)
         {
             // make sure data is valid
             if (string.IsNullOrEmpty(productHandle)) throw new ArgumentNullException(nameof(productHandle));
@@ -2198,7 +2198,7 @@ namespace ChargifyNET
         /// <param name="firstName">The first name, as it appears on the credit card</param>
         /// <param name="lastName">The last name, as it appears on the credit card</param>
         /// <returns>The xml describing the new subsscription</returns>
-        private ISubscription CreateSubscription(string productHandle, int chargifyId, string fullNumber, int expirationMonth, int expirationYear,
+        private ISubscription CreateSubscription(string productHandle, long chargifyId, string fullNumber, int expirationMonth, int expirationYear,
                                                         string cvv, string billingAddress, string billingCity, string billingState, string billingZip,
                                                         string billingCountry, string couponCode, string firstName, string lastName)
         {
@@ -2261,7 +2261,7 @@ namespace ChargifyNET
         /// <param name="billingCountry">The billing country</param>
         /// <param name="couponCode">The discount coupon code</param>
         /// <returns>The xml describing the new subsscription</returns>
-        private ISubscription CreateSubscription(string productHandle, int chargifyId, string fullNumber, int expirationMonth, int expirationYear,
+        private ISubscription CreateSubscription(string productHandle, long chargifyId, string fullNumber, int expirationMonth, int expirationYear,
                                                         string cvv, string billingAddress, string billingCity, string billingState, string billingZip,
                                                         string billingCountry, string couponCode)
         {
@@ -4177,7 +4177,7 @@ namespace ChargifyNET
         /// <param name="chargifyId">The product family ID</param>
         /// <param name="includeArchived">Filter flag for archived components</param>
         /// <returns>A dictionary of components if there are results, null otherwise.</returns>
-        public IDictionary<int, IComponentInfo> GetComponentsForProductFamily(int chargifyId, bool includeArchived)
+        public IDictionary<int, IComponentInfo> GetComponentsForProductFamily(long chargifyId, bool includeArchived)
         {
             // make sure data is valid
             if (chargifyId == int.MinValue) throw new ArgumentNullException("chargifyId");
@@ -4247,7 +4247,7 @@ namespace ChargifyNET
         /// </summary>
         /// <param name="chargifyId">The product family ID</param>
         /// <returns>A dictionary of components if there are results, null otherwise.</returns>
-        public IDictionary<int, IComponentInfo> GetComponentsForProductFamily(int chargifyId)
+        public IDictionary<int, IComponentInfo> GetComponentsForProductFamily(long chargifyId)
         {
             return GetComponentsForProductFamily(chargifyId, false);
         }
@@ -5363,7 +5363,7 @@ namespace ChargifyNET
         /// <summary>
         /// From http://docs.chargify.com/api-billing-portal
         /// </summary>
-        public IBillingManagementInfo GetManagementLink(int chargifyId)
+        public IBillingManagementInfo GetManagementLink(long chargifyId)
         {
             try
             {
@@ -5389,7 +5389,7 @@ namespace ChargifyNET
         /// <param name="chargifyId">The chargify ID of the customer</param>
         /// <param name="autoInvite">Should an email be automatically sent to customer with billing portal link</param>
         /// <returns>True if success, otherwise error is thrown</returns>
-        public bool EnableBillingPortalAccess(int chargifyId, bool autoInvite = false)
+        public bool EnableBillingPortalAccess(long chargifyId, bool autoInvite = false)
         {
             try
             {
@@ -5430,7 +5430,7 @@ namespace ChargifyNET
         /// </summary>
         /// <param name="chargifyId">The chargify ID of the customer</param>
         /// <returns>True if success, otherwise error is thrown</returns>
-        public bool RevokeBillingPortalAccess(int chargifyId)
+        public bool RevokeBillingPortalAccess(long chargifyId)
         {
             try
             {
@@ -5447,6 +5447,11 @@ namespace ChargifyNET
             {
                 if (cex.StatusCode == HttpStatusCode.NotFound)
                     throw new InvalidOperationException("Subscription not found");
+
+                if (cex.StatusCode == (HttpStatusCode)422)
+                {
+                    return true;
+                }
                 throw;
             }
         }
