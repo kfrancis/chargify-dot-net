@@ -27,6 +27,9 @@
 //
 #endregion
 
+using System.Collections.Generic;
+using System.Text;
+
 namespace ChargifyNET
 {
     #region Imports
@@ -185,6 +188,46 @@ namespace ChargifyNET
             if (temp == null)
                 return false;
             return Equals(temp);
+        }
+        #endregion
+
+        #region XmlBuilders
+
+        internal static string GetMetadatumXml(long chargifyId, IList<Metadata> metadatum)
+        {
+            var metadataXml = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+            metadataXml.Append("<metadata type=\"array\">");
+            foreach (var metadata in metadatum)
+            {
+                metadataXml.Append("<metadatum>");
+                if (metadata.ResourceID > 0)
+                {
+                    metadataXml.AppendFormat("<resource-id>{0}</resource-id>", metadata.ResourceID);
+                }
+                else
+                {
+                    metadataXml.AppendFormat("<resource-id>{0}</resource-id>", chargifyId);
+                }
+                metadataXml.AppendFormat("<name>{0}</name>", metadata.Name);
+                metadataXml.AppendFormat("<value>{0}</value>", metadata.Value);
+                metadataXml.Append("</metadatum>");
+            }
+            metadataXml.Append("</metadata>");
+            return metadataXml.ToString();
+        }
+
+        internal static string GetMetadatumJson(IList<Metadata> metadatum)
+        {
+            var metadataJson = new StringBuilder();
+            metadataJson.Append("{\"metadata\": [");
+            foreach (var metadata in metadatum)
+            {
+                metadataJson.Append("{\"name\":\"" + metadata.Name + "\",\"value\":\"" + metadata.Value + "\"}");
+                metadataJson.Append(",");
+            }
+            metadataJson.Remove(metadataJson.Length - 1, 1);
+            metadataJson.Append("]}");
+            return metadataJson.ToString();
         }
         #endregion
     }

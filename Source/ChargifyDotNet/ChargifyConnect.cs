@@ -27,8 +27,10 @@
 //
 #endregion
 
+using System.Linq;
 using System.Xml.Serialization;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace ChargifyNET
 {
@@ -247,72 +249,61 @@ namespace ChargifyNET
         public List<IMetadata> SetMetadataFor<T>(long chargifyId, IList<Metadata> metadatum)
         {
             // make sure data is valid
-            if (metadatum == null) { throw new ArgumentNullException("metadatum"); }
-            if (metadatum.Count <= 0) { throw new ArgumentOutOfRangeException("metadatum"); }
-            //if (metadatum.Select(m => m.ResourceID < 0).Count() > 0) { throw new ArgumentOutOfRangeException("Metadata.ResourceID"); }
-            //if (metadatum.Select(m => string.IsNullOrEmpty(m.Name)).Count() > 0) { throw new ArgumentNullException("Metadata.Name"); }
-            //if (metadatum.Select(m => m.Value == null).Count() > 0) { throw new ArgumentNullException("Metadata.Value"); }
+            RequireNotNull(nameof(metadatum), metadatum);
+            RequireAtLeastZeroElement(nameof(metadatum), metadatum);
 
             // create XML for creation of metadata
-            
-            var metadataXml = new StringBuilder(GetXmlStringIfApplicable());
-            metadataXml.Append("<metadata type=\"array\">");
-            foreach (var metadata in metadatum)
-            {
-                metadataXml.Append("<metadatum>");
-                if (metadata.ResourceID > 0)
-                {
-                    metadataXml.AppendFormat("<resource-id>{0}</resource-id>", metadata.ResourceID);
-                }
-                else
-                {
-                    metadataXml.AppendFormat("<resource-id>{0}</resource-id>", chargifyId);
-                }
-                metadataXml.AppendFormat("<name>{0}</name>", metadata.Name);
-                metadataXml.AppendFormat("<value>{0}</value>", metadata.Value);
-                metadataXml.Append("</metadatum>");
-            }
-            metadataXml.Append("</metadata>");
+
+            var metadataBody = !UseJSON ? Metadata.GetMetadatumXml(chargifyId, metadatum) : Metadata.GetMetadatumJson(metadatum);
 
             string url;
             switch (typeof(T).Name)
             {
                 case nameof(Customer):
                 case nameof(ICustomer):
-                    url = $"customers/{chargifyId}/metadata.{GetMethodExtension()}";
+                    url = $"customers/{chargifyId}/metadata";
                     break;
                 case nameof(Subscription):
                 case nameof(ISubscription):
-                    url = $"subscriptions/{chargifyId}/metadata.{GetMethodExtension()}";
+                    url = $"subscriptions/{chargifyId}/metadata";
                     break;
                 default:
                     throw new Exception($"Must be of type '{string.Join(", ", _metadataTypes.ToArray())}'");
             }
 
             // now make the request
-            string response = DoRequest(url, HttpRequestMethod.Post, metadataXml.ToString());
+            string response = DoRequest(url, HttpRequestMethod.Post, (object)metadataBody);
 
             var retVal = new List<IMetadata>();
 
             // now build the object based on response as XML
-            XmlDocument doc = new XmlDocument();
-            doc.LoadXml(response); // get the XML into an XML document
-            if (doc.ChildNodes.Count == 0) throw new InvalidOperationException("Returned XML not valid");
-            // loop through the child nodes of this node
-            foreach (XmlNode parentNode in doc.ChildNodes)
+            if (UseJSON)
             {
-                if (parentNode.Name == "metadata")
+                var metadatumResult = JsonConvert.DeserializeObject<IList<Metadata>>(response);
+                retVal = metadatumResult.Cast<IMetadata>().ToList();
+            }
+            else
+            {
+                XmlDocument doc = new XmlDocument();
+                doc.LoadXml(response); // get the XML into an XML document
+                if (doc.ChildNodes.Count == 0) throw new InvalidOperationException("Returned XML not valid");
+                // loop through the child nodes of this node
+                foreach (XmlNode parentNode in doc.ChildNodes)
                 {
-                    foreach (XmlNode childNode in parentNode.ChildNodes)
+                    if (parentNode.Name == "metadata")
                     {
-                        if (childNode.Name == "metadatum")
+                        foreach (XmlNode childNode in parentNode.ChildNodes)
                         {
-                            IMetadata loadedNode = new Metadata(childNode);
-                            retVal.Add(loadedNode);
+                            if (childNode.Name == "metadatum")
+                            {
+                                IMetadata loadedNode = new Metadata(childNode);
+                                retVal.Add(loadedNode);
+                            }
                         }
                     }
                 }
             }
+           
 
             return retVal;
         }
@@ -3256,29 +3247,40 @@ namespace ChargifyNET
 
         private bool ApplyDelayedCancelToSubscription(int subscriptionId, string cancellationMessage)
         {
-            return HandleExceptions(attempt: () =>
-                {
-                    string response = DoRequest($"subscriptions/{subscriptionId}/delayed_cancel.{GetMethodExtension()}",
-                        HttpRequestMethod.Post, GetBody(new
+            try
+            {
+                DoRequest($"subscriptions/{subscriptionId}/delayed_cancel",
+                    HttpRequestMethod.Post, new
+                    {
+                        subscription = new
                         {
-                            subscription = new
-                            {
-                                cancellation_message = cancellationMessage
-                            }
-                        }));
-                    return true;
-                },
-                uponFailure: new ExceptionHandler().Add(@if: AttemptThrowsNotFoundStatusCode, then: HandleSubscriptionNotFound));
+                            cancellation_message = cancellationMessage
+                        }
+                    });
+                return true;
+            }
+            catch (ChargifyException cex)
+            {
+                if (cex.StatusCode == HttpStatusCode.NotFound)
+                    throw new InvalidOperationException("Subscription not found");
+                throw;
+            }
         }
 
         private bool RemoveDelayedCancelFromSubscription(int subscriptionId)
         {
-            return HandleExceptions(attempt: () =>
-                {
-                    string response = DoRequest($"subscriptions/{subscriptionId}/delayed_cancel.{GetMethodExtension()}",HttpRequestMethod.Delete, null);
-                    return true;
-                },
-                uponFailure: new ExceptionHandler().Add(@if: AttemptThrowsNotFoundStatusCode, then: HandleSubscriptionNotFound));
+            try
+            {
+                DoRequest($"subscriptions/{subscriptionId}/delayed_cancel",
+                    HttpRequestMethod.Delete, null);
+                return true;
+            }
+            catch (ChargifyException cex)
+            {
+                if (cex.StatusCode == HttpStatusCode.NotFound)
+                    throw new InvalidOperationException("Subscription not found");
+                throw;
+            }
         }
 
         /// <summary>
@@ -6381,31 +6383,195 @@ namespace ChargifyNET
                 }
             }
         }
-        #endregion
 
-        #region Exception Handling
 
-        private bool AttemptThrowsNotFoundStatusCode(ChargifyException e)
+        /// <summary>
+        /// Make a request to Chargify
+        /// </summary>
+        /// <param name="methodString">The root chargify url string for the request. This is appended to the base URL. This should not include xml or json</param>
+        /// <param name="requestMethod">The request method (GET or POST)</param>
+        /// <param name="postData">The data as an anonymous object included as part of a POST, PUT or DELETE request</param>
+        /// <returns>The xml response to the request</returns>
+        private string DoRequest(string methodString, HttpRequestMethod requestMethod, object postData)
         {
-            return e.StatusCode == HttpStatusCode.NotFound;
-        }
-        private void HandleSubscriptionNotFound(ChargifyException e)
-        {
-            throw new InvalidOperationException("Subscription not found");
-        }
-        private T HandleExceptions<T>(Func<T> attempt,
-            ExceptionHandler uponFailure)
-        {
+            // make sure values are set
+            Require(nameof(URL), URL);
+            Require(nameof(apiKey), apiKey);
+            Require(nameof(Password), Password);
+            
+            if (_protocolType != null)
+            {
+                ServicePointManager.SecurityProtocol = _protocolType.Value;
+            }
+
+            var uriBuilder = new UriBuilder(URL)
+            {
+                Scheme = Uri.UriSchemeHttps,
+                Port = -1 // default port for scheme
+            };
+            uriBuilder.Path = $"{methodString}.{GetMethodExtension()}";
+            Uri address = uriBuilder.Uri;
+
+            // Create the web request
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(address);
+            request.Timeout = _timeout;
+            string credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes(apiKey + ":" + Password));
+            request.Headers[HttpRequestHeader.Authorization] = "Basic " + credentials;
+            request.UserAgent = UserAgent;
+            request.SendChunked = false;
+
+            // Set Content-Type and Accept headers
+            request.Method = requestMethod.ToString().ToUpper();
+            string dataToPost = null;
+            if (!UseJSON)
+            {
+                if (postData is string)
+                    dataToPost = (string) postData;
+                else
+                {
+                    var dataAsJson = JsonConvert.SerializeObject(postData);
+                    var dataAsJObject = JsonConvert.DeserializeXmlNode(dataAsJson);
+                    dataToPost = GetXmlStringIfApplicable() + dataAsJObject.InnerXml;
+                }
+                    
+                request.ContentType = "text/xml";
+                request.Accept = "application/xml";
+            }
+            else
+            {
+                if (postData is string)
+                    dataToPost = (string) postData;
+                else
+                    dataToPost = JsonConvert.SerializeObject(postData);
+                request.ContentType = "application/json";
+                request.Accept = "application/json";
+            }
+
+            if (requestMethod == HttpRequestMethod.Post || requestMethod == HttpRequestMethod.Put || requestMethod == HttpRequestMethod.Delete)
+            {
+                bool hasWritten = false;
+                // only write if there's data to write ...
+                if (!string.IsNullOrEmpty(dataToPost))
+                {
+                    // Wrap the request stream with a text-based writer
+                    using (StreamWriter writer = new StreamWriter(request.GetRequestStream()))
+                    {
+                        // Write the XML/JSON text into the stream
+                        writer.WriteLine(dataToPost);
+                        writer.Close();
+                        hasWritten = true;
+                    }
+                }
+                else request.ContentLength = 0;
+
+            }
+           
             try
             {
-                return attempt();
+                LogRequest?.Invoke(requestMethod, address.AbsolutePath, dataToPost);
+
+                string retValue = string.Empty;
+                using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
+                {
+                    if (response != null)
+                    {
+                        var responseStream = response.GetResponseStream();
+                        if (responseStream != null)
+                        {
+                            using (StreamReader reader = new StreamReader(responseStream))
+                            {
+                                retValue = reader.ReadToEnd();
+                                _lastResponse = response;
+                            }
+                        }
+                        LogResponse?.Invoke(response.StatusCode, address.AbsolutePath, retValue);
+                    }
+                }
+                // return the result
+                return retValue;
             }
-            catch (ChargifyException e)
+            catch (WebException wex)
             {
-                uponFailure.Evaluate(e);
-                throw;
+                Exception newException = null;
+                // build exception and set last response
+                if (wex.Response != null)
+                {
+                    using (HttpWebResponse errorResponse = (HttpWebResponse)wex.Response)
+                    {
+                        var sanitizedPostData = dataToPost;
+
+                        if (!string.IsNullOrEmpty(sanitizedPostData))
+                        {
+                            if (sanitizedPostData.Contains("<full_number>"))
+                            {
+                                var xdoc = XDocument.Parse(sanitizedPostData);
+                                var fullNumberElement = xdoc.Element("subscription")?.Element("credit_card_attributes")?.Element("full_number");
+                                if (fullNumberElement != null)
+                                {
+                                    fullNumberElement.Value = fullNumberElement.Value.Mask('X', 4);
+                                    sanitizedPostData = xdoc.ToString();
+                                }
+                            }
+                        }
+
+                        newException = new ChargifyException(errorResponse, wex, sanitizedPostData);
+                        _lastResponse = errorResponse;
+
+                        // Use the ChargifyException ToString override to provide the parsed errors
+                        LogResponse?.Invoke(errorResponse.StatusCode, address.AbsoluteUri, newException.ToString());
+                    }
+                }
+                else
+                {
+                    _lastResponse = null;
+                }
+                // throw the approriate exception
+                if (newException != null)
+                {
+                    throw newException;
+                }
+                else
+                {
+                    throw;
+                }
             }
         }
+
+        #endregion
+
+        #region RequirementHandling
+
+        /// <summary>
+        /// Checks whether a string is null or empty. Throws an InvalidOperationException.
+        /// </summary>
+        private void Require(string name, string str)
+        {
+            if (string.IsNullOrEmpty(str)) throw new InvalidOperationException($"{name} not set");
+        }
+
+        /// <summary>
+        /// Checks whether an object is null, or if it is a string, not empty. Throws ArgumentNullException
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="str"></param>
+        private void RequireNotNull(string name, object str)
+        {
+            if (str == null || (str is string && string.IsNullOrWhiteSpace((string)str))) throw new ArgumentNullException($"{name}");
+        }
+
+        private void RequireAtLeastOneElement<T>(string name, IList<T> list)
+        {
+            if (list.Count <= 0)
+                throw new ArgumentOutOfRangeException(name);
+
+        }
+        private void RequireAtLeastZeroElement<T>(string name, IList<T> list)
+        {
+            if (list.Count < 0)
+                throw new ArgumentOutOfRangeException(name);
+
+        }
+
         #endregion
     }
 }
