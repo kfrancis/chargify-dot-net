@@ -252,10 +252,6 @@ namespace ChargifyNET
             RequireNotNull(nameof(metadatum), metadatum);
             RequireAtLeastZeroElement(nameof(metadatum), metadatum);
 
-            // create XML for creation of metadata
-
-            var metadataBody = !UseJSON ? Metadata.GetMetadatumXml(chargifyId, metadatum) : Metadata.GetMetadatumJson(metadatum);
-
             string url;
             switch (typeof(T).Name)
             {
@@ -272,7 +268,9 @@ namespace ChargifyNET
             }
 
             // now make the request
-            string response = DoRequest(url, HttpRequestMethod.Post, (object)metadataBody);
+            string response = !UseJSON 
+                ? DoNewRequest(url, HttpRequestMethod.Post, Metadata.GetMetadatumXml(chargifyId, metadatum))
+                : DoNewRequest(url, HttpRequestMethod.Post, new { metadata = metadatum });
 
             var retVal = new List<IMetadata>();
 
@@ -1423,28 +1421,21 @@ namespace ChargifyNET
 
         private IDictionary<int, ISubscription> GetSubscriptionList(int page, int perPage, SubscriptionState state) 
         {
-            string qs = string.Empty;
+            var queryString = new StringBuilder();
+            // we sort by signup_date ascending to make sure we never encounter an off-by-one error when adding a new record to production.
+            AppendToQueryString(queryString, "sort","created_at");
+            AppendToQueryString(queryString, "direction", "asc");
 
             if (page != int.MinValue)
-            {
-                if (qs.Length > 0) { qs += "&"; }
-                qs += string.Format("page={0}", page);
-            }
-
+                AppendToQueryString(queryString, "page",page);
+            
             if (perPage != int.MinValue)
-            {
-                if (qs.Length > 0) { qs += "&"; }
-                qs += string.Format("per_page={0}", perPage);
-            }
+                AppendToQueryString(queryString, "per_page", perPage);
+
             if (state != SubscriptionState.Unknown)
-            {
-                // Append the kind to the query string ...
-                if (qs.Length > 0) { qs += "&"; }
-                qs += string.Format("state={0}", state.ToString().ToLower());
-            }
-            string url = string.Format("subscriptions.{0}", GetMethodExtension());
-            if (!string.IsNullOrEmpty(qs)) { url += "?" + qs; }
-            string response = DoRequest(url);
+                AppendToQueryString(queryString, "state", state.ToString().ToLower());
+
+            string response = DoNewRequest("subscriptions", queryString);
 
             var retValue = new Dictionary<int, ISubscription>();
             if (response.IsXml())
@@ -3249,7 +3240,7 @@ namespace ChargifyNET
         {
             try
             {
-                DoRequest($"subscriptions/{subscriptionId}/delayed_cancel",
+                DoNewRequest($"subscriptions/{subscriptionId}/delayed_cancel",
                     HttpRequestMethod.Post, new
                     {
                         subscription = new
@@ -6047,6 +6038,13 @@ namespace ChargifyNET
             return result;
         }
 
+        private void AppendToQueryString(StringBuilder queryString, string additionKey, object additionValue)
+        {
+            if (queryString.Length > 0)
+                queryString.Append("&");
+            queryString.Append($"{additionKey}={additionValue}");
+        }
+
         /// <summary>
         /// Make a GET request to Chargify
         /// </summary>
@@ -6385,6 +6383,25 @@ namespace ChargifyNET
         }
 
 
+        private string DoNewRequest(string methodString, StringBuilder queryString)
+        {
+            return DoNewRequest(methodString, queryString.ToString());
+        }
+
+        private string DoNewRequest(string methodString, string queryString)
+        {
+            Require(nameof(URL), URL);
+            var uriBuilder = new UriBuilder(URL)
+            {
+                Scheme = Uri.UriSchemeHttps,
+                Port = -1 // default port for scheme
+            };
+            uriBuilder.Path = $"{methodString}.{GetMethodExtension()}";
+            uriBuilder.Query = queryString;
+
+            return DoNewRequest(uriBuilder.Uri, HttpRequestMethod.Get, null);
+        }
+
         /// <summary>
         /// Make a request to Chargify
         /// </summary>
@@ -6392,28 +6409,33 @@ namespace ChargifyNET
         /// <param name="requestMethod">The request method (GET or POST)</param>
         /// <param name="postData">The data as an anonymous object included as part of a POST, PUT or DELETE request</param>
         /// <returns>The xml response to the request</returns>
-        private string DoRequest(string methodString, HttpRequestMethod requestMethod, object postData)
+        private string DoNewRequest(string methodString, HttpRequestMethod requestMethod, object postData)
         {
-            // make sure values are set
             Require(nameof(URL), URL);
-            Require(nameof(apiKey), apiKey);
-            Require(nameof(Password), Password);
-            
-            if (_protocolType != null)
-            {
-                ServicePointManager.SecurityProtocol = _protocolType.Value;
-            }
-
             var uriBuilder = new UriBuilder(URL)
             {
                 Scheme = Uri.UriSchemeHttps,
                 Port = -1 // default port for scheme
             };
             uriBuilder.Path = $"{methodString}.{GetMethodExtension()}";
-            Uri address = uriBuilder.Uri;
+
+            return DoNewRequest(uriBuilder.Uri, requestMethod, postData);
+        }
+
+        private string DoNewRequest(Uri uri, HttpRequestMethod requestMethod, object body)
+        {
+            // make sure values are set
+            Require(nameof(URL), URL);
+            Require(nameof(apiKey), apiKey);
+            Require(nameof(Password), Password);
+
+            if (_protocolType != null)
+            {
+                ServicePointManager.SecurityProtocol = _protocolType.Value;
+            }
 
             // Create the web request
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(address);
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
             request.Timeout = _timeout;
             string credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes(apiKey + ":" + Password));
             request.Headers[HttpRequestHeader.Authorization] = "Basic " + credentials;
@@ -6422,42 +6444,45 @@ namespace ChargifyNET
 
             // Set Content-Type and Accept headers
             request.Method = requestMethod.ToString().ToUpper();
-            string dataToPost = null;
-            if (!UseJSON)
+            string postData = null;
+            if (body != null)
             {
-                if (postData is string)
-                    dataToPost = (string) postData;
+                if (!UseJSON)
+                {
+                    if (body is string)
+                        postData = (string)body;
+                    else
+                    {
+                        var dataAsJson = JsonConvert.SerializeObject(body);
+                        var dataAsJObject = JsonConvert.DeserializeXmlNode(dataAsJson);
+                        postData = GetXmlStringIfApplicable() + dataAsJObject.InnerXml;
+                    }
+
+                    request.ContentType = "text/xml";
+                    request.Accept = "application/xml";
+                }
                 else
                 {
-                    var dataAsJson = JsonConvert.SerializeObject(postData);
-                    var dataAsJObject = JsonConvert.DeserializeXmlNode(dataAsJson);
-                    dataToPost = GetXmlStringIfApplicable() + dataAsJObject.InnerXml;
+                    if (body is string)
+                        postData = (string)body;
+                    else
+                        postData = JsonConvert.SerializeObject(body);
+                    request.ContentType = "application/json";
+                    request.Accept = "application/json";
                 }
-                    
-                request.ContentType = "text/xml";
-                request.Accept = "application/xml";
-            }
-            else
-            {
-                if (postData is string)
-                    dataToPost = (string) postData;
-                else
-                    dataToPost = JsonConvert.SerializeObject(postData);
-                request.ContentType = "application/json";
-                request.Accept = "application/json";
             }
 
             if (requestMethod == HttpRequestMethod.Post || requestMethod == HttpRequestMethod.Put || requestMethod == HttpRequestMethod.Delete)
             {
                 bool hasWritten = false;
                 // only write if there's data to write ...
-                if (!string.IsNullOrEmpty(dataToPost))
+                if (!string.IsNullOrEmpty(postData))
                 {
                     // Wrap the request stream with a text-based writer
                     using (StreamWriter writer = new StreamWriter(request.GetRequestStream()))
                     {
                         // Write the XML/JSON text into the stream
-                        writer.WriteLine(dataToPost);
+                        writer.WriteLine(postData);
                         writer.Close();
                         hasWritten = true;
                     }
@@ -6465,10 +6490,10 @@ namespace ChargifyNET
                 else request.ContentLength = 0;
 
             }
-           
+
             try
             {
-                LogRequest?.Invoke(requestMethod, address.AbsolutePath, dataToPost);
+                LogRequest?.Invoke(requestMethod, uri.AbsolutePath, postData);
 
                 string retValue = string.Empty;
                 using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
@@ -6484,7 +6509,7 @@ namespace ChargifyNET
                                 _lastResponse = response;
                             }
                         }
-                        LogResponse?.Invoke(response.StatusCode, address.AbsolutePath, retValue);
+                        LogResponse?.Invoke(response.StatusCode, uri.AbsolutePath, retValue);
                     }
                 }
                 // return the result
@@ -6498,7 +6523,7 @@ namespace ChargifyNET
                 {
                     using (HttpWebResponse errorResponse = (HttpWebResponse)wex.Response)
                     {
-                        var sanitizedPostData = dataToPost;
+                        var sanitizedPostData = postData;
 
                         if (!string.IsNullOrEmpty(sanitizedPostData))
                         {
@@ -6518,7 +6543,7 @@ namespace ChargifyNET
                         _lastResponse = errorResponse;
 
                         // Use the ChargifyException ToString override to provide the parsed errors
-                        LogResponse?.Invoke(errorResponse.StatusCode, address.AbsoluteUri, newException.ToString());
+                        LogResponse?.Invoke(errorResponse.StatusCode, uri.AbsoluteUri, newException.ToString());
                     }
                 }
                 else

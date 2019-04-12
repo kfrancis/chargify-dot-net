@@ -29,6 +29,7 @@
 
 using System.Collections.Generic;
 using System.Text;
+using Newtonsoft.Json;
 
 namespace ChargifyNET
 {
@@ -129,12 +130,14 @@ namespace ChargifyNET
         /// <summary>
         /// The value of the attribute that was added to the resource
         /// </summary>
+        [JsonProperty("value")]
         public string Value { get { return _value; } set { _value = value; } }
         private string _value;
 
         /// <summary>
         /// The name of the attribute that is added to the resource
         /// </summary>
+        [JsonProperty("name")]
         public string Name { get { return _name; } set { _name = value; } }
         private string _name = string.Empty;
 
@@ -214,20 +217,6 @@ namespace ChargifyNET
             }
             metadataXml.Append("</metadata>");
             return metadataXml.ToString();
-        }
-
-        internal static string GetMetadatumJson(IList<Metadata> metadatum)
-        {
-            var metadataJson = new StringBuilder();
-            metadataJson.Append("{\"metadata\": [");
-            foreach (var metadata in metadatum)
-            {
-                metadataJson.Append("{\"name\":\"" + metadata.Name + "\",\"value\":\"" + metadata.Value + "\"}");
-                metadataJson.Append(",");
-            }
-            metadataJson.Remove(metadataJson.Length - 1, 1);
-            metadataJson.Append("]}");
-            return metadataJson.ToString();
         }
         #endregion
     }
