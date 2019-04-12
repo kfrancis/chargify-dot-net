@@ -29,6 +29,7 @@
 
 using System.Linq;
 using System.Xml.Serialization;
+using ChargifyDotNet.RequestDTOs;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -430,6 +431,22 @@ namespace ChargifyNET
             }
         }
 
+        private ICustomer CreateCustomer(CustomerRequest customer)
+        {
+#if !DEBUG
+            RequireNotNull("firstName", firstName);
+            RequireNotNull("lastName", lastName);
+            RequireNotNull("emailAddress", emailAddress);
+            RequireArgument("systemId", systemId, "Empty SystemID not allowed");
+            // make sure data is valid
+            if (LoadCustomer(systemId) != null) throw new ArgumentException("Not unique", "systemId");
+#endif
+            var body = UseJSON ? new {customer} : (object)CustomerRequest.GetCustomerCreateXml(customer);
+
+            var response = DoNewRequest("customers", HttpRequestMethod.Post, body);
+            // change the response to the object
+            return response.ConvertResponseTo<Customer>("customer");
+        }
         /// <summary>
         /// Create a new chargify customer
         /// </summary>
@@ -439,12 +456,26 @@ namespace ChargifyNET
         /// <returns>The created chargify customer</returns>
         public ICustomer CreateCustomer(ICustomer customer)
         {
-            // make sure data is valid
             if (customer == null) throw new ArgumentNullException("customer");
             if (customer.IsSaved) throw new ArgumentException("Customer already saved", "customer");
-            return CreateCustomer(customer.FirstName, customer.LastName, customer.Email, customer.Phone, customer.Organization, customer.SystemID, 
-                                  customer.CCEmails, customer.ShippingAddress, customer.ShippingAddress2, customer.ShippingCity, customer.ShippingState,
-                                  customer.ShippingZip, customer.ShippingCountry, customer.TaxExempt);
+
+            return CreateCustomer(new CustomerRequest
+            {
+                FirstName = customer.FirstName,
+                LastName = customer.LastName,
+                Email = customer.Email,
+                Phone = customer.Phone,
+                Organization = customer.Organization,
+                SystemID = customer.SystemID,
+                CCEmails = customer.CCEmails,
+                ShippingAddress = customer.ShippingAddress,
+                ShippingAddress2 = customer.ShippingAddress2,
+                ShippingCity = customer.ShippingCity,
+                ShippingState = customer.ShippingState,
+                ShippingZip = customer.ShippingZip,
+                ShippingCountry = customer.ShippingCountry,
+                TaxExempt = customer.TaxExempt
+            });
         }
 
         /// <summary>
@@ -469,37 +500,24 @@ namespace ChargifyNET
                                         string ccEmails, string shippingAddress, string shippingAddress2, string shippingCity, string shippingState,
                                         string shippingZip, string shippingCountry, bool taxExempt = false)
         {
-            // make sure data is valid
-            if (string.IsNullOrEmpty(firstName)) throw new ArgumentNullException(nameof(firstName));
-#if !DEBUG
-            if (string.IsNullOrEmpty(lastName)) throw new ArgumentNullException(nameof(lastName));
-            if (string.IsNullOrEmpty(emailAddress)) throw new ArgumentNullException(nameof(emailAddress));
-            if (systemId == string.Empty) throw new ArgumentException("Empty systemId not allowed", nameof(systemId));
-            // make sure that the system ID is unique
-            if (this.LoadCustomer(systemId) != null) throw new ArgumentException("Not unique", nameof(systemId));
-#endif
-            // create XML for creation of customer
-            var customerXml = new StringBuilder(GetXmlStringIfApplicable());
-            customerXml.Append("<customer>");
-            if (!string.IsNullOrEmpty(emailAddress)) customerXml.AppendFormat("<email>{0}</email>", emailAddress);
-            if (!string.IsNullOrEmpty(phone)) customerXml.AppendFormat("<{0}>{1}</{2}>", CustomerAttributes.PhoneKey, phone, CustomerAttributes.PhoneKey);
-            if (!string.IsNullOrEmpty(firstName)) customerXml.AppendFormat("<first_name>{0}</first_name>", firstName);
-            if (!string.IsNullOrEmpty(lastName)) customerXml.AppendFormat("<last_name>{0}</last_name>", lastName);
-            if (!string.IsNullOrEmpty(organization)) customerXml.AppendFormat("<organization>{0}</organization>", WebUtility.HtmlEncode(organization));
-            if (!string.IsNullOrEmpty(systemId)) customerXml.AppendFormat("<reference>{0}</reference>", systemId);
-            if (!string.IsNullOrEmpty(ccEmails)) customerXml.AppendFormat("<cc_emails>{0}</cc_emails>", ccEmails);
-            if (!string.IsNullOrEmpty(shippingAddress)) customerXml.AppendFormat("<address>{0}</address>", shippingAddress);
-            if (!string.IsNullOrEmpty(shippingAddress2)) customerXml.AppendFormat("<address_2>{0}</address_2>", shippingAddress2);
-            if (!string.IsNullOrEmpty(shippingCity)) customerXml.AppendFormat("<city>{0}</city>", shippingCity);
-            if (!string.IsNullOrEmpty(shippingState)) customerXml.AppendFormat("<state>{0}</state>", shippingState);
-            if (!string.IsNullOrEmpty(shippingZip)) customerXml.AppendFormat("<zip>{0}</zip>", shippingZip);
-            if (!string.IsNullOrEmpty(shippingCountry)) customerXml.AppendFormat("<country>{0}</country>", shippingCountry);
-            if (taxExempt) customerXml.AppendFormat("<tax_exempt>{0}</tax_exempt>", taxExempt.ToString().ToLowerInvariant());
-            customerXml.Append("</customer>");
-            // now make the request
-            string response = DoRequest(string.Format("customers.{0}", GetMethodExtension()), HttpRequestMethod.Post, customerXml.ToString());
-            // change the response to the object
-            return response.ConvertResponseTo<Customer>("customer");
+            return CreateCustomer(new CustomerRequest()
+            {
+                FirstName = firstName,
+                LastName = lastName,
+                Email = emailAddress,
+                Phone = phone,
+                Organization = organization,
+                SystemID = systemId,
+                CCEmails = ccEmails,
+                ShippingAddress = shippingAddress,
+                ShippingAddress2 = shippingAddress2,
+                ShippingCity = shippingCity,
+                ShippingState = shippingState,
+                ShippingZip = shippingZip,
+                ShippingCountry = shippingCountry,
+                TaxExempt = taxExempt
+            });
+
         }
 
         /// <summary>
@@ -514,27 +532,15 @@ namespace ChargifyNET
         /// <returns>The created chargify customer</returns>
         public ICustomer CreateCustomer(string firstName, string lastName, string emailAddress, string phone, string organization, string systemId)
         {
-            // make sure data is valid
-            if (string.IsNullOrEmpty(firstName)) throw new ArgumentNullException("firstName");
-            if (string.IsNullOrEmpty(lastName)) throw new ArgumentNullException("lastName");
-            if (string.IsNullOrEmpty(emailAddress)) throw new ArgumentNullException("emailAddress");
-            if (systemId == string.Empty) throw new ArgumentException("Empty SystemID not allowed", "systemId");
-            // make sure that the system ID is unique
-            if (LoadCustomer(systemId) != null) throw new ArgumentException("Not unique", "systemId");
-            // create XML for creation of customer
-            var customerXml = new StringBuilder(GetXmlStringIfApplicable());
-            customerXml.Append("<customer>");
-            customerXml.AppendFormat("<email>{0}</email>", emailAddress);
-            customerXml.AppendFormat("<first_name>{0}</first_name>", firstName);
-            customerXml.AppendFormat("<last_name>{0}</last_name>", lastName);
-            if (!string.IsNullOrEmpty(phone)) customerXml.AppendFormat("<{0}>{1}</{2}>", CustomerAttributes.PhoneKey, phone, CustomerAttributes.PhoneKey);
-            if (!string.IsNullOrEmpty(organization)) customerXml.AppendFormat("<organization>{0}</organization>", PCLWebUtility.WebUtility.HtmlEncode(organization));
-            if (!string.IsNullOrEmpty(systemId)) customerXml.AppendFormat("<reference>{0}</reference>", systemId);
-            customerXml.Append("</customer>");
-            // now make the request
-            string response = DoRequest(string.Format("customers.{0}", GetMethodExtension()), HttpRequestMethod.Post, customerXml.ToString());
-            // change the response to the object
-            return response.ConvertResponseTo<Customer>("customer");
+            return CreateCustomer(new CustomerRequest()
+            {
+                FirstName = firstName,
+                LastName = lastName,
+                Email = emailAddress,
+                Phone = phone,
+                Organization = organization,
+                SystemID = systemId
+            });
         }
 
         /// <summary>
@@ -6582,6 +6588,11 @@ namespace ChargifyNET
         private void RequireNotNull(string name, object str)
         {
             if (str == null || (str is string && string.IsNullOrWhiteSpace((string)str))) throw new ArgumentNullException($"{name}");
+        }
+
+        private void RequireArgument(string name, object str, string exceptionReason)
+        {
+            if (str == null || (str is string && string.IsNullOrWhiteSpace((string)str))) throw new ArgumentException($"{name}", exceptionReason);
         }
 
         private void RequireAtLeastOneElement<T>(string name, IList<T> list)
