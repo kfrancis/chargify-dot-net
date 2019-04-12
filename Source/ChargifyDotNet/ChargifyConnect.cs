@@ -270,8 +270,8 @@ namespace ChargifyNET
 
             // now make the request
             string response = !UseJSON 
-                ? DoNewRequest(url, HttpRequestMethod.Post, Metadata.GetMetadatumXml(chargifyId, metadatum))
-                : DoNewRequest(url, HttpRequestMethod.Post, new { metadata = metadatum });
+                ? DoNewRequest(url, HttpRequestMethod.Post, MetadataRequest.GetMetadatumXml(chargifyId, metadatum))
+                : DoNewRequest(url, HttpRequestMethod.Post, new { metadata = MetadataRequest.GetMetadatumRequest(metadatum) });
 
             var retVal = new List<IMetadata>();
 

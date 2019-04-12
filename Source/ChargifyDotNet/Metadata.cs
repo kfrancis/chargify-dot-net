@@ -27,10 +27,6 @@
 //
 #endregion
 
-using System.Collections.Generic;
-using System.Text;
-using Newtonsoft.Json;
-
 namespace ChargifyNET
 {
     #region Imports
@@ -130,14 +126,12 @@ namespace ChargifyNET
         /// <summary>
         /// The value of the attribute that was added to the resource
         /// </summary>
-        [JsonProperty("value")]
         public string Value { get { return _value; } set { _value = value; } }
         private string _value;
 
         /// <summary>
         /// The name of the attribute that is added to the resource
         /// </summary>
-        [JsonProperty("name")]
         public string Name { get { return _name; } set { _name = value; } }
         private string _name = string.Empty;
 
@@ -191,32 +185,6 @@ namespace ChargifyNET
             if (temp == null)
                 return false;
             return Equals(temp);
-        }
-        #endregion
-
-        #region XmlBuilders
-
-        internal static string GetMetadatumXml(long chargifyId, IList<Metadata> metadatum)
-        {
-            var metadataXml = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-            metadataXml.Append("<metadata type=\"array\">");
-            foreach (var metadata in metadatum)
-            {
-                metadataXml.Append("<metadatum>");
-                if (metadata.ResourceID > 0)
-                {
-                    metadataXml.AppendFormat("<resource-id>{0}</resource-id>", metadata.ResourceID);
-                }
-                else
-                {
-                    metadataXml.AppendFormat("<resource-id>{0}</resource-id>", chargifyId);
-                }
-                metadataXml.AppendFormat("<name>{0}</name>", metadata.Name);
-                metadataXml.AppendFormat("<value>{0}</value>", metadata.Value);
-                metadataXml.Append("</metadatum>");
-            }
-            metadataXml.Append("</metadata>");
-            return metadataXml.ToString();
         }
         #endregion
     }
