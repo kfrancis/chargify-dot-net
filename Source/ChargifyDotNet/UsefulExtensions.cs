@@ -1554,14 +1554,14 @@
         public static IntervalUnit GetJSONContentAsIntervalUnit(this JsonObject obj, string key)
         {
             IntervalUnit result = IntervalUnit.Unknown;
-            if (obj != null)
+            if (obj?.ContainsKey(key) == true)
             {
-                if (obj.ContainsKey(key))
+                JsonString str = obj[key] as JsonString;
+                if (str.Value != null)
                 {
-                    JsonString str = obj[key] as JsonString;
-                    if (str != null)
+                    if (!Enum.TryParse<IntervalUnit>(str.Value, true, out result))
                     {
-                        result = (IntervalUnit) Enum.Parse(typeof(IntervalUnit), str.Value, true);
+                        result = IntervalUnit.Unknown;
                     }
                 }
             }
@@ -1578,7 +1578,10 @@
             IntervalUnit result = IntervalUnit.Unknown;
             if (node.FirstChild != null)
             {
-                result = (IntervalUnit) Enum.Parse(typeof(IntervalUnit), node.FirstChild.Value, true);
+                if (!Enum.TryParse<IntervalUnit>(node.FirstChild.Value, true, out result))
+                {
+                    result = IntervalUnit.Unknown;
+                }
             }
             return result;
         }
