@@ -120,6 +120,11 @@ namespace ChargifyNET
         string CouponCode { get; set; }
 
         /// <summary>
+        /// (Optional) The coupon codes of the coupons to apply
+        /// </summary>
+        string[] CouponCodes { get; set; }
+
+        /// <summary>
         /// (Optional) The type of payment collection to be used in the subscription. May be 
         /// automatic, or invoice.
         /// </summary>
@@ -334,6 +339,19 @@ namespace ChargifyNET
         public bool ShouldSerializeCouponCode()
         {
             return !string.IsNullOrWhiteSpace(CouponCode);
+        }
+
+        /// <summary>
+        /// (Optional) The coupon codes of the coupons to apply
+        /// </summary>
+        [XmlElement("coupon_codes")]
+        public string[] CouponCodes { get; set; }
+        /// <summary>
+        /// Ignore, used to determine if the field should be serialized
+        /// </summary>
+        public bool ShouldSerializeCouponCodes()
+        {
+            return CouponCodes != null && CouponCodes.Length > 0;
         }
 
         /// <summary>
