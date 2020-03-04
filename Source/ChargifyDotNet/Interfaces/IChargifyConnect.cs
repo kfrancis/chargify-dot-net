@@ -282,9 +282,9 @@ namespace ChargifyNET
         /// </summary>
         /// <typeparam name="T">The type of resource. Currently either Subscription or Customer</typeparam>
         /// <param name="resourceID">The Chargify identifier for the resource</param>
-        /// <param name="page">Which page to return</param>
+        /// <param name="page">Which page to return -- Chargify Indexes Metadata Page at 1</param>
         /// <returns>The metadata result containing the response</returns>
-        IMetadataResult GetMetadataFor<T>(long resourceID, int? page);
+        IMetadataResult GetMetadataFor<T>(long resourceID, int? page = null);
 
         /// <summary>
         /// Allows you to set a group of metadata for a specific resource
@@ -293,7 +293,7 @@ namespace ChargifyNET
         /// <param name="chargifyId">The Chargify identifier for the resource</param>
         /// <param name="metadata">The list of metadata to set</param>
         /// <returns>The metadata result containing the response</returns>
-        List<IMetadata> SetMetadataFor<T>(long chargifyId, List<Metadata> metadata);
+        List<IMetadata> SetMetadataFor<T>(long chargifyId, IList<Metadata> metadata);
 
         /// <summary>
         /// Allows you to set a single metadata for a specific resource

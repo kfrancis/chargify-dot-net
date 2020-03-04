@@ -29,6 +29,8 @@
 #endregion
 
 // ReSharper disable once CheckNamespace
+using Newtonsoft.Json;
+
 namespace ChargifyNET
 {
     /// <summary>
@@ -51,11 +53,13 @@ namespace ChargifyNET
         /// <summary>
         /// The value of the attribute that was added to the resource
         /// </summary>
+        [JsonProperty("value")]
         string Value { get; set; }
 
         /// <summary>
         /// The name of the attribute that is added to the resource
         /// </summary>
+        [JsonProperty("name")]
         string Name { get; set; }
     }
 }

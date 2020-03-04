@@ -10,6 +10,8 @@ namespace ChargifyDotNetTests
     [TestClass]
     public class CustomerTests : ChargifyTestBase
     {
+        private const string StringWithNonUnicodeCharacters = "ÄäËëÏïÖöÜüŸß";
+        private const string StringWithAmpersand = "Foo&Bar";
         [TestMethod]
         public void Customer_CreateWithError()
         {
@@ -239,7 +241,7 @@ namespace ChargifyDotNetTests
         }
 
         [TestMethod]
-        public void Customer_OddCharactersForOrganization()
+        public void Customer_AmpersandForOrganization()
         {
             // Arrange
             string referenceID = Guid.NewGuid().ToString();
@@ -266,6 +268,186 @@ namespace ChargifyDotNetTests
             Assert.IsNotNull(createdCustomer);
             //Assert.IsInstanceOfType(createdCustomer, typeof(Customer));
             Assert.IsTrue(createdCustomer.Organization == customer.Organization);
+        }
+
+        [TestMethod]
+        public void Customer_NonUnicodeForOrganization()
+        {
+            // Arrange
+            string referenceID = Guid.NewGuid().ToString();
+            var customer = new Customer()
+            {
+                FirstName = Faker.Name.FirstName(),
+                LastName = Faker.Name.LastName(),
+                Email = Faker.Internet.Email(),
+                Phone = Faker.Phone.PhoneNumber(),
+                Organization = "Chargify&" + StringWithNonUnicodeCharacters,
+                SystemID = referenceID,
+                ShippingAddress = Faker.Address.StreetAddress(false),
+                ShippingAddress2 = Faker.Address.SecondaryAddress(),
+                ShippingCity = Faker.Address.City(),
+                ShippingState = Faker.Address.StateAbbr(),
+                ShippingZip = Faker.Address.ZipCode(),
+                ShippingCountry = "US"
+            };
+
+            // Act
+            var createdCustomer = Chargify.CreateCustomer(customer);
+
+            // Assert
+            Assert.IsNotNull(createdCustomer);
+            //Assert.IsInstanceOfType(createdCustomer, typeof(Customer));
+            Assert.IsTrue(createdCustomer.Organization == customer.Organization);
+        }
+
+        [TestMethod]
+        public void Customer_AmpersandCharactersForFirstName()
+        {
+            // Arrange
+            string referenceID = Guid.NewGuid().ToString();
+            var customer = new Customer()
+            {
+                FirstName = StringWithAmpersand,
+                LastName = Faker.Name.LastName(),
+                Email = Faker.Internet.Email(),
+                Phone = Faker.Phone.PhoneNumber(),
+                Organization = "",
+                SystemID = referenceID,
+                ShippingAddress = Faker.Address.StreetAddress(false),
+                ShippingAddress2 = Faker.Address.SecondaryAddress(),
+                ShippingCity = Faker.Address.City(),
+                ShippingState = Faker.Address.StateAbbr(),
+                ShippingZip = Faker.Address.ZipCode(),
+                ShippingCountry = "US"
+            };
+
+            // Act
+            var createdCustomer = Chargify.CreateCustomer(customer);
+
+            // Assert
+            Assert.IsNotNull(createdCustomer);
+            //Assert.IsInstanceOfType(createdCustomer, typeof(Customer));
+            Assert.IsTrue(createdCustomer.FirstName == customer.FirstName);
+        }
+        [TestMethod]
+        public void Customer_NonUnicodeCharactersForFirstName()
+        {
+            // Arrange
+            string referenceID = Guid.NewGuid().ToString();
+            var customer = new Customer()
+            {
+                FirstName = StringWithNonUnicodeCharacters,
+                LastName = Faker.Name.LastName(),
+                Email = Faker.Internet.Email(),
+                Phone = Faker.Phone.PhoneNumber(),
+                Organization = "",
+                SystemID = referenceID,
+                ShippingAddress = Faker.Address.StreetAddress(false),
+                ShippingAddress2 = Faker.Address.SecondaryAddress(),
+                ShippingCity = Faker.Address.City(),
+                ShippingState = Faker.Address.StateAbbr(),
+                ShippingZip = Faker.Address.ZipCode(),
+                ShippingCountry = "US"
+            };
+
+            // Act
+            var createdCustomer = Chargify.CreateCustomer(customer);
+
+            // Assert
+            Assert.IsNotNull(createdCustomer);
+            //Assert.IsInstanceOfType(createdCustomer, typeof(Customer));
+            Assert.IsTrue(createdCustomer.FirstName == customer.FirstName);
+        }
+
+
+        [TestMethod]
+        public void Customer_AmpersandCharactersForLastName()
+        {
+            // Arrange
+            string referenceID = Guid.NewGuid().ToString();
+            var customer = new Customer()
+            {
+                FirstName = Faker.Name.FirstName(),
+                LastName = StringWithAmpersand,
+                Email = Faker.Internet.Email(),
+                Phone = Faker.Phone.PhoneNumber(),
+                Organization = "",
+                SystemID = referenceID,
+                ShippingAddress = Faker.Address.StreetAddress(false),
+                ShippingAddress2 = Faker.Address.SecondaryAddress(),
+                ShippingCity = Faker.Address.City(),
+                ShippingState = Faker.Address.StateAbbr(),
+                ShippingZip = Faker.Address.ZipCode(),
+                ShippingCountry = "US"
+            };
+
+            // Act
+            var createdCustomer = Chargify.CreateCustomer(customer);
+
+            // Assert
+            Assert.IsNotNull(createdCustomer);
+            //Assert.IsInstanceOfType(createdCustomer, typeof(Customer));
+            Assert.IsTrue(createdCustomer.FirstName == customer.FirstName);
+        }
+        [TestMethod]
+        public void Customer_NonUnicodeCharactersForLastName()
+        {
+            // Arrange
+            string referenceID = Guid.NewGuid().ToString();
+            var customer = new Customer()
+            {
+                FirstName = Faker.Name.FirstName(),
+                LastName = StringWithNonUnicodeCharacters,
+                Email = Faker.Internet.Email(),
+                Phone = Faker.Phone.PhoneNumber(),
+                Organization = "",
+                SystemID = referenceID,
+                ShippingAddress = Faker.Address.StreetAddress(false),
+                ShippingAddress2 = Faker.Address.SecondaryAddress(),
+                ShippingCity = Faker.Address.City(),
+                ShippingState = Faker.Address.StateAbbr(),
+                ShippingZip = Faker.Address.ZipCode(),
+                ShippingCountry = "US"
+            };
+
+            // Act
+            var createdCustomer = Chargify.CreateCustomer(customer);
+
+            // Assert
+            Assert.IsNotNull(createdCustomer);
+            //Assert.IsInstanceOfType(createdCustomer, typeof(Customer));
+            Assert.IsTrue(createdCustomer.FirstName == customer.FirstName);
+        }
+
+      
+        [TestMethod]
+        public void Customer_NonUnicodeCharactersForEmailAddress()
+        {
+            // Arrange
+            string referenceID = Guid.NewGuid().ToString();
+            var customer = new Customer()
+            {
+                FirstName = Faker.Name.FirstName(),
+                LastName = Faker.Name.LastName(),
+                Email = $"{StringWithNonUnicodeCharacters}@gmail.com",
+                Phone = Faker.Phone.PhoneNumber(),
+                Organization = "",
+                SystemID = referenceID,
+                ShippingAddress = Faker.Address.StreetAddress(false),
+                ShippingAddress2 = Faker.Address.SecondaryAddress(),
+                ShippingCity = Faker.Address.City(),
+                ShippingState = Faker.Address.StateAbbr(),
+                ShippingZip = Faker.Address.ZipCode(),
+                ShippingCountry = "US"
+            };
+
+            // Act
+            var createdCustomer = Chargify.CreateCustomer(customer);
+
+            // Assert
+            Assert.IsNotNull(createdCustomer);
+            //Assert.IsInstanceOfType(createdCustomer, typeof(Customer));
+            Assert.IsTrue(createdCustomer.FirstName == customer.FirstName);
         }
 
         [TestMethod]
