@@ -49,8 +49,8 @@ namespace ChargifyNET
         /// <summary>
         /// Invoices are issued to users, paid and organized by staff
         /// </summary>
-        [XmlEnum("invoice")]
-        Invoice,
+        [XmlEnum("remittance")]
+        Remittance,
         /// <summary>
         /// The default state if the value could not be parsed, or wasn't sent.
         /// </summary>
