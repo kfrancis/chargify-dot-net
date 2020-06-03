@@ -141,8 +141,11 @@ namespace ChargifyNET
                     case ReferenceKey:
                         SystemID = obj.GetJSONContentAsString(key);
                         break;
+                    case CCEmailsKey:
+                        CCEmails = obj.GetJSONContentAsString(key);
+                        break;
                     case IdKey:
-                        _chargifyId = obj.GetJSONContentAsInt(key);
+                        ChargifyID = obj.GetJSONContentAsLong(key);
                         break;
                     case CreatedAtKey:
                         _created = obj.GetJSONContentAsDateTime(key);
@@ -206,8 +209,11 @@ namespace ChargifyNET
                     case ReferenceKey:
                         SystemID = dataNode.GetNodeContentAsString();
                         break;
+                    case CCEmailsKey:
+                        CCEmails = dataNode.GetNodeContentAsString();
+                        break;
                     case IdKey:
-                        _chargifyId = dataNode.GetNodeContentAsInt();
+                        ChargifyID = dataNode.GetNodeContentAsLong();
                         break;
                     case CreatedAtKey:
                         _created = dataNode.GetNodeContentAsDateTime();
@@ -250,14 +256,8 @@ namespace ChargifyNET
         /// <summary>
         /// Get the customer's chargify ID
         /// </summary>
-        public int ChargifyID
-        {
-            get
-            {
-                return _chargifyId;
-            }
-        }
-        private int _chargifyId = int.MinValue;
+        public long ChargifyID { get; private set; } = long.MinValue;
+
         /// <summary>
         /// Get the date and time the customer was created a Chargify
         /// </summary>
@@ -289,7 +289,7 @@ namespace ChargifyNET
         {
             get
             {
-                return !(ChargifyID == int.MinValue);
+                return !(ChargifyID == long.MinValue);
             }
         }
 

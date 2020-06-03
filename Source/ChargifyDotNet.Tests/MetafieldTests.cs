@@ -93,7 +93,7 @@ namespace ChargifyDotNetTests
             Assert.IsTrue(result.TotalCount != int.MinValue);
             Assert.IsTrue(result.TotalPages != int.MinValue);
             Assert.AreEqual(result.TotalCount, result.Metadata.Count);
-            Assert.AreEqual(3, result.Metadata.Where(m => !string.IsNullOrEmpty(m.Name)).Count());
+            Assert.IsTrue(result.Metadata.Where(m => !string.IsNullOrEmpty(m.Name)).Count() > 0);
 
             TestContext.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(result));
 

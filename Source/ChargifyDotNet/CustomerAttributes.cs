@@ -11,7 +11,7 @@
 //  Permission is hereby granted, free of charge, to any person obtaining a
 //  copy of this software and associated documentation files (the "Software"),
 //  to deal in the Software without restriction, including without limitation
-//  the rights to use, copy, modify, merge, publish, distribute, sublicense,
+//  the rights to use, copy, modify, merge, publish, distribute, sub license,
 //  and/or sell copies of the Software, and to permit persons to whom the
 //  Software is furnished to do so, subject to the following conditions:
 //
@@ -54,6 +54,7 @@ namespace ChargifyNET
         internal const string OrganizationKey = "organization";
         internal const string VatNumberKey = "vat_number";
         internal const string ReferenceKey = "reference";
+        internal const string CCEmailsKey = "cc_emails";
         internal const string IdKey = "id";
         internal const string CreatedAtKey = "created_at";
         internal const string UpdatedAtKey = "updated_at";
@@ -141,7 +142,7 @@ namespace ChargifyNET
         internal CustomerAttributes(XmlNode customerAttributesNode)
         {
             if (customerAttributesNode == null) throw new ArgumentNullException(nameof(customerAttributesNode));
-            if (customerAttributesNode.Name != "customer_attributes") throw new ArgumentException("Not a vaild customer attributes node", nameof(customerAttributesNode));
+            if (customerAttributesNode.Name != "customer_attributes") throw new ArgumentException("Not a valid customer attributes node", nameof(customerAttributesNode));
             if (customerAttributesNode.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(customerAttributesNode));
             LoadFromNode(customerAttributesNode);
         }
@@ -153,7 +154,7 @@ namespace ChargifyNET
         public CustomerAttributes(JsonObject customerAttributesObject)
         {
             if (customerAttributesObject == null) throw new ArgumentNullException(nameof(customerAttributesObject));
-            if (customerAttributesObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild customer attributes object", nameof(customerAttributesObject));
+            if (customerAttributesObject.Keys.Count <= 0) throw new ArgumentException("Not a valid customer attributes object", nameof(customerAttributesObject));
         }
 
         /// <summary>
@@ -183,6 +184,9 @@ namespace ChargifyNET
                         break;
                     case ReferenceKey:
                         _systemId = obj.GetJSONContentAsString(key);
+                        break;
+                    case CCEmailsKey:
+                        CCEmails = obj.GetJSONContentAsString(key);
                         break;
                     case ShippingAddressKey:
                         ShippingAddress = obj.GetJSONContentAsString(key);
@@ -236,6 +240,9 @@ namespace ChargifyNET
                         break;
                     case ReferenceKey:
                         _systemId = dataNode.GetNodeContentAsString();
+                        break;
+                    case CCEmailsKey:
+                        CCEmails = dataNode.GetNodeContentAsString();
                         break;
                     case ShippingAddressKey:
                         ShippingAddress = dataNode.GetNodeContentAsString();
@@ -457,6 +464,19 @@ namespace ChargifyNET
         public bool ShouldSerializeSystemId()
         {
             return !string.IsNullOrEmpty(SystemID);
+        }
+
+        /// <summary>
+        /// Get or set the customer's cc emails
+        /// </summary>
+        [XmlElement("cc_emails")]
+        public string CCEmails { get; set; }
+        /// <summary>
+        /// Ignore, used for determining if the value should be serialized
+        /// </summary>
+        public bool ShouldSerializeCCEmails()
+        {
+            return !string.IsNullOrEmpty(CCEmails);
         }
 
         /// <summary>

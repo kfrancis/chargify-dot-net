@@ -127,14 +127,14 @@ namespace ChargifyNET
         /// </summary>
         /// <param name="ChargifyID">The product family ID</param>
         /// <returns>A dictionary of components if there are results, null otherwise.</returns>
-        IDictionary<int, IComponentInfo> GetComponentsForProductFamily(int ChargifyID);
+        IDictionary<int, IComponentInfo> GetComponentsForProductFamily(long chargifyId);
         /// <summary>
         /// Method for getting a list of components for a specific product family
         /// </summary>
         /// <param name="ChargifyID">The product family ID</param>
         /// <param name="includeArchived">Filter flag for archived components</param>
         /// <returns>A dictionary of components if there are results, null otherwise.</returns>
-        IDictionary<int, IComponentInfo> GetComponentsForProductFamily(int ChargifyID, bool includeArchived);
+        IDictionary<int, IComponentInfo> GetComponentsForProductFamily(long chargifyId, bool includeArchived);
         /// <summary>
         /// Returns all components "attached" to that subscription.
         /// </summary>
@@ -242,7 +242,7 @@ namespace ChargifyNET
         /// </summary>
         /// <param name="ChargifyId">The ID of the customer (not reference)</param>
         /// <returns>The billing portal management link and additional information</returns>
-        IBillingManagementInfo GetManagementLink(int ChargifyId);
+        IBillingManagementInfo GetManagementLink(long chargifyId);
         #endregion
 
         #region Invoices
@@ -282,18 +282,18 @@ namespace ChargifyNET
         /// </summary>
         /// <typeparam name="T">The type of resource. Currently either Subscription or Customer</typeparam>
         /// <param name="resourceID">The Chargify identifier for the resource</param>
-        /// <param name="page">Which page to return</param>
+        /// <param name="page">Which page to return -- Chargify Indexes Metadata Page at 1</param>
         /// <returns>The metadata result containing the response</returns>
-        IMetadataResult GetMetadataFor<T>(int resourceID, int? page);
+        IMetadataResult GetMetadataFor<T>(long resourceID, int? page = null);
 
         /// <summary>
         /// Allows you to set a group of metadata for a specific resource
         /// </summary>
         /// <typeparam name="T">The type of resource. Currently either Subscription or Customer</typeparam>
-        /// <param name="chargifyID">The Chargify identifier for the resource</param>
+        /// <param name="chargifyId">The Chargify identifier for the resource</param>
         /// <param name="metadata">The list of metadata to set</param>
         /// <returns>The metadata result containing the response</returns>
-        List<IMetadata> SetMetadataFor<T>(int chargifyID, List<Metadata> metadata);
+        List<IMetadata> SetMetadataFor<T>(long chargifyId, IList<Metadata> metadata);
 
         /// <summary>
         /// Allows you to set a single metadata for a specific resource
@@ -302,7 +302,7 @@ namespace ChargifyNET
         /// <param name="chargifyID">The Chargify identifier for the resource</param>
         /// <param name="metadata">The list of metadata to set</param>
         /// <returns>The metadata result containing the response</returns>
-        List<IMetadata> SetMetadataFor<T>(int chargifyID, Metadata metadata);
+        List<IMetadata> SetMetadataFor<T>(long chargifyId, Metadata metadata);
         #endregion
 
         #region Sites
@@ -636,7 +636,7 @@ namespace ChargifyNET
         /// <param name="ChargifyID">The integer identifier of the customer</param>
         /// <returns>True if the customer was deleted, false otherwise.</returns>
         /// <remarks>This method does not currently work, but it will once they open up the API. This will always return false, as Chargify will send a Http Forbidden everytime.</remarks>
-        bool DeleteCustomer(int ChargifyID);
+        bool DeleteCustomer(long chargifyId);
         /// <summary>
         /// Delete the specified customer
         /// </summary>
@@ -675,7 +675,7 @@ namespace ChargifyNET
         /// </summary>
         /// <param name="ChargifyID">The chargify id of the customer</param>
         /// <returns>The requested customer, null otherwise</returns>
-        ICustomer LoadCustomer(int ChargifyID);
+        ICustomer LoadCustomer(long ChargifyID);
         /// <summary>
         /// Load the requested customer from chargify
         /// </summary>
@@ -938,7 +938,7 @@ namespace ChargifyNET
         /// <param name="ChargifyID">The Chargify ID of the customer</param>
         /// <param name="PaymentCollectionMethod">Optional, type of payment collection method</param>
         /// <returns>The xml describing the new subsscription</returns>
-        ISubscription CreateSubscription(string ProductHandle, int ChargifyID, PaymentCollectionMethod? PaymentCollectionMethod = PaymentCollectionMethod.Automatic);
+        ISubscription CreateSubscription(string ProductHandle, long chargifyId, PaymentCollectionMethod? PaymentCollectionMethod = PaymentCollectionMethod.Automatic);
         /// <summary>
         /// Create a new subscription 
         /// </summary>
@@ -946,7 +946,7 @@ namespace ChargifyNET
         /// <param name="ChargifyID">The Chargify ID of the customer</param>
         /// <param name="CreditCardAttributes">The credit card attributes</param>
         /// <returns>The xml describing the new subsscription</returns>
-        ISubscription CreateSubscription(string ProductHandle, int ChargifyID, ICreditCardAttributes CreditCardAttributes);
+        ISubscription CreateSubscription(string ProductHandle, long chargifyId, ICreditCardAttributes CreditCardAttributes);
         /// <summary>
         /// Create a subscription
         /// </summary>
@@ -955,8 +955,8 @@ namespace ChargifyNET
         /// <param name="CreditCardAttributes">The credit card attributes to use for the new subscription</param>
         /// <param name="NextBillingAt">The date that should be used for the next_billing_at</param>
         /// <returns>The new subscription, if successful. Null otherwise.</returns>
-        ISubscription CreateSubscription(string ProductHandle, int ChargifyID, ICreditCardAttributes CreditCardAttributes, DateTime NextBillingAt);
-        //ISubscription CreateSubscription(string ProductHandle, int ChargifyID, ICreditCardAttributes CreditCardAttributes, DateTime NextBillingAt);
+        ISubscription CreateSubscription(string ProductHandle, long chargifyId, ICreditCardAttributes CreditCardAttributes, DateTime NextBillingAt);
+        //ISubscription CreateSubscription(string ProductHandle, long chargifyId, ICreditCardAttributes CreditCardAttributes, DateTime NextBillingAt);
         /// <summary>
         /// Create a subscription using a coupon for discounted rate, without using credit card information.
         /// </summary>
@@ -965,7 +965,7 @@ namespace ChargifyNET
         /// <param name="CouponCode">The discount coupon code</param>
         /// <param name="paymentCollectionMethod">Optional, type of payment collection method</param>
         /// <returns>If sucessful, the subscription object. Otherwise null.</returns>
-        ISubscription CreateSubscription(string ProductHandle, int ChargifyID, string CouponCode, PaymentCollectionMethod? paymentCollectionMethod);
+        ISubscription CreateSubscription(string ProductHandle, long chargifyId, string CouponCode, PaymentCollectionMethod? paymentCollectionMethod);
         /// <summary>
         /// Create a new subscription without requiring credit card information
         /// </summary>
@@ -1066,7 +1066,7 @@ namespace ChargifyNET
         /// <param name="CreditCardAttributes">The credit card attributes to use for this transaction</param>
         /// <param name="CouponCode">The discount coupon code</param>
         /// <returns></returns>
-        ISubscription CreateSubscriptionUsingCoupon(string ProductHandle, int ChargifyID, ICreditCardAttributes CreditCardAttributes, string CouponCode);
+        ISubscription CreateSubscriptionUsingCoupon(string ProductHandle, long chargifyId, ICreditCardAttributes CreditCardAttributes, string CouponCode);
         /// <summary>
         /// Create a new subscription 
         /// </summary>
@@ -1074,7 +1074,7 @@ namespace ChargifyNET
         /// <param name="ChargifyID">The Chargify ID of the customer</param>
         /// <param name="CouponCode">The discount coupon code</param>
         /// <returns>The xml describing the new subsscription</returns>
-        ISubscription CreateSubscriptionUsingCoupon(string ProductHandle, int ChargifyID, string CouponCode);
+        ISubscription CreateSubscriptionUsingCoupon(string ProductHandle, long chargifyId, string CouponCode);
         /// <summary>
         /// Create a new subscription 
         /// </summary>
@@ -1163,7 +1163,7 @@ namespace ChargifyNET
         /// </summary>
         /// <param name="ChargifyID">The ChargifyID of the customer</param>
         /// <returns>A list of subscriptions</returns>
-        IDictionary<int, ISubscription> GetSubscriptionListForCustomer(int ChargifyID);
+        IDictionary<int, ISubscription> GetSubscriptionListForCustomer(long chargifyId);
         /// <summary>
         /// Method to get the secure URL for updating the payment details for a subscription.
         /// </summary>
