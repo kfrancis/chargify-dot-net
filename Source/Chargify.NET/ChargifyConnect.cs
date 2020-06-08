@@ -40,6 +40,7 @@ namespace ChargifyNET
     using System.Xml;
     using System.Globalization;
     using Newtonsoft.Json;
+    using System.Linq;
     #endregion
 
     /// <summary>
@@ -461,6 +462,61 @@ namespace ChargifyNET
                 string response = DoRequest(string.Format("customers/lookup.{0}?reference={1}", GetMethodExtension(), systemId));
                 // change the response to the object
                 return response.ConvertResponseTo<Customer>("customer");
+            }
+            catch (ChargifyException cex)
+            {
+                if (cex.StatusCode == HttpStatusCode.NotFound) return null;
+                throw;
+            }
+        }
+
+        public ICustomer FindCustomerByEmail(string emailAddress)
+        {
+            try
+            {
+                // make sure data is valid
+                if (emailAddress == string.Empty) throw new ArgumentException("Empty Email Address not allowed", "emailAddress");
+                string response = DoRequest(string.Format("customers.{0}?q={1}", GetMethodExtension(), HttpUtility.UrlEncode(emailAddress)));
+                if (response.IsXml())
+                {
+                    // now build customer object based on response as XML
+                    XmlDocument doc = new XmlDocument();
+                    doc.LoadXml(response); // get the XML into an XML document
+                    if (doc.ChildNodes.Count == 0) throw new InvalidOperationException("Returned XML not valid");
+                    // loop through the child nodes of this node
+                    foreach (XmlNode elementNode in doc.ChildNodes)
+                    {
+                        if (elementNode.Name == "customers")
+                        {
+                            foreach (XmlNode customerNode in elementNode.ChildNodes)
+                            {
+                                if (customerNode.Name == "customer")
+                                {
+                                    ICustomer loadedCustomer = new Customer(customerNode);
+                                    return loadedCustomer;
+                                }
+                            }
+                        }
+                    }
+                }
+                else if (response.IsJSON())
+                {
+                    // should be expecting an array
+                    int position = 0;
+                    JsonArray array = JsonArray.Parse(response, ref position);
+                    for (int i = 0; i <= array.Length - 1; i++)
+                    {
+                        var jsonObject = array.Items[i] as JsonObject;
+                        if (jsonObject != null && jsonObject.ContainsKey("customer"))
+                        {
+                            JsonObject customerObj = (array.Items[i] as JsonObject)["customer"] as JsonObject;
+                            ICustomer loadedCustomer = new Customer(customerObj);
+                            return loadedCustomer;
+                        }
+                    }
+                }
+
+                return null;
             }
             catch (ChargifyException cex)
             {
