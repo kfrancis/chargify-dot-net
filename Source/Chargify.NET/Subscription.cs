@@ -80,6 +80,7 @@ namespace ChargifyNET
         private const string ProductPriceInCentsKey = "product_price_in_cents";
         private const string NextProductIdKey = "next_product_id";
         private const string ReferralCodeKey = "referral_code";
+        private const string CurrencyKey = "currency";
         #endregion
 
         #region Constructors
@@ -237,6 +238,9 @@ namespace ChargifyNET
                     case ReferralCodeKey:
                         _referralCode = obj.GetJSONContentAsString(key);
                         break;
+                    case CurrencyKey:
+                        Currency = obj.GetJSONContentAsString(key);
+                        break;
                 }
             }
         }
@@ -339,6 +343,9 @@ namespace ChargifyNET
                         break;
                     case ReferralCodeKey:
                         _referralCode = dataNode.GetNodeContentAsString();
+                        break;
+                    case CurrencyKey:
+                        Currency = dataNode.GetNodeContentAsString();
                         break;
                 }
             }
@@ -562,6 +569,14 @@ namespace ChargifyNET
             }
         }
         private IProduct _product;
+
+        /// <summary>
+        /// Gets the currency.
+        /// </summary>
+        /// <value>
+        /// The currency.
+        /// </value>
+        public string Currency { get; private set; }
 
         /// <summary>
         /// Get the credit card information for this subscription

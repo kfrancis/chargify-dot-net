@@ -258,7 +258,7 @@ namespace ChargifyNET
     /// </summary>
     [XmlType("subscription")]
     [Serializable]
-    public class SubscriptionCreateOptions: ISubscriptionCreateOptions
+    public class SubscriptionCreateOptions : ISubscriptionCreateOptions
     {
         /// <summary>
         /// The list of components to set when creating the subscription
@@ -521,5 +521,8 @@ namespace ChargifyNET
 
         //[XmlElement("metafields")]
         //public Dictionary<string, string> Metafields { get; set; }
+
+        [XmlElement("currency")]
+        public string Currency { get; set; }
     }
 }

@@ -227,8 +227,16 @@ namespace ChargifyNET
         /// </summary>
         IProduct Product { get; }
         /// <summary>
+        /// Gets or sets the currency.
+        /// </summary>
+        /// <value>
+        /// The currency.
+        /// </value>
+        string Currency { get; }
+        /// <summary>
         /// Get the credit card details for this subscription
         /// </summary>
+        /// 
         IPaymentProfileView PaymentProfile { get; }
         /// <summary>
         /// Get the customer details for this subscription
