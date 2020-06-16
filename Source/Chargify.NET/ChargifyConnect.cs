@@ -4333,6 +4333,50 @@ namespace ChargifyNET
         }
 
         /// <summary>
+        /// Method for updating the price-point of a Component on a Subscription
+        /// </summary>
+        /// <param name="subscriptionId">The subscriptionID to modify</param>
+        /// <param name="componentId">The ID of the (metered or quantity) component to add a usage of</param>
+        /// <param name="quantity">The number of usages to add</param>
+        /// <param name="memo">The memo for the usage</param>
+        /// <returns>The usage added if successful, otherwise null.</returns>
+        public IComponentPricePoint UpdatePricePoint(int subscriptionId, int componentId, string pricePointHandle)
+        {
+            // Chargify DOES currently allow a negative value for "quantity", so allow users to call this method that way.
+            //if (Quantity < 0) throw new ArgumentNullException("Quantity");
+            if (string.IsNullOrEmpty(pricePointHandle)) throw new ArgumentNullException("pricePointHandle");
+            // make sure that the SubscriptionID is unique
+            if (LoadSubscription(subscriptionId) == null) throw new ArgumentException("Not an SubscriptionID", "subscriptionId");
+            // create XML for addition of usage
+            StringBuilder usageXml = new StringBuilder(GetXmlStringIfApplicable());
+            if (UseJSON) 
+            {
+                usageXml.Append("{");
+                usageXml.Append("\"components\": [");
+                usageXml.Append("{");
+                usageXml.AppendFormat("\"component_id\": {0},", componentId);
+                usageXml.AppendFormat("\"price_point\":\"{0}\"", HttpUtility.HtmlEncode(pricePointHandle));
+                usageXml.Append("}");
+                usageXml.Append("]");
+                usageXml.Append("}");
+            }
+            else
+            {
+                usageXml.Append("<components>");
+                usageXml.Append("<element>");
+                usageXml.AppendFormat("<component_id>{0}</component_id>", componentId);
+                usageXml.AppendFormat("<price_point>{0}</price_point>", HttpUtility.HtmlEncode(pricePointHandle));
+                usageXml.Append("</element>");
+                usageXml.Append("</components>");
+            }
+            
+            
+            string response = DoRequest(string.Format("subscriptions/{0}/price_points.{1}", subscriptionId, GetMethodExtension()), HttpRequestMethod.Post, usageXml.ToString());
+            // change the response to the object            
+            return response.ConvertResponseTo<ComponentPricePoint>("usage");
+        }
+
+        /// <summary>
         /// Method for turning on or off a component
         /// </summary>
         /// <param name="subscriptionId">The ID of the subscription to modify</param>
@@ -6133,9 +6177,16 @@ namespace ChargifyNET
                 {
                     if (UseJSON)
                     {
-                        XmlDocument doc = new XmlDocument();
-                        doc.LoadXml(postData);
-                        dataToPost = XmlToJsonConverter.XmlToJson(doc);
+                        try
+                        {
+                            XmlDocument doc = new XmlDocument();
+                            doc.LoadXml(postData);
+                            dataToPost = XmlToJsonConverter.XmlToJson(doc);
+                        }
+                        catch (XmlException)
+                        {
+                            dataToPost = postData;
+                        }
                     }
 
                     // Wrap the request stream with a text-based writer

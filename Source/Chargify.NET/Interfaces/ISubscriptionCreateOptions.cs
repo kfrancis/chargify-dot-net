@@ -211,6 +211,20 @@ namespace ChargifyNET
             return AllocatedQuantity.HasValue;
         }
 
+        /// <summary>
+        /// The price point identifier.
+        /// </summary>
+        [XmlElement("price_point_id")]
+        public int PricePointId { get; set; }
+
+        /// <summary>
+        /// Ignore, used to determine if the field should be serialized
+        /// </summary>
+        public bool ShouldSerializePricePointId()
+        {
+            return AllocatedQuantity.HasValue;
+        }
+
         ///// <summary>
         ///// The scheme used if the proration was an upgrade. This is only present when the allocation was created mid-period.
         ///// </summary>
