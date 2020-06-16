@@ -118,7 +118,6 @@
     <Compile Include="ComponentAttributes.cs" />
     <Compile Include="ComponentInfo.cs" />
     <Compile Include="ComponentPricePoint.cs" />
-    <Compile Include="ComponentUsage.cs" />
     <Compile Include="Data\Configuration\ChargifyAccountElement.cs" />
     <Compile Include="Data\Configuration\ChargifyAccountElementCollection.cs" />
     <Compile Include="Data\Configuration\ChargifyAccountRetrieverSection.cs" />
@@ -131,7 +130,6 @@
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="HttpRequestMethod.cs" />
     <Compile Include="Interfaces\IComponentPricePoint.cs" />
-    <Compile Include="Interfaces\IComponentUsage.cs" />
     <Compile Include="Interfaces\ICouponUsage.cs" />
     <Compile Include="Interfaces\IGetRelationshipInvoiceListResponse.cs" />
     <Compile Include="Interfaces\IMetadata.cs" />
