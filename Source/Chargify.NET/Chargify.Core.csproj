@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Data\Controls\**" />
+    <EmbeddedResource Remove="Data\Controls\**" />
+    <None Remove="Data\Controls\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="ChargifyPage.cs" />
+    <Compile Remove="Properties\AssemblyInfo.cs" />
+    <Compile Remove="SubscriptionPostbackHandler.cs" />
+    <Compile Remove="WebhookHandler.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.7.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+
+</Project>
