@@ -41,6 +41,7 @@ namespace ChargifyNET
     using System.Globalization;
     using Newtonsoft.Json;
     using System.Linq;
+    using System.Xml.Linq;
     #endregion
 
     /// <summary>
@@ -302,19 +303,16 @@ namespace ChargifyNET
             if (metadata.Value == null) throw new ArgumentNullException(nameof(metadata), "Metadata.Value");
 
             // create XML for creation of metadata
-            var metadataXml = new StringBuilder(GetXmlStringIfApplicable());
-            metadataXml.Append("<metadata>");
-            if (metadata.ResourceID > 0)
-            {
-                metadataXml.AppendFormat("<resource-id>{0}</resource-id>", metadata.ResourceID);
-            }
-            else
-            {
-                metadataXml.AppendFormat("<resource-id>{0}</resource-id>", chargifyId);
-            }
-            metadataXml.AppendFormat("<name>{0}</name>", metadata.Name);
-            metadataXml.AppendFormat("<value>{0}</value>", metadata.Value);
-            metadataXml.Append("</metadata>");
+            XElement metadataElement = new XElement("metadata");
+            metadataElement.Add(new XElement("resource-id", metadata.ResourceID > 0 ? metadata.ResourceID : chargifyId));
+            metadataElement.Add(new XElement("name", metadata.Name));
+            metadataElement.Add(new XElement("value", metadata.Value));
+
+            //Would be nicer to do this with an XDecleration, but that doesn't seem to have a constructor from a string
+            string payload = new StringBuilder(GetXmlStringIfApplicable())
+                .Append(metadataElement.ToString(SaveOptions.DisableFormatting))
+                .ToString();
+
 
             string url;
             switch (typeof(T).Name.ToLowerInvariant())
@@ -330,7 +328,7 @@ namespace ChargifyNET
             }
 
             // now make the request
-            string response = DoRequest(url, HttpRequestMethod.Post, metadataXml.ToString());
+            string response = DoRequest(url, HttpRequestMethod.Post, payload);
 
             var retVal = new List<IMetadata>();
 
