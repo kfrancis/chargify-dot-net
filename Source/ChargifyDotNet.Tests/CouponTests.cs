@@ -29,6 +29,30 @@ namespace ChargifyDotNetTests
             Assert.IsTrue(result.Amount == (Convert.ToDecimal(result.AmountInCents)/100));
             Assert.AreEqual(result.ID, couponID);
         }
+
+        [TestMethod]
+        public void Coupon_Read_Percentage()
+        {
+            // Arrange
+            var productFamily = Chargify.GetProductFamilyList().Values.FirstOrDefault();
+            if (productFamily == null) Assert.Inconclusive("A valid product family could not be found.");
+            var coupons = Chargify.GetAllCoupons(productFamily.ID);
+            var coupon = coupons.FirstOrDefault(c => c.Value.Percentage > 0).Value;
+            var couponID = coupon.ID;
+
+            // Act
+            var result = Chargify.LoadCoupon(productFamily.ID, couponID);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result.Percentage != decimal.MinValue);
+            Assert.IsTrue(result.Percentage > 0);
+            Assert.AreEqual(coupon.Percentage, result.Percentage);
+            Assert.AreEqual(result.ID, couponID);
+
+            TestContext.WriteLine($"Coupon percentage: {coupon.Percentage}");
+        }
+
         [TestMethod]
         public void Coupon_Create()
         {

@@ -116,9 +116,9 @@ namespace ChargifyNET
         int DurationPeriodCount { get; set; }
 
         /// <summary>
-        /// If percentage based, the percentage. Int.MinValue otherwise.
+        /// If percentage based, the percentage. decimal.MinValue otherwise.
         /// </summary>
-        int Percentage { get; set; }
+        decimal Percentage { get; set; }
 
         /// <summary>
         /// Is this a recurring coupon?

@@ -3896,7 +3896,7 @@ namespace ChargifyNET
         /// <param name="durationPeriodCount">How long does the coupon last?</param>
         /// <param name="endDate">At what point will the coupon no longer be valid?</param>
         /// <returns></returns>
-        private string BuildCouponXml(int productFamilyId, string name, string code, string description, decimal amount, int percentage, bool allowNegativeBalance,
+        private string BuildCouponXml(int productFamilyId, string name, string code, string description, decimal amount, decimal percentage, bool allowNegativeBalance,
             bool recurring, int durationPeriodCount, DateTime endDate)
         {
             // make sure data is valid
