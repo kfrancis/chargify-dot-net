@@ -1310,18 +1310,17 @@
         /// <param name="obj">The object to retrieve the Transaction value from</param>
         /// <param name="key">The key of the Transaction field in the JsonObject</param>
         /// <returns>The Transaction value, null otherwise.</returns>
-        public static Transaction GetJSONContentAsTransaction(this JsonObject obj, string key)
+        public static IntervalUnit GetJSONContentAsIntervalUnit(this JsonObject obj, string key)
         {
-            Transaction result = null;
-            if (obj != null)
+            IntervalUnit result = IntervalUnit.Unknown;
+            if (obj?.ContainsKey(key) == true)
             {
-                if (obj.ContainsKey(key))
+                JsonString str = obj[key] as JsonString;
+                if (str.Value != null)
                 {
-                    JsonObject transactionObj = obj[key] as JsonObject;
-                    if (transactionObj != null)
+                    if (!Enum.TryParse<IntervalUnit>(str.Value, true, out result))
                     {
-                        // create the new transaction object
-                        result = new Transaction(transactionObj);
+                        result = IntervalUnit.Unknown;
                     }
                 }
             }
@@ -1338,14 +1337,14 @@
         public static IntervalUnit GetJSONContentAsIntervalUnit(this JsonObject obj, string key)
         {
             IntervalUnit result = IntervalUnit.Unknown;
-            if (obj != null)
+            if (obj?.ContainsKey(key) == true)
             {
-                if (obj.ContainsKey(key))
+                JsonString str = obj[key] as JsonString;
+                if (str.Value != null)
                 {
-                    JsonString str = obj[key] as JsonString;
-                    if (str != null)
+                    if (!Enum.TryParse<IntervalUnit>(str.Value, true, out result))
                     {
-                        result = (IntervalUnit) Enum.Parse(typeof(IntervalUnit), str.Value, true);
+                        result = IntervalUnit.Unknown;
                     }
                 }
             }
@@ -1362,7 +1361,10 @@
             IntervalUnit result = IntervalUnit.Unknown;
             if (node.FirstChild != null)
             {
-                result = (IntervalUnit) Enum.Parse(typeof(IntervalUnit), node.FirstChild.Value, true);
+                if (!Enum.TryParse<IntervalUnit>(node.FirstChild.Value, true, out result))
+                {
+                    result = IntervalUnit.Unknown;
+                }
             }
             return result;
         }
