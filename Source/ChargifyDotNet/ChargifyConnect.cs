@@ -434,12 +434,12 @@ namespace ChargifyNET
         private ICustomer CreateCustomer(CustomerRequest customer)
         {
 #if !DEBUG
-            RequireNotNull("firstName", firstName);
-            RequireNotNull("lastName", lastName);
-            RequireNotNull("emailAddress", emailAddress);
-            RequireArgument("systemId", systemId, "Empty SystemID not allowed");
+            RequireNotNull("firstName", customer.FirstName);
+            RequireNotNull("lastName", customer.LastName);
+            RequireNotNull("emailAddress", customer.Email);
+            RequireArgument("systemId", customer.SystemID, "Empty SystemID not allowed");
             // make sure data is valid
-            if (LoadCustomer(systemId) != null) throw new ArgumentException("Not unique", "systemId");
+            if (LoadCustomer(customer.SystemID) != null) throw new ArgumentException("Not unique", "systemId");
 #endif
             var body = UseJSON ? new {customer} : (object)CustomerRequest.GetCustomerCreateXml(customer);
 
