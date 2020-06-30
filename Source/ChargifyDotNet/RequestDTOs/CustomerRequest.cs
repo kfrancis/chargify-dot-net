@@ -67,10 +67,14 @@ namespace ChargifyDotNet.RequestDTOs
 
         private static void AppendXmlIfValid(StringBuilder stringBuilder, string nodeTemplate, params string[] values)
         {
+#if NETCORE
             var encodedValues = values.Select(elem => HttpUtility.HtmlEncode(elem)).Cast<object>().ToArray();
+#else
+            var encodedValues = values.Select(elem => System.Net.WebUtility.HtmlEncode(elem)).Cast<object>().ToArray();
+#endif
             if (values.All(elem => !string.IsNullOrWhiteSpace(elem))) stringBuilder.AppendFormat(nodeTemplate, encodedValues);
         }
-        #endregion
+#endregion
         
     }
 }

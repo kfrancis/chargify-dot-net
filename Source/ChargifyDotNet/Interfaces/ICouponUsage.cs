@@ -33,6 +33,9 @@ namespace ChargifyNET
     using System;
     #endregion
 
+    /// <summary>
+    /// Coupon Usage
+    /// </summary>
     public interface ICouponUsage : IComparable<ICouponUsage>
     {
         /// <summary>

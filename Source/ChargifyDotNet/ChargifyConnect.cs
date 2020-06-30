@@ -6480,7 +6480,6 @@ namespace ChargifyNET
 
             if (requestMethod == HttpRequestMethod.Post || requestMethod == HttpRequestMethod.Put || requestMethod == HttpRequestMethod.Delete)
             {
-                bool hasWritten = false;
                 // only write if there's data to write ...
                 if (!string.IsNullOrEmpty(postData))
                 {
@@ -6490,7 +6489,6 @@ namespace ChargifyNET
                         // Write the XML/JSON text into the stream
                         writer.WriteLine(postData);
                         writer.Close();
-                        hasWritten = true;
                     }
                 }
                 else request.ContentLength = 0;

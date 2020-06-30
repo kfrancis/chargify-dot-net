@@ -35,18 +35,36 @@ namespace ChargifyNET
     using System.Collections.Generic;
     #endregion
 
+    /// <summary>
+    /// Subscription preview
+    /// </summary>
     public interface ISubscriptionPreview
     {
+        /// <summary>
+        /// Subscription preview result
+        /// </summary>
         SubscriptionPreviewResult SubscriptionPreviewResult { get; set; }
     }
 
+    /// <summary>
+    /// Subscription preview result
+    /// </summary>
     public interface ISubscriptionPreviewResult
     {
+        /// <summary>
+        /// Current billing manifest
+        /// </summary>
         SubscriptionPreviewBillingManifest CurrentBillingManifest { get; set; }
 
+        /// <summary>
+        /// Next billing manifest
+        /// </summary>
         SubscriptionPreviewBillingManifest NextBillingManifest { get; set; }
     }
 
+    /// <summary>
+    /// Subscription preview billing manifest
+    /// </summary>
     public interface ISubscriptionPreviewBillingManifest
     {
         List<SubscriptionPreviewLineItem> LineItems { get; set; }
