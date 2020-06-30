@@ -1399,13 +1399,13 @@ namespace ChargifyNET
                 subscriptionXml.AppendFormat("<id>{0}</id>", id);
                 subscriptionXml.Append("</target>");
                 subscriptionXml.Append("<billing>");
-                subscriptionXml.AppendFormat("<accrue>{0}</prorate>", accrue);
+                subscriptionXml.AppendFormat("<accrue>{0}</accrue>", accrue);
                 subscriptionXml.AppendFormat("<align_date>{0}</align_date>", alignDate);
                 subscriptionXml.AppendFormat("<prorate>{0}</prorate>", prorate);
                 subscriptionXml.Append("</billing>");
                 subscriptionXml.Append("</group>");
                 // now make the request
-                string response = DoRequest(string.Format("subscriptions/{0}/group.{1}", subscriptionId, GetMethodExtension()), HttpRequestMethod.Delete, subscriptionXml.ToString());
+                string response = DoRequest(string.Format("subscriptions/{0}/group.{1}", subscriptionId, GetMethodExtension()), HttpRequestMethod.Post, subscriptionXml.ToString());
                 return response.ConvertResponseTo<SubscriptionGroup>("subscription_group");
             }
             catch (ChargifyException cex)
