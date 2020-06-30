@@ -434,12 +434,12 @@ namespace ChargifyNET
         private ICustomer CreateCustomer(CustomerRequest customer)
         {
 #if !DEBUG
-            RequireNotNull("firstName", firstName);
-            RequireNotNull("lastName", lastName);
-            RequireNotNull("emailAddress", emailAddress);
-            RequireArgument("systemId", systemId, "Empty SystemID not allowed");
+            RequireNotNull("firstName", customer.FirstName);
+            RequireNotNull("lastName", customer.LastName);
+            RequireNotNull("emailAddress", customer.Email);
+            RequireArgument("systemId", customer.SystemID, "Empty SystemID not allowed");
             // make sure data is valid
-            if (LoadCustomer(systemId) != null) throw new ArgumentException("Not unique", "systemId");
+            if (LoadCustomer(customer.SystemID) != null) throw new ArgumentException("Not unique", "systemId");
 #endif
             var body = UseJSON ? new {customer} : (object)CustomerRequest.GetCustomerCreateXml(customer);
 
@@ -6480,7 +6480,6 @@ namespace ChargifyNET
 
             if (requestMethod == HttpRequestMethod.Post || requestMethod == HttpRequestMethod.Put || requestMethod == HttpRequestMethod.Delete)
             {
-                bool hasWritten = false;
                 // only write if there's data to write ...
                 if (!string.IsNullOrEmpty(postData))
                 {
@@ -6490,7 +6489,6 @@ namespace ChargifyNET
                         // Write the XML/JSON text into the stream
                         writer.WriteLine(postData);
                         writer.Close();
-                        hasWritten = true;
                     }
                 }
                 else request.ContentLength = 0;

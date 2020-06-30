@@ -4,6 +4,9 @@ using ChargifyNET.Json;
 
 namespace ChargifyNET
 {
+    /// <summary>
+    /// Coupon usage
+    /// </summary>
     public class CouponUsage : ChargifyBase, ICouponUsage, IComparable<CouponUsage>
     {
         #region Field Keys
