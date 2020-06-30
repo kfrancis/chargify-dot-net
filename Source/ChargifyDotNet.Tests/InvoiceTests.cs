@@ -37,7 +37,7 @@ namespace ChargifyDotNetTests
             Assert.IsNotNull(product, "No valid product was found.");
 
             // Act
-            var result = Chargify.CreateSubscription(product.Handle, customer.ChargifyID, PaymentCollectionMethod.Invoice);
+            var result = Chargify.CreateSubscription(product.Handle, customer.ChargifyID, PaymentCollectionMethod.Remittance);
 
             // Assert
             //Assert.IsInstanceOfType(result, typeof(Subscription));
@@ -54,7 +54,7 @@ namespace ChargifyDotNetTests
             Assert.IsTrue(result.Customer.SystemID == customer.SystemID);
             Assert.IsTrue(result.ProductPriceInCents == product.PriceInCents);
             Assert.IsTrue(result.ProductPrice == product.Price);
-            Assert.IsTrue(result.PaymentCollectionMethod == PaymentCollectionMethod.Invoice);
+            Assert.IsTrue(result.PaymentCollectionMethod == PaymentCollectionMethod.Remittance);
 
             // Cleanup
             Assert.IsTrue(Chargify.DeleteSubscription(result.SubscriptionID, "Automatic cancel due to test"));
@@ -71,7 +71,7 @@ namespace ChargifyDotNetTests
             var newCustomer = new CustomerAttributes(faker.Name.FirstName(), faker.Name.LastName(), faker.Internet.Email(), faker.Phone.PhoneNumber(), faker.Company.CompanyName(), referenceID);
 
             // Act
-            var newSubscription = Chargify.CreateSubscription(product.Handle, newCustomer, PaymentCollectionMethod.Invoice);
+            var newSubscription = Chargify.CreateSubscription(product.Handle, newCustomer, PaymentCollectionMethod.Remittance);
 
             // Assert
             //Assert.IsInstanceOfType(newSubscription, typeof(Subscription));
@@ -88,7 +88,7 @@ namespace ChargifyDotNetTests
             Assert.IsTrue(newSubscription.Customer.SystemID == referenceID);
             Assert.IsTrue(newSubscription.ProductPriceInCents == product.PriceInCents);
             Assert.IsTrue(newSubscription.ProductPrice == product.Price);
-            Assert.IsTrue(newSubscription.PaymentCollectionMethod == PaymentCollectionMethod.Invoice);
+            Assert.IsTrue(newSubscription.PaymentCollectionMethod == PaymentCollectionMethod.Remittance);
 
             // Cleanup
             Assert.IsTrue(Chargify.DeleteSubscription(newSubscription.SubscriptionID, "Automatic cancel due to test"));

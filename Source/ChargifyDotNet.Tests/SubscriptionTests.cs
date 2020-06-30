@@ -312,7 +312,7 @@ namespace ChargifyDotNetTests
             // Arrange
             var client = Chargify;
             var subscription = client.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value;
-            var paymentCollectionMethod = subscription.PaymentCollectionMethod == PaymentCollectionMethod.Automatic ? PaymentCollectionMethod.Invoice : PaymentCollectionMethod.Automatic;
+            var paymentCollectionMethod = subscription.PaymentCollectionMethod == PaymentCollectionMethod.Automatic ? PaymentCollectionMethod.Remittance : PaymentCollectionMethod.Automatic;
 
             // Act
             var updatedSubscription = client.UpdatePaymentCollectionMethod(subscription.SubscriptionID, paymentCollectionMethod);
