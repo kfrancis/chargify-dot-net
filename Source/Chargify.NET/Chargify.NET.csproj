@@ -153,6 +153,7 @@
     <Compile Include="Interfaces\IRelationshipInvoiceTax.cs" />
     <Compile Include="Interfaces\IRenewalDetails.cs" />
     <Compile Include="Interfaces\ISubscriptionCreateOptions.cs" />
+    <Compile Include="Interfaces\ISubscriptionGroup.cs" />
     <Compile Include="Interfaces\ISubscriptionOverride.cs" />
     <Compile Include="RelationshipInvoiceAddress.cs" />
     <Compile Include="RelationshipInvoiceCredit.cs" />
@@ -229,6 +230,7 @@
     <Compile Include="SiteStatistics.cs" />
     <Compile Include="Statement.cs" />
     <Compile Include="Subscription.cs" />
+    <Compile Include="SubscriptionGroup.cs" />
     <Compile Include="SubscriptionOverride.cs" />
     <Compile Include="SubscriptionPostbackHandler.cs" />
     <Compile Include="Transaction.cs" />
