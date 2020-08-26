@@ -4271,14 +4271,23 @@ namespace ChargifyNET
         /// <param name="subscriptionId">The subscription ID to examine</param>
         /// <param name="componentId">The ID of the component to examine</param>
         /// <param name="page">The result page to get. Defaults to 1</param>
+        /// <param name="sinceDate">The earliest date to fetch results from. Optional.</param>
         /// <returns>A dictionary of usages if there are results, null otherwise.</returns>
-        public IDictionary<string, IComponent> GetComponentList(int subscriptionId, int componentId, int page = 1)
+        public IDictionary<string, IComponent> GetComponentList(int subscriptionId, int componentId, int page = 1, DateTimeOffset? sinceDate = null)
         {
             // make sure data is valid
             if (subscriptionId == int.MinValue) throw new ArgumentNullException("subscriptionId");
             if (componentId == int.MinValue) throw new ArgumentNullException("componentId");
+
+            var query = $"subscriptions/{subscriptionId}/components/{componentId}/usages.{GetMethodExtension()}?page={page}";
+
+            if(sinceDate.HasValue)
+            {
+                query += $"&since_date={sinceDate.Value.ToString("yyyy-MM-dd")}";
+            }
+
             // now make the request
-            string response = DoRequest(string.Format("subscriptions/{0}/components/{1}/usages.{2}?page={3}", subscriptionId, componentId, GetMethodExtension(), page));
+            string response = DoRequest(query);
             var retValue = new Dictionary<string, IComponent>();
             if (response.IsXml())
             {
