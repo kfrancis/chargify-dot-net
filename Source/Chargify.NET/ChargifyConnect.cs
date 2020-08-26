@@ -4270,14 +4270,15 @@ namespace ChargifyNET
         /// </summary>
         /// <param name="subscriptionId">The subscription ID to examine</param>
         /// <param name="componentId">The ID of the component to examine</param>
+        /// <param name="page">The result page to get. Defaults to 1</param>
         /// <returns>A dictionary of usages if there are results, null otherwise.</returns>
-        public IDictionary<string, IComponent> GetComponentList(int subscriptionId, int componentId)
+        public IDictionary<string, IComponent> GetComponentList(int subscriptionId, int componentId, int page = 1)
         {
             // make sure data is valid
             if (subscriptionId == int.MinValue) throw new ArgumentNullException("subscriptionId");
             if (componentId == int.MinValue) throw new ArgumentNullException("componentId");
             // now make the request
-            string response = DoRequest(string.Format("subscriptions/{0}/components/{1}/usages.{2}", subscriptionId, componentId, GetMethodExtension()));
+            string response = DoRequest(string.Format("subscriptions/{0}/components/{1}/usages.{2}?page={3}", subscriptionId, componentId, GetMethodExtension(), page));
             var retValue = new Dictionary<string, IComponent>();
             if (response.IsXml())
             {

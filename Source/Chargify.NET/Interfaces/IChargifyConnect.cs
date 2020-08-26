@@ -120,8 +120,9 @@ namespace ChargifyNET
         /// </summary>
         /// <param name="SubscriptionID">The subscription ID to examine</param>
         /// <param name="ComponentID">The ID of the component to examine</param>
+        /// <param name="Page">The result page to get. Defaults to 1</param>
         /// <returns>A dictionary of usages if there are results, null otherwise.</returns>
-        IDictionary<string, IComponent> GetComponentList(int SubscriptionID, int ComponentID);
+        IDictionary<string, IComponent> GetComponentList(int SubscriptionID, int ComponentID, int Page);
         /// <summary>
         /// Method for getting a list of components for a specific product family
         /// </summary>
