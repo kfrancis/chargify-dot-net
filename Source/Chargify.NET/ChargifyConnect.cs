@@ -491,7 +491,10 @@ namespace ChargifyNET
                                 if (customerNode.Name == "customer")
                                 {
                                     ICustomer loadedCustomer = new Customer(customerNode);
-                                    return loadedCustomer;
+                                    if (loadedCustomer.Email == emailAddress)
+                                    {
+                                        return loadedCustomer;
+                                    }
                                 }
                             }
                         }
@@ -509,7 +512,10 @@ namespace ChargifyNET
                         {
                             JsonObject customerObj = (array.Items[i] as JsonObject)["customer"] as JsonObject;
                             ICustomer loadedCustomer = new Customer(customerObj);
-                            return loadedCustomer;
+                            if (loadedCustomer.Email == emailAddress)
+                            {
+                                return loadedCustomer;
+                            }
                         }
                     }
                 }
