@@ -23,7 +23,7 @@ namespace ChargifyNET.Data
         {
             _countries = new XmlDocument();
 
-            var resourceFileWithNamespace = $"{GetType().Namespace}.{CountriesFilename}";
+            var resourceFileWithNamespace = $"{GetType().Assembly.GetName().Name}.Data.{CountriesFilename}";
             var fileStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceFileWithNamespace);
 
             if (fileStream != null)
