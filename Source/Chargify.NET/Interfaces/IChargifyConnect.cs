@@ -487,6 +487,16 @@ namespace ChargifyNET
         /// <param name="Memo">The memo for the usage</param>
         /// <returns>The usage added if successful, otherwise null.</returns>
         IUsage AddUsage(int SubscriptionID, int ComponentID, int Quantity, string Memo);
+
+        /// <summary>
+        /// Method for updating the price-point of a Component on a Subscription
+        /// </summary>
+        /// <param name="subscriptionId">The subscriptionID to modify</param>
+        /// <param name="componentId">The ID of the (metered or quantity) component to add a usage of</param>
+        /// <param name="quantity">The number of usages to add</param>
+        /// <param name="memo">The memo for the usage</param>
+        /// <returns>The usage added if successful, otherwise null.</returns>
+        IComponentPricePoint UpdatePricePoint(int subscriptionId, int componentId, string pricePointHandle);
         #endregion
 
         #region Product Families
@@ -668,6 +678,12 @@ namespace ChargifyNET
         /// <param name="SystemID">The system ID of the customer</param>
         /// <returns>The customer with the specified chargify ID</returns>
         ICustomer LoadCustomer(string SystemID);
+        /// <summary>
+        /// Find a customer with the specified email address.
+        /// </summary>
+        /// <param name="emailAddress">The email address to search for</param>
+        /// <returns>The customer with the specified email address</returns>
+        ICustomer FindCustomerByEmail(string emailAddress);
         #endregion
 
         #region Subscriptions
@@ -849,6 +865,7 @@ namespace ChargifyNET
         /// <param name="SubscriptionID">The ID of the subscription</param>
         /// <returns>The subscription with the specified ID</returns>
         ISubscription LoadSubscription(int SubscriptionID);
+        ISubscriptionGroup GroupSubscription(int subscriptionId, string type, int id, bool accrue, bool alignDate, bool prorate);
         /// <summary>
         /// Create a subscription
         /// </summary>
