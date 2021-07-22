@@ -1,0 +1,40 @@
+name: Build and NuGet Publish
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build-test:
+    name: Build and Publish
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0 # avoid shallow clone so nbgv can do its work.
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+
+    - uses: dotnet/nbgv@master
+      with:
+        setAllVars: true
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --no-restore
+
+    - name: Publish
+      run: | # | character makes the "run" property multi-line, so we can put multiple commands in the same step
+        mkdir __out
+        dotnet pack -c Release -o ${GITHUB_WORKSPACE}/packages --no-restore -p:RepositoryBranch=main -p:ContinuousIntegrationBuild=true /p:PublicRelease=true
+        dotnet nuget push ${GITHUB_WORKSPACE}/packages/'*.nupkg' -s https://api.nuget.org/v3/index.json --skip-duplicate --no-symbols true --api-key ${{secrets.NUGET_API_KEY}}
+  
