@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>$author$</authors>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">MIT</license>
+    <projectUrl>https://github.com/kfrancis/chargify-dot-net</projectUrl>
+    <description>$description$</description>
+    <copyright>$copyright$</copyright>
+    <tags>Chargify</tags>
+  </metadata>
+</package>

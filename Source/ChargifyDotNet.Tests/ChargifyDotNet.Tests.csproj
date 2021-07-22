@@ -1,11 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp2.0;net45;</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1;net45;</TargetFrameworks>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0'">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1'">
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.10.0" />
   </ItemGroup>
   
@@ -28,8 +28,8 @@
     <Compile Update="Base\ChargifyTestBase.cs" />
   </ItemGroup>
 
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0'">
-    <DefineConstants>DEBUG;NETCORE;NETSTANDARD;NETSTANDARD2_0;NETCOREAPP2_0;NUNIT</DefineConstants>
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1'">
+    <DefineConstants>DEBUG;NETCORE;NETSTANDARD;NETSTANDARD2_0;NETCOREAPP3_1;NUNIT</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net45'">

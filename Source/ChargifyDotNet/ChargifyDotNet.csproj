@@ -2,26 +2,14 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net45;net40</TargetFrameworks>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageId>chargify</PackageId>
     <PackageProjectUrl>https://github.com/kfrancis/chargify-dot-net</PackageProjectUrl>
-    <PackageLicenseUrl>https://raw.githubusercontent.com/kfrancis/chargify-dot-net/master/LICENSE</PackageLicenseUrl>
-    <PackageTags>Chargify</PackageTags>
     <Authors>KFrancis, DBall</Authors>
     <Company>Clinical Support Systems</Company>
     <Product>Chargify.NET</Product>
     <Description>Chargify.NET is a comprehensive .NET API wrapper library for accessing Chargify.com, using XML or JSON to read/write.</Description>
-    <AssemblyVersion>1.2.5</AssemblyVersion>
-    <FileVersion>1.2.5</FileVersion>
-    <VersionPrefix>1.2.5</VersionPrefix>
-    <!--<VersionSuffix>beta1</VersionSuffix>-->
-    <IncludeSource>true</IncludeSource>
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <Version>1.2.5</Version>
   </PropertyGroup>
+  
   <ItemGroup>
     <EmbeddedResource Include="Data\ISO_3166-1_list_en.xml" />
   </ItemGroup>
@@ -63,15 +51,15 @@
     <DefineConstants>NET40</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
-    <DebugType>embedded</DebugType>
+    <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
-    <DocumentationFile>bin\Debug\netstandard2.0\ChargifyDotNet.xml</DocumentationFile>
+    <DocumentationFile>C:\Users\kfrancis\Documents\GitHub\chargify-dot-net\Source\ChargifyDotNet\ChargifyDotNet.xml</DocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.0|AnyCPU'">
     <DebugType>embedded</DebugType>
     <DebugSymbols>true</DebugSymbols>
-    <DocumentationFile></DocumentationFile>
+    <DocumentationFile>C:\Users\kfrancis\Documents\GitHub\chargify-dot-net\Source\ChargifyDotNet\ChargifyDotNet.xml</DocumentationFile>
   </PropertyGroup>
 
   <Target Name="IncludeDocFile" BeforeTargets="PrepareForPublish">
