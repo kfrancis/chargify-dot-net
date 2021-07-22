@@ -30,7 +30,7 @@ jobs:
       run: dotnet restore
 
     - name: Build
-      run: dotnet build --no-restore --nowarn:CS1591
+      run: dotnet build --no-restore /nowarn:CS1591
 
     - name: Publish
       run: | # | character makes the "run" property multi-line, so we can put multiple commands in the same step
