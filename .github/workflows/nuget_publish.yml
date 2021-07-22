@@ -36,5 +36,5 @@ jobs:
       run: | # | character makes the "run" property multi-line, so we can put multiple commands in the same step
         mkdir __out
         dotnet pack -c Release -o ${GITHUB_WORKSPACE}/packages --no-restore -p:RepositoryBranch=main -p:ContinuousIntegrationBuild=true /p:PublicRelease=true
-        dotnet nuget push ${GITHUB_WORKSPACE}/packages/'*.nupkg' -s https://api.nuget.org/v3/index.json --skip-duplicate --no-symbols true --api-key ${{secrets.NUGET_API_KEY}}
+        dotnet nuget push ${GITHUB_WORKSPACE}/packages/'*.nupkg' -s https://api.nuget.org/v3/index.json --skip-duplicate --no-symbols true --api-key ${{secrets.NUGET_KEY}}
   
