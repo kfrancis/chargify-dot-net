@@ -57,7 +57,7 @@
     <NoWarn>1701;1702;1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.0|AnyCPU'">
-    <DebugType>portable</DebugType>
+    <DebugType>embedded</DebugType>
     <DebugSymbols>true</DebugSymbols>
     <DocumentationFile>C:\Users\kfrancis\Documents\GitHub\chargify-dot-net\Source\ChargifyDotNet\ChargifyDotNet.xml</DocumentationFile>
   </PropertyGroup>
