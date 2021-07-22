@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.0.31512.422
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31424.327
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5D223E15-C3F1-4516-AC83-41AF719DE77B}"
 	ProjectSection(SolutionItems) = preProject
@@ -17,16 +17,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "lib", "lib", "{1109C7B5-C897-4B8C-8942-AF7F8B7FFE83}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{D741C8EB-46FE-477B-97D2-5D2463EA6BDC}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{B1023B37-8D93-4B15-80DB-4C99742E26EE}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{7F8C958D-61FB-44BA-A2CE-C31888E2A858}"
 	ProjectSection(SolutionItems) = preProject
 		.nuget\packages.config = .nuget\packages.config
 	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChargifyNetSample.MVC", "Source\ChargifyNetSample.MVC\ChargifyNetSample.MVC.csproj", "{C618CDC0-A9D1-4FF0-93A8-5A46848BFE14}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChargifyDotNet", "Source\ChargifyDotNet\ChargifyDotNet.csproj", "{61707A83-DFFC-4CBF-BB4C-0D41B21F94A7}"
 EndProject
@@ -48,13 +44,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{C618CDC0-A9D1-4FF0-93A8-5A46848BFE14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C618CDC0-A9D1-4FF0-93A8-5A46848BFE14}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{C618CDC0-A9D1-4FF0-93A8-5A46848BFE14}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{C618CDC0-A9D1-4FF0-93A8-5A46848BFE14}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{C618CDC0-A9D1-4FF0-93A8-5A46848BFE14}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C618CDC0-A9D1-4FF0-93A8-5A46848BFE14}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{C618CDC0-A9D1-4FF0-93A8-5A46848BFE14}.Release|x86.ActiveCfg = Release|Any CPU
 		{61707A83-DFFC-4CBF-BB4C-0D41B21F94A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{61707A83-DFFC-4CBF-BB4C-0D41B21F94A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{61707A83-DFFC-4CBF-BB4C-0D41B21F94A7}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
@@ -120,7 +109,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{C618CDC0-A9D1-4FF0-93A8-5A46848BFE14} = {D741C8EB-46FE-477B-97D2-5D2463EA6BDC}
 		{61707A83-DFFC-4CBF-BB4C-0D41B21F94A7} = {1109C7B5-C897-4B8C-8942-AF7F8B7FFE83}
 		{A06994B4-ADE0-4EEB-B0DC-C54DC5C34539} = {B1023B37-8D93-4B15-80DB-4C99742E26EE}
 		{03976E82-FA97-4D44-BB79-80254B00CCEC} = {B1023B37-8D93-4B15-80DB-4C99742E26EE}
