@@ -141,8 +141,8 @@ namespace ChargifyNET
                             // There's no constructor that takes in an XmlNode, so parse it here.
                             foreach (XmlNode metadataNode in dataNode.ChildNodes)
                             {
-                                var newObj = new Metadata();
-                                var hasData = false;
+                                Metadata newObj = new Metadata();
+                                bool hasData = false;
                                 foreach (XmlNode metadatumNode in metadataNode.ChildNodes)
                                 {
                                     switch (metadatumNode.Name)
@@ -201,9 +201,9 @@ namespace ChargifyNET
                         {
                             foreach (JsonValue item in viewObj.Items)
                             {
-                                var newObj = new Metadata();
-                                var hasData = false;
-                                var itemObj = (JsonObject)item;
+                                Metadata newObj = new Metadata();
+                                bool hasData = false;
+                                JsonObject itemObj = (JsonObject)item;
                                 foreach (string subItemKey in itemObj.Keys)
                                 {
                                     switch (subItemKey)

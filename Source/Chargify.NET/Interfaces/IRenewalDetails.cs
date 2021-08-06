@@ -151,7 +151,7 @@ namespace ChargifyNET
         public RenewalLineItem(XmlNode node)
         {
             // Deserialize
-            var obj = node.ConvertNode<RenewalLineItem>();
+            RenewalLineItem obj = node.ConvertNode<RenewalLineItem>();
 
             TransactionType = obj.TransactionType;
             Kind = obj.Kind;
@@ -168,7 +168,7 @@ namespace ChargifyNET
         public RenewalLineItem(JsonObject renewalLineItem)
         {
             // Deserialize
-            var obj = JsonConvert.DeserializeObject<RenewalLineItem>(renewalLineItem.ToString());
+            RenewalLineItem obj = JsonConvert.DeserializeObject<RenewalLineItem>(renewalLineItem.ToString());
 
             TransactionType = obj.TransactionType;
             Kind = obj.Kind;

@@ -21,7 +21,7 @@ namespace ChargifyNET.Json
             string childName = string.Empty;
             foreach (object child in node)
             {
-                var childElement = child as XmlElement;
+                XmlElement childElement = child as XmlElement;
                 if (childElement != null)
                 {
                     if (childName == string.Empty)
@@ -84,7 +84,7 @@ namespace ChargifyNET.Json
                     OutputNode(childname, alChild[0], sbJson, true);
                 else
                 {
-                    var alChildElement = alChild[0] as XmlElement;
+                    XmlElement alChildElement = alChild[0] as XmlElement;
                     //var alParentElementHasChildren = alChildElement != null ? (alChildElement.ParentNode as XmlElement) != null ? (alChildElement.ParentNode as XmlElement).HasChildren() : false : false;
                     bool hasChildrenArray = alChildElement.HasChildren();
                     sbJson.Append(" \"" + SafeJson(childname) + string.Format("\": {0} ", hasChildrenArray ? "[" : string.Empty));   
@@ -103,7 +103,7 @@ namespace ChargifyNET.Json
         private static void StoreChildNode(SortedList childNodeNames, string nodeName, object nodeValue)
         {
             // Pre-process contraction of XmlElement-s
-            var nodeElement = nodeValue as XmlElement;
+            XmlElement nodeElement = nodeValue as XmlElement;
             if (nodeElement != null)
             {
                 // Convert  <aa></aa> into "aa":null

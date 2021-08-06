@@ -53,7 +53,7 @@ namespace ChargifyNET.Json
             while (IsNumberPart(str[position]))
                 position++;
 
-            var value = double.Parse(str.Substring(startPos, position - startPos),
+            double value = double.Parse(str.Substring(startPos, position - startPos),
                 CultureInfo.InvariantCulture);
 
             return new JsonNumber(value);

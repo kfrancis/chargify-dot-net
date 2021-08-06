@@ -84,7 +84,7 @@ namespace ChargifyNET
         public PaymentProfileView(string paymentProfileXml)
         {
             // get the XML into an XML document
-            var doc = new XmlDocument();
+            XmlDocument doc = new XmlDocument();
             doc.LoadXml(paymentProfileXml);
             if (doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(paymentProfileXml));
             // loop through the child nodes of this node

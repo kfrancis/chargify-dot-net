@@ -66,7 +66,7 @@ namespace ChargifyNET
         public SubscriptionOverride(string subscriptionOverrideXml)
         {
             // get the XML into an XML document
-            var xdoc = new XmlDocument();
+            XmlDocument xdoc = new XmlDocument();
             xdoc.LoadXml(subscriptionOverrideXml);
             if (xdoc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(subscriptionOverrideXml));
             // loop through the child nodes of this node

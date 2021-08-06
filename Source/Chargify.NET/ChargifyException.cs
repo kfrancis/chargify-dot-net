@@ -98,7 +98,7 @@ namespace ChargifyNET
             List<ChargifyError> errors = new List<ChargifyError>();
             if (response != null)
             {
-                var responseStream = response.GetResponseStream();
+                Stream responseStream = response.GetResponseStream();
                 if (responseStream != null)
                 {
                     using (StreamReader reader = new StreamReader(responseStream))
@@ -114,7 +114,7 @@ namespace ChargifyNET
                             XDocument xdoc = XDocument.Parse(errorResponse);
                             if (xdoc.Descendants("error").Any())
                             {
-                                var results = from e in xdoc.Descendants("error")
+                                IEnumerable<ChargifyError> results = from e in xdoc.Descendants("error")
                                               select new ChargifyError
                                               {
                                                   Message = e.Value
@@ -123,7 +123,7 @@ namespace ChargifyNET
                             }
                             else
                             {
-                                var results = from e in xdoc.Descendants("errors")
+                                IEnumerable<ChargifyError> results = from e in xdoc.Descendants("errors")
                                               select new ChargifyError
                                               {
                                                   Message = e.Value

@@ -123,9 +123,9 @@ namespace ChargifyNET
                         JsonArray chargesArray = obj[key] as JsonArray;
                         if (chargesArray != null)
                         {
-                            foreach (var jsonValue in chargesArray.Items)
+                            foreach (JsonValue jsonValue in chargesArray.Items)
                             {
-                                var charge = (JsonObject) jsonValue;
+                                JsonObject charge = (JsonObject) jsonValue;
                                 _charges.Add(charge.GetJSONContentAsCharge("charge"));
                             }
                         }

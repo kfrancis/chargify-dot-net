@@ -158,13 +158,13 @@ namespace ChargifyNET
                         JsonArray pricesArray = obj[key] as JsonArray;
                         if (pricesArray != null)
                         {
-                            foreach (var jsonValue in pricesArray.Items)
+                            foreach (JsonValue jsonValue in pricesArray.Items)
                             {
-                                var priceObj = (JsonObject) jsonValue;
+                                JsonObject priceObj = (JsonObject) jsonValue;
                                 if (priceObj == null) continue;
-                                var bracketInfo = new PriceBracketInfo();
+                                PriceBracketInfo bracketInfo = new PriceBracketInfo();
 
-                                foreach (var bracketKey in priceObj.Keys)
+                                foreach (string bracketKey in priceObj.Keys)
                                 {
                                     switch (bracketKey)
                                     {
@@ -240,7 +240,7 @@ namespace ChargifyNET
                         _prices = new List<IPriceBracketInfo>();
                         foreach (XmlNode priceNode in dataNode.ChildNodes)
                         {
-                            var bracketInfo = new PriceBracketInfo();
+                            PriceBracketInfo bracketInfo = new PriceBracketInfo();
                             foreach (XmlNode bracketNode in priceNode.ChildNodes)
                             {
                                 switch (bracketNode.Name)

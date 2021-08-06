@@ -23,12 +23,12 @@ namespace ChargifyNET.Data
         {
             _countries = new XmlDocument();
 
-            var resourceFileWithNamespace = $"{GetType().Assembly.GetName().Name}.Data.{CountriesFilename}";
-            var fileStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceFileWithNamespace);
+            string resourceFileWithNamespace = $"{GetType().Assembly.GetName().Name}.Data.{CountriesFilename}";
+            Stream fileStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceFileWithNamespace);
 
             if (fileStream != null)
             {
-                using (var reader = new StreamReader(fileStream))
+                using (StreamReader reader = new StreamReader(fileStream))
                 {
                     _countries.LoadXml(reader.ReadToEnd());
                 }
@@ -43,12 +43,12 @@ namespace ChargifyNET.Data
         public string GetCountryName(string countryCode2)
         {
             string result = String.Empty;
-            var selectSingleNode = _countries.SelectSingleNode($@"/ISO_3166-1_List_en/ISO_3166-1_Entry/ISO_3166-1_Alpha-2_Code_element[.=""{countryCode2}""]");
-            var countryNode = selectSingleNode?.ParentNode;
-            var singleCountryNode = countryNode?.SelectSingleNode("ISO_3166-1_Country_name");
+            XmlNode selectSingleNode = _countries.SelectSingleNode($@"/ISO_3166-1_List_en/ISO_3166-1_Entry/ISO_3166-1_Alpha-2_Code_element[.=""{countryCode2}""]");
+            XmlNode countryNode = selectSingleNode?.ParentNode;
+            XmlNode singleCountryNode = countryNode?.SelectSingleNode("ISO_3166-1_Country_name");
             if (singleCountryNode != null)
             {
-                var countryName = singleCountryNode.InnerText.ToLower();
+                string countryName = singleCountryNode.InnerText.ToLower();
                 result = char.ToUpper(countryName[0]) + countryName.Substring(1);
             }
             return result;

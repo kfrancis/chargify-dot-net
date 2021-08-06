@@ -77,7 +77,7 @@
 
             if (!string.IsNullOrEmpty(possibleData))
             {
-                var calculatedSignature = CalculateHMAC256Signature(possibleData, sharedKey);
+                string calculatedSignature = CalculateHMAC256Signature(possibleData, sharedKey);
                 if (calculatedSignature != givenSignature)
                 {
                     retVal = false;
@@ -284,7 +284,7 @@
         /// <returns>The JSON result</returns>
         public static string ToJson(this XmlDocument doc)
         {
-            var result = XmlToJsonConverter.XmlToJson(doc);
+            string result = XmlToJsonConverter.XmlToJson(doc);
             result = result.Replace(@"\", @"\\");
             return result;
         }
@@ -296,8 +296,8 @@
         /// <returns>The formatted amount.</returns>
         public static string ToChargifyCurrencyFormat(this decimal value)
         {
-            var usCulture = CultureInfo.CreateSpecificCulture("en-US");
-            var clonedNumbers = (NumberFormatInfo) usCulture.NumberFormat.Clone();
+            CultureInfo usCulture = CultureInfo.CreateSpecificCulture("en-US");
+            NumberFormatInfo clonedNumbers = (NumberFormatInfo) usCulture.NumberFormat.Clone();
             clonedNumbers.CurrencyNegativePattern = 2;
             return string.Format(clonedNumbers, "{0:C2}", value).Replace("$", "");
         }
@@ -624,7 +624,7 @@
 
                 stm.Position = 0;
 
-                var ser = new XmlSerializer(typeof(T));
+                XmlSerializer ser = new XmlSerializer(typeof(T));
                 T result = (ser.Deserialize(stm) as T);
                 return result;
             }
@@ -638,13 +638,13 @@
         /// <returns>The list result, or empty list otherwise</returns>
         public static List<RenewalLineItem> GetJSONContentAsRenewalLineItems(this JsonObject obj, string key)
         {
-            var renewalLineItems = new List<RenewalLineItem>();
-            var renewalLineItemsArray = obj[key] as JsonArray;
+            List<RenewalLineItem> renewalLineItems = new List<RenewalLineItem>();
+            JsonArray renewalLineItemsArray = obj[key] as JsonArray;
             if (renewalLineItemsArray != null)
             {
-                foreach (var jsonValue in renewalLineItemsArray.Items)
+                foreach (JsonValue jsonValue in renewalLineItemsArray.Items)
                 {
-                    var renewalLineItem = (JsonObject) jsonValue;
+                    JsonObject renewalLineItem = (JsonObject) jsonValue;
                     renewalLineItems.Add(new RenewalLineItem(renewalLineItem));
                 }
             }
@@ -663,7 +663,7 @@
         /// <returns>The list result, or empty list otherwise</returns>
         public static List<RenewalLineItem> GetNodeContentAsRenewalLineItems(this XmlNode node)
         {
-            var lineItems = new List<RenewalLineItem>();
+            List<RenewalLineItem> lineItems = new List<RenewalLineItem>();
             foreach (XmlNode childNode in node.ChildNodes)
             {
                 switch (childNode.Name)
@@ -689,7 +689,7 @@
         /// <returns>The PublicSignupPages value of the node, empty list otherwise.</returns>
         public static List<IPublicSignupPage> GetNodeContentAsPublicSignupPages(this XmlNode node)
         {
-            var publicSignupPages = new List<IPublicSignupPage>();
+            List<IPublicSignupPage> publicSignupPages = new List<IPublicSignupPage>();
             foreach (XmlNode childNode in node.ChildNodes)
             {
                 switch (childNode.Name)
@@ -716,13 +716,13 @@
         /// <returns>The list of PublicSignupPages if possible, empty list otherwise.</returns>
         public static List<IPublicSignupPage> GetJSONContentAsPublicSignupPages(this JsonObject obj, string key)
         {
-            var publicSignupPages = new List<IPublicSignupPage>();
-            var publicSignupPagesArray = obj[key] as JsonArray;
+            List<IPublicSignupPage> publicSignupPages = new List<IPublicSignupPage>();
+            JsonArray publicSignupPagesArray = obj[key] as JsonArray;
             if (publicSignupPagesArray != null)
             {
-                foreach (var jsonValue in publicSignupPagesArray.Items)
+                foreach (JsonValue jsonValue in publicSignupPagesArray.Items)
                 {
-                    var publicSignupPage = (JsonObject) jsonValue;
+                    JsonObject publicSignupPage = (JsonObject) jsonValue;
                     publicSignupPages.Add(new PublicSignupPage(publicSignupPage));
                 }
             }
@@ -1598,7 +1598,7 @@
             if ((transactions != null) && (transactions.Count > 0))
             {
                 decimal total = 0;
-                var paymentTransactions = from t in transactions.Values
+                IEnumerable<ITransaction> paymentTransactions = from t in transactions.Values
                                           where t.Type == TransactionType.Payment
                                           select t;
                 foreach (ITransaction paymentTransaction in paymentTransactions)
@@ -1609,7 +1609,7 @@
                     }
                 }
 
-                var refundTransactions = from t1 in transactions.Values
+                IEnumerable<ITransaction> refundTransactions = from t1 in transactions.Values
                                          where t1.Type == TransactionType.Refund
                                          select t1;
                 foreach (ITransaction refundTransaction in refundTransactions)

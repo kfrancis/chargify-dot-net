@@ -68,7 +68,7 @@ namespace ChargifyNET
         public RenewalDetails(string renewalXml)
         {
             // get the XML into an XML document
-            var xmlDoc = new XmlDocument();
+            XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.LoadXml(renewalXml);
             if (xmlDoc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid, expecting children.", nameof(renewalXml));
             // loop through the child nodes of this node

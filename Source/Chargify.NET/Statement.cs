@@ -236,9 +236,9 @@ namespace ChargifyNET
                         JsonArray transactionsArray = obj[key] as JsonArray;
                         if (transactionsArray != null)
                         {
-                            foreach (var jsonValue in transactionsArray.Items)
+                            foreach (JsonValue jsonValue in transactionsArray.Items)
                             {
-                                var transaction = (JsonObject) jsonValue;
+                                JsonObject transaction = (JsonObject) jsonValue;
                                 _transactions.Add(new Transaction(transaction));
                             }
                         }
