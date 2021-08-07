@@ -1,4 +1,10 @@
-﻿using ChargifyNET;
+﻿// -----------------------------------------------------------------------
+// <copyright file="SubscriptionGroup.cs" company="Loaded Reports">
+// Copyright (c) Loaded Reports. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
+
+using ChargifyNET;
 using ChargifyNET.Json;
 using System;
 using System.Collections.Generic;
@@ -51,7 +57,7 @@ namespace ChargifyNET
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="adjustmentNode">XML containing adjustment info (in expected format)</param>
+        /// <param name="subscriptionGroupNode">XML containing subscription info (in expected format)</param>
         internal SubscriptionGroup(XmlNode subscriptionGroupNode)
         {
             if (subscriptionGroupNode == null) throw new ArgumentNullException(nameof(subscriptionGroupNode));
@@ -63,7 +69,7 @@ namespace ChargifyNET
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="adjustmentObject">Json containing adjustment info (in expected format)</param>
+        /// <param name="subscriptionGroupObject">Json containing subscription info (in expected format)</param>
         public SubscriptionGroup(JsonObject subscriptionGroupObject)
         {
             if (subscriptionGroupObject == null) throw new ArgumentNullException(nameof(subscriptionGroupObject));

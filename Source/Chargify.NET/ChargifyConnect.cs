@@ -4382,8 +4382,7 @@ namespace ChargifyNET
         /// </summary>
         /// <param name="subscriptionId">The subscriptionID to modify</param>
         /// <param name="componentId">The ID of the (metered or quantity) component to add a usage of</param>
-        /// <param name="quantity">The number of usages to add</param>
-        /// <param name="memo">The memo for the usage</param>
+        /// <param name="pricePointHandle">The number of usages to add</param>
         /// <returns>The usage added if successful, otherwise null.</returns>
         public IComponentPricePoint UpdatePricePoint(int subscriptionId, int componentId, string pricePointHandle)
         {
