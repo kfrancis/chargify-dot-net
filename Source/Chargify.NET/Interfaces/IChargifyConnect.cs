@@ -216,7 +216,6 @@ namespace ChargifyNET
         ISubscription AddCoupon(int SubscriptionID, string CouponCode);
 
         /// <summary>
-
         /// Method for retrieving information about a coupon using the ID of that coupon.
         /// </summary>
         /// <param name="ProductFamilyID">The ID of the product family that the coupon belongs to</param>
@@ -230,6 +229,7 @@ namespace ChargifyNET
         /// <returns>The object if found, null otherwise.</returns>
         IDictionary<int, ICouponUsage> GetCouponUsage(int CouponID);
 
+        /// <summary>
         /// Method to remove a coupon to a subscription using the API
         /// </summary>
         /// <param name="SubscriptionID">The ID of the subscription to modify</param>
@@ -493,8 +493,7 @@ namespace ChargifyNET
         /// </summary>
         /// <param name="subscriptionId">The subscriptionID to modify</param>
         /// <param name="componentId">The ID of the (metered or quantity) component to add a usage of</param>
-        /// <param name="quantity">The number of usages to add</param>
-        /// <param name="memo">The memo for the usage</param>
+        /// <param name="pricePointHandle">The price point to use.</param>
         /// <returns>The usage added if successful, otherwise null.</returns>
         IComponentPricePoint UpdatePricePoint(int subscriptionId, int componentId, string pricePointHandle);
         #endregion
@@ -575,11 +574,6 @@ namespace ChargifyNET
         /// <param name="CouponID">The ID of the coupon</param>
         /// <returns>The object if found, null otherwise.</returns>
         ICoupon LoadCoupon(int ProductFamilyID, int CouponID);
-        /// <summary>
-        /// Load the requested customer from chargify
-        /// </summary>
-        /// <param name="ChargifyID">The chargify ID of the customer</param>
-        /// <returns>The customer with the specified chargify ID</returns>
         #endregion
 
         #region Credit
