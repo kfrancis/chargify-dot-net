@@ -1283,7 +1283,10 @@
                     JsonString str = obj[key] as JsonString;
                     if (str != null)
                     {
-                        result = (PaymentCollectionMethod) Enum.Parse(typeof(PaymentCollectionMethod), str.Value, true);
+                        if (Enum.TryParse(str.Value, true, out PaymentCollectionMethod parsedResult))
+                        {
+                            result = parsedResult;
+                        }
                     }
                 }
             }
@@ -1340,7 +1343,10 @@
             PaymentCollectionMethod result = PaymentCollectionMethod.Unknown;
             if (node.FirstChild != null)
             {
-                result = (PaymentCollectionMethod) Enum.Parse(typeof(PaymentCollectionMethod), node.FirstChild.Value, true);
+                if (Enum.TryParse(node.FirstChild.Value, true, out PaymentCollectionMethod parsedResult))
+                {
+                    result = parsedResult;
+                }
             }
             return result;
         }
