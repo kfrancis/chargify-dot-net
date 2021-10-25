@@ -55,7 +55,13 @@ namespace ChargifyNET
         /// The default state if the value could not be parsed, or wasn't sent.
         /// </summary>
         [XmlIgnore]
-        Unknown
+        Unknown,
+
+        /// <summary>
+        /// Represents invoice billing type
+        /// </summary>
+        [XmlEnum("invoice")]
+        Invoice
     }
 
     /// <summary>
