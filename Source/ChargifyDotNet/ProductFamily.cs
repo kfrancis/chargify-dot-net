@@ -193,7 +193,7 @@ namespace ChargifyNET
             if (ReferenceEquals(a, b)) { return true; }
 
             // If one is null, but not both, return false.
-            if (((object) a == null) || ((object) b == null)) { return false; }
+            if ((a is null) || (b is null)) { return false; }
 
             return (a.Handle == b.Handle);
         }
@@ -208,7 +208,7 @@ namespace ChargifyNET
             if (ReferenceEquals(a, b)) { return true; }
 
             // If one is null, but not both, return false.
-            if (((object) a == null) || (b == null)) { return false; }
+            if ((a is null) || (b == null)) { return false; }
 
             return (a.Handle == b.Handle);
         }
@@ -223,7 +223,7 @@ namespace ChargifyNET
             if (ReferenceEquals(a, b)) { return true; }
 
             // If one is null, but not both, return false.
-            if ((a == null) || ((object) b == null)) { return false; }
+            if ((a == null) || (b is null)) { return false; }
 
             return (a.Handle == b.Handle);
         }

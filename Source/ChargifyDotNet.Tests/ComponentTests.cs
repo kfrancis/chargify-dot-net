@@ -3,6 +3,11 @@ using System.Linq;
 using ChargifyNET;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using ChargifyDotNet;
+using Shouldly;
+using Bogus;
+using System.Collections.Generic;
+using Bogus.Extensions;
 
 namespace ChargifyDotNetTests
 {
@@ -24,7 +29,7 @@ namespace ChargifyDotNetTests
             // Assert
             Assert.IsNotNull(components);
             //Assert.IsInstanceOfType(components, typeof(List<IComponentInfo>));
-            Assert.IsTrue(components.Where(c => c.Prices != null && c.Prices.Count > 0).Count() > 0);
+            Assert.IsTrue(components.Where(c => c.Prices.Any()).Any());
             Assert.IsTrue(components.FirstOrDefault(c => c.Prices != null && c.Prices.Count > 0).Prices.First().StartingQuantity != int.MinValue);
             Assert.IsTrue(components.FirstOrDefault(c => c.Prices != null && c.Prices.Count > 0).Prices.First().EndingQuantity != int.MinValue);
             Assert.IsTrue(components.FirstOrDefault(c => c.Prices != null && c.Prices.Count > 0).Prices.First().UnitPrice != int.MinValue);
@@ -133,6 +138,264 @@ namespace ChargifyDotNetTests
 
             // Cleanup
             Assert.IsTrue(Chargify.DeleteSubscription(newSubscription.SubscriptionID, "Automatic cancel due to test"));
+        }
+
+        [DataTestMethod]
+        [DataRow(false)]
+        [DataRow(true)]
+
+        [TestMethod]
+        public void PricePoints_Create(bool isJson)
+        {
+            SetJson(isJson);
+
+            // Arrange
+            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value;
+            if (subscription == null) Assert.Inconclusive("A valid subscription could not be found.");
+            var subscriptionComponent = Chargify.GetComponentInfoForSubscription(subscription.SubscriptionID, 1526150);
+
+            var priceFaker = new Faker<ComponentPrice>()
+                .RuleFor(c => c.ComponentId, f => subscriptionComponent.ComponentID)
+                .RuleFor(c => c.StartingQuantity, f => f.Random.Number(1, 5000))
+                //.RuleFor(c => c.EndingQuantity, f => f.Random.Long())
+                .RuleFor(c => c.UnitPrice, f => f.Finance.Amount());
+
+            var pricePointFaker = new Faker<ComponentPricePoint>()
+                .RuleFor(c => c.Name, f => f.Lorem.Word())
+                .RuleFor(c => c.PricingScheme, f => f.PickRandomWithout<PricingSchemeType>(PricingSchemeType.Unknown))
+                .RuleFor(c => c.Handle, (f, c) => $"{c.Name}-handle")
+                .RuleFor(c => c.ComponentId, f => subscriptionComponent.ComponentID)
+                .RuleFor(c => c.RenewPrepaidAllocation, f => f.Random.Bool().OrNull(f, .95f))
+                .RuleFor(c => c.ExpirationIntervalUnit, f => f.PickRandomWithout<IntervalUnit>())
+                .RuleFor(c => c.ExpirationInterval, (f, c) => c.ExpirationIntervalUnit != IntervalUnit.Unknown && c.ExpirationIntervalUnit != IntervalUnit.Never ? f.Random.Number(0, 6) : int.MinValue)
+                .RuleFor(c => c.RolloverPrepaidRemainder, (f, c) => c.ExpirationInterval > 0 ? true : (bool?)null)
+                .RuleFor(c => c.Prices, f => priceFaker.GenerateBetween(1, f.Random.Number(2, 4)));
+            //.RuleFor(c => c.OveragePricingScheme, f => f.Random.Bool(0.1f) ? f.PickRandom<PricingSchemeType>() : PricingSchemeType.Unknown)
+            //.RuleFor(c => c.OveragePricingPrices, (f, c) => c.OveragePricingScheme != PricingSchemeType.Unknown ? priceFaker.GenerateBetween(1, f.Random.Number(2, 4)) : null);
+
+            ComponentPricePoint newPricePoint = pricePointFaker.Generate(1).Single();
+            newPricePoint = ComponentTests.FixPricePoints(newPricePoint);
+
+            // Act
+            ComponentPricePoint result = Chargify.CreatePricePoint(subscriptionComponent.ComponentID, newPricePoint);
+
+            // Assert
+            result.ShouldNotBeNull();
+            result.ComponentId.ShouldBe(newPricePoint.ComponentId);
+            result.Handle.ShouldBe(newPricePoint.Handle);
+            result.Name.ShouldBe(newPricePoint.Name);
+            result.PricingScheme.ShouldBe(newPricePoint.PricingScheme);
+            result.Prices.Count.ShouldBe(newPricePoint.Prices.Count);
+
+            SetJson(!isJson);
+        }
+
+        /// <summary>
+        /// While we're generating random numbers, we need to fix them up to make them look reasonable.
+        /// </summary>
+        /// <param name="pricePoint"></param>
+        /// <returns></returns>
+        private static ComponentPricePoint FixPricePoints(ComponentPricePoint pricePoint)
+        {
+            if (pricePoint.PricingScheme == PricingSchemeType.Volume ||
+                pricePoint.PricingScheme == PricingSchemeType.Tiered ||
+                pricePoint.PricingScheme == PricingSchemeType.Stairstep)
+            {
+                if (pricePoint.Prices != null && pricePoint.Prices.Any())
+                {
+                    pricePoint.Prices = FixStartEndQuantities(pricePoint.Prices.ToList());
+                }
+
+                if (pricePoint.OveragePricingPrices != null && pricePoint.OveragePricingPrices.Any())
+                {
+                    pricePoint.OveragePricingPrices = FixStartEndQuantities(pricePoint.OveragePricingPrices.ToList());
+                }
+            }
+            else
+            {
+                if (pricePoint.Prices != null && pricePoint.Prices.Any())
+                {
+                    pricePoint.Prices = FixStartEndQuantities(pricePoint.Prices.Take(1).ToList());
+                }
+
+                if (pricePoint.OveragePricingPrices != null && pricePoint.OveragePricingPrices.Any())
+                {
+                    pricePoint.OveragePricingPrices = FixStartEndQuantities(pricePoint.OveragePricingPrices.Take(1).ToList());
+                }
+            }
+
+            return pricePoint;
+        }
+
+        private static List<ComponentPrice> FixStartEndQuantities(List<ComponentPrice> priceList)
+        {
+            var listCopy = priceList.ToList();
+            for (int i = 0; i <= listCopy.Count() - 1; i++)
+            {
+                if (i == 0)
+                {
+                    listCopy[i].StartingQuantity = 1;
+                }
+                else
+                {
+                    listCopy[i - 1].EndingQuantity = listCopy[i].StartingQuantity - 1;
+                    listCopy[i].StartingQuantity = listCopy[i - 1].EndingQuantity + 1;
+                }
+            }
+            return listCopy;
+        }
+
+        [DataTestMethod]
+        [DataRow(false)]
+        [DataRow(true)]
+        [TestMethod]
+        public void PricePoints_PromoteToDefault(bool isJson)
+        {
+            SetJson(isJson);
+
+            // Arrange
+            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value;
+            if (subscription == null) Assert.Inconclusive("A valid subscription could not be found.");
+            var subscriptionComponent = Chargify.GetComponentInfoForSubscription(subscription.SubscriptionID, 1526150);
+
+            var defaultPricePoint = subscriptionComponent.PricePoints.FirstOrDefault(x => x.Default == true);
+            var firstNonDefaultPricePoint = subscriptionComponent.PricePoints.FirstOrDefault(x => x.Default != true);
+
+            SetJson(!isJson);
+        }
+
+        [DataTestMethod]
+        [DataRow(false)]
+        [DataRow(true)]
+        [TestMethod]
+        public void PricePoints_CreateBulk(bool isJson)
+        {
+            SetJson(isJson);
+
+            // Arrange
+            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value;
+            if (subscription == null) Assert.Inconclusive("A valid subscription could not be found.");
+            var subscriptionComponent = Chargify.GetComponentInfoForSubscription(subscription.SubscriptionID, 1526150);
+
+            SetJson(!isJson);
+        }
+
+        [DataTestMethod]
+        [DataRow(false)]
+        [DataRow(true)]
+        [TestMethod]
+        public void PricePoints_Update(bool isJson)
+        {
+            SetJson(isJson);
+
+            // Arrange
+            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value;
+            if (subscription == null) Assert.Inconclusive("A valid subscription could not be found.");
+            var subscriptionComponent = Chargify.GetComponentInfoForSubscription(subscription.SubscriptionID, 1526150);
+
+            SetJson(!isJson);
+        }
+
+        [DataTestMethod]
+        [DataRow(false)]
+        [DataRow(true)]
+        [TestMethod]
+        public void PricePoints_Archive(bool isJson)
+        {
+            SetJson(isJson);
+
+            // Arrange
+            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value;
+            if (subscription == null) Assert.Inconclusive("A valid subscription could not be found.");
+            var subscriptionComponent = Chargify.GetComponentInfoForSubscription(subscription.SubscriptionID, 1526150);
+
+            var defaultPricePoint = subscriptionComponent.PricePoints.FirstOrDefault(x => !x.ArchivedAt.HasValue);
+            if (defaultPricePoint == null) Assert.Inconclusive("No unarchived price points to unarchive.");
+
+            var result = Chargify.ArchivePricePoint(subscriptionComponent.ComponentID, defaultPricePoint.Id);
+
+            result.ShouldNotBeNull();
+            result.ArchivedAt.ShouldNotBeNull();
+
+            SetJson(!isJson);
+        }
+
+        [DataTestMethod]
+        [DataRow(false)]
+        [DataRow(true)]
+        [TestMethod]
+        public void PricePoints_Read(bool isJson)
+        {
+            SetJson(isJson);
+
+            // Arrange
+            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value;
+            if (subscription == null) Assert.Inconclusive("A valid subscription could not be found.");
+            var subscriptionComponent = Chargify.GetComponentInfoForSubscription(subscription.SubscriptionID, 1526150);
+
+            // Act
+            var result = Chargify.GetPricePoints(subscriptionComponent.ComponentID);
+
+            result.ShouldNotBeNull();
+            result.ShouldAllBe(x => x.Value.ComponentId == subscriptionComponent.ComponentID);
+
+            SetJson(!isJson);
+        }
+
+        [DataTestMethod]
+        [DataRow(false)]
+        [DataRow(true)]
+        [TestMethod]
+        public void PricePoints_Unarchive(bool isJson)
+        {
+            SetJson(isJson);
+
+            // Arrange
+            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value;
+            if (subscription == null) Assert.Inconclusive("A valid subscription could not be found.");
+            var subscriptionComponent = Chargify.GetComponentInfoForSubscription(subscription.SubscriptionID, 1526150);
+
+            var defaultPricePoint = subscriptionComponent.PricePoints.FirstOrDefault(x => x.ArchivedAt.HasValue);
+            if (defaultPricePoint == null) Assert.Inconclusive("No archived price points to unarchive.");
+
+            var result = Chargify.UnarchivePricePoint(subscriptionComponent.ComponentID, defaultPricePoint.Id);
+
+            result.ShouldNotBeNull();
+            result.ArchivedAt.ShouldBeNull();
+
+            SetJson(!isJson);
+        }
+
+        [DataTestMethod]
+        [DataRow(false)]
+        [DataRow(true)]
+        [TestMethod]
+        public void PricePoints_UpdatePrices(bool isJson)
+        {
+            SetJson(isJson);
+
+            // Arrange
+            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value;
+            if (subscription == null) Assert.Inconclusive("A valid subscription could not be found.");
+            var subscriptionComponent = Chargify.GetComponentInfoForSubscription(subscription.SubscriptionID, 1526150);
+
+            SetJson(!isJson);
+        }
+
+        [DataTestMethod]
+        [DataRow(false)]
+        [DataRow(true)]
+        [TestMethod]
+        public void PricePoints_CreatePrices(bool isJson)
+        {
+            SetJson(isJson);
+
+            // Arrange
+            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value;
+            if (subscription == null) Assert.Inconclusive("A valid subscription could not be found.");
+            var subscriptionComponent = Chargify.GetComponentInfoForSubscription(subscription.SubscriptionID, 1526150);
+
+            SetJson(!isJson);
         }
 
         private CreditCardAttributes GetTestPaymentMethod(CustomerAttributes customer)

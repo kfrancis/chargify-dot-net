@@ -56,8 +56,7 @@ namespace ChargifyNET
                     bool azureDeployed = UsefulExtensions.IsRunningAzure();
                     if (!azureDeployed)
                     {
-                        ChargifyAccountRetrieverSection config = ConfigurationManager.GetSection("chargify") as ChargifyAccountRetrieverSection;
-                        if (config != null)
+                        if (ConfigurationManager.GetSection("chargify") is ChargifyAccountRetrieverSection config)
                         {
                             ChargifyAccountElement accountInfo = config.GetDefaultOrFirst();
                             _chargify.apiKey = accountInfo.ApiKey;

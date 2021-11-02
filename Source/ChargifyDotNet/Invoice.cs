@@ -281,7 +281,7 @@ namespace ChargifyNET
         /// A list of the financial transactions that modify the amount due
         /// </summary>
         public List<IInvoicePaymentAndCredit> PaymentsAndCredits { get { return _paymentsAndCredits; } }
-        private List<IInvoicePaymentAndCredit> _paymentsAndCredits = new List<IInvoicePaymentAndCredit>();
+        private readonly List<IInvoicePaymentAndCredit> _paymentsAndCredits = new List<IInvoicePaymentAndCredit>();
         #endregion
     }
 }

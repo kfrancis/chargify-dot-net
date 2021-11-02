@@ -1,10 +1,11 @@
 ﻿#region License, Terms and Conditions
+
 //
 // ChargifyConnect.cs
 //
 // Authors: Kori Francis <twitter.com/djbyter>, David Ball
 // Copyright (C) 2010 Clinical Support Systems, Inc. All rights reserved.
-// 
+//
 //  THIS FILE IS LICENSED UNDER THE MIT LICENSE AS OUTLINED IMMEDIATELY BELOW:
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a
@@ -25,27 +26,29 @@
 //  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 //  DEALINGS IN THE SOFTWARE.
 //
+
 #endregion
 
-using System.Linq;
-using System.Xml.Serialization;
 using ChargifyDotNet.RequestDTOs;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using System.Linq;
 
 namespace ChargifyNET
 {
     #region Imports
+
+    using ChargifyDotNet;
     using Json;
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.IO;
     using System.Net;
     using System.Text;
-    using System.Web;
     using System.Xml;
-    using System.Globalization;
     using System.Xml.Linq;
+    using System.Xml.Schema;
+
     #endregion
 
     /// <summary>
@@ -54,6 +57,7 @@ namespace ChargifyNET
     public class ChargifyConnect : IChargifyConnect
     {
         #region System Constants
+
         private const string DateTimeFormat = "yyyy-MM-dd";
         private const string UpdateShortName = "update_payment";
 
@@ -66,7 +70,8 @@ namespace ChargifyNET
         /// <summary>
         /// Constructor
         /// </summary>
-        public ChargifyConnect() { }
+        public ChargifyConnect()
+        { }
 
         /// <summary>
         /// Constructor
@@ -99,6 +104,7 @@ namespace ChargifyNET
         #endregion
 
         #region Properties
+
         private static string UserAgent => _userAgent ??
                                            (_userAgent =
                                                string.Format("Chargify.NET Client v" +
@@ -134,7 +140,9 @@ namespace ChargifyNET
         /// <summary>
         /// Should the library require a CVV?
         /// </summary>
-        public bool CvvRequired { get { return _cvvRequired; } set { _cvvRequired = value; } }
+        public bool CvvRequired
+        { get { return _cvvRequired; } set { _cvvRequired = value; } }
+
         private bool _cvvRequired = true;
 
         /// <summary>
@@ -156,6 +164,7 @@ namespace ChargifyNET
                 }
             }
         }
+
         private SecurityProtocolType? _protocolType;
 
         /// <summary>
@@ -209,11 +218,13 @@ namespace ChargifyNET
                 return _lastResponse;
             }
         }
+
         private HttpWebResponse _lastResponse;
 
         #endregion
 
         #region Metafield
+
         /// <summary>
         /// Returns a list of all metadata for a resource.
         /// </summary>
@@ -227,19 +238,24 @@ namespace ChargifyNET
                 case "customer":
                     response = DoRequest(string.Format("customers/metafields.{0}", GetMethodExtension()), HttpRequestMethod.Get, null);
                     break;
+
                 case "subscription":
                     response = DoRequest(string.Format("subscriptions/metafields.{0}", GetMethodExtension()), HttpRequestMethod.Get, null);
                     break;
+
                 default:
                     throw new Exception(string.Format("Must be of type '{0}'", string.Join(", ", _metafieldTypes.ToArray())));
             }
             // change the response to the object
             return response.ConvertResponseTo<Metafield>("metafield");
         }
-        private static List<string> _metafieldTypes = new List<string> { "Customer", "Subscription" };
+
+        private static readonly List<string> _metafieldTypes = new List<string> { "Customer", "Subscription" };
+
         #endregion
 
         #region Metadata
+
         /// <summary>
         /// Allows you to set a group of metadata for a specific resource
         /// </summary>
@@ -260,16 +276,18 @@ namespace ChargifyNET
                 case nameof(ICustomer):
                     url = $"customers/{chargifyId}/metadata";
                     break;
+
                 case nameof(Subscription):
                 case nameof(ISubscription):
                     url = $"subscriptions/{chargifyId}/metadata";
                     break;
+
                 default:
                     throw new Exception($"Must be of type '{string.Join(", ", _metadataTypes.ToArray())}'");
             }
 
             // now make the request
-            string response = !UseJSON 
+            string response = !UseJSON
                 ? DoNewRequest(url, HttpRequestMethod.Post, MetadataRequest.GetMetadatumXml(chargifyId, metadatum))
                 : DoNewRequest(url, HttpRequestMethod.Post, new { metadata = MetadataRequest.GetMetadatumRequest(metadatum) });
 
@@ -302,7 +320,6 @@ namespace ChargifyNET
                     }
                 }
             }
-           
 
             return retVal;
         }
@@ -316,7 +333,7 @@ namespace ChargifyNET
         /// <returns>The metadata result containing the response</returns>
         public List<IMetadata> SetMetadataFor<T>(long chargifyId, Metadata metadata)
         {
-            return SetMetadataFor<T>(chargifyId, new [] {metadata});
+            return SetMetadataFor<T>(chargifyId, new[] { metadata });
         }
 
         /// <summary>
@@ -335,10 +352,12 @@ namespace ChargifyNET
                 case nameof(ICustomer):
                     url = string.Format("customers/{0}/metadata.{1}", resourceId, GetMethodExtension());
                     break;
+
                 case nameof(Subscription):
                 case nameof(ISubscription):
                     url = string.Format("subscriptions/{0}/metadata.{1}", resourceId, GetMethodExtension());
                     break;
+
                 default:
                     throw new Exception(string.Format("Must be of type '{0}'", string.Join(", ", _metadataTypes.ToArray())));
             }
@@ -370,17 +389,21 @@ namespace ChargifyNET
                 case nameof(ICustomer):
                     response = DoRequest(string.Format("customers/metadata.{0}", GetMethodExtension()), HttpRequestMethod.Get, null);
                     break;
+
                 case nameof(Subscription):
                 case nameof(ISubscription):
                     response = DoRequest(string.Format("subscriptions/metadata.{0}", GetMethodExtension()), HttpRequestMethod.Get, null);
                     break;
+
                 default:
                     throw new Exception(string.Format("Must be of type '{0}'", string.Join(", ", _metadataTypes)));
             }
             // change the response to the object
             return response.ConvertResponseTo<MetadataResult>("metadata");
         }
-        private static List<string> _metadataTypes = new List<string> { nameof(ICustomer),nameof(Customer), nameof(ISubscription),nameof(Subscription) };
+
+        private static readonly List<string> _metadataTypes = new List<string> { nameof(ICustomer), nameof(Customer), nameof(ISubscription), nameof(Subscription) };
+
         #endregion
 
         #region Customers
@@ -441,12 +464,13 @@ namespace ChargifyNET
             // make sure data is valid
             if (LoadCustomer(customer.SystemID) != null) throw new ArgumentException("Not unique", "systemId");
 #endif
-            var body = UseJSON ? new {customer} : (object)CustomerRequest.GetCustomerCreateXml(customer);
+            var body = UseJSON ? new { customer } : (object)CustomerRequest.GetCustomerCreateXml(customer);
 
             var response = DoNewRequest("customers", HttpRequestMethod.Post, body);
             // change the response to the object
             return response.ConvertResponseTo<Customer>("customer");
         }
+
         /// <summary>
         /// Create a new chargify customer
         /// </summary>
@@ -496,7 +520,7 @@ namespace ChargifyNET
         /// <param name="shippingCountry">The shipping country of the customer, if applicable.</param>
         /// <param name="taxExempt">The tax exemption status of the customer, if applicable.</param>
         /// <returns>The created chargify customer</returns>
-        public ICustomer CreateCustomer(string firstName, string lastName, string emailAddress, string phone, string organization, string systemId, 
+        public ICustomer CreateCustomer(string firstName, string lastName, string emailAddress, string phone, string organization, string systemId,
                                         string ccEmails, string shippingAddress, string shippingAddress2, string shippingCity, string shippingState,
                                         string shippingZip, string shippingCountry, bool taxExempt = false)
         {
@@ -517,7 +541,6 @@ namespace ChargifyNET
                 ShippingCountry = shippingCountry,
                 TaxExempt = taxExempt
             });
-
         }
 
         /// <summary>
@@ -647,8 +670,7 @@ namespace ChargifyNET
                 JsonArray array = JsonArray.Parse(response, ref position);
                 for (int i = 0; i <= array.Length - 1; i++)
                 {
-                    var jsonObject = array.Items[i] as JsonObject;
-                    if (jsonObject != null && jsonObject.ContainsKey("customer"))
+                    if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("customer"))
                     {
                         JsonObject customerObj = (array.Items[i] as JsonObject)["customer"] as JsonObject;
                         ICustomer loadedCustomer = new Customer(customerObj);
@@ -691,7 +713,7 @@ namespace ChargifyNET
             // now make the request
             string response = DoRequest(string.Format("customers.{0}?page={1}", GetMethodExtension(), pageNumber));
             return ProcessCustomerListResponse(response, keyByChargifyId);
-        }        
+        }
 
         /// <summary>
         /// Get a list of all customers.  Be careful calling this method because a large number of
@@ -769,6 +791,7 @@ namespace ChargifyNET
                     case HttpStatusCode.Forbidden:
                     case HttpStatusCode.NotFound:
                         return false;
+
                     default:
                         throw;
                 }
@@ -807,11 +830,11 @@ namespace ChargifyNET
                 }
             }
         }
-        
 
         #endregion
 
         #region Products
+
         /// <summary>
         /// Method that updates a product
         /// </summary>
@@ -979,8 +1002,7 @@ namespace ChargifyNET
                 JsonArray array = JsonArray.Parse(response, ref position);
                 for (int i = 0; i <= array.Length - 1; i++)
                 {
-                    var jsonObject = array.Items[i] as JsonObject;
-                    if (jsonObject != null && jsonObject.ContainsKey("product"))
+                    if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("product"))
                     {
                         JsonObject productObj = (array.Items[i] as JsonObject)["product"] as JsonObject;
                         IProduct loadedProduct = new Product(productObj);
@@ -1002,6 +1024,7 @@ namespace ChargifyNET
         #endregion
 
         #region Product Families
+
         /// <summary>
         /// Method for creating a new product family via the API
         /// </summary>
@@ -1072,8 +1095,7 @@ namespace ChargifyNET
                 JsonArray array = JsonArray.Parse(response, ref position);
                 for (int i = 0; i <= array.Length - 1; i++)
                 {
-                    var jsonObject = array.Items[i] as JsonObject;
-                    if (jsonObject != null && jsonObject.ContainsKey("product_family"))
+                    if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("product_family"))
                     {
                         JsonObject productFamilyObj = (array.Items[i] as JsonObject)["product_family"] as JsonObject;
                         IProductFamily loadedProductFamily = new ProductFamily(productFamilyObj);
@@ -1143,6 +1165,7 @@ namespace ChargifyNET
                 throw;
             }
         }
+
         #endregion
 
         #region Subscriptions
@@ -1309,7 +1332,7 @@ namespace ChargifyNET
         /// https://SUBDOMAIN_HERE.chargify.com/subscriptions/SUBSCRIPTION_ID_HERE/purge.json?ack=CUSTOMER_ID_HERE
         /// <param name="subscriptionId">The id of the subscription</param>
         /// <returns>True if the subscription was purged, false otherwise.</returns>
-        public bool PurgeSubscription(int subscriptionId) 
+        public bool PurgeSubscription(int subscriptionId)
         {
             try
             {
@@ -1363,7 +1386,7 @@ namespace ChargifyNET
         /// <param name="state">The state of subscriptions to return</param>
         /// <returns>Null if there are no results, object otherwise.</returns>
 
-        public IDictionary<int, ISubscription> GetSubscriptionList(SubscriptionState state) 
+        public IDictionary<int, ISubscription> GetSubscriptionList(SubscriptionState state)
         {
             var retValue = new Dictionary<int, ISubscription>();
             int pageCount = 1000;
@@ -1425,16 +1448,16 @@ namespace ChargifyNET
             return GetSubscriptionList(page, perPage, SubscriptionState.Unknown);
         }
 
-        private IDictionary<int, ISubscription> GetSubscriptionList(int page, int perPage, SubscriptionState state) 
+        private IDictionary<int, ISubscription> GetSubscriptionList(int page, int perPage, SubscriptionState state)
         {
             var queryString = new StringBuilder();
             // we sort by signup_date ascending to make sure we never encounter an off-by-one error when adding a new record to production.
-            AppendToQueryString(queryString, "sort","created_at");
+            AppendToQueryString(queryString, "sort", "created_at");
             AppendToQueryString(queryString, "direction", "asc");
 
             if (page != int.MinValue)
-                AppendToQueryString(queryString, "page",page);
-            
+                AppendToQueryString(queryString, "page", page);
+
             if (perPage != int.MinValue)
                 AppendToQueryString(queryString, "per_page", perPage);
 
@@ -1480,8 +1503,7 @@ namespace ChargifyNET
                 JsonArray array = JsonArray.Parse(response, ref position);
                 for (int i = 0; i <= array.Length - 1; i++)
                 {
-                    var jsonObject = array.Items[i] as JsonObject;
-                    if (jsonObject != null && jsonObject.ContainsKey("subscription"))
+                    if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("subscription"))
                     {
                         JsonObject subscriptionObj = (array.Items[i] as JsonObject)["subscription"] as JsonObject;
                         ISubscription loadedSubscription = new Subscription(subscriptionObj);
@@ -1550,8 +1572,7 @@ namespace ChargifyNET
                     JsonArray array = JsonArray.Parse(response, ref position);
                     for (int i = 0; i <= array.Length - 1; i++)
                     {
-                        var jsonObject = array.Items[i] as JsonObject;
-                        if (jsonObject != null && jsonObject.ContainsKey("subscription"))
+                        if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("subscription"))
                         {
                             JsonObject subscriptionObj = (array.Items[i] as JsonObject)["subscription"] as JsonObject;
                             ISubscription loadedSubscription = new Subscription(subscriptionObj);
@@ -1638,7 +1659,7 @@ namespace ChargifyNET
         }
 
         /// <summary>
-        /// Create a new subscription 
+        /// Create a new subscription
         /// </summary>
         /// <param name="productHandle">The handle to the product</param>
         /// <param name="chargifyId">The Chargify ID of the customer</param>
@@ -1684,7 +1705,7 @@ namespace ChargifyNET
         {
             if (chargifyId == int.MinValue) throw new ArgumentException("Invalid Customer ID detected", "chargifyId");
             if (string.IsNullOrEmpty(couponCode)) throw new ArgumentException("CouponCode can't be empty", "couponCode");
-            return CreateSubscription(productHandle, chargifyId, couponCode, default(PaymentCollectionMethod?));
+            return CreateSubscription(productHandle, chargifyId, couponCode, default);
         }
 
         /// <summary>
@@ -1721,7 +1742,7 @@ namespace ChargifyNET
         }
 
         /// <summary>
-        /// Create a new subscription 
+        /// Create a new subscription
         /// </summary>
         /// <param name="productHandle">The handle to the product</param>
         /// <param name="systemId">The System ID of the customer</param>
@@ -1748,14 +1769,14 @@ namespace ChargifyNET
         /// <returns>The xml describing the new subscription</returns>
         public ISubscription CreateSubscriptionUsingCoupon(string productHandle, string systemId, string couponCode)
         {
-            // make sure data is valid            
+            // make sure data is valid
             if (systemId == string.Empty) throw new ArgumentException("Invalid system customer ID detected", nameof(systemId));
 
             return CreateSubscription(productHandle, systemId, couponCode);
         }
 
         /// <summary>
-        /// Create a new subscription 
+        /// Create a new subscription
         /// </summary>
         /// <param name="productHandle">The handle to the product</param>
         /// <param name="systemId">The System ID of the customer</param>
@@ -2125,7 +2146,7 @@ namespace ChargifyNET
         }
 
         /// <summary>
-        /// Create a new subscription 
+        /// Create a new subscription
         /// </summary>
         /// <param name="productHandle">The handle to the product</param>
         /// <param name="chargifyId">The Chargify ID of the customer</param>
@@ -2169,7 +2190,7 @@ namespace ChargifyNET
         }
 
         /// <summary>
-        /// Create a new subscription 
+        /// Create a new subscription
         /// </summary>
         /// <param name="productHandle">The handle to the product</param>
         /// <param name="chargifyId">The Chargify ID of the customer</param>
@@ -2234,7 +2255,7 @@ namespace ChargifyNET
         }
 
         /// <summary>
-        /// Create a new subscription 
+        /// Create a new subscription
         /// </summary>
         /// <param name="productHandle">The handle to the product</param>
         /// <param name="chargifyId">The Chargify ID of the customer</param>
@@ -2296,11 +2317,11 @@ namespace ChargifyNET
         }
 
         /// <summary>
-        /// Create a new subscription 
+        /// Create a new subscription
         /// </summary>
         /// <param name="productHandle">The handle to the product</param>
         /// <param name="systemId">The System ID of the customer</param>
-        /// <param name="couponCode">The discount coupon code</param> 
+        /// <param name="couponCode">The discount coupon code</param>
         /// <returns>The xml describing the new subsscription</returns>
         private ISubscription CreateSubscription(string productHandle, string systemId, string couponCode)
         {
@@ -2330,7 +2351,7 @@ namespace ChargifyNET
         }
 
         /// <summary>
-        /// Create a new subscription 
+        /// Create a new subscription
         /// </summary>
         /// <param name="productHandle">The handle to the product</param>
         /// <param name="systemId">The System ID of the customer</param>
@@ -2343,7 +2364,7 @@ namespace ChargifyNET
         /// <param name="billingState">The billing state or province</param>
         /// <param name="billingZip">The billing zip code or postal code</param>
         /// <param name="billingCountry">The billing country</param>
-        /// <param name="couponCode">The discount coupon code</param> 
+        /// <param name="couponCode">The discount coupon code</param>
         /// <param name="firstName">The first name, as listed on the credit card</param>
         /// <param name="lastName">The last name, as listed on the credit card</param>
         /// <returns>The xml describing the new subsscription</returns>
@@ -2403,7 +2424,7 @@ namespace ChargifyNET
         }
 
         /// <summary>
-        /// Create a new subscription 
+        /// Create a new subscription
         /// </summary>
         /// <param name="productHandle">The handle to the product</param>
         /// <param name="systemId">The System ID of the customer</param>
@@ -2416,7 +2437,7 @@ namespace ChargifyNET
         /// <param name="billingState">The billing state or province</param>
         /// <param name="billingZip">The billing zip code or postal code</param>
         /// <param name="billingCountry">The billing country</param>
-        /// <param name="couponCode">The discount coupon code</param> 
+        /// <param name="couponCode">The discount coupon code</param>
         /// <returns>The xml describing the new subsscription</returns>
         private ISubscription CreateSubscription(string productHandle, string systemId, string fullNumber, int expirationMonth, int expirationYear,
                                                         string cvv, string billingAddress, string billingCity, string billingState, string billingZip,
@@ -2463,7 +2484,7 @@ namespace ChargifyNET
         }
 
         /// <summary>
-        /// Create a new subscription 
+        /// Create a new subscription
         /// </summary>
         /// <param name="productHandle">The handle to the product</param>
         /// <param name="newSystemId">The reference field value of the customer</param>
@@ -2472,7 +2493,7 @@ namespace ChargifyNET
         /// <param name="emailAddress">The email address of the customer</param>
         /// <param name="phone">The phone number of the customer</param>
         /// <param name="organization">The customer's organization</param>
-        /// <param name="couponCode">The discount coupon code</param> 
+        /// <param name="couponCode">The discount coupon code</param>
         /// <param name="nextBillingAt">The next date that the billing should be processed (DateTime.Min if unspecified)</param>
         /// <param name="paymentProfileId">The id of the payment profile to use when creating the subscription (existing data)</param>
         /// <returns>The xml describing the new subsscription</returns>
@@ -2522,7 +2543,7 @@ namespace ChargifyNET
         }
 
         /// <summary>
-        /// Create a new subscription 
+        /// Create a new subscription
         /// </summary>
         /// <param name="productHandle">The handle to the product</param>
         /// <param name="newSystemId">The reference field value of the customer</param>
@@ -2531,7 +2552,7 @@ namespace ChargifyNET
         /// <param name="emailAddress">The email address of the customer</param>
         /// <param name="phone">The phone number of the customer</param>
         /// <param name="organization">The customer's organization</param>
-        /// <param name="couponCode">The discount coupon code</param> 
+        /// <param name="couponCode">The discount coupon code</param>
         /// <param name="nextBillingAt">The next date that the billing should be processed</param>
         /// <param name="paymentProfile">The paymentProfile object to use when creating the subscription (existing data)</param>
         /// <param name="paymentCollectionMethod">The type of subscription, recurring (automatic) billing, or invoice (if applicable)</param>
@@ -2681,7 +2702,7 @@ namespace ChargifyNET
             subscriptionXml.AppendFormat("<email>{0}</email>", emailAddress);
             if (!string.IsNullOrEmpty(phone)) subscriptionXml.AppendFormat("<phone>{0}</phone>", phone.ToHtmlEncoded());
             subscriptionXml.AppendFormat("<organization>{0}</organization>", (organization != null) ? organization.ToHtmlEncoded() : "null");
-            subscriptionXml.AppendFormat("<vat_number>{0}</vat_number>", (vatNumber != null) ? vatNumber.ToHtmlEncoded() : null);
+            subscriptionXml.AppendFormat("<vat_number>{0}</vat_number>", vatNumber?.ToHtmlEncoded());
             subscriptionXml.AppendFormat("<reference>{0}</reference>", newSystemId);
             if (!string.IsNullOrEmpty(shippingAddress)) subscriptionXml.AppendFormat("<address>{0}</address>", shippingAddress.ToHtmlEncoded());
             if (!string.IsNullOrEmpty(shippingCity)) subscriptionXml.AppendFormat("<city>{0}</city>", shippingCity.ToHtmlEncoded());
@@ -2784,7 +2805,6 @@ namespace ChargifyNET
         public ISubscription UpdateSubscriptionCreditCard(int subscriptionId, string fullNumber, int? expirationMonth, int? expirationYear, string cvv,
                                                                  string billingAddress, string billingCity, string billingState, string billingZip, string billingCountry)
         {
-
             // make sure data is OK
             if (subscriptionId == int.MinValue) throw new ArgumentNullException("subscriptionId");
 
@@ -2811,7 +2831,6 @@ namespace ChargifyNET
         public ISubscription UpdateSubscriptionCreditCard(int subscriptionId, string firstName, string lastName, string fullNumber, int? expirationMonth, int? expirationYear, string cvv,
                                                                  string billingAddress, string billingCity, string billingState, string billingZip, string billingCountry)
         {
-
             // make sure data is OK
             if (subscriptionId == int.MinValue) throw new ArgumentNullException("subscriptionId");
 
@@ -2838,7 +2857,6 @@ namespace ChargifyNET
         private ISubscription UpdateTheSubscriptionCreditCard(int subscriptionId, string firstName, string lastName, string fullNumber, int? expirationMonth, int? expirationYear, string cvv,
                                                                  string billingAddress, string billingCity, string billingState, string billingZip, string billingCountry)
         {
-
             // make sure data is OK
             if (subscriptionId == int.MinValue) throw new ArgumentNullException("subscriptionId");
             if (string.IsNullOrEmpty("FullNumber")) throw new ArgumentNullException("fullNumber");
@@ -3135,15 +3153,15 @@ namespace ChargifyNET
             // create XML for creation of customer
             StringBuilder subscriptionXml = new StringBuilder(GetXmlStringIfApplicable());
             subscriptionXml.Append("<subscription>");
-            //if (!string.IsNullOrEmpty(ProductHandle) && existingSubscription.Product.Handle != ProductHandle)  
+            //if (!string.IsNullOrEmpty(ProductHandle) && existingSubscription.Product.Handle != ProductHandle)
             subscriptionXml.AppendFormat("<product_handle>{0}</product_handle>", productHandle);
             if (!string.IsNullOrEmpty(firstName) || !string.IsNullOrEmpty(lastName) || !string.IsNullOrEmpty(emailAddress) ||
                 !string.IsNullOrEmpty(organization) || systemId != string.Empty)
             {
                 subscriptionXml.Append("<customer_attributes>");
-                //if (!string.IsNullOrEmpty(FirstName) && existingSubscription.Customer.FirstName != FirstName) 
+                //if (!string.IsNullOrEmpty(FirstName) && existingSubscription.Customer.FirstName != FirstName)
                 subscriptionXml.AppendFormat("<first_name>{0}</first_name>", firstName);
-                //if (!string.IsNullOrEmpty(LastName) && existingSubscription.Customer.LastName != LastName) 
+                //if (!string.IsNullOrEmpty(LastName) && existingSubscription.Customer.LastName != LastName)
                 subscriptionXml.AppendFormat("<last_name>{0}</last_name>", lastName);
                 if (!string.IsNullOrEmpty(emailAddress) && existingSubscription.Customer.Email != emailAddress) subscriptionXml.AppendFormat("<email>{0}</email>", emailAddress);
                 if (!string.IsNullOrEmpty(phone) && existingSubscription.Customer.Phone != phone) subscriptionXml.AppendFormat("<{0}>{1}</{2}>", CustomerAttributes.PhoneKey, phone, CustomerAttributes.PhoneKey);
@@ -3156,7 +3174,6 @@ namespace ChargifyNET
                 !string.IsNullOrEmpty(billingAddress) || !string.IsNullOrEmpty(billingCity) || !string.IsNullOrEmpty(billingState) ||
                 !string.IsNullOrEmpty(billingZip) || !string.IsNullOrEmpty(billingCountry))
             {
-
                 StringBuilder paymentProfileXml = new StringBuilder();
                 if ((!string.IsNullOrEmpty(fullNumber)) && (existingSubscription.PaymentProfile.FullNumber != fullNumber)) paymentProfileXml.AppendFormat("<full_number>{0}</full_number>", fullNumber);
                 if ((expirationMonth == null) && (existingSubscription.PaymentProfile.ExpirationMonth != expirationMonth)) paymentProfileXml.AppendFormat("<expiration_month>{0}</expiration_month>", expirationMonth);
@@ -3171,7 +3188,6 @@ namespace ChargifyNET
                 {
                     subscriptionXml.AppendFormat("<credit_card_attributes>{0}</credit_card_attributes>", paymentProfileXml);
                 }
-
             }
             subscriptionXml.Append("</subscription>");
             try
@@ -3235,11 +3251,10 @@ namespace ChargifyNET
             bool isSuccessful = cancelAtEndOfPeriod
                 ? ApplyDelayedCancelToSubscription(subscriptionId, cancellationMessage)
                 : RemoveDelayedCancelFromSubscription(subscriptionId);
-          
+
             if (isSuccessful)
                 return LoadSubscription(subscriptionId);
             return null;
-
         }
 
         private bool ApplyDelayedCancelToSubscription(int subscriptionId, string cancellationMessage)
@@ -3281,7 +3296,7 @@ namespace ChargifyNET
         }
 
         /// <summary>
-        /// Method for reseting a subscription balance to zero (removes outstanding balance). 
+        /// Method for reseting a subscription balance to zero (removes outstanding balance).
         /// Useful when reactivating subscriptions, and making sure not to charge the user
         /// their existing balance when then cancelled.
         /// </summary>
@@ -3379,8 +3394,8 @@ namespace ChargifyNET
         }
 
         /// <summary>
-        /// Resume a paused (on-hold) subscription. If the normal next renewal date has not passed, 
-        /// the subscription will return to active and will renew on that date. Otherwise, it will 
+        /// Resume a paused (on-hold) subscription. If the normal next renewal date has not passed,
+        /// the subscription will return to active and will renew on that date. Otherwise, it will
         /// behave like a reactivation, setting the billing date to 'now' and charging the subscriber.
         /// </summary>
         /// <param name="subscriptionId">The (Chargify) id of the subscription</param>
@@ -3462,6 +3477,7 @@ namespace ChargifyNET
         #endregion
 
         #region Subscription Override
+
         /// <summary>
         /// This API endpoint allows you to set certain subscription fields that are usually managed for you automatically. Some of the fields can be set via the normal Subscriptions Update API, but others can only be set using this endpoint.
         /// </summary>
@@ -3515,14 +3531,17 @@ namespace ChargifyNET
                 {
                     case HttpStatusCode.BadRequest:
                         return false;
+
                     default:
                         throw;
                 }
             }
         }
+
         #endregion
 
         #region Migrations
+
         /// <summary>
         /// Return a preview of charges for a subscription product migrations
         /// </summary>
@@ -3591,6 +3610,7 @@ namespace ChargifyNET
             if (product == null) throw new ArgumentNullException("product");
             return PreviewMigrateSubscriptionProduct(subscription.SubscriptionID, product.ID);
         }
+
         #endregion
 
         #region Coupons
@@ -3612,7 +3632,6 @@ namespace ChargifyNET
                 string response = DoRequest(string.Format("product_families/{0}/coupons/{1}.{2}", productFamilyId, couponId, GetMethodExtension()));
                 // change the response to the object
                 return response.ConvertResponseTo<Coupon>("coupon");
-
             }
             catch (ChargifyException cex)
             {
@@ -3818,7 +3837,7 @@ namespace ChargifyNET
             if (LoadSubscription(subscriptionId) == null) throw new ArgumentException("Not an SubscriptionID", "subscriptionId");
             if (string.IsNullOrEmpty(couponCode)) throw new ArgumentException("Coupon code is empty", "couponCode");
             string response = DoRequest(string.Format("subscriptions/{0}/add_coupon.{1}?code={2}", subscriptionId, GetMethodExtension(), couponCode), HttpRequestMethod.Post, null);
-            // change the response to the object            
+            // change the response to the object
             return response.ConvertResponseTo<Subscription>("subscription");
         }
 
@@ -3837,7 +3856,7 @@ namespace ChargifyNET
             {
                 string response = this.DoRequest(string.Format("subscriptions/{0}/remove_coupon.{1}?code={2}", SubscriptionID, GetMethodExtension(), CouponCode), HttpRequestMethod.Delete, null);
 
-                // change the response to the object            
+                // change the response to the object
                 return response.Contains("Coupon removed");
             }
             catch (Exception)
@@ -3937,8 +3956,8 @@ namespace ChargifyNET
             if (productFamilyId > 0) couponXml.AppendFormat("<product_family_id>{0}</product_family_id>", productFamilyId);
             couponXml.Append("</coupon>");
             return couponXml.ToString();
-
         }
+
         #endregion
 
         #region One-Time Charges
@@ -4054,9 +4073,245 @@ namespace ChargifyNET
             // change the response to the object
             return response.ConvertResponseTo<Credit>("credit");
         }
+
         #endregion
 
         #region Components
+
+
+        public List<ComponentPricePoint> GetPricePoints(int componentID, List<ComponentPricePoint> bulkPricePoints)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ComponentPricePoint SetPricePointDefault(int componentID, long pricePointId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ComponentPricePoint ArchivePricePoint(int componentID, long pricePointId)
+        {
+            try
+            {
+                // make sure data is valid
+                if (pricePointId < 0) throw new ArgumentNullException(nameof(pricePointId));
+                if (componentID < 0) throw new ArgumentNullException(nameof(componentID));
+
+                // now make the request
+                string response = DoRequest(string.Format("components/{0}/price_points/{1}.{2}", componentID, pricePointId, GetMethodExtension()), HttpRequestMethod.Delete, null);
+
+                // Convert the Chargify response into the object we're looking for
+                return response.ConvertResponseTo<ComponentPricePoint>("price_point");
+            }
+            catch (ChargifyException cex)
+            {
+                if (cex.StatusCode == HttpStatusCode.NotFound)
+                    throw new InvalidOperationException("Subscription not found");
+
+                throw;
+            }
+        }
+        public ComponentPricePoint UnarchivePricePoint(int componentID, long pricePointId)
+        {
+            try
+            {
+                // make sure data is valid
+                if (pricePointId < 0) throw new ArgumentNullException(nameof(pricePointId));
+                if (componentID < 0) throw new ArgumentNullException(nameof(componentID));
+
+                // now make the request
+                string response = DoRequest(string.Format("components/{0}/price_points/{1}.{2}", componentID, pricePointId, GetMethodExtension()), HttpRequestMethod.Put, null);
+
+                // Convert the Chargify response into the object we're looking for
+                return response.ConvertResponseTo<ComponentPricePoint>("price_point");
+            }
+            catch (ChargifyException cex)
+            {
+                if (cex.StatusCode == HttpStatusCode.NotFound)
+                    throw new InvalidOperationException("Subscription not found");
+
+                throw;
+            }
+        }
+
+        public ComponentPricePoint UpdatePricePoint(int componentID, ComponentPricePoint updatedPricePoint)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IDictionary<long, ComponentPricePoint> GetPricePoints(int componentId)
+        {
+            // make sure data is valid
+            if (componentId == int.MinValue) throw new ArgumentNullException("componentId");
+            // now make the request
+            string response = DoRequest(string.Format("components/{0}/price_points.{1}", componentId, GetMethodExtension()));
+            var retValue = new Dictionary<long, ComponentPricePoint>();
+            if (response.IsXml())
+            {
+                // now build a product list based on response XML
+                XmlDocument doc = new XmlDocument();
+                doc.LoadXml(response); // get the XML into an XML document
+                if (doc.ChildNodes.Count == 0) throw new InvalidOperationException("Returned XML not valid");
+                // loop through the child nodes of this node
+                foreach (XmlNode elementNode in doc.ChildNodes)
+                {
+                    if (elementNode.Name == "price_points")
+                    {
+                        foreach (XmlNode pricePointNode in elementNode.ChildNodes)
+                        {
+                            if (pricePointNode.Name == "price_point")
+                            {
+                                var pricePoint = new ComponentPricePoint(pricePointNode);
+                                if (!retValue.ContainsKey(pricePoint.Id))
+                                {
+                                    retValue.Add(pricePoint.Id, pricePoint);
+                                }
+                                else
+                                {
+                                    throw new InvalidOperationException("Duplicate id values detected");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else if (response.IsJSON())
+            {
+                // should be expecting an array
+                int position = 0;
+                JsonArray array = JsonArray.Parse(response, ref position);
+                for (int i = 0; i <= array.Length - 1; i++)
+                {
+                    if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("price_point"))
+                    {
+                        JsonObject componentObj = (array.Items[i] as JsonObject)["price_points"] as JsonObject;
+                        var loadedComponent = new ComponentPricePoint(componentObj);
+                        if (!retValue.ContainsKey(loadedComponent.Id))
+                        {
+                            retValue.Add(loadedComponent.Id, loadedComponent);
+                        }
+                        else
+                        {
+                            throw new InvalidOperationException("Duplicate ID values detected");
+                        }
+                    }
+                }
+            }
+            // return the list
+            return retValue;
+        }
+
+        public ComponentPricePoint CreatePricePoint(int componentID, ComponentPricePoint newPricePoint)
+        {
+            // create XML for creation of an adjustment
+            StringBuilder pricePointXml = new StringBuilder(GetXmlStringIfApplicable());
+            //if (GetMethodExtension() == "xml")
+            //{
+            //    pricePointXml.Append("<price_points>");
+            //}
+            pricePointXml.Append("<price_point>");
+            //pricePointXml.AppendFormat("<default type=\"boolean\">{0}</default>", newPricePoint.Default.ToString().ToLowerInvariant());
+            pricePointXml.AppendFormat("<name>{0}</name>", newPricePoint.Name);
+            if (!string.IsNullOrEmpty(newPricePoint.Handle)) pricePointXml.AppendFormat("<handle>{0}</handle>", newPricePoint.Handle);
+            //if (newPricePoint.ComponentId > 0) pricePointXml.AppendFormat("<component_id>{0}</component_id>", newPricePoint.ComponentId);
+            //pricePointXml.AppendFormat("<type>{0}</type>", newPricePoint.Type ?? "default");
+            if (newPricePoint.PricingScheme != PricingSchemeType.Unknown)
+            {
+                var pricingSchemeName = Enum.GetName(typeof(PricingSchemeType), newPricePoint.PricingScheme);
+                if (!string.IsNullOrEmpty(pricingSchemeName))
+                    pricePointXml.Append(string.Format("<pricing_scheme>{0}</pricing_scheme>", pricingSchemeName.ToLowerInvariant()));
+            }
+
+            if (newPricePoint.RenewPrepaidAllocation.HasValue) pricePointXml.AppendFormat("<renew_prepaid_allocation>{0}</renew_prepaid_allocation>", newPricePoint.RenewPrepaidAllocation.ToString().ToLowerInvariant());
+            if (newPricePoint.RolloverPrepaidRemainder.HasValue) pricePointXml.AppendFormat("<rollover_prepaid_remainder>{0}</rollover_prepaid_remainder>", newPricePoint.RolloverPrepaidRemainder.ToString().ToLowerInvariant());
+            if (newPricePoint.ArchivedAt.HasValue) pricePointXml.AppendFormat("<archived_at>{0}</archived_at>", newPricePoint.ArchivedAt);
+            if (newPricePoint.ExpirationInterval > 0 && newPricePoint.RolloverPrepaidRemainder.HasValue)
+            {
+                pricePointXml.AppendFormat("<expiration_interval>{0}</expiration_interval>", newPricePoint.ExpirationInterval);
+                if (newPricePoint.ExpirationIntervalUnit != IntervalUnit.Unknown && newPricePoint.ExpirationIntervalUnit != IntervalUnit.Never)
+                {
+                    var intervalUnitName = Enum.GetName(typeof(IntervalUnit), newPricePoint.ExpirationIntervalUnit);
+                    if (!string.IsNullOrEmpty(intervalUnitName))
+                        pricePointXml.Append(string.Format("<expiration_interval_unit>{0}</expiration_interval_unit>", intervalUnitName.ToLowerInvariant()));
+                }
+            }
+            pricePointXml.Append(FormatPriceXml(newPricePoint.Prices, GetMethodExtension() == "json"));
+            if (newPricePoint.OveragePricingScheme != PricingSchemeType.Unknown)
+            {
+                pricePointXml.Append("<overage_pricing>");
+                var pricingSchemeName = Enum.GetName(typeof(PricingSchemeType), newPricePoint.OveragePricingScheme);
+                if (!string.IsNullOrEmpty(pricingSchemeName))
+                    pricePointXml.Append(string.Format("<pricing_scheme>{0}</pricing_scheme>", pricingSchemeName.ToLowerInvariant()));
+                pricePointXml.Append(FormatPriceXml(newPricePoint.OveragePricingPrices, GetMethodExtension() == "json"));
+                pricePointXml.Append("</overage_pricing>");
+            }
+            pricePointXml.Append("</price_point>");
+            //if (GetMethodExtension() == "xml")
+            //{
+            //    pricePointXml.Append("</price_points>");
+            //}
+            // now make the request
+            string response = DoRequest(string.Format("components/{0}/price_points.{1}", componentID, GetMethodExtension()), HttpRequestMethod.Post, pricePointXml.ToString());
+            // change the response to the object
+            return response.ConvertResponseTo<ComponentPricePoint>("price_point");
+        }
+
+        /// <summary>
+        /// Format ComponentPrice Lists
+        /// </summary>
+        /// <param name="prices">The prices to format</param>
+        /// <param name="isJson">Is the eventual result going to be JSON? We need to slightly adjust if that's the case</param>
+        /// <returns>The xml formatted prices string</returns>
+        private static string FormatPriceXml(IEnumerable<ComponentPrice> prices, bool isJson = false)
+        {
+            StringBuilder pricePointXml = new StringBuilder();
+            if (prices != null && prices.Any())
+            {
+                StringBuilder priceXml = new StringBuilder();
+                foreach (var price in prices)
+                {
+                    if (isJson)
+                    {
+                        priceXml.Append("<prices json:Array='true'>");
+                    }
+                    else
+                    {
+                        priceXml.Append("<price>");
+                    }
+                    priceXml.AppendFormat("<starting_quantity>{0}</starting_quantity>", price.StartingQuantity);
+                    if (price.EndingQuantity > 0)
+                    {
+                        priceXml.AppendFormat("<ending_quantity>{0}</ending_quantity>", price.EndingQuantity);
+                    }
+                    //else
+                    //{
+                    //    priceXml.Append("<ending_quantity nil=\"true\"></ending_quantity>");
+                    //}
+                    if (price.UnitPrice >= 0)
+                    {
+                        priceXml.AppendFormat("<unit_price>{0}</unit_price>", price.UnitPrice);
+                    }
+                    //if (price.ComponentId > 0) priceXml.AppendFormat("<component_id>{0}</component_id>", price.ComponentId);
+                    if (isJson)
+                    {
+                        priceXml.Append("</prices>");
+                    }
+                    else
+                    {
+                        priceXml.Append("</price>");
+                    }
+                }
+                if (!isJson)
+                {
+                    pricePointXml.AppendFormat("<prices>{0}</prices>", priceXml.ToString());
+                }
+                else
+                {
+                    pricePointXml.Append(priceXml.ToString());
+                }
+            }
+            return pricePointXml.ToString();
+        }
 
         /// <summary>
         /// Method to update the allocated amount of a component for a subscription
@@ -4150,8 +4405,7 @@ namespace ChargifyNET
                 JsonArray array = JsonArray.Parse(response, ref position);
                 for (int i = 0; i <= array.Length - 1; i++)
                 {
-                    var jsonObject = array.Items[i] as JsonObject;
-                    if (jsonObject != null && jsonObject.ContainsKey("component"))
+                    if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("component"))
                     {
                         JsonObject componentObj = (array.Items[i] as JsonObject)["component"] as JsonObject;
                         IComponentAttributes loadedComponent = new ComponentAttributes(componentObj);
@@ -4221,8 +4475,7 @@ namespace ChargifyNET
                 JsonArray array = JsonArray.Parse(response, ref position);
                 for (int i = 0; i <= array.Length - 1; i++)
                 {
-                    var jsonObject = array.Items[i] as JsonObject;
-                    if (jsonObject != null && jsonObject.ContainsKey("component"))
+                    if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("component"))
                     {
                         JsonObject componentObj = (array.Items[i] as JsonObject)["component"] as JsonObject;
                         IComponentInfo loadedComponent = new ComponentInfo(componentObj);
@@ -4301,8 +4554,7 @@ namespace ChargifyNET
                 JsonArray array = JsonArray.Parse(response, ref position);
                 for (int i = 0; i <= array.Length - 1; i++)
                 {
-                    var jsonObject = array.Items[i] as JsonObject;
-                    if (jsonObject != null && jsonObject.ContainsKey("component"))
+                    if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("component"))
                     {
                         JsonObject componentObj = (array.Items[i] as JsonObject)["component"] as JsonObject;
                         IComponent loadedComponent = new Component(componentObj);
@@ -4343,7 +4595,7 @@ namespace ChargifyNET
             usageXml.AppendFormat("<memo>{0}</memo>", PCLWebUtility.WebUtility.HtmlEncode(memo));
             usageXml.Append("</usage>");
             string response = DoRequest(string.Format("subscriptions/{0}/components/{1}/usages.{2}", subscriptionId, componentId, GetMethodExtension()), HttpRequestMethod.Post, usageXml.ToString());
-            // change the response to the object            
+            // change the response to the object
             return response.ConvertResponseTo<Usage>("usage");
         }
 
@@ -4380,6 +4632,7 @@ namespace ChargifyNET
         #endregion
 
         #region Component Allocations
+
         /// <summary>
         /// Returns the 50 most recent Allocations, ordered by most recent first.
         /// </summary>
@@ -4441,8 +4694,7 @@ namespace ChargifyNET
                     List<IComponentAllocation> childComponentAllocations = new List<IComponentAllocation>();
                     for (int i = 0; i <= array.Length - 1; i++)
                     {
-                        var jsonObject = array.Items[i] as JsonObject;
-                        if (jsonObject != null && jsonObject.ContainsKey(ComponentAllocation.AllocationRootKey))
+                        if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey(ComponentAllocation.AllocationRootKey))
                         {
                             JsonObject componentObj = (array.Items[i] as JsonObject)[ComponentAllocation.AllocationRootKey] as JsonObject;
                             IComponentAllocation loadedComponentAllocation = new ComponentAllocation(componentObj);
@@ -4564,11 +4816,12 @@ namespace ChargifyNET
             }
             componentAllocationXml.Append("</allocation>");
             return componentAllocationXml.ToString();
-
         }
+
         #endregion
 
         #region Transactions
+
         /// <summary>
         /// Method for getting a list of transactions
         /// </summary>
@@ -4740,8 +4993,7 @@ namespace ChargifyNET
                 JsonArray array = JsonArray.Parse(response, ref position);
                 for (int i = 0; i <= array.Length - 1; i++)
                 {
-                    var jsonObject = array.Items[i] as JsonObject;
-                    if (jsonObject != null && jsonObject.ContainsKey("transaction"))
+                    if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("transaction"))
                     {
                         JsonObject transactionObj = (array.Items[i] as JsonObject)["transaction"] as JsonObject;
                         ITransaction loadedTransaction = new Transaction(transactionObj);
@@ -4938,8 +5190,7 @@ namespace ChargifyNET
                 JsonArray array = JsonArray.Parse(response, ref position);
                 for (int i = 0; i < array.Length; i++)
                 {
-                    var jsonObject = array.Items[i] as JsonObject;
-                    if (jsonObject != null && jsonObject.ContainsKey("transaction"))
+                    if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("transaction"))
                     {
                         JsonObject transactionObj = (array.Items[i] as JsonObject)["transaction"] as JsonObject;
                         ITransaction loadedTransaction = new Transaction(transactionObj);
@@ -4984,6 +5235,7 @@ namespace ChargifyNET
         #endregion
 
         #region Refunds
+
         /// <summary>
         /// Create a refund
         /// </summary>
@@ -5020,12 +5272,14 @@ namespace ChargifyNET
             refundXml.AppendFormat("<memo>{0}</memo>", PCLWebUtility.WebUtility.HtmlEncode(memo));
             refundXml.Append("</refund>");
             string response = DoRequest(string.Format("subscriptions/{0}/refunds.{1}", subscriptionId, GetMethodExtension()), HttpRequestMethod.Post, refundXml.ToString());
-            // change the response to the object            
+            // change the response to the object
             return response.ConvertResponseTo<Refund>("refund");
         }
+
         #endregion
 
         #region Statements
+
         /// <summary>
         /// Method for getting a specific statement
         /// </summary>
@@ -5139,13 +5393,11 @@ namespace ChargifyNET
                 if (!statementIdsObj.ContainsKey("statement_ids"))
                     throw new InvalidOperationException("Returned JSON not valid");
 
-                JsonArray jsonArray = (statementIdsObj["statement_ids"]) as JsonArray;
-                if (jsonArray != null)
+                if ((statementIdsObj["statement_ids"]) is JsonArray jsonArray)
                 {
                     for (int i = 0; i <= jsonArray.Length - 1; i++)
                     {
-                        JsonNumber statementIdValue = jsonArray.Items[i] as JsonNumber;
-                        if (statementIdValue == null)
+                        if (!(jsonArray.Items[i] is JsonNumber statementIdValue))
                             throw new InvalidOperationException("Statement ID is not a valid number");
                         if (!retValue.Contains(statementIdValue.IntValue))
                         {
@@ -5159,7 +5411,6 @@ namespace ChargifyNET
                 }
             }
             return retValue;
-
         }
 
         /// <summary>
@@ -5229,8 +5480,7 @@ namespace ChargifyNET
                 JsonArray array = JsonArray.Parse(response, ref position);
                 for (int i = 0; i <= array.Length - 1; i++)
                 {
-                    var jsonObject = array.Items[i] as JsonObject;
-                    if (jsonObject != null && jsonObject.ContainsKey("statement"))
+                    if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("statement"))
                     {
                         JsonObject statementObj = (array.Items[i] as JsonObject)["statement"] as JsonObject;
                         IStatement loadedStatement = new Statement(statementObj);
@@ -5247,6 +5497,7 @@ namespace ChargifyNET
             }
             return retValue;
         }
+
         #endregion
 
         #region Statistics
@@ -5273,6 +5524,7 @@ namespace ChargifyNET
         #endregion
 
         #region Adjustments
+
         /// <summary>
         /// Method for applying an adjustment to a subscription
         /// </summary>
@@ -5356,9 +5608,11 @@ namespace ChargifyNET
             // change the response to the object
             return response.ConvertResponseTo<Adjustment>("adjustment");
         }
+
         #endregion
 
         #region Billing Portal
+
         /// <summary>
         /// From http://docs.chargify.com/api-billing-portal
         /// </summary>
@@ -5407,6 +5661,7 @@ namespace ChargifyNET
                 throw;
             }
         }
+
         /// <summary>
         /// From http://docs.chargify.com/api-billing-portal
         /// </summary>
@@ -5470,9 +5725,11 @@ namespace ChargifyNET
 
             return RevokeBillingPortalAccess(customer.ChargifyID);
         }
+
         #endregion
 
         #region Invoices
+
         /// <summary>
         /// Gets a list of invoices
         /// </summary>
@@ -5535,9 +5792,11 @@ namespace ChargifyNET
             // change the response to the object
             return response.ConvertResponseTo<Payment>("payment");
         }
+
         #endregion
 
         #region Sites
+
         /// <summary>
         /// Clean up a site in test mode.
         /// </summary>
@@ -5570,12 +5829,14 @@ namespace ChargifyNET
 
             return retVal;
         }
+
         #endregion
 
         #region Payments
+
         /// <summary>
         /// Chargify allows you to record payments that occur outside of the normal flow of payment processing.
-        /// These payments are considered external payments.A common case to apply such a payment is when a 
+        /// These payments are considered external payments.A common case to apply such a payment is when a
         /// customer pays by check or some other means for their subscription.
         /// </summary>
         /// <param name="subscriptionId">The ID of the subscription to apply this manual payment record to</param>
@@ -5589,7 +5850,7 @@ namespace ChargifyNET
 
         /// <summary>
         /// Chargify allows you to record payments that occur outside of the normal flow of payment processing.
-        /// These payments are considered external payments.A common case to apply such a payment is when a 
+        /// These payments are considered external payments.A common case to apply such a payment is when a
         /// customer pays by check or some other means for their subscription.
         /// </summary>
         /// <param name="subscriptionId">The ID of the subscription to apply this manual payment record to</param>
@@ -5620,6 +5881,7 @@ namespace ChargifyNET
         #endregion
 
         #region Payment Profiles
+
         /// <summary>
         /// Retrieve a payment profile
         /// </summary>
@@ -5698,11 +5960,13 @@ namespace ChargifyNET
                 throw;
             }
         }
+
         #endregion
 
         #region Renewal Preview
+
         /// <summary>
-        /// Renewal Preview is an object representing a subscription’s next assessment. 
+        /// Renewal Preview is an object representing a subscription’s next assessment.
         /// You can retrieve it to see a snapshot of how much your customer will be charged on their next renewal.
         /// </summary>
         /// <param name="subscriptionId">Integer, the id for the subscription that is to be previewed</param>
@@ -5714,9 +5978,11 @@ namespace ChargifyNET
             // change the response to the object
             return response.ConvertResponseTo<RenewalDetails>("renewal_preview");
         }
+
         #endregion
 
         #region Notes
+
         /// <summary>
         /// Create a note
         /// </summary>
@@ -5754,7 +6020,7 @@ namespace ChargifyNET
         }
 
         /// <summary>
-        /// Retrieve the notes 
+        /// Retrieve the notes
         /// </summary>
         /// <param name="subscriptionId"></param>
         /// <returns></returns>
@@ -5803,8 +6069,7 @@ namespace ChargifyNET
                 JsonArray array = JsonArray.Parse(response, ref position);
                 for (int i = 0; i <= array.Length - 1; i++)
                 {
-                    var jsonObject = array.Items[i] as JsonObject;
-                    if (jsonObject != null && jsonObject.ContainsKey("note"))
+                    if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("note"))
                     {
                         JsonObject componentObj = (array.Items[i] as JsonObject)["note"] as JsonObject;
                         INote loadedComponent = new Note(componentObj);
@@ -5871,6 +6136,7 @@ namespace ChargifyNET
                     case HttpStatusCode.Forbidden:
                     case HttpStatusCode.NotFound:
                         return false;
+
                     default:
                         throw;
                 }
@@ -5920,6 +6186,7 @@ namespace ChargifyNET
             }
             return note;
         }
+
         #endregion
 
         #region Referral Code
@@ -5945,9 +6212,11 @@ namespace ChargifyNET
                 throw cex;
             }
         }
+
         #endregion
 
         #region Utility Methods
+
         private string GetBody(object obj)
         {
             var json = JsonConvert.SerializeObject(obj);
@@ -5957,6 +6226,7 @@ namespace ChargifyNET
             var xmlNode = JsonConvert.DeserializeXmlNode(json);
             return xmlNode.InnerXml;
         }
+
         private Dictionary<int, T> GetListedJsonResponse<T>(string key, string response)
             where T : class, IChargifyEntity
         {
@@ -5967,8 +6237,7 @@ namespace ChargifyNET
             JsonArray array = JsonArray.Parse(response, ref position);
             for (int i = 0; i <= array.Length - 1; i++)
             {
-                var jsonObject = array.Items[i] as JsonObject;
-                if (jsonObject != null && jsonObject.ContainsKey(key))
+                if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey(key))
                 {
                     JsonObject jsonObj = (array.Items[i] as JsonObject)[key] as JsonObject;
                     T value = (T)Activator.CreateInstance(typeof(T), jsonObj);
@@ -6021,6 +6290,7 @@ namespace ChargifyNET
 
             return retValue;
         }
+
         #endregion
 
         #region Request Methods
@@ -6190,7 +6460,7 @@ namespace ChargifyNET
                         var sanitizedPostData = postData;
 
                         if (!string.IsNullOrEmpty(sanitizedPostData))
-                        {   
+                        {
                             if (sanitizedPostData.Contains("<full_number>"))
                             {
                                 var xdoc = XDocument.Parse(sanitizedPostData);
@@ -6206,11 +6476,8 @@ namespace ChargifyNET
                         newException = new ChargifyException(errorResponse, wex, sanitizedPostData);
                         _lastResponse = errorResponse;
 
-                        if (LogResponse != null)
-                        {
-                            // Use the ChargifyException ToString override to provide the parsed errors
-                            LogResponse(errorResponse.StatusCode, addressString, newException.ToString());
-                        }
+                        // Use the ChargifyException ToString override to provide the parsed errors
+                        LogResponse?.Invoke(errorResponse.StatusCode, addressString, newException.ToString());
                     }
                 }
                 else
@@ -6290,7 +6557,12 @@ namespace ChargifyNET
                     if (UseJSON)
                     {
                         XmlDocument doc = new XmlDocument();
-                        doc.LoadXml(postData);
+                        XmlReaderSettings settings = new XmlReaderSettings { NameTable = new NameTable() };
+                        XmlNamespaceManager xmlns = new XmlNamespaceManager(settings.NameTable);
+                        xmlns.AddNamespace("json", "http://james.newtonking.com/projects/json");
+                        XmlParserContext context = new XmlParserContext(null, xmlns, "", XmlSpace.Default);
+                        XmlReader reader = XmlReader.Create(new StringReader(postData), settings, context);
+                        doc.Load(reader);
                         dataToPost = XmlToJsonConverter.XmlToJson(doc);
                     }
 
@@ -6365,11 +6637,8 @@ namespace ChargifyNET
                         newException = new ChargifyException(errorResponse, wex, sanitizedPostData);
                         _lastResponse = errorResponse;
 
-                        if (LogResponse != null)
-                        {
-                            // Use the ChargifyException ToString override to provide the parsed errors
-                            LogResponse(errorResponse.StatusCode, addressString, newException.ToString());
-                        }
+                        // Use the ChargifyException ToString override to provide the parsed errors
+                        LogResponse?.Invoke(errorResponse.StatusCode, addressString, newException.ToString());
                     }
                 }
                 else
@@ -6387,7 +6656,6 @@ namespace ChargifyNET
                 }
             }
         }
-
 
         private string DoNewRequest(string methodString, StringBuilder queryString)
         {
@@ -6492,7 +6760,6 @@ namespace ChargifyNET
                     }
                 }
                 else request.ContentLength = 0;
-
             }
 
             try
@@ -6597,13 +6864,12 @@ namespace ChargifyNET
         {
             if (list.Count <= 0)
                 throw new ArgumentOutOfRangeException(name);
-
         }
+
         private void RequireAtLeastZeroElement<T>(string name, IList<T> list)
         {
             if (list.Count < 0)
                 throw new ArgumentOutOfRangeException(name);
-
         }
 
         #endregion

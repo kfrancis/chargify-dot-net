@@ -161,7 +161,7 @@ namespace ChargifyNET
         /// <returns></returns>
         public bool Equals(Metadata value)
         {
-            if (ReferenceEquals(null, value))
+            if (value is null)
             {
                 return false;
             }
@@ -181,8 +181,7 @@ namespace ChargifyNET
         /// <returns></returns>
         public override bool Equals(object obj)
         {
-            Metadata temp = obj as Metadata;
-            if (temp == null)
+            if (!(obj is Metadata temp))
                 return false;
             return Equals(temp);
         }

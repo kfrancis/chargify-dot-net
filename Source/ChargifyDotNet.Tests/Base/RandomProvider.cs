@@ -7,7 +7,7 @@ namespace ChargifyDotNetTests.Base
     {
         private static int seed = Environment.TickCount;
 
-        private static ThreadLocal<Random> randomWrapper = new ThreadLocal<Random>(() =>
+        private static readonly ThreadLocal<Random> randomWrapper = new ThreadLocal<Random>(() =>
             new Random(Interlocked.Increment(ref seed))
         );
 

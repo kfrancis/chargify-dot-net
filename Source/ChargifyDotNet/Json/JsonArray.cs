@@ -7,7 +7,7 @@ namespace ChargifyNET.Json
     /// </summary>
     public sealed class JsonArray : JsonValue
     {
-        List<JsonValue> _items;
+        readonly List<JsonValue> _items;
 
         /// <summary>
         /// The JsonValue items in the array

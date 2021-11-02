@@ -138,12 +138,11 @@ namespace ChargifyNET
                             JsonObject obj = JsonObject.Parse(errorResponse, ref position);
                             if (obj.ContainsKey("errors"))
                             {
-                                JsonArray array = obj["errors"] as JsonArray;
-                                if (array != null && array.Length > 0)
+                                if (obj["errors"] is JsonArray array && array.Length > 0)
                                 {
                                     for (int i = 0; i <= array.Length - 1; i++)
                                     {
-                                        if ((((JsonString) array.Items[i]) != null) && (!string.IsNullOrEmpty(((JsonString) array.Items[i]).Value)))
+                                        if ((((JsonString)array.Items[i]) != null) && (!string.IsNullOrEmpty(((JsonString)array.Items[i]).Value)))
                                         {
                                             JsonString errorStr = array.Items[i] as JsonString;
                                             ChargifyError anError = new ChargifyError(errorStr);

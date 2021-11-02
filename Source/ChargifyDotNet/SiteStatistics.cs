@@ -86,8 +86,7 @@ using Json;
                         _siteName = obj.GetJSONContentAsString(key);
                         break;
                     case StatsKey:
-                        JsonObject statsObj = obj[key] as JsonObject;
-                        if (statsObj != null)
+                        if (obj[key] is JsonObject statsObj)
                             foreach (string innerKey in statsObj.Keys)
                             {
                                 switch (innerKey)

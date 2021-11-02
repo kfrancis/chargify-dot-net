@@ -196,3 +196,4 @@ FakesAssemblies/
 *.opt
 .nuget/NuGet.exe
 *.bat
+/Bogus.Premium.LicenseKey

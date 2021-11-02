@@ -1,11 +1,11 @@
-﻿
-#region License, Terms and Conditions
+﻿#region License, Terms and Conditions
+
 //
 // IComponentAttributes.cs
 //
 // Authors: Kori Francis <twitter.com/djbyter>, David Ball
 // Copyright (C) 2010 Clinical Support Systems, Inc. All rights reserved.
-// 
+//
 //  THIS FILE IS LICENSED UNDER THE MIT LICENSE AS OUTLINED IMMEDIATELY BELOW:
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a
@@ -26,13 +26,17 @@
 //  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 //  DEALINGS IN THE SOFTWARE.
 //
+
 #endregion
 
 // ReSharper disable once CheckNamespace
+using ChargifyDotNet;
+using System.Collections.Generic;
+
 namespace ChargifyNET
 {
     /// <summary>
-    /// Specfic class when getting information about a component as set to a specific subscription 
+    /// Specfic class when getting information about a component as set to a specific subscription
     /// as specified here: http://support.chargify.com/faqs/technical/quantity-based-components
     /// </summary>
     public interface IComponentAttributes
@@ -41,38 +45,53 @@ namespace ChargifyNET
         /// The name of the component as created by the Chargify user
         /// </summary>
         string Name { get; }
+
         /// <summary>
         /// The kind of component, either quantity-based or metered component
         /// </summary>
         string Kind { get; }
+
         /// <summary>
         /// The ID of the subscription that this component applies to
         /// </summary>
         int SubscriptionID { get; }
+
         /// <summary>
         /// The ID of the component itself
         /// </summary>
         int ComponentID { get; }
+
         /// <summary>
         /// The quantity allocated to this subscription
         /// </summary>
         decimal AllocatedQuantity { get; }
+
         /// <summary>
         /// The method used to charge, either: per-unit, volume, tiered or stairstep
         /// </summary>
         string PricingScheme { get; }
+
         /// <summary>
         /// The name for the unit this component is measured in.
         /// </summary>
         string UnitName { get; }
+
         /// <summary>
         /// The balance of units of this component against the subscription
         /// </summary>
         int UnitBalance { get; }
+
         /// <summary>
         /// The status of whether this component is enabled or disabled.
         /// (On/Off components only)
         /// </summary>
         bool Enabled { get; }
+
+        /// <summary>
+        /// Component price points allows you to charge customers different amounts for the same component. 
+        /// You will be able to define multiple prices and pricing schemes, and then choose which price 
+        /// point to use for each subscription.
+        /// </summary>
+        IEnumerable<ComponentPricePoint> PricePoints { get; }
     }
 }

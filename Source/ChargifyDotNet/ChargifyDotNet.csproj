@@ -1,72 +1,73 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net45;net40</TargetFrameworks>
-    <PackageId>chargify</PackageId>
-    <PackageProjectUrl>https://github.com/kfrancis/chargify-dot-net</PackageProjectUrl>
-    <Authors>KFrancis, DBall</Authors>
-    <Company>Clinical Support Systems</Company>
-    <Product>Chargify.NET</Product>
-    <Description>Chargify.NET is a comprehensive .NET API wrapper library for accessing Chargify.com, using XML or JSON to read/write.</Description>
-  </PropertyGroup>
-  
-  <ItemGroup>
-    <EmbeddedResource Include="Data\ISO_3166-1_list_en.xml" />
-  </ItemGroup>
+	<PropertyGroup>
+		<TargetFrameworks>netstandard2.0;net45;net40</TargetFrameworks>
+		<PackageId>chargify</PackageId>
+		<PackageProjectUrl>https://github.com/kfrancis/chargify-dot-net</PackageProjectUrl>
+		<Authors>KFrancis, DBall</Authors>
+		<Company>Clinical Support Systems</Company>
+		<Product>Chargify.NET</Product>
+		<Description>Chargify.NET is a comprehensive .NET API wrapper library for accessing Chargify.com, using XML or JSON to read/write.</Description>
+		<LangVersion>latest</LangVersion>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Nerdbank.GitVersioning" Version="3.4.244">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-  </ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Include="Data\ISO_3166-1_list_en.xml" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Compile Update="WebhookHandler.cs" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Nerdbank.GitVersioning" Version="3.4.244">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+	</ItemGroup>
 
-  <!-- .NET Standard 2.0 references, compilation flags and build options -->
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0'">
-    <DefineConstants>NETCORE;NETSTANDARD;NETSTANDARD2_0</DefineConstants>
-  </PropertyGroup>
+	<ItemGroup>
+		<Compile Update="WebhookHandler.cs" />
+	</ItemGroup>
 
-  <!-- .NET 4.5 references, compilation flags and build options -->
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
-    <Reference Include="mscorlib" />
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Web" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Security" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Configuration" />
-  </ItemGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net45'">
-    <DefineConstants>NET45;NETFULL</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net40'">
-    <DefineConstants>NET40</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
-    <DebugType>full</DebugType>
-    <DebugSymbols>true</DebugSymbols>
-    <DocumentationFile>C:\Users\kfrancis\Documents\GitHub\chargify-dot-net\Source\ChargifyDotNet\ChargifyDotNet.xml</DocumentationFile>
-    <NoWarn>1701;1702;1591</NoWarn>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.0|AnyCPU'">
-    <DebugType>embedded</DebugType>
-    <DebugSymbols>true</DebugSymbols>
-    <DocumentationFile>C:\Users\kfrancis\Documents\GitHub\chargify-dot-net\Source\ChargifyDotNet\ChargifyDotNet.xml</DocumentationFile>
-  </PropertyGroup>
+	<!-- .NET Standard 2.0 references, compilation flags and build options -->
+	<PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0'">
+		<DefineConstants>NETCORE;NETSTANDARD;NETSTANDARD2_0</DefineConstants>
+	</PropertyGroup>
 
-  <Target Name="IncludeDocFile" BeforeTargets="PrepareForPublish">
-    <ItemGroup Condition=" '$(DocumentationFile)' != '' ">
-      <_DocumentationFile Include="$(DocumentationFile)" />
-      <ContentWithTargetPath Include="@(_DocumentationFile->'%(FullPath)')" RelativePath="%(_DocumentationFile.Identity)" TargetPath="%(_DocumentationFile.Filename)%(_DocumentationFile.Extension)" CopyToPublishDirectory="PreserveNewest" />
-    </ItemGroup>
-  </Target>
-  
+	<!-- .NET 4.5 references, compilation flags and build options -->
+	<ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
+		<Reference Include="mscorlib" />
+		<Reference Include="System" />
+		<Reference Include="System.Core" />
+		<Reference Include="Microsoft.CSharp" />
+		<Reference Include="System.Data" />
+		<Reference Include="System.Web" />
+		<Reference Include="System.Drawing" />
+		<Reference Include="System.Security" />
+		<Reference Include="System.Xml" />
+		<Reference Include="System.Configuration" />
+	</ItemGroup>
+	<PropertyGroup Condition=" '$(TargetFramework)' == 'net45'">
+		<DefineConstants>NET45;NETFULL</DefineConstants>
+	</PropertyGroup>
+	<PropertyGroup Condition=" '$(TargetFramework)' == 'net40'">
+		<DefineConstants>NET40</DefineConstants>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
+		<DebugType>full</DebugType>
+		<DebugSymbols>true</DebugSymbols>
+		<DocumentationFile>C:\Users\kfrancis\Documents\GitHub\chargify-dot-net\Source\ChargifyDotNet\ChargifyDotNet.xml</DocumentationFile>
+		<NoWarn>1701;1702;1591</NoWarn>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.0|AnyCPU'">
+		<DebugType>embedded</DebugType>
+		<DebugSymbols>true</DebugSymbols>
+		<DocumentationFile>C:\Users\kfrancis\Documents\GitHub\chargify-dot-net\Source\ChargifyDotNet\ChargifyDotNet.xml</DocumentationFile>
+	</PropertyGroup>
+
+	<Target Name="IncludeDocFile" BeforeTargets="PrepareForPublish">
+		<ItemGroup Condition=" '$(DocumentationFile)' != '' ">
+			<_DocumentationFile Include="$(DocumentationFile)" />
+			<ContentWithTargetPath Include="@(_DocumentationFile->'%(FullPath)')" RelativePath="%(_DocumentationFile.Identity)" TargetPath="%(_DocumentationFile.Filename)%(_DocumentationFile.Extension)" CopyToPublishDirectory="PreserveNewest" />
+		</ItemGroup>
+	</Target>
+
 </Project>

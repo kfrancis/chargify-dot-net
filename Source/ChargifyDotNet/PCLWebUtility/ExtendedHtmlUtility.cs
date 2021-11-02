@@ -8,7 +8,7 @@ namespace PCLWebUtility
 {
     internal class ExtendedHtmlUtility
     {
-        private static Regex entityResolver;
+        private static readonly Regex entityResolver;
 
         static ExtendedHtmlUtility()
         {

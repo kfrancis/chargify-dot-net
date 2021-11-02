@@ -17,7 +17,7 @@ namespace ChargifyDotNetTests
             Assert.IsNotNull(subscription, "No suitable subscription could be found.");
             var noteBody = Guid.NewGuid().ToString();
             Random rand = new Random();
-            var isSticky = rand.Next(0, 1) == 1 ? true : false;
+            var isSticky = rand.Next(0, 1) == 1;
 
             // Act
             var result = Chargify.CreateNote(subscription.SubscriptionID, noteBody, isSticky);

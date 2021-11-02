@@ -5,7 +5,7 @@
     /// </summary>
     public sealed class JsonBoolean : JsonValue
     {
-        bool _value;
+        readonly bool _value;
 
         /// <summary>
         /// The value of this object (as bool)

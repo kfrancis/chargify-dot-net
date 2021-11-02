@@ -1,12 +1,13 @@
 ﻿namespace ChargifyNET
 {
     #region Imports
-    using System.IO;
-    using System.Web;
+
+    using ChargifyDotNet;
     using Json;
     using System;
     using System.Collections.Generic;
     using System.Globalization;
+    using System.IO;
     using System.Linq;
     using System.Reflection;
     using System.Security.Cryptography;
@@ -14,7 +15,8 @@
     using System.Text.RegularExpressions;
     using System.Xml;
     using System.Xml.Serialization;
-    #endregion
+
+    #endregion Imports
 
     /// <summary>
     /// An enumeration of the types of masking styles for the Mask() extension method
@@ -43,7 +45,6 @@
         /// </summary>
         public static readonly char DefaultMaskCharacter = '*';
 
-
         /// <summary>
         /// Returns true if the string is non-null and at least the specified number of characters.
         /// </summary>
@@ -59,9 +60,7 @@
                                                         "The length must be a non-negative number.");
             }
 
-            return value != null
-                        ? value.Length >= length
-                        : false;
+            return value != null && value.Length >= length;
         }
 
         /// <summary>
@@ -211,6 +210,7 @@
     public static class UsefulExtensions
     {
         #region Utility Extensions
+
         private static readonly Regex _guidRegex = new Regex(@"^(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}$", RegexOptions.Compiled);
 
         /// <summary>
@@ -425,7 +425,7 @@
                     JsonObject.Parse(value);
                 }
 
-                // If we get here, then all was well. 
+                // If we get here, then all was well.
                 return true;
             }
             catch (Exception)
@@ -442,7 +442,7 @@
         /// <returns>True if the value is a guid, false otherwise.</returns>
         public static bool IsGuid(this string value)
         {
-            return !string.IsNullOrEmpty(value) ? _guidRegex.IsMatch(value) : false;
+            return !string.IsNullOrEmpty(value) && _guidRegex.IsMatch(value);
         }
 
         /// <summary>
@@ -475,11 +475,12 @@
         public static string ToChargifyCurrencyFormat(this decimal value)
         {
             var usCulture = CultureInfo.CreateSpecificCulture("en-US");
-            var clonedNumbers = (NumberFormatInfo) usCulture.NumberFormat.Clone();
+            var clonedNumbers = (NumberFormatInfo)usCulture.NumberFormat.Clone();
             clonedNumbers.CurrencyNegativePattern = 2;
             return string.Format(clonedNumbers, "{0:C2}", value).Replace("$", "");
         }
-        #endregion
+
+        #endregion Utility Extensions
 
         #region XML Node and JSON Extensions
 
@@ -496,10 +497,9 @@
             {
                 if (obj.ContainsKey(key))
                 {
-                    JsonString str = obj[key] as JsonString;
-                    if (str != null)
+                    if (obj[key] is JsonString str)
                     {
-                        result = (ComponentDowngradeProrationScheme) Enum.Parse(typeof(ComponentDowngradeProrationScheme), str.Value.Replace("-", "_"), true);
+                        result = (ComponentDowngradeProrationScheme)Enum.Parse(typeof(ComponentDowngradeProrationScheme), str.Value.Replace("-", "_"), true);
                     }
                 }
             }
@@ -518,7 +518,7 @@
             {
                 if (node.FirstChild.Value != null)
                 {
-                    result = (ComponentDowngradeProrationScheme) Enum.Parse(typeof(ComponentDowngradeProrationScheme), node.FirstChild.Value.Replace("-", "_"), true);
+                    result = (ComponentDowngradeProrationScheme)Enum.Parse(typeof(ComponentDowngradeProrationScheme), node.FirstChild.Value.Replace("-", "_"), true);
                 }
             }
             return result;
@@ -537,10 +537,9 @@
             {
                 if (obj.ContainsKey(key))
                 {
-                    JsonString str = obj[key] as JsonString;
-                    if (str != null)
+                    if (obj[key] is JsonString str)
                     {
-                        result = (ComponentUpgradeProrationScheme) Enum.Parse(typeof(ComponentUpgradeProrationScheme), str.Value.Replace("-", "_"), true);
+                        result = (ComponentUpgradeProrationScheme)Enum.Parse(typeof(ComponentUpgradeProrationScheme), str.Value.Replace("-", "_"), true);
                     }
                 }
             }
@@ -559,7 +558,7 @@
             {
                 if (node.FirstChild.Value != null)
                 {
-                    result = (ComponentUpgradeProrationScheme) Enum.Parse(typeof(ComponentUpgradeProrationScheme), node.FirstChild.Value.Replace("-", "_"), true);
+                    result = (ComponentUpgradeProrationScheme)Enum.Parse(typeof(ComponentUpgradeProrationScheme), node.FirstChild.Value.Replace("-", "_"), true);
                 }
             }
             return result;
@@ -593,8 +592,7 @@
             {
                 if (obj.ContainsKey(key))
                 {
-                    JsonString str = obj[key] as JsonString;
-                    if (str != null)
+                    if (obj[key] is JsonString str)
                     {
                         if (decimal.TryParse(str.Value, NumberStyles.Number, CultureInfo.InvariantCulture, out result))
                         {
@@ -602,8 +600,7 @@
                         }
                     }
 
-                    JsonNumber value = obj[key] as JsonNumber;
-                    if (value != null)
+                    if (obj[key] is JsonNumber value)
                     {
                         result = new decimal(value.DoubleValue);
                         return result;
@@ -622,8 +619,7 @@
         {
             if (node.FirstChild != null)
             {
-                int result;
-                if (int.TryParse(node.FirstChild.Value, NumberStyles.Number, CultureInfo.InvariantCulture, out result))
+                if (int.TryParse(node.FirstChild.Value, NumberStyles.Number, CultureInfo.InvariantCulture, out int result))
                 {
                     return result;
                 }
@@ -659,8 +655,7 @@
             {
                 if (obj.ContainsKey(key))
                 {
-                    JsonString str = obj[key] as JsonString;
-                    if (str != null)
+                    if (obj[key] is JsonString str)
                     {
                         result = str.Value;
                     }
@@ -713,8 +708,7 @@
             {
                 if (obj.ContainsKey(key))
                 {
-                    JsonNumber value = obj[key] as JsonNumber;
-                    if (value != null)
+                    if (obj[key] is JsonNumber value)
                     {
                         result = value.IntValue;
                     }
@@ -736,8 +730,7 @@
             {
                 if (obj.ContainsKey(key))
                 {
-                    JsonNumber value = obj[key] as JsonNumber;
-                    if (value != null)
+                    if (obj[key] is JsonNumber value)
                     {
                         result = value.LongValue;
                     }
@@ -759,8 +752,7 @@
             {
                 if (obj.ContainsKey(key))
                 {
-                    JsonNumber value = obj[key] as JsonNumber;
-                    if (value != null)
+                    if (obj[key] is JsonNumber value)
                     {
                         result = value.IntValue;
                     }
@@ -782,8 +774,7 @@
             {
                 if (obj.ContainsKey(key))
                 {
-                    JsonObject familyObj = obj[key] as JsonObject;
-                    if (familyObj != null)
+                    if (obj[key] is JsonObject familyObj)
                     {
                         result = new ProductFamily(familyObj);
                     }
@@ -819,6 +810,16 @@
             if (node.FirstChild != null)
             {
                 result = new RenewalLineItem(node);
+            }
+            return result;
+        }
+
+        public static ComponentPricePoint GetNodeContentAsComponentPricePoint(this XmlNode node)
+        {
+            ComponentPricePoint result = null;
+            if (node.FirstChild != null)
+            {
+                result = new ComponentPricePoint(node);
             }
             return result;
         }
@@ -860,7 +861,7 @@
             {
                 foreach (var jsonValue in renewalLineItemsArray.Items)
                 {
-                    var renewalLineItem = (JsonObject) jsonValue;
+                    var renewalLineItem = (JsonObject)jsonValue;
                     renewalLineItems.Add(new RenewalLineItem(renewalLineItem));
                 }
             }
@@ -938,7 +939,7 @@
             {
                 foreach (var jsonValue in publicSignupPagesArray.Items)
                 {
-                    var publicSignupPage = (JsonObject) jsonValue;
+                    var publicSignupPage = (JsonObject)jsonValue;
                     publicSignupPages.Add(new PublicSignupPage(publicSignupPage));
                 }
             }
@@ -963,8 +964,7 @@
             {
                 if (obj.ContainsKey(key))
                 {
-                    JsonObject customerObj = obj[key] as JsonObject;
-                    if (customerObj != null)
+                    if (obj[key] is JsonObject customerObj)
                     {
                         // create the new customer object
                         result = new Customer(customerObj);
@@ -1003,8 +1003,7 @@
             {
                 if (obj.ContainsKey(key))
                 {
-                    JsonObject paymentProfileViewObj = obj[key] as JsonObject;
-                    if (paymentProfileViewObj != null)
+                    if (obj[key] is JsonObject paymentProfileViewObj)
                     {
                         // create the new PaymentProfileView object
                         result = new PaymentProfileView(paymentProfileViewObj);
@@ -1042,8 +1041,7 @@
             {
                 if (obj.ContainsKey(key))
                 {
-                    JsonObject customerObj = obj[key] as JsonObject;
-                    if (customerObj != null)
+                    if (obj[key] is JsonObject customerObj)
                     {
                         // create the new product object
                         result = new Product(customerObj);
@@ -1068,6 +1066,16 @@
             return result;
         }
 
+        public static ComponentPrice GetNodeContentAsComponentPrice(this XmlNode node)
+        {
+            ComponentPrice result = null;
+            if (node.FirstChild != null)
+            {
+                result = new ComponentPrice(node);
+            }
+            return result;
+        }
+
         /// <summary>
         /// Method for getting the content of a JsonObject as a boolean
         /// </summary>
@@ -1081,14 +1089,53 @@
             {
                 if (obj.ContainsKey(key))
                 {
-                    JsonBoolean objVal = obj[key] as JsonBoolean;
-                    if (objVal != null)
+                    if (obj[key] is JsonBoolean objVal)
                     {
                         result = objVal.Value;
                     }
                 }
             }
             return result;
+        }
+
+        public static List<ComponentPricePoint> GetJSONContentAsPricePoints(this JsonObject obj, string key)
+        {
+            var pricePoints = new List<ComponentPricePoint>();
+            var pricePointsArray = obj[key] as JsonArray;
+            if (pricePointsArray != null)
+            {
+                foreach (var jsonValue in pricePointsArray.Items)
+                {
+                    var pricePoint = (JsonObject)jsonValue;
+                    pricePoints.Add(new ComponentPricePoint(pricePoint));
+                }
+            }
+            // Sanity check, should be equal.
+            if (pricePointsArray != null && pricePointsArray.Length != pricePoints.Count)
+            {
+                throw new JsonParseException(string.Format("Unable to parse component price points ({0} != {1})", pricePointsArray.Length, pricePoints.Count));
+            }
+            return pricePoints;
+        }
+
+        public static List<ComponentPrice> GetJSONContentAsPrices(this JsonObject obj, string key)
+        {
+            var prices = new List<ComponentPrice>();
+            var pricesArray = obj[key] as JsonArray;
+            if (pricesArray != null)
+            {
+                foreach (var jsonValue in pricesArray.Items)
+                {
+                    var price = (JsonObject)jsonValue;
+                    prices.Add(new ComponentPrice(price));
+                }
+            }
+            // Sanity check, should be equal.
+            if (pricesArray != null && pricesArray.Length != prices.Count)
+            {
+                throw new JsonParseException(string.Format("Unable to parse component prices ({0} != {1})", pricesArray.Length, prices.Count));
+            }
+            return prices;
         }
 
         /// <summary>
@@ -1106,6 +1153,48 @@
             return result;
         }
 
+        public static List<ComponentPricePoint> GetNodeContentAsPricePoints(this XmlNode node)
+        {
+            var pricePoints = new List<ComponentPricePoint>();
+            foreach (XmlNode childNode in node.ChildNodes)
+            {
+                switch (childNode.Name)
+                {
+                    case "price_point":
+                        pricePoints.Add(childNode.GetNodeContentAsComponentPricePoint());
+                        break;
+                }
+            }
+            // Sanity check, should be equal.
+            if (node.ChildNodes.Count != pricePoints.Count)
+            {
+                throw new Exception(string.Format("Unable to parse component price points ({0} != {1})", node.ChildNodes.Count, pricePoints.Count));
+            }
+
+            return pricePoints;
+        }
+
+        public static List<ComponentPrice> GetNodeContentAsComponentPrices(this XmlNode node)
+        {
+            var prices = new List<ComponentPrice>();
+            foreach (XmlNode childNode in node.ChildNodes)
+            {
+                switch (childNode.Name)
+                {
+                    case "price":
+                        prices.Add(childNode.GetNodeContentAsComponentPrice());
+                        break;
+                }
+            }
+            // Sanity check, should be equal.
+            if (node.ChildNodes.Count != prices.Count)
+            {
+                throw new Exception(string.Format("Unable to parse component prices ({0} != {1})", node.ChildNodes.Count, prices.Count));
+            }
+
+            return prices;
+        }
+
         /// <summary>
         /// Method for retrieving the DateTime from a JsonObject
         /// </summary>
@@ -1119,8 +1208,7 @@
             {
                 if (obj.ContainsKey(key))
                 {
-                    JsonString str = obj[key] as JsonString;
-                    if (str != null)
+                    if (obj[key] is JsonString str)
                     {
                         string dateStr = str.Value;
                         if (!DateTime.TryParse(dateStr, out result)) result = DateTime.MinValue;
@@ -1129,6 +1217,30 @@
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Method for retrieving the DateTime from a JsonObject
+        /// </summary>
+        /// <param name="obj">The object to retrieve the DateTime value from</param>
+        /// <param name="key">The key of the DateTime field in the JsonObject</param>
+        /// <returns>The DateTime value, DateTime.MinValue otherwise.</returns>
+        public static DateTime? GetJSONContentAsNullableDateTime(this JsonObject obj, string key)
+        {
+            DateTime? retVal = null;
+            if (obj != null)
+            {
+                if (obj.ContainsKey(key))
+                {
+                    if (obj[key] is JsonString str)
+                    {
+                        string dateStr = str.Value;
+                        if (!DateTime.TryParse(dateStr, out var result)) retVal = result != DateTime.MinValue ? (DateTime?)result : null;
+                    }
+                }
+            }
+
+            return retVal;
         }
 
         /// <summary>
@@ -1147,6 +1259,21 @@
         }
 
         /// <summary>
+        /// Method for getting the content of an XmlNode as a DateTime object
+        /// </summary>
+        /// <param name="node">The node whose value needs to be extracted</param>
+        /// <returns>The DateTime value of the node</returns>
+        public static DateTime? GetNodeContentAsNullableDateTime(this XmlNode node)
+        {
+            DateTime? retVal = null;
+            if (node.FirstChild != null)
+            {
+                if (!DateTime.TryParse(node.FirstChild.Value, out var result)) retVal = result != DateTime.MinValue ? (DateTime?)result : null;
+            }
+            return retVal;
+        }
+
+        /// <summary>
         /// Method for retrieving the Guid from a JsonObject
         /// </summary>
         /// <param name="obj">The object to retrieve the Guid value from</param>
@@ -1159,8 +1286,7 @@
             {
                 if (obj.ContainsKey(key))
                 {
-                    JsonString str = obj[key] as JsonString;
-                    if (str != null)
+                    if (obj[key] is JsonString str)
                     {
                         string guidStr = str.Value;
                         result = guidStr.ConvertToGuid();
@@ -1198,10 +1324,9 @@
             {
                 if (obj.ContainsKey(key))
                 {
-                    JsonString str = obj[key] as JsonString;
-                    if (str != null)
+                    if (obj[key] is JsonString str)
                     {
-                        result = (PricingSchemeType) Enum.Parse(typeof(PricingSchemeType), str.Value, true);
+                        result = (PricingSchemeType)Enum.Parse(typeof(PricingSchemeType), str.Value, true);
                     }
                 }
             }
@@ -1220,7 +1345,7 @@
             {
                 if (node.FirstChild.Value != null)
                 {
-                    result = (PricingSchemeType) Enum.Parse(typeof(PricingSchemeType), node.FirstChild.Value, true);
+                    result = (PricingSchemeType)Enum.Parse(typeof(PricingSchemeType), node.FirstChild.Value, true);
                 }
             }
             return result;
@@ -1239,10 +1364,9 @@
             {
                 if (obj.ContainsKey(key))
                 {
-                    JsonString str = obj[key] as JsonString;
-                    if (str != null)
+                    if (obj[key] is JsonString str)
                     {
-                        result = (ComponentType) Enum.Parse(typeof(ComponentType), str.Value, true);
+                        result = (ComponentType)Enum.Parse(typeof(ComponentType), str.Value, true);
                     }
                 }
             }
@@ -1261,7 +1385,7 @@
             {
                 if (node.FirstChild.Value != null)
                 {
-                    result = (ComponentType) Enum.Parse(typeof(ComponentType), node.FirstChild.Value, true);
+                    result = (ComponentType)Enum.Parse(typeof(ComponentType), node.FirstChild.Value, true);
                 }
             }
             return result;
@@ -1280,8 +1404,7 @@
             {
                 if (obj.ContainsKey(key))
                 {
-                    JsonString str = obj[key] as JsonString;
-                    if (str != null)
+                    if (obj[key] is JsonString str)
                     {
                         if (Enum.TryParse(str.Value, true, out PaymentCollectionMethod parsedResult))
                         {
@@ -1306,11 +1429,10 @@
             {
                 if (obj.ContainsKey(key))
                 {
-                    JsonString str = obj[key] as JsonString;
-                    if (str != null)
+                    if (obj[key] is JsonString str)
                     {
                         string value = str.Value;
-                        result = (TransactionType) Enum.Parse(typeof(TransactionType), value, true);
+                        result = (TransactionType)Enum.Parse(typeof(TransactionType), value, true);
                     }
                 }
             }
@@ -1328,7 +1450,7 @@
             if (node.FirstChild != null)
             {
                 string nodeText = node.FirstChild.Value;
-                result = (TransactionType) Enum.Parse(typeof(TransactionType), nodeText, true);
+                result = (TransactionType)Enum.Parse(typeof(TransactionType), nodeText, true);
             }
             return result;
         }
@@ -1361,7 +1483,7 @@
             SubscriptionState result = SubscriptionState.Unknown;
             if (node.FirstChild != null)
             {
-                result = (SubscriptionState) Enum.Parse(typeof(SubscriptionState), node.FirstChild.Value, true);
+                result = (SubscriptionState)Enum.Parse(typeof(SubscriptionState), node.FirstChild.Value, true);
             }
             return result;
         }
@@ -1373,12 +1495,12 @@
         /// <returns>The enumerated value of the node</returns>
         public static T GetNodeContentAsEnum<T>(this XmlNode node) where T : struct
         {
-            T result = default(T);
+            T result = default;
             if (node.FirstChild != null)
             {
                 if (CheckEnumIsDefined<T>(node.FirstChild.Value))
                 {
-                    result = (T) Enum.Parse(typeof(T), node.FirstChild.Value, true);
+                    result = (T)Enum.Parse(typeof(T), node.FirstChild.Value, true);
                 }
             }
             return result;
@@ -1392,17 +1514,16 @@
         /// <returns>The SubscriptionState value, SubscriptionState.Unknown otherwise.</returns>
         public static T GetJSONContentAsEnum<T>(this JsonObject obj, string key) where T : struct
         {
-            T result = default(T);
+            T result = default;
             if (obj != null)
             {
                 if (obj.ContainsKey(key))
                 {
-                    JsonString str = obj[key] as JsonString;
-                    if (str != null)
+                    if (obj[key] is JsonString str)
                     {
                         if (CheckEnumIsDefined<T>(str.Value))
                         {
-                            result = (T) Enum.Parse(typeof(T), str.Value, true);
+                            result = (T)Enum.Parse(typeof(T), str.Value, true);
                         }
                     }
                 }
@@ -1423,10 +1544,9 @@
             {
                 if (obj.ContainsKey(key))
                 {
-                    JsonString str = obj[key] as JsonString;
-                    if (str != null)
+                    if (obj[key] is JsonString str)
                     {
-                        result = (SubscriptionState) Enum.Parse(typeof(SubscriptionState), str.Value, true);
+                        result = (SubscriptionState)Enum.Parse(typeof(SubscriptionState), str.Value, true);
                     }
                 }
             }
@@ -1461,8 +1581,7 @@
             {
                 if (obj.ContainsKey(key))
                 {
-                    JsonObject chargeObj = obj[key] as JsonObject;
-                    if (chargeObj != null)
+                    if (obj[key] is JsonObject chargeObj)
                     {
                         // create the new public signup page object
                         result = new Charge(chargeObj);
@@ -1500,8 +1619,7 @@
             {
                 if (obj.ContainsKey(key))
                 {
-                    JsonObject publicSignupPageObj = obj[key] as JsonObject;
-                    if (publicSignupPageObj != null)
+                    if (obj[key] is JsonObject publicSignupPageObj)
                     {
                         // create the new public signup page object
                         result = new PublicSignupPage(publicSignupPageObj);
@@ -1539,8 +1657,7 @@
             {
                 if (obj.ContainsKey(key))
                 {
-                    JsonObject transactionObj = obj[key] as JsonObject;
-                    if (transactionObj != null)
+                    if (obj[key] is JsonObject transactionObj)
                     {
                         // create the new transaction object
                         result = new Transaction(transactionObj);
@@ -1549,7 +1666,6 @@
             }
             return result;
         }
-
 
         /// <summary>
         /// Method for retrieving the IntervalUnit from a JsonObject
@@ -1592,9 +1708,10 @@
             return result;
         }
 
-        #endregion
+        #endregion XML Node and JSON Extensions
 
         #region Useful
+
         /// <summary>
         /// Check if the enum is defined
         /// </summary>
@@ -1624,7 +1741,7 @@
                     Type classType = a.GetType("Microsoft.WindowsAzure.ServiceRuntime.RoleEnvironment");
                     PropertyInfo pi = classType.GetProperty("IsAvailable");
                     // This is the same as calling RoleEnvironment.IsAvailable, but without requiring it be referenced.
-                    result = (bool) pi.GetValue(null, null); // This should get the result of IsAvailable
+                    result = (bool)pi.GetValue(null, null); // This should get the result of IsAvailable
                 }
             }
             catch
@@ -1651,7 +1768,7 @@
                     Type classType = a.GetType("Microsoft.WindowsAzure.ServiceRuntime.RoleEnvironment");
                     MethodInfo mi = classType.GetMethod("GetConfigurationSettingValue");
                     // This is the same as calling RoleEnvironment.GetConfigurationSettingValue(settingName)
-                    result = (string) mi.Invoke(null, new object[] { settingName });
+                    result = (string)mi.Invoke(null, new object[] { settingName });
                 }
             }
             catch
@@ -1668,7 +1785,7 @@
         /// <typeparam name="T">The type of object to parse the string as</typeparam>
         /// <param name="serverResponse">The XML or JSON response from Chargify</param>
         /// <param name="key">The JSON key that corresponds to the object to parse</param>
-        /// <returns>The object of type T</returns>        
+        /// <returns>The object of type T</returns>
         public static T ConvertResponseTo<T>(this string serverResponse, string key)
             where T : ChargifyBase
         {
@@ -1676,7 +1793,7 @@
             {
                 Type[] argTypes = { typeof(string) };
                 ConstructorInfo cInfo = typeof(T).GetConstructor(argTypes);
-                if (cInfo != null) return (T) cInfo.Invoke(new object[] { serverResponse });
+                if (cInfo != null) return (T)cInfo.Invoke(new object[] { serverResponse });
             }
             else if (serverResponse.IsJSON())
             {
@@ -1688,13 +1805,13 @@
                     {
                         Type[] argTypes = { typeof(JsonObject) };
                         ConstructorInfo cInfo = typeof(T).GetConstructor(argTypes);
-                        if (cInfo != null) return (T) cInfo.Invoke(new object[] { obj[key] as JsonObject });
+                        if (cInfo != null) return (T)cInfo.Invoke(new object[] { obj[key] as JsonObject });
                     }
                     else
                     {
                         Type[] argTypes = { typeof(JsonObject) };
                         ConstructorInfo cInfo = typeof(T).GetConstructor(argTypes);
-                        if (cInfo != null) return (T) cInfo.Invoke(new object[] { obj });
+                        if (cInfo != null) return (T)cInfo.Invoke(new object[] { obj });
                     }
                 }
                 else
@@ -1723,15 +1840,17 @@
             {
                 case "customer":
                     if (!typeof(ICustomer).IsAssignableFrom(typeof(T))) throw new ArgumentException();
-                    result = (T) chargify.UpdateCustomer(objectToBeSaved as ICustomer);
+                    result = (T)chargify.UpdateCustomer(objectToBeSaved as ICustomer);
                     break;
+
                 case "subscription":
                     if (!typeof(ISubscription).IsAssignableFrom(typeof(T))) throw new ArgumentException();
-                    result = (T) chargify.UpdateSubscription(objectToBeSaved as ISubscription);
+                    result = (T)chargify.UpdateSubscription(objectToBeSaved as ISubscription);
                     break;
+
                 case "coupon":
                     if (!typeof(ICoupon).IsAssignableFrom(typeof(T))) throw new ArgumentException();
-                    result = (T) chargify.UpdateCoupon(objectToBeSaved as ICoupon);
+                    result = (T)chargify.UpdateCoupon(objectToBeSaved as ICoupon);
                     break;
             }
             return result;
@@ -1756,52 +1875,58 @@
                 case "customer":
                     if (!typeof(ICustomer).IsAssignableFrom(typeof(T))) throw new ArgumentException();
                     ICustomer customer = null;
-                    // load the object depending on what the ID can be interpreted as, 
+                    // load the object depending on what the ID can be interpreted as,
                     // in this case it's either the ChargifyID (int) or the SystemID (string)
                     if (ID is string) customer = chargify.LoadCustomer(ID as string);
-                    else if (ID is int) customer = chargify.LoadCustomer((int) ID);
-                    result = (T) customer;
+                    else if (ID is int customerId) customer = chargify.LoadCustomer(customerId);
+                    result = (T)customer;
                     break;
+
                 case "subscription":
                     if (!typeof(ISubscription).IsAssignableFrom(typeof(T))) throw new ArgumentException();
                     ISubscription subscription = null;
-                    // load the object depending on what the ID can be interpreted as, 
+                    // load the object depending on what the ID can be interpreted as,
                     // in this case it's only SubscriptionID (int)
-                    if (ID is int) subscription = chargify.LoadSubscription((int) ID);
-                    result = (T) subscription;
+                    if (ID is int subscriptionId) subscription = chargify.LoadSubscription(subscriptionId);
+                    result = (T)subscription;
                     break;
+
                 case "product":
                     if (!typeof(IProduct).IsAssignableFrom(typeof(T))) throw new ArgumentException();
                     IProduct product = null;
-                    // load the object depending on what the ID can be interpreted as, 
+                    // load the object depending on what the ID can be interpreted as,
                     // in this case it's either the ProductID (int) or the ProductHandle (string)
                     if (ID is string) product = chargify.LoadProduct(ID as string, true);
-                    else if (ID is int) product = chargify.LoadProduct(((int) ID).ToString(), false);
-                    result = (T) product;
+                    else if (ID is int productId) product = chargify.LoadProduct(productId.ToString(), false);
+                    result = (T)product;
                     break;
+
                 case "statement":
                     if (!typeof(IStatement).IsAssignableFrom(typeof(T))) throw new ArgumentException();
                     IStatement statement = null;
-                    if (ID is int) statement = chargify.LoadStatement((int) ID);
-                    result = (T) statement;
+                    if (ID is int statementId) statement = chargify.LoadStatement(statementId);
+                    result = (T)statement;
                     break;
+
                 case "transaction":
                     if (!typeof(ITransaction).IsAssignableFrom(typeof(T))) throw new ArgumentException();
                     ITransaction transaction = null;
-                    if (ID is int) transaction = chargify.LoadTransaction((int) ID);
-                    result = (T) transaction;
+                    if (ID is int transactionId) transaction = chargify.LoadTransaction(transactionId);
+                    result = (T)transaction;
                     break;
+
                 case "coupon":
                     if (!typeof(ICoupon).IsAssignableFrom(typeof(T))) throw new ArgumentException();
                     ICoupon coupon = null;
-                    if (ID is int && parentID.HasValue && parentID.Value > 0) coupon = chargify.LoadCoupon(parentID.Value, (int) ID);
-                    result = (T) coupon;
+                    if (ID is int couponId && parentID.HasValue && parentID.Value > 0) coupon = chargify.LoadCoupon(parentID.Value, couponId);
+                    result = (T)coupon;
                     break;
+
                 case "productfamily":
                     if (!typeof(IProductFamily).IsAssignableFrom(typeof(T))) throw new ArgumentException();
                     IProductFamily productFamily = null;
-                    if (ID is int) productFamily = chargify.LoadProductFamily((int) ID);
-                    result = (T) productFamily;
+                    if (ID is int familyId) productFamily = chargify.LoadProductFamily(familyId);
+                    result = (T)productFamily;
                     break;
             }
             return result;
@@ -1816,9 +1941,11 @@
         public static decimal CalculateSubscriptionRevenue(this ChargifyConnect chargify, ISubscription subscription)
         {
             decimal retValue = 0;
-            List<TransactionType> refundKinds = new List<TransactionType>();
-            refundKinds.Add(TransactionType.Payment);
-            refundKinds.Add(TransactionType.Refund);
+            List<TransactionType> refundKinds = new List<TransactionType>
+            {
+                TransactionType.Payment,
+                TransactionType.Refund
+            };
             IDictionary<int, ITransaction> transactions = chargify.GetTransactionsForSubscription(subscription.SubscriptionID, refundKinds);
             if ((transactions != null) && (transactions.Count > 0))
             {
@@ -1846,6 +1973,7 @@
             }
             return retValue;
         }
-        #endregion
+
+        #endregion Useful
     }
 }

@@ -7,7 +7,7 @@ namespace ChargifyNET.Json
     /// </summary>
     public sealed class JsonString : JsonValue
     {
-        string _value;
+        readonly string _value;
 
         /// <summary>
         /// The value of this JsonString

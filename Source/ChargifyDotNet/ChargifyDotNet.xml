@@ -780,7 +780,7 @@
         </member>
         <member name="M:ChargifyNET.ChargifyConnect.CreateSubscription(System.String,System.Int64,ChargifyNET.ICreditCardAttributes)">
             <summary>
-            Create a new subscription 
+            Create a new subscription
             </summary>
             <param name="productHandle">The handle to the product</param>
             <param name="chargifyId">The Chargify ID of the customer</param>
@@ -826,7 +826,7 @@
         </member>
         <member name="M:ChargifyNET.ChargifyConnect.CreateSubscription(System.String,System.String,ChargifyNET.ICreditCardAttributes)">
             <summary>
-            Create a new subscription 
+            Create a new subscription
             </summary>
             <param name="productHandle">The handle to the product</param>
             <param name="systemId">The System ID of the customer</param>
@@ -844,7 +844,7 @@
         </member>
         <member name="M:ChargifyNET.ChargifyConnect.CreateSubscriptionUsingCoupon(System.String,System.String,ChargifyNET.ICreditCardAttributes,System.String)">
             <summary>
-            Create a new subscription 
+            Create a new subscription
             </summary>
             <param name="productHandle">The handle to the product</param>
             <param name="systemId">The System ID of the customer</param>
@@ -998,7 +998,7 @@
         </member>
         <member name="M:ChargifyNET.ChargifyConnect.CreateSubscription(System.String,System.Int64,System.String,System.Nullable{ChargifyNET.PaymentCollectionMethod})">
             <summary>
-            Create a new subscription 
+            Create a new subscription
             </summary>
             <param name="productHandle">The handle to the product</param>
             <param name="chargifyId">The Chargify ID of the customer</param>
@@ -1008,7 +1008,7 @@
         </member>
         <member name="M:ChargifyNET.ChargifyConnect.CreateSubscription(System.String,System.Int64,System.String,System.Int32,System.Int32,System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String)">
             <summary>
-            Create a new subscription 
+            Create a new subscription
             </summary>
             <param name="productHandle">The handle to the product</param>
             <param name="chargifyId">The Chargify ID of the customer</param>
@@ -1028,7 +1028,7 @@
         </member>
         <member name="M:ChargifyNET.ChargifyConnect.CreateSubscription(System.String,System.Int64,System.String,System.Int32,System.Int32,System.String,System.String,System.String,System.String,System.String,System.String,System.String)">
             <summary>
-            Create a new subscription 
+            Create a new subscription
             </summary>
             <param name="productHandle">The handle to the product</param>
             <param name="chargifyId">The Chargify ID of the customer</param>
@@ -1046,16 +1046,16 @@
         </member>
         <member name="M:ChargifyNET.ChargifyConnect.CreateSubscription(System.String,System.String,System.String)">
             <summary>
-            Create a new subscription 
+            Create a new subscription
             </summary>
             <param name="productHandle">The handle to the product</param>
             <param name="systemId">The System ID of the customer</param>
-            <param name="couponCode">The discount coupon code</param> 
+            <param name="couponCode">The discount coupon code</param>
             <returns>The xml describing the new subsscription</returns>
         </member>
         <member name="M:ChargifyNET.ChargifyConnect.CreateSubscription(System.String,System.String,System.String,System.Int32,System.Int32,System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String)">
             <summary>
-            Create a new subscription 
+            Create a new subscription
             </summary>
             <param name="productHandle">The handle to the product</param>
             <param name="systemId">The System ID of the customer</param>
@@ -1068,14 +1068,14 @@
             <param name="billingState">The billing state or province</param>
             <param name="billingZip">The billing zip code or postal code</param>
             <param name="billingCountry">The billing country</param>
-            <param name="couponCode">The discount coupon code</param> 
+            <param name="couponCode">The discount coupon code</param>
             <param name="firstName">The first name, as listed on the credit card</param>
             <param name="lastName">The last name, as listed on the credit card</param>
             <returns>The xml describing the new subsscription</returns>
         </member>
         <member name="M:ChargifyNET.ChargifyConnect.CreateSubscription(System.String,System.String,System.String,System.Int32,System.Int32,System.String,System.String,System.String,System.String,System.String,System.String,System.String)">
             <summary>
-            Create a new subscription 
+            Create a new subscription
             </summary>
             <param name="productHandle">The handle to the product</param>
             <param name="systemId">The System ID of the customer</param>
@@ -1088,12 +1088,12 @@
             <param name="billingState">The billing state or province</param>
             <param name="billingZip">The billing zip code or postal code</param>
             <param name="billingCountry">The billing country</param>
-            <param name="couponCode">The discount coupon code</param> 
+            <param name="couponCode">The discount coupon code</param>
             <returns>The xml describing the new subsscription</returns>
         </member>
         <member name="M:ChargifyNET.ChargifyConnect.CreateSubscription(System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.DateTime,System.Int32)">
             <summary>
-            Create a new subscription 
+            Create a new subscription
             </summary>
             <param name="productHandle">The handle to the product</param>
             <param name="newSystemId">The reference field value of the customer</param>
@@ -1102,14 +1102,14 @@
             <param name="emailAddress">The email address of the customer</param>
             <param name="phone">The phone number of the customer</param>
             <param name="organization">The customer's organization</param>
-            <param name="couponCode">The discount coupon code</param> 
+            <param name="couponCode">The discount coupon code</param>
             <param name="nextBillingAt">The next date that the billing should be processed (DateTime.Min if unspecified)</param>
             <param name="paymentProfileId">The id of the payment profile to use when creating the subscription (existing data)</param>
             <returns>The xml describing the new subsscription</returns>
         </member>
         <member name="M:ChargifyNET.ChargifyConnect.CreateSubscription(System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.DateTime,ChargifyNET.IPaymentProfileAttributes,System.Nullable{ChargifyNET.PaymentCollectionMethod})">
             <summary>
-            Create a new subscription 
+            Create a new subscription
             </summary>
             <param name="productHandle">The handle to the product</param>
             <param name="newSystemId">The reference field value of the customer</param>
@@ -1118,7 +1118,7 @@
             <param name="emailAddress">The email address of the customer</param>
             <param name="phone">The phone number of the customer</param>
             <param name="organization">The customer's organization</param>
-            <param name="couponCode">The discount coupon code</param> 
+            <param name="couponCode">The discount coupon code</param>
             <param name="nextBillingAt">The next date that the billing should be processed</param>
             <param name="paymentProfile">The paymentProfile object to use when creating the subscription (existing data)</param>
             <param name="paymentCollectionMethod">The type of subscription, recurring (automatic) billing, or invoice (if applicable)</param>
@@ -1383,7 +1383,7 @@
         </member>
         <member name="M:ChargifyNET.ChargifyConnect.ResetSubscriptionBalance(System.Int32)">
             <summary>
-            Method for reseting a subscription balance to zero (removes outstanding balance). 
+            Method for reseting a subscription balance to zero (removes outstanding balance).
             Useful when reactivating subscriptions, and making sure not to charge the user
             their existing balance when then cancelled.
             </summary>
@@ -1409,8 +1409,8 @@
         </member>
         <member name="M:ChargifyNET.ChargifyConnect.ResumeSubscription(System.Int32)">
             <summary>
-            Resume a paused (on-hold) subscription. If the normal next renewal date has not passed, 
-            the subscription will return to active and will renew on that date. Otherwise, it will 
+            Resume a paused (on-hold) subscription. If the normal next renewal date has not passed,
+            the subscription will return to active and will renew on that date. Otherwise, it will
             behave like a reactivation, setting the billing date to 'now' and charging the subscriber.
             </summary>
             <param name="subscriptionId">The (Chargify) id of the subscription</param>
@@ -1590,6 +1590,14 @@
             <param name="amount">The amount to credit the customer</param>
             <param name="memo">A note regarding the reason for the credit</param>
             <returns>The object if successful, null otherwise.</returns>
+        </member>
+        <member name="M:ChargifyNET.ChargifyConnect.FormatPriceXml(System.Collections.Generic.IEnumerable{ChargifyDotNet.ComponentPrice},System.Boolean)">
+            <summary>
+            Format ComponentPrice Lists
+            </summary>
+            <param name="prices">The prices to format</param>
+            <param name="isJson">Is the eventual result going to be JSON? We need to slightly adjust if that's the case</param>
+            <returns>The xml formatted prices string</returns>
         </member>
         <member name="M:ChargifyNET.ChargifyConnect.UpdateComponentAllocationForSubscription(System.Int32,System.Int32,System.Int32)">
             <summary>
@@ -2078,7 +2086,7 @@
         <member name="M:ChargifyNET.ChargifyConnect.AddPayment(System.Int32,System.Decimal,System.String)">
             <summary>
             Chargify allows you to record payments that occur outside of the normal flow of payment processing.
-            These payments are considered external payments.A common case to apply such a payment is when a 
+            These payments are considered external payments.A common case to apply such a payment is when a
             customer pays by check or some other means for their subscription.
             </summary>
             <param name="subscriptionId">The ID of the subscription to apply this manual payment record to</param>
@@ -2089,7 +2097,7 @@
         <member name="M:ChargifyNET.ChargifyConnect.AddPayment(System.Int32,System.Int32,System.String)">
             <summary>
             Chargify allows you to record payments that occur outside of the normal flow of payment processing.
-            These payments are considered external payments.A common case to apply such a payment is when a 
+            These payments are considered external payments.A common case to apply such a payment is when a
             customer pays by check or some other means for their subscription.
             </summary>
             <param name="subscriptionId">The ID of the subscription to apply this manual payment record to</param>
@@ -2113,7 +2121,7 @@
         </member>
         <member name="M:ChargifyNET.ChargifyConnect.PreviewRenewal(System.Int32)">
             <summary>
-            Renewal Preview is an object representing a subscription’s next assessment. 
+            Renewal Preview is an object representing a subscription’s next assessment.
             You can retrieve it to see a snapshot of how much your customer will be charged on their next renewal.
             </summary>
             <param name="subscriptionId">Integer, the id for the subscription that is to be previewed</param>
@@ -2137,7 +2145,7 @@
         </member>
         <member name="M:ChargifyNET.ChargifyConnect.GetNotesForSubscription(System.Int32)">
             <summary>
-            Retrieve the notes 
+            Retrieve the notes
             </summary>
             <param name="subscriptionId"></param>
             <returns></returns>
@@ -5462,7 +5470,7 @@
         </member>
         <member name="T:ChargifyNET.IComponentAttributes">
             <summary>
-            Specfic class when getting information about a component as set to a specific subscription 
+            Specfic class when getting information about a component as set to a specific subscription
             as specified here: http://support.chargify.com/faqs/technical/quantity-based-components
             </summary>
         </member>
@@ -5510,6 +5518,13 @@
             <summary>
             The status of whether this component is enabled or disabled.
             (On/Off components only)
+            </summary>
+        </member>
+        <member name="P:ChargifyNET.IComponentAttributes.PricePoints">
+            <summary>
+            Component price points allows you to charge customers different amounts for the same component. 
+            You will be able to define multiple prices and pricing schemes, and then choose which price 
+            point to use for each subscription.
             </summary>
         </member>
         <member name="T:ChargifyNET.ComponentType">
@@ -11373,7 +11388,22 @@
             <param name="key">The key of the DateTime field in the JsonObject</param>
             <returns>The DateTime value, DateTime.MinValue otherwise.</returns>
         </member>
+        <member name="M:ChargifyNET.UsefulExtensions.GetJSONContentAsNullableDateTime(ChargifyNET.Json.JsonObject,System.String)">
+            <summary>
+            Method for retrieving the DateTime from a JsonObject
+            </summary>
+            <param name="obj">The object to retrieve the DateTime value from</param>
+            <param name="key">The key of the DateTime field in the JsonObject</param>
+            <returns>The DateTime value, DateTime.MinValue otherwise.</returns>
+        </member>
         <member name="M:ChargifyNET.UsefulExtensions.GetNodeContentAsDateTime(System.Xml.XmlNode)">
+            <summary>
+            Method for getting the content of an XmlNode as a DateTime object
+            </summary>
+            <param name="node">The node whose value needs to be extracted</param>
+            <returns>The DateTime value of the node</returns>
+        </member>
+        <member name="M:ChargifyNET.UsefulExtensions.GetNodeContentAsNullableDateTime(System.Xml.XmlNode)">
             <summary>
             Method for getting the content of an XmlNode as a DateTime object
             </summary>
@@ -11575,7 +11605,7 @@
             <typeparam name="T">The type of object to parse the string as</typeparam>
             <param name="serverResponse">The XML or JSON response from Chargify</param>
             <param name="key">The JSON key that corresponds to the object to parse</param>
-            <returns>The object of type T</returns>        
+            <returns>The object of type T</returns>
         </member>
         <member name="M:ChargifyNET.UsefulExtensions.Save``1(ChargifyNET.ChargifyConnect,``0)">
             <summary>
@@ -11603,6 +11633,51 @@
             <param name="chargify">The ChargifyConnect object to use</param>
             <param name="subscription">The subscription from which to calculate the revenue</param>
             <returns>The decimal value of revenue.</returns>
+        </member>
+        <member name="M:ChargifyDotNet.ComponentPricePoint.#ctor(System.Xml.XmlNode)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="componentPricePointNode">XmlNode containing the data (in expected format)</param>
+            <exception cref="T:System.ArgumentNullException"></exception>
+            <exception cref="T:System.ArgumentException"></exception>
+        </member>
+        <member name="M:ChargifyDotNet.ComponentPricePoint.#ctor(ChargifyNET.Json.JsonObject)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="componentPricePointObject">JsonObject containing the data (in expected format)</param>
+        </member>
+        <member name="M:ChargifyDotNet.ComponentPricePoint.LoadFromJson(ChargifyNET.Json.JsonObject)">
+            <summary>
+            Load data from a JsonObject
+            </summary>
+            <param name="obj">The JsonObject containing product data</param>
+        </member>
+        <member name="M:ChargifyDotNet.ComponentPricePoint.CompareTo(ChargifyDotNet.ComponentPricePoint)">
+            <summary>
+            Compare this ComponentAttributes to another
+            </summary>
+        </member>
+        <member name="M:ChargifyDotNet.ComponentPrice.#ctor(System.Xml.XmlNode)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="componentPriceNode">XmlNode containing the data (in expected format)</param>
+            <exception cref="T:System.ArgumentNullException"></exception>
+            <exception cref="T:System.ArgumentException"></exception>
+        </member>
+        <member name="M:ChargifyDotNet.ComponentPrice.#ctor(ChargifyNET.Json.JsonObject)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="componentPriceObject">JsonObject containing the data (in expected format)</param>
+        </member>
+        <member name="M:ChargifyDotNet.ComponentPrice.LoadFromJson(ChargifyNET.Json.JsonObject)">
+            <summary>
+            Load data from a JsonObject
+            </summary>
+            <param name="obj">The JsonObject containing product data</param>
         </member>
         <member name="T:PCLWebUtility.WebUtility">
             <summary>

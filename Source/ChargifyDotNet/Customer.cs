@@ -307,7 +307,7 @@ namespace ChargifyNET
             if (ReferenceEquals(a, b)) return true;
 
             // If one is null, but not both, return false.
-            if (((object) a == null) || ((object) b == null))
+            if ((a is null) || (b is null))
             {
                 return false;
             }
@@ -339,7 +339,7 @@ namespace ChargifyNET
             if (ReferenceEquals(a, b)) return true;
 
             // If one is null, but not both, return false.
-            if (((object) a == null) || (b == null))
+            if ((a is null) || (b == null))
             {
                 return false;
             }
@@ -371,7 +371,7 @@ namespace ChargifyNET
             if (ReferenceEquals(a, b)) return true;
 
             // If one is null, but not both, return false.
-            if ((a == null) || ((object) b == null))
+            if ((a == null) || (b is null))
             {
                 return false;
             }

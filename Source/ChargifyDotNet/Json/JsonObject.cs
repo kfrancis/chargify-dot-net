@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ChargifyDotNet;
+using System;
 using System.Collections.Generic;
 
 namespace ChargifyNET.Json
@@ -8,7 +9,7 @@ namespace ChargifyNET.Json
     /// </summary>
     public sealed class JsonObject : JsonValue
     {
-        Dictionary<string, JsonValue> _value;
+        readonly Dictionary<string, JsonValue> _value;
 
         /// <summary>
         /// Enumerator into this object

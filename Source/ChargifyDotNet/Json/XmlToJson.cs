@@ -2,6 +2,9 @@
 using System.Text;
 using System.Xml;
 using System.Collections;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using System.Globalization;
 
 namespace ChargifyNET.Json
 {
@@ -21,8 +24,7 @@ namespace ChargifyNET.Json
             string childName = string.Empty;
             foreach (object child in node)
             {
-                var childElement = child as XmlElement;
-                if (childElement != null)
+                if (child is XmlElement childElement)
                 {
                     if (childName == string.Empty)
                     {
@@ -44,11 +46,20 @@ namespace ChargifyNET.Json
         /// <returns>The JSON equivalent string</returns>
         public static string XmlToJson(XmlDocument xmlDoc)
         {
-            StringBuilder sbJson = new StringBuilder();
-            sbJson.Append("{");
-            XmlToJsoNnode(sbJson, xmlDoc.DocumentElement, true);
-            sbJson.Append("}");
-            return sbJson.ToString();
+            //StringBuilder sbJson = new StringBuilder();
+            //sbJson.Append("{");
+            //XmlToJsoNnode(sbJson, xmlDoc.DocumentElement, true);
+            //sbJson.Append("}");
+            var converterSettings = new JsonSerializerSettings
+            {
+                MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
+                DateParseHandling = DateParseHandling.None,
+                Converters =
+                {
+                    new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }
+                },
+            };
+            return Newtonsoft.Json.JsonConvert.SerializeObject(xmlDoc, Newtonsoft.Json.Formatting.Indented, converterSettings);
         }
 
         //  XmlToJSONnode:  Output an XmlElement, possibly as part of a higher array
@@ -103,8 +114,7 @@ namespace ChargifyNET.Json
         private static void StoreChildNode(SortedList childNodeNames, string nodeName, object nodeValue)
         {
             // Pre-process contraction of XmlElement-s
-            var nodeElement = nodeValue as XmlElement;
-            if (nodeElement != null)
+            if (nodeValue is XmlElement nodeElement)
             {
                 // Convert  <aa></aa> into "aa":null
                 //          <aa>xx</aa> into "aa":"xx"
@@ -114,8 +124,8 @@ namespace ChargifyNET.Json
                     XmlNodeList children = cnode.ChildNodes;
                     if (children.Count == 0)
                         nodeValue = null;
-                    else if (children.Count == 1 && (children[0] is XmlText))
-                        nodeValue = ((XmlText)(children[0])).InnerText;
+                    else if (children.Count == 1 && (children[0] is XmlText innerText))
+                        nodeValue = innerText;
                 }
             }
             // Add nodeValue to ArrayList associated with each nodeName
@@ -140,11 +150,10 @@ namespace ChargifyNET.Json
                     sbJson.Append("\"" + SafeJson(childname) + "\": ");
                 sbJson.Append("null");
             }
-            else if (alChild is string)
+            else if (alChild is string sChild)
             {
                 if (showNodeName)
                     sbJson.Append("\"" + SafeJson(childname) + "\": ");
-                string sChild = (string)alChild;
                 sChild = sChild.Trim();
                 sbJson.Append("\"" + SafeJson(sChild) + "\"");
             }
