@@ -69,6 +69,25 @@ namespace ChargifyDotNet
             _overagePricingPrices = new List<ComponentPrice>();
         }
 
+        public ComponentPricePoint(string componentPricePointXml)
+        {
+            // get the XML into an XML document
+            XmlDocument doc = new XmlDocument();
+            doc.LoadXml(componentPricePointXml);
+            if (doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(componentPricePointXml));
+            // loop through the child nodes of this node
+            foreach (XmlNode elementNode in doc.ChildNodes)
+            {
+                if (elementNode.Name == "price_point")
+                {
+                    LoadFromNode(elementNode);
+                    return;
+                }
+            }
+            // if we get here, then no info was found
+            throw new ArgumentException("XML does not contain price point information", nameof(componentPricePointXml));
+        }
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -262,6 +281,14 @@ namespace ChargifyDotNet
         public IntervalUnit ExpirationIntervalUnit { get => _expirationIntervalUnit; set => _expirationIntervalUnit = value; }
 
         public DateTime? ArchivedAt { get => _archivedAt; set => _archivedAt = value; }
+
+        public bool IsArchived
+        {
+            get
+            {
+                return _archivedAt != null && _archivedAt.HasValue;
+            }
+        }
 
         public DateTime CreatedAt { get => _createdAt; set => _createdAt = value; }
 

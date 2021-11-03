@@ -147,7 +147,8 @@ namespace ChargifyDotNetTests
         [TestMethod]
         public void PricePoints_Create(string method)
         {
-            SetJson(method == "json");
+            bool isJson = method == "json";
+            SetJson(isJson);
 
             // Arrange
             var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value;
@@ -187,7 +188,7 @@ namespace ChargifyDotNetTests
             result.PricingScheme.ShouldBe(newPricePoint.PricingScheme);
             result.Prices.Count.ShouldBe(newPricePoint.Prices.Count);
 
-            SetJson(method != "json");
+            SetJson(!isJson);
         }
 
         /// <summary>
@@ -321,13 +322,16 @@ namespace ChargifyDotNetTests
             if (subscription == null) Assert.Inconclusive("A valid subscription could not be found.");
             var subscriptionComponent = Chargify.GetComponentInfoForSubscription(subscription.SubscriptionID, 1526150);
 
-            var defaultPricePoint = subscriptionComponent.PricePoints.FirstOrDefault(x => !x.ArchivedAt.HasValue);
+            var pricePoints = Chargify.GetPricePoints(subscriptionComponent.ComponentID)?.Values.ToList();
+
+            var defaultPricePoint = pricePoints.FirstOrDefault(x => !x.IsArchived);
             if (defaultPricePoint == null) Assert.Inconclusive("No unarchived price points to unarchive.");
 
             var result = Chargify.ArchivePricePoint(subscriptionComponent.ComponentID, defaultPricePoint.Id);
 
             result.ShouldNotBeNull();
             result.ArchivedAt.ShouldNotBeNull();
+            result.IsArchived.ShouldBeTrue();
 
             SetJson(!isJson);
         }
@@ -351,7 +355,7 @@ namespace ChargifyDotNetTests
 
             result.ShouldNotBeNull();
             result.ShouldAllBe(x => x.Value.ComponentId == subscriptionComponent.ComponentID);
-            result.Values.Count.ShouldBe(subscriptionComponent.PricePoints.Count());
+            result.Values.Count.ShouldBeGreaterThan(0);
 
             SetJson(!isJson);
         }
@@ -370,13 +374,16 @@ namespace ChargifyDotNetTests
             if (subscription == null) Assert.Inconclusive("A valid subscription could not be found.");
             var subscriptionComponent = Chargify.GetComponentInfoForSubscription(subscription.SubscriptionID, 1526150);
 
-            var defaultPricePoint = subscriptionComponent.PricePoints.FirstOrDefault(x => x.ArchivedAt.HasValue);
+            var pricePoints = Chargify.GetPricePoints(subscriptionComponent.ComponentID)?.Values.ToList();
+
+            var defaultPricePoint = pricePoints.FirstOrDefault(x => x.IsArchived);
             if (defaultPricePoint == null) Assert.Inconclusive("No archived price points to unarchive.");
 
             var result = Chargify.UnarchivePricePoint(subscriptionComponent.ComponentID, defaultPricePoint.Id);
 
             result.ShouldNotBeNull();
             result.ArchivedAt.ShouldBeNull();
+            result.IsArchived.ShouldBeFalse();
 
             SetJson(!isJson);
         }

@@ -4136,7 +4136,7 @@ namespace ChargifyNET
                 if (componentID < 0) throw new ArgumentNullException(nameof(componentID));
 
                 // now make the request
-                string response = DoRequest(string.Format("components/{0}/price_points/{1}.{2}", componentID, pricePointId, GetMethodExtension()), HttpRequestMethod.Put, null);
+                string response = DoRequest(string.Format("components/{0}/price_points/{1}/unarchive.{2}", componentID, pricePointId, GetMethodExtension()), HttpRequestMethod.Put, null);
 
                 // Convert the Chargify response into the object we're looking for
                 return response.ConvertResponseTo<ComponentPricePoint>("price_point");
@@ -4193,14 +4193,16 @@ namespace ChargifyNET
             }
             else if (response.IsJSON())
             {
+                // should be expecting an object containing an array
+                JsonObject jObj = JsonObject.Parse(response);
+
                 // should be expecting an array
-                int position = 0;
-                JsonArray array = JsonArray.Parse(response, ref position);
+                JsonArray array = jObj["price_points"] as JsonArray;
                 for (int i = 0; i <= array.Length - 1; i++)
                 {
-                    if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("price_point"))
+                    if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("prices"))
                     {
-                        JsonObject componentObj = (array.Items[i] as JsonObject)["price_points"] as JsonObject;
+                        JsonObject componentObj = array.Items[i] as JsonObject;
                         var loadedComponent = new ComponentPricePoint(componentObj);
                         if (!retValue.ContainsKey(loadedComponent.Id))
                         {
@@ -4208,10 +4210,26 @@ namespace ChargifyNET
                         }
                         else
                         {
-                            throw new InvalidOperationException("Duplicate ID values detected");
+                            throw new InvalidOperationException("Duplicate ComponentID values detected");
                         }
                     }
                 }
+
+                //// should be expecting an array
+                //JsonObject jObj1 = JsonObject.Parse(response);
+                //if (jObj1 != null && jObj1.ContainsKey("price_points"))
+                //{
+                //    JsonObject componentObj = jObj1["price_points"] as JsonObject;
+                //    var loadedComponent = new ComponentPricePoint(componentObj);
+                //    if (!retValue.ContainsKey(loadedComponent.Id))
+                //    {
+                //        retValue.Add(loadedComponent.Id, loadedComponent);
+                //    }
+                //    else
+                //    {
+                //        throw new InvalidOperationException("Duplicate ID values detected");
+                //    }
+                //}
             }
             // return the list
             return retValue;

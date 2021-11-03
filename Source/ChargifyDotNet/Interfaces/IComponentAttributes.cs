@@ -87,11 +87,11 @@ namespace ChargifyNET
         /// </summary>
         bool Enabled { get; }
 
-        /// <summary>
-        /// Component price points allows you to charge customers different amounts for the same component. 
-        /// You will be able to define multiple prices and pricing schemes, and then choose which price 
-        /// point to use for each subscription.
-        /// </summary>
-        IEnumerable<ComponentPricePoint> PricePoints { get; }
+        ///// <summary>
+        ///// Component price points allows you to charge customers different amounts for the same component. 
+        ///// You will be able to define multiple prices and pricing schemes, and then choose which price 
+        ///// point to use for each subscription.
+        ///// </summary>
+        //IEnumerable<ComponentPricePoint> PricePoints { get; }
     }
 }

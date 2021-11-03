@@ -1235,7 +1235,7 @@
                     if (obj[key] is JsonString str)
                     {
                         string dateStr = str.Value;
-                        if (!DateTime.TryParse(dateStr, out var result)) retVal = result != DateTime.MinValue ? (DateTime?)result : null;
+                        if (DateTime.TryParse(dateStr, out var result)) retVal = result != DateTime.MinValue ? (DateTime?)result : null;
                     }
                 }
             }
@@ -1268,7 +1268,7 @@
             DateTime? retVal = null;
             if (node.FirstChild != null)
             {
-                if (!DateTime.TryParse(node.FirstChild.Value, out var result)) retVal = result != DateTime.MinValue ? (DateTime?)result : null;
+                if (DateTime.TryParse(node.FirstChild.Value, out var result)) retVal = result != DateTime.MinValue ? (DateTime?)result : null;
             }
             return retVal;
         }

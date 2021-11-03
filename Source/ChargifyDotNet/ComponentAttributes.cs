@@ -54,7 +54,7 @@ namespace ChargifyNET
         private const string PricingSchemeKey = "pricing_scheme";
         private const string UnitBalanceKey = "unit_balance";
         private const string EnabledKey = "enabled";
-        private const string PricePointsKey = "price_points";
+        //private const string PricePointsKey = "price_points";
         #endregion
 
         #region Constructors
@@ -145,9 +145,9 @@ namespace ChargifyNET
                     case EnabledKey:
                         _enabled = obj.GetJSONContentAsBoolean(key);
                         break;
-                    case PricePointsKey:
-                        _pricePoints = obj.GetJSONContentAsPricePoints(key);
-                        break;
+                    //case PricePointsKey:
+                    //    _pricePoints = obj.GetJSONContentAsPricePoints(key);
+                    //    break;
                 }
             }
         }
@@ -187,9 +187,9 @@ namespace ChargifyNET
                     case EnabledKey:
                         _enabled = dataNode.GetNodeContentAsBoolean();
                         break;
-                    case PricePointsKey:
-                        _pricePoints = dataNode.GetNodeContentAsPricePoints();
-                        break;
+                    //case PricePointsKey:
+                    //    _pricePoints = dataNode.GetNodeContentAsPricePoints();
+                    //    break;
                 }
             }
         }
@@ -282,11 +282,11 @@ namespace ChargifyNET
         private bool _enabled;
 
 
-        public IEnumerable<ComponentPricePoint> PricePoints
-        {
-            get => _pricePoints;
-        } 
-        private IEnumerable<ComponentPricePoint> _pricePoints = new List<ComponentPricePoint>();
+        //public IEnumerable<ComponentPricePoint> PricePoints
+        //{
+        //    get => _pricePoints;
+        //}
+        //private IEnumerable<ComponentPricePoint> _pricePoints = new List<ComponentPricePoint>();
 
 
 

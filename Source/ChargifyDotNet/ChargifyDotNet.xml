@@ -5520,13 +5520,6 @@
             (On/Off components only)
             </summary>
         </member>
-        <member name="P:ChargifyNET.IComponentAttributes.PricePoints">
-            <summary>
-            Component price points allows you to charge customers different amounts for the same component. 
-            You will be able to define multiple prices and pricing schemes, and then choose which price 
-            point to use for each subscription.
-            </summary>
-        </member>
         <member name="T:ChargifyNET.ComponentType">
             <summary>
             The type of component as defined in Chargify's documentation
