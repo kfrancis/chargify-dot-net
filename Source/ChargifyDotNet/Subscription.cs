@@ -98,7 +98,7 @@ namespace ChargifyNET
         public Subscription(string subscriptionXml)
         {
             // get the XML into an XML document
-            XmlDocument doc = new XmlDocument();
+            XmlDocument doc = new();
             doc.LoadXml(subscriptionXml);
             if (doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(subscriptionXml));
             // loop through the child nodes of this node
@@ -143,7 +143,7 @@ namespace ChargifyNET
         /// <param name="obj">The JsonObject containing subscription data</param>
         private void LoadFromJson(JsonObject obj)
         {
-            foreach (string key in obj.Keys)
+            foreach (var key in obj.Keys)
             {
                 switch (key)
                 {
@@ -802,7 +802,7 @@ namespace ChargifyNET
         /// </summary>
         public override string ToString()
         {
-            StringBuilder myString = new StringBuilder();
+            StringBuilder myString = new();
             if (Customer != null)
             {
                 myString.AppendFormat("Customer: {0}", Customer.FullName);

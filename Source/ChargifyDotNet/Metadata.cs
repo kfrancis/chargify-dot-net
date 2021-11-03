@@ -62,7 +62,7 @@ namespace ChargifyNET
         public Metadata(string metadataXml)
         {
             // get the XML into an XML document
-            XmlDocument doc = new XmlDocument();
+            XmlDocument doc = new();
             doc.LoadXml(metadataXml);
             if (doc.ChildNodes.Count == 0)
                 throw new ArgumentException("XML not valid", nameof(metadataXml));
@@ -146,7 +146,7 @@ namespace ChargifyNET
         {
             unchecked
             {
-                int result = 17;
+                var result = 17;
                 result = result * 23 + ResourceID.GetHashCode();
                 result = result * 23 + ((Value != null) ? Value.GetHashCode() : 0);
                 result = result * 23 + ((Name != null) ? Name.GetHashCode() : 0);

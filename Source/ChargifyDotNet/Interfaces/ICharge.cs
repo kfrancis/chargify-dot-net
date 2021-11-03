@@ -236,7 +236,7 @@ namespace ChargifyNET
         /// The ending balance of the subscription, in dollars and cents (formatted as decimal)
         /// </summary>
         decimal EndingBalance { get; }
-        
+
         /// <summary>
         /// The ID of the charge
         /// </summary>
@@ -271,7 +271,7 @@ namespace ChargifyNET
         /// The type of transaction
         /// </summary>
         string TransactionType { get; }
-        
+
         /// <summary>
         /// The ID of the gateway transaction, useful for debugging.
         /// </summary>

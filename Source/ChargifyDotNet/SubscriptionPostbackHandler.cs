@@ -42,8 +42,8 @@ namespace ChargifyNET
     /// </summary>
     public abstract class SubscriptionPostbackHandler : IHttpHandler
     {
-        
-    #region IHttpHandler Members
+
+        #region IHttpHandler Members
 
         /// <summary>
         /// You will need to configure this handler in the web.config file of your 
@@ -65,14 +65,14 @@ namespace ChargifyNET
         /// </summary>
         public void ProcessRequest(HttpContext context)
         {
-            StreamReader sr = new StreamReader(context.Request.InputStream);
-            string possibleData = sr.ReadToEnd();
+            StreamReader sr = new(context.Request.InputStream);
+            var possibleData = sr.ReadToEnd();
             sr.Close();
             if (!string.IsNullOrEmpty(possibleData))
             {
                 // strip away the json giving us only the values to pass on ..
-                string temp = possibleData.Trim('[', ']');
-                string[] values = temp.Split(',');
+                var temp = possibleData.Trim('[', ']');
+                var values = temp.Split(',');
                 OnChargifyUpdate(values);
             }
         }
@@ -83,7 +83,7 @@ namespace ChargifyNET
         /// <param name="ids">The list of subscription IDs which have been updated/altered</param>
         public abstract void OnChargifyUpdate(string[] ids);
 
-    #endregion
+        #endregion
     }
 #endif
 }

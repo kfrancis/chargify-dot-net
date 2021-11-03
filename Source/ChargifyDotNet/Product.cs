@@ -1,4 +1,4 @@
-﻿
+
 #region License, Terms and Conditions
 //
 // Product.cs
@@ -59,7 +59,7 @@ namespace ChargifyNET
         public Product(string productXml)
         {
             // get the XML into an XML document
-            XmlDocument doc = new XmlDocument();
+            XmlDocument doc = new();
             doc.LoadXml(productXml);
             if (doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(productXml));
             // loop through the child nodes of this node
@@ -104,7 +104,7 @@ namespace ChargifyNET
         /// <param name="obj">The JsonObject containing product data</param>
         private void LoadFromJson(JsonObject obj)
         {
-            foreach (string key in obj.Keys)
+            foreach (var key in obj.Keys)
             {
                 switch (key)
                 {
@@ -633,7 +633,7 @@ namespace ChargifyNET
         /// List of public signup page URLs and the associated ID
         /// </summary>
         public List<IPublicSignupPage> PublicSignupPages { get { return _publicSignupPages; } }
-        private List<IPublicSignupPage> _publicSignupPages = new List<IPublicSignupPage>();
+        private List<IPublicSignupPage> _publicSignupPages = new();
 
         /// <summary>
         /// The product version number
@@ -757,9 +757,9 @@ namespace ChargifyNET
         {
             if (obj == null) return false;
 
-            if (obj is IProduct)
+            if (obj is IProduct product)
             {
-                return (Handle == ((IProduct) obj).Handle);
+                return (Handle == product.Handle);
             }
             return ReferenceEquals(this, obj);
         }

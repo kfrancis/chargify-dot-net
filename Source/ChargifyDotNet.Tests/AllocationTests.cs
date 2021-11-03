@@ -50,7 +50,8 @@ namespace ChargifyDotNetTests
             var component = Chargify.GetComponentsForSubscription(subscription.SubscriptionID).FirstOrDefault(c => c.Value.Kind == "quantity_based_component" || c.Value.Kind == "on_off_component").Value;
             if (component == null) Assert.Inconclusive("A valid component could not be found.");
 
-            var allocation = new ComponentAllocation() {
+            var allocation = new ComponentAllocation()
+            {
                 Quantity = 1,
                 Memo = Guid.NewGuid().ToString(),
                 UpgradeScheme = ComponentUpgradeProrationScheme.Prorate_Delay_Capture,
@@ -86,7 +87,7 @@ namespace ChargifyDotNetTests
             var component = Chargify.GetComponentsForSubscription(subscription.SubscriptionID).FirstOrDefault(c => c.Value.Kind == "quantity_based_component" && c.Value.AllocatedQuantity > 0).Value; // || c.Value.Kind == "on_off_component"
             if (component == null) Assert.Inconclusive("A valid component could not be found.");
 
-            int quantityToAllocate = (int)component.AllocatedQuantity+1;
+            var quantityToAllocate = (int)component.AllocatedQuantity + 1;
             IComponentAllocation result = null;
 
             // Act

@@ -51,7 +51,7 @@ namespace ChargifyNET
         public SubscriptionPreview(string xml)
         {
             // get the XML into an XML document
-            XmlDocument doc = new XmlDocument();
+            XmlDocument doc = new();
             doc.LoadXml(xml);
             if (doc.ChildNodes.Count == 0)
                 throw new ArgumentException("XML not valid", nameof(xml));
@@ -90,11 +90,9 @@ namespace ChargifyNET
 
         private void LoadFromNode(string elementNode)
         {
-            XmlSerializer serializer = new XmlSerializer(typeof(SubscriptionPreviewResult));
-            using (var reader = new StringReader(elementNode))
-            {
-                SubscriptionPreviewResult = (SubscriptionPreviewResult)serializer.Deserialize(reader);
-            }
+            XmlSerializer serializer = new(typeof(SubscriptionPreviewResult));
+            using var reader = new StringReader(elementNode);
+            SubscriptionPreviewResult = (SubscriptionPreviewResult)serializer.Deserialize(reader);
         }
 
         /// <summary>

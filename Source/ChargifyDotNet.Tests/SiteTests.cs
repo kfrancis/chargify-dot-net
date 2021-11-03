@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using ChargifyDotNetTests.Base;
 using ChargifyNET;
 using System.Linq;
@@ -12,7 +12,7 @@ namespace ChargifyDotNetTests
         [TestInitialize]
         public void Startup()
         {
-            int familyId = int.MinValue;
+            var familyId = int.MinValue;
             var productFamilyList = Chargify.GetProductFamilyList();
             if (productFamilyList.Count == 0)
             {
@@ -43,7 +43,7 @@ namespace ChargifyDotNetTests
 
             var customerId = long.MinValue;
             var customerList = Chargify.GetCustomerList();
-            string referenceID = Guid.NewGuid().ToString();
+            var referenceID = Guid.NewGuid().ToString();
             Customer customer = null;
             if (customerList.Count == 0)
             {
@@ -77,7 +77,7 @@ namespace ChargifyDotNetTests
             {
                 var expMonth = DateTime.Now.AddMonths(1).Month;
                 var expYear = DateTime.Now.AddMonths(12).Year;
-                var newPaymentInfo = GetTestPaymentMethod(customer);
+                var newPaymentInfo = SiteTests.GetTestPaymentMethod(customer);
                 var newSubscription = Chargify.CreateSubscription(productHandle, customer.ChargifyID, newPaymentInfo);
             }
         }
@@ -193,7 +193,7 @@ namespace ChargifyDotNetTests
             SetJson(!isJson);
         }
 
-        private CreditCardAttributes GetTestPaymentMethod(CustomerAttributes customer)
+        private static CreditCardAttributes GetTestPaymentMethod(CustomerAttributes customer)
         {
             var retVal = new CreditCardAttributes()
             {

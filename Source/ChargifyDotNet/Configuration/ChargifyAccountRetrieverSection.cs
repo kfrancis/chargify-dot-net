@@ -30,10 +30,10 @@
 
 namespace ChargifyNET.Configuration
 {
-    #if NETFULL
-#region Imports
+#if NETFULL
+    #region Imports
     using System.Configuration;
-#endregion
+    #endregion
 
     /// <summary>
     /// Class that deals with getting the account elements in web.config
@@ -46,7 +46,7 @@ namespace ChargifyNET.Configuration
         [ConfigurationProperty("defaultAccount")]
         public string DefaultAccount
         {
-            get { return (string) base["defaultAccount"]; }
+            get { return (string)base["defaultAccount"]; }
             set { base["defaultAccount"] = value; }
         }
 
@@ -58,7 +58,7 @@ namespace ChargifyNET.Configuration
         {
             get
             {
-                if (base["useJSON"] != null) { return (bool) base["useJSON"]; }
+                if (base["useJSON"] != null) { return (bool)base["useJSON"]; }
                 return false;
             }
             set { base["useJSON"] = value; }
@@ -70,7 +70,7 @@ namespace ChargifyNET.Configuration
         [ConfigurationProperty("accounts", IsDefaultCollection = true)]
         public ChargifyAccountElementCollection Accounts
         {
-            get { return (ChargifyAccountElementCollection) this["accounts"]; }
+            get { return (ChargifyAccountElementCollection)this["accounts"]; }
             set { this["accounts"] = value; }
         }
 

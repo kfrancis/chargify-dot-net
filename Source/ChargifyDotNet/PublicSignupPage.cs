@@ -66,7 +66,7 @@ namespace ChargifyNET
         public PublicSignupPage(string publicSignupPageXml)
         {
             // get the XML into an XML document
-            XmlDocument doc = new XmlDocument();
+            XmlDocument doc = new();
             doc.LoadXml(publicSignupPageXml);
             if (doc.ChildNodes.Count == 0)
                 throw new ArgumentException("XML not valid", nameof(publicSignupPageXml));
@@ -137,7 +137,7 @@ namespace ChargifyNET
 
         private void LoadFromJson(JsonObject obj)
         {
-            foreach (string key in obj.Keys)
+            foreach (var key in obj.Keys)
             {
                 switch (key)
                 {

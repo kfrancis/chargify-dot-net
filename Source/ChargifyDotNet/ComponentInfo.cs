@@ -73,7 +73,7 @@ namespace ChargifyNET
         public ComponentInfo(string componentInfoXml)
         {
             // get the XML into an XML document
-            XmlDocument doc = new XmlDocument();
+            XmlDocument doc = new();
             doc.LoadXml(componentInfoXml);
             if (doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(componentInfoXml));
             // loop through the child nodes of this node
@@ -115,7 +115,7 @@ namespace ChargifyNET
         private void LoadFromJson(JsonObject obj)
         {
             // loop through the keys of this JsonObject to get component info, and parse it out
-            foreach (string key in obj.Keys)
+            foreach (var key in obj.Keys)
             {
                 switch (key)
                 {
@@ -155,12 +155,12 @@ namespace ChargifyNET
                         break;
                     case PricesKey:
                         _prices = new List<IPriceBracketInfo>();
-                        JsonArray pricesArray = obj[key] as JsonArray;
+                        var pricesArray = obj[key] as JsonArray;
                         if (pricesArray != null)
                         {
                             foreach (var jsonValue in pricesArray.Items)
                             {
-                                var priceObj = (JsonObject) jsonValue;
+                                var priceObj = (JsonObject)jsonValue;
                                 if (priceObj == null) continue;
                                 var bracketInfo = new PriceBracketInfo();
 
@@ -385,7 +385,7 @@ namespace ChargifyNET
         {
             get { return _prices; }
         }
-        private List<IPriceBracketInfo> _prices = new List<IPriceBracketInfo>();
+        private List<IPriceBracketInfo> _prices = new();
 
         /// <summary>
         /// Boolean flag describing whether a component is archived or not

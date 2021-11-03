@@ -20,14 +20,14 @@ namespace ChargifyDotNetTests
 
             // Arrange
             var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value;
-            DateTime now = DateTime.Now;
-            DateTime activatedAt = now.AddDays(-4);
-            DateTime canceledAt = now;
-            DateTime expiresAt = now.AddDays(4);
-            string cancellationMessage = Guid.NewGuid().ToString();
+            var now = DateTime.Now;
+            var activatedAt = now.AddDays(-4);
+            var canceledAt = now;
+            var expiresAt = now.AddDays(4);
+            var cancellationMessage = Guid.NewGuid().ToString();
 
             // Act
-            bool result = Chargify.SetSubscriptionOverride(subscription.SubscriptionID, activatedAt, canceledAt, cancellationMessage, expiresAt);
+            var result = Chargify.SetSubscriptionOverride(subscription.SubscriptionID, activatedAt, canceledAt, cancellationMessage, expiresAt);
             var retrievedSubscription = Chargify.Find<Subscription>(subscription.SubscriptionID);
 
             // Assert

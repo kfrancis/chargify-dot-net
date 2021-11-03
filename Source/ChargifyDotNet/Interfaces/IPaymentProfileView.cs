@@ -95,6 +95,6 @@ namespace ChargifyNET
         /// TODO
         /// </summary>
         string PayPalEmail { get; set; }
-        
+
     }
 }

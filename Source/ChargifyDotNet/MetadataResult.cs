@@ -71,7 +71,7 @@ namespace ChargifyNET
         public MetadataResult(string metadataResultXml)
         {
             // get the XML into an XML document
-            XmlDocument doc = new XmlDocument();
+            XmlDocument doc = new();
             doc.LoadXml(metadataResultXml);
             if (doc.ChildNodes.Count == 0)
                 throw new ArgumentException("XML not valid", nameof(metadataResultXml));
@@ -175,9 +175,9 @@ namespace ChargifyNET
 
         private void LoadFromJson(JsonObject obj)
         {
-            foreach (string key in obj.Keys)
+            foreach (var key in obj.Keys)
             {
-                string theKey = key;
+                var theKey = key;
                 if (key.Contains("_"))
                     theKey = key.Replace("_", "-"); // Chargify seems to return different keys based on xml or json return type
                 switch (theKey)
@@ -196,15 +196,15 @@ namespace ChargifyNET
                         break;
                     case MetadataKey:
                         _metadata = new List<IMetadata>();
-                        JsonArray viewObj = obj[key] as JsonArray;
+                        var viewObj = obj[key] as JsonArray;
                         if (viewObj?.Items != null && viewObj.Length > 0)
                         {
-                            foreach (JsonValue item in viewObj.Items)
+                            foreach (var item in viewObj.Items)
                             {
                                 var newObj = new Metadata();
                                 var hasData = false;
                                 var itemObj = (JsonObject)item;
-                                foreach (string subItemKey in itemObj.Keys)
+                                foreach (var subItemKey in itemObj.Keys)
                                 {
                                     switch (subItemKey)
                                     {
@@ -300,7 +300,7 @@ namespace ChargifyNET
             }
         }
 
-        private List<IMetadata> _metadata = new List<IMetadata>();
+        private List<IMetadata> _metadata = new();
 
         #endregion
     }

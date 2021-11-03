@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Linq;
 using ChargifyDotNetTests.Base;
@@ -32,7 +32,7 @@ namespace ChargifyDotNetTests
             Assert.IsNotNull(result);
             Assert.IsTrue(result.AmountInCents != int.MinValue);
             Assert.IsTrue(result.AmountInCents > 0);
-            Assert.IsTrue(result.Amount == (Convert.ToDecimal(result.AmountInCents)/100));
+            Assert.IsTrue(result.Amount == (Convert.ToDecimal(result.AmountInCents) / 100));
             Assert.AreEqual(result.ID, couponID);
 
             SetJson(!isJson);
@@ -81,7 +81,7 @@ namespace ChargifyDotNetTests
             // Arrange
             var productFamily = Chargify.GetProductFamilyList().Values.FirstOrDefault();
             if (productFamily == null) Assert.Inconclusive("A valid product family could not be found.");
-            string couponCode = Guid.NewGuid().ToString().Replace("-",string.Empty).ToUpperInvariant().Substring(0, 8);
+            var couponCode = Guid.NewGuid().ToString().Replace("-", string.Empty).ToUpperInvariant().Substring(0, 8);
             var newCoupon = new Coupon()
             {
                 AllowNegativeBalance = false,
@@ -123,7 +123,7 @@ namespace ChargifyDotNetTests
             if (productFamily == null) Assert.Inconclusive("A valid product family could not be found.");
             var foundCoupon = Chargify.GetAllCoupons(productFamily.ID).FirstOrDefault().Value;
             if (foundCoupon == null) Assert.Inconclusive("A valid coupon could not be found.");
-            string originalName = foundCoupon.Name;
+            var originalName = foundCoupon.Name;
             foundCoupon.Name = originalName + "_1";
 
             // Act

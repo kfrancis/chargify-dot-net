@@ -1,4 +1,4 @@
-﻿#region License, Terms and Conditions
+#region License, Terms and Conditions
 //
 // WebhookHandler.cs
 //
@@ -33,7 +33,7 @@ namespace ChargifyNET
     #region Imports
     using System.IO;
     using System.Web;
-#endregion
+    #endregion
 
     /// <summary>
     /// IHttpHandler which processes any webhook responses FROM chargify.
@@ -45,7 +45,7 @@ namespace ChargifyNET
         private const string SignatureHeaderHandle = "X-Chargify-Webhook-Signature";
         private const string SignatureQueryStringHandle = "signature";
 
-        #region IHttpHandler Members
+    #region IHttpHandler Members
 
         /// <summary>
         /// You will need to configure this handler in the web.config file of your 
@@ -68,19 +68,19 @@ namespace ChargifyNET
         public void ProcessRequest(HttpContext context)
         {
             string possibleData;
-            using (StreamReader sr = new StreamReader(context.Request.InputStream))
+            using (StreamReader sr = new(context.Request.InputStream))
             {
                 possibleData = sr.ReadToEnd();
             }
             if (!string.IsNullOrEmpty(possibleData))
             {
-                string signature = context.Request.Headers[SignatureHeaderHandle];
+                var signature = context.Request.Headers[SignatureHeaderHandle];
                 if (string.IsNullOrEmpty(signature))
                 {
                     signature = context.Request.QueryString[SignatureQueryStringHandle];
                 }
                 // Grab the webhook id as well, since it'll be used for validation.
-                int webhookId = int.Parse(context.Request.Headers[WebhookIdHandle]);
+                var webhookId = int.Parse(context.Request.Headers[WebhookIdHandle]);
 
                 // Now that we have data, signature and webhook id, pass it back.
                 OnChargifyUpdate(webhookId, signature, possibleData);
@@ -95,7 +95,7 @@ namespace ChargifyNET
         /// <param name="data">They data they are sending</param>
         protected abstract void OnChargifyUpdate(int webhookId, string signature, string data);
 
-#endregion
+    #endregion
     }
 #endif
 }

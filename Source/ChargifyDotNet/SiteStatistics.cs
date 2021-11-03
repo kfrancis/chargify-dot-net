@@ -31,8 +31,8 @@
 namespace ChargifyNET
 {
     #region Imports
-using System;
-using Json;
+    using System;
+    using Json;
     #endregion
 
     /// <summary>
@@ -75,7 +75,7 @@ using Json;
         private void LoadFromJson(JsonObject obj)
         {
             // loop through the keys of this JsonObject to get stats info, and parse it out
-            foreach (string key in obj.Keys)
+            foreach (var key in obj.Keys)
             {
                 switch (key)
                 {
@@ -87,7 +87,7 @@ using Json;
                         break;
                     case StatsKey:
                         if (obj[key] is JsonObject statsObj)
-                            foreach (string innerKey in statsObj.Keys)
+                            foreach (var innerKey in statsObj.Keys)
                             {
                                 switch (innerKey)
                                 {

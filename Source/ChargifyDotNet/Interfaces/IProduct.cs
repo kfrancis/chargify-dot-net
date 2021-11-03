@@ -33,7 +33,7 @@ namespace ChargifyNET
 {
     #region Imports
     using System;
-using System.Collections.Generic;
+    using System.Collections.Generic;
     #endregion
 
     /// <summary>

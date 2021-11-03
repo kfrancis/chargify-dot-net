@@ -1482,14 +1482,14 @@
             <summary>
             Method for retrieving information about a coupon using the ID of that coupon.
             </summary>
-            <param name="ProductFamilyID">The ID of the product family that the coupon belongs to</param>
+            <param name="productFamilyID">The ID of the product family that the coupon belongs to</param>
             <returns>A dictionary of objects if found, empty collection otherwise.</returns>
         </member>
         <member name="M:ChargifyNET.ChargifyConnect.GetCouponUsage(System.Int32)">
             <summary>
             Method for retrieving information about a coupon usage using the ID of that coupon.
             </summary>
-            <param name="CouponID">The ID of the coupon</param>
+            <param name="couponId">The ID of the coupon</param>
             <returns>The object if found, null otherwise.</returns>
         </member>
         <member name="M:ChargifyNET.ChargifyConnect.FindCoupon(System.Int32,System.String)">
@@ -1512,8 +1512,8 @@
             <summary>
             Method to remove a coupon to a subscription using the API
             </summary>
-            <param name="SubscriptionID">The ID of the subscription to modify</param>
-            <param name="CouponCode">The code of the coupon to remove from the subscription</param>
+            <param name="subscriptionID">The ID of the subscription to modify</param>
+            <param name="couponCode">The code of the coupon to remove from the subscription</param>
             <returns>True if successful, false otherwise.</returns>
         </member>
         <member name="M:ChargifyNET.ChargifyConnect.CreateCoupon(ChargifyNET.ICoupon,System.Int32)">
@@ -2178,7 +2178,7 @@
             <summary>
             Method for retrieving information about a coupon using the ID of that referral code.
             </summary>
-            <param name="ReferralCode">Referral code</param>
+            <param name="referralCode">Referral code</param>
             <returns>The object if found, null otherwise.</returns>
         </member>
         <member name="M:ChargifyNET.ChargifyConnect.GetMethodExtension">
@@ -11615,8 +11615,8 @@
             </summary>
             <typeparam name="T">The type of object you wish to find</typeparam>
             <param name="chargify">The ChargifyConnect object</param>
-            <param name="ID">The ID (or Handle if Product) to find</param>
-            <param name="parentID">The ID of the parent, optional</param>
+            <param name="id">The ID (or Handle if Product) to find</param>
+            <param name="parentId">The ID of the parent, optional</param>
             <returns>The found object if applicable, null otherwise.</returns>
         </member>
         <member name="M:ChargifyNET.UsefulExtensions.CalculateSubscriptionRevenue(ChargifyNET.ChargifyConnect,ChargifyNET.ISubscription)">

@@ -74,7 +74,7 @@ namespace ChargifyNET
         public Payment(string paymentXml)
         {
             // get the XML into an XML document
-            XmlDocument doc = new XmlDocument();
+            XmlDocument doc = new();
             doc.LoadXml(paymentXml);
             if (doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(paymentXml));
             // loop through the child nodes of this node
@@ -120,7 +120,7 @@ namespace ChargifyNET
         private void LoadFromJson(JsonObject obj)
         {
             // loop through the keys of this JsonObject to get object info, and parse it out
-            foreach (string key in obj.Keys)
+            foreach (var key in obj.Keys)
             {
                 switch (key)
                 {

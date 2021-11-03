@@ -19,7 +19,8 @@ namespace ChargifyDotNetTests
             SetJson(isJson);
 
             // Arrange
-            var newFamily = new ProductFamily() {
+            var newFamily = new ProductFamily()
+            {
                 Name = string.Format("Test{0}", Guid.NewGuid().ToString())
             };
 
@@ -45,7 +46,8 @@ namespace ChargifyDotNetTests
             SetJson(isJson);
 
             // Arrange
-            var newFamily = new ProductFamily() {
+            var newFamily = new ProductFamily()
+            {
                 Name = string.Format("Test{0}", Guid.NewGuid().ToString()),
                 Description = Guid.NewGuid().ToString(),
                 AccountingCode = Guid.NewGuid().ToString(),

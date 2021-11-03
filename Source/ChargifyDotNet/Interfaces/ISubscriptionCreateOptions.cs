@@ -212,39 +212,39 @@ namespace ChargifyNET
         }
 
         /// <summary>
-         /// The Unit Balance
-         /// </summary>
-         [XmlElement("unit_balance")]
-         public int? UnitBalance { get; set; }
- 
-         /// <summary>
-         /// Ignore, used to determine if the field should be serialized
-         /// </summary>
-         public bool ShouldSerializeUnitBalance()
-         {
-             return UnitBalance.HasValue;
-         }
+        /// The Unit Balance
+        /// </summary>
+        [XmlElement("unit_balance")]
+        public int? UnitBalance { get; set; }
 
-    ///// <summary>
-    ///// The scheme used if the proration was an upgrade. This is only present when the allocation was created mid-period.
-    ///// </summary>
-    //[XmlElement("proration_upgrade_scheme")]
-    //public ComponentUpgradeProrationScheme? UpgradeScheme { get; set; }
-    //public bool ShouldSerializeUpgradeScheme()
-    //{
-    //    return UpgradeScheme.HasValue && UpgradeScheme.Value != ComponentUpgradeProrationScheme.Unknown;
-    //}
+        /// <summary>
+        /// Ignore, used to determine if the field should be serialized
+        /// </summary>
+        public bool ShouldSerializeUnitBalance()
+        {
+            return UnitBalance.HasValue;
+        }
 
-    ///// <summary>
-    ///// The scheme used if the proration was a downgrade. This is only present when the allocation was created mid-period.
-    ///// </summary>
-    //[XmlElement("proration_downgrade_scheme")]
-    //public ComponentDowngradeProrationScheme? DowngradeScheme { get; set; }
-    //public bool ShouldSerializeDowngradeScheme()
-    //{
-    //    return DowngradeScheme.HasValue && DowngradeScheme.Value != ComponentDowngradeProrationScheme.Unknown;
-    //}
-}
+        ///// <summary>
+        ///// The scheme used if the proration was an upgrade. This is only present when the allocation was created mid-period.
+        ///// </summary>
+        //[XmlElement("proration_upgrade_scheme")]
+        //public ComponentUpgradeProrationScheme? UpgradeScheme { get; set; }
+        //public bool ShouldSerializeUpgradeScheme()
+        //{
+        //    return UpgradeScheme.HasValue && UpgradeScheme.Value != ComponentUpgradeProrationScheme.Unknown;
+        //}
+
+        ///// <summary>
+        ///// The scheme used if the proration was a downgrade. This is only present when the allocation was created mid-period.
+        ///// </summary>
+        //[XmlElement("proration_downgrade_scheme")]
+        //public ComponentDowngradeProrationScheme? DowngradeScheme { get; set; }
+        //public bool ShouldSerializeDowngradeScheme()
+        //{
+        //    return DowngradeScheme.HasValue && DowngradeScheme.Value != ComponentDowngradeProrationScheme.Unknown;
+        //}
+    }
 
     /// <summary>
     /// Calendar billing
@@ -272,7 +272,7 @@ namespace ChargifyNET
     /// </summary>
     [XmlType("subscription")]
     [Serializable]
-    public class SubscriptionCreateOptions: ISubscriptionCreateOptions
+    public class SubscriptionCreateOptions : ISubscriptionCreateOptions
     {
         /// <summary>
         /// The list of components to set when creating the subscription

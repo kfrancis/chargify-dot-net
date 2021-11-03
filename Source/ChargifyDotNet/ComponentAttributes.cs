@@ -1,4 +1,4 @@
-﻿
+
 #region License, Terms and Conditions
 //
 // ComponentAttributes.cs
@@ -71,7 +71,7 @@ namespace ChargifyNET
         public ComponentAttributes(string componentAttributesXml)
         {
             // get the XML into an XML document
-            XmlDocument doc = new XmlDocument();
+            XmlDocument doc = new();
             doc.LoadXml(componentAttributesXml);
             if (doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(componentAttributesXml));
             // loop through the child nodes of this node
@@ -113,7 +113,7 @@ namespace ChargifyNET
         private void LoadFromJson(JsonObject obj)
         {
             // loop through the keys of this JsonObject to get component info, and parse it out
-            foreach (string key in obj.Keys)
+            foreach (var key in obj.Keys)
             {
                 switch (key)
                 {
@@ -145,9 +145,9 @@ namespace ChargifyNET
                     case EnabledKey:
                         _enabled = obj.GetJSONContentAsBoolean(key);
                         break;
-                    //case PricePointsKey:
-                    //    _pricePoints = obj.GetJSONContentAsPricePoints(key);
-                    //    break;
+                        //case PricePointsKey:
+                        //    _pricePoints = obj.GetJSONContentAsPricePoints(key);
+                        //    break;
                 }
             }
         }
@@ -187,9 +187,9 @@ namespace ChargifyNET
                     case EnabledKey:
                         _enabled = dataNode.GetNodeContentAsBoolean();
                         break;
-                    //case PricePointsKey:
-                    //    _pricePoints = dataNode.GetNodeContentAsPricePoints();
-                    //    break;
+                        //case PricePointsKey:
+                        //    _pricePoints = dataNode.GetNodeContentAsPricePoints();
+                        //    break;
                 }
             }
         }

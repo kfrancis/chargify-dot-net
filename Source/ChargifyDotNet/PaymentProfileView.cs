@@ -181,7 +181,7 @@ namespace ChargifyNET
                         _bankAccountNumber = dataNode.GetNodeContentAsString();
                         break;
                     case BankAccountTypeKey:
-                        _bankAccountType = dataNode.GetNodeContentAsEnum<BankAccountType>();                        
+                        _bankAccountType = dataNode.GetNodeContentAsEnum<BankAccountType>();
                         break;
                     case BankAccountHolderTypeKey:
                         _bankAccountHolderType = dataNode.GetNodeContentAsEnum<BankAccountHolderType>();
@@ -207,7 +207,7 @@ namespace ChargifyNET
 
         private void LoadFromJson(JsonObject obj)
         {
-            foreach (string key in obj.Keys)
+            foreach (var key in obj.Keys)
             {
                 switch (key)
                 {

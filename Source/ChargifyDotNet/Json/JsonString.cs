@@ -30,7 +30,7 @@ namespace ChargifyNET.Json
 
         static string JsonDecode(string str, ref int position)
         {
-            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            System.Text.StringBuilder sb = new();
 
             EatSpaces(str, ref position);
 
@@ -41,7 +41,7 @@ namespace ChargifyNET.Json
 
             while (position < str.Length)
             {
-                int nextIndex = str.IndexOfAny(JsonDecodeStopChars, position);
+                var nextIndex = str.IndexOfAny(JsonDecodeStopChars, position);
 
                 if (nextIndex < 0)
                 {
@@ -52,7 +52,7 @@ namespace ChargifyNET.Json
                 }
                 else if (str[nextIndex] == '\"')
                 {
-                    string substring = str.Substring(position, nextIndex - position);
+                    var substring = str.Substring(position, nextIndex - position);
 
                     position = nextIndex + 1;
 
@@ -91,10 +91,10 @@ namespace ChargifyNET.Json
                             sb.Append('\r');
                             break;
                         case 'u':
-                            string number = str.Substring(position + 1, 4);
+                            var number = str.Substring(position + 1, 4);
                             position += 4;
-                            int code = int.Parse(number, System.Globalization.NumberStyles.HexNumber);
-                            char ch = (char)code;
+                            var code = int.Parse(number, System.Globalization.NumberStyles.HexNumber);
+                            var ch = (char)code;
                             sb.Append(ch);
                             break;
                         default:
@@ -161,7 +161,7 @@ namespace ChargifyNET.Json
             if (str[position] != '\"')
                 throw new JsonParseException(str, position);
 
-            string jsonString = JsonDecode(str, ref position);
+            var jsonString = JsonDecode(str, ref position);
 
             return new JsonString(jsonString);
         }

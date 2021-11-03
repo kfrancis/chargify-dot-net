@@ -48,7 +48,7 @@ namespace ChargifyDotNetTests
         [TestMethod]
         public void Test_ListProducts()
         {
-            IDictionary<int, IProduct> productList = Chargify.GetProductList();
+            var productList = Chargify.GetProductList();
 
             Assert.IsNotNull(productList);
             Assert.AreNotEqual(0, productList.Count);
@@ -61,7 +61,7 @@ namespace ChargifyDotNetTests
         public void Test_GetSingleProductByHandle()
         {
             // Test using handle
-            IProduct basicProduct = Chargify.LoadProduct("basic", true);
+            var basicProduct = Chargify.LoadProduct("basic", true);
 
             Assert.IsNotNull(basicProduct);
             Assert.AreEqual("basic", basicProduct.Handle);
@@ -74,7 +74,7 @@ namespace ChargifyDotNetTests
         public void Test_GetSingleProductByID()
         {
             // Arrange
-            var firstProduct =Chargify.GetProductList().FirstOrDefault();
+            var firstProduct = Chargify.GetProductList().FirstOrDefault();
 
             // Act
             var result = Chargify.LoadProduct(firstProduct.Key.ToString(), false);
@@ -93,7 +93,7 @@ namespace ChargifyDotNetTests
             // Act
             try
             {
-                string productName = "test-product" + Guid.NewGuid().ToString();
+                var productName = "test-product" + Guid.NewGuid().ToString();
                 var newProduct = Chargify.CreateProduct(productFamily.ID, productName, productName, 5000, 1, IntervalUnit.Month, string.Empty, "This is a test product, please archive");
 
                 // Assert

@@ -141,7 +141,7 @@ namespace ChargifyNET
         /// <param name="SubscriptionID">The ID of the subscription to query about</param>
         /// <returns>A dictionary of components, if applicable.</returns>
         IDictionary<int, IComponentAttributes> GetComponentsForSubscription(int SubscriptionID);
-         /// <summary>
+        /// <summary>
         /// Method to update the allocated amount of a component for a subscription
         /// </summary>
         /// <param name="SubscriptionID">The ID of the subscription to modify the allocation for</param>
@@ -1387,17 +1387,17 @@ namespace ChargifyNET
         /// a Chargify Connect method
         /// </summary>
         HttpWebResponse LastResponse { get; }
-                
+
         /// <summary>
         /// Get or set the password
         /// </summary>
         string Password { get; set; }
-        
+
         /// <summary>
         /// SharedKey used for url generation
         /// </summary>
         string SharedKey { get; set; }
-        
+
         /// <summary>
         /// Get or set the URL for chargify
         /// </summary>

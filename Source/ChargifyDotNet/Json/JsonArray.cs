@@ -37,14 +37,14 @@ namespace ChargifyNET.Json
 
         internal static JsonArray Parse(string str, ref int position)
         {
-            JsonArray jsonArray = new JsonArray();
+            JsonArray jsonArray = new();
 
             EatSpaces(str, ref position);
 
             if (str[position] != '[')
                 throw new JsonParseException(str, position);
 
-            bool firstItem = true;
+            var firstItem = true;
 
             while (position < str.Length)
             {
@@ -63,7 +63,7 @@ namespace ChargifyNET.Json
                     }
                 }
 
-                JsonValue jsonValue = ParseValue(str, ref position);
+                var jsonValue = ParseValue(str, ref position);
                 jsonArray.Add(jsonValue);
 
                 EatSpaces(str, ref position);

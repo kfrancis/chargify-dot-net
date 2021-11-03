@@ -31,10 +31,10 @@
 namespace ChargifyNET
 {
     #region Imports
-using System;
-using System.Diagnostics;
-using System.Xml;
-using Json;
+    using System;
+    using System.Diagnostics;
+    using System.Xml;
+    using Json;
     #endregion
 
     /// <summary>
@@ -57,7 +57,7 @@ using Json;
         public Transaction(string transactionXml)
         {
             // get the XML into an XML document
-            XmlDocument doc = new XmlDocument();
+            XmlDocument doc = new();
             doc.LoadXml(transactionXml);
             if (doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(transactionXml));
             // loop through the child nodes of this node
@@ -102,7 +102,7 @@ using Json;
         /// <param name="obj">The JsonObject containing transaction data</param>
         private void LoadFromJson(JsonObject obj)
         {
-            foreach (string key in obj.Keys)
+            foreach (var key in obj.Keys)
             {
                 switch (key)
                 {
@@ -362,7 +362,7 @@ using Json;
         {
             get { return _gatewayOrderId; }
         }
-        private string _gatewayOrderId = string.Empty;        
+        private string _gatewayOrderId = string.Empty;
 
         #endregion
 

@@ -20,9 +20,9 @@ namespace ChargifyNET.Json
         /// <returns>True if the element has children, false otherwise.</returns>
         public static bool HasChildren(this XmlElement node)
         {
-            bool hasChildrenArray = false;
-            string childName = string.Empty;
-            foreach (object child in node)
+            var hasChildrenArray = false;
+            var childName = string.Empty;
+            foreach (var child in node)
             {
                 if (child is XmlElement childElement)
                 {
@@ -72,7 +72,7 @@ namespace ChargifyNET.Json
             //  where   key is case-sensitive nodeName
             //          value is an ArrayList of string or XmlElement
             //  so that we know whether the nodeName is an array or not.
-            SortedList childNodeNames = new SortedList();
+            SortedList childNodeNames = new();
 
             //  Add in all node attributes
             foreach (XmlAttribute attr in node.Attributes)
@@ -90,16 +90,16 @@ namespace ChargifyNET.Json
             // Now output all stored info
             foreach (string childname in childNodeNames.Keys)
             {
-                ArrayList alChild = (ArrayList)childNodeNames[childname];
+                var alChild = (ArrayList)childNodeNames[childname];
                 if (alChild.Count == 1 && (alChild[0] is string))
                     OutputNode(childname, alChild[0], sbJson, true);
                 else
                 {
                     var alChildElement = alChild[0] as XmlElement;
                     //var alParentElementHasChildren = alChildElement != null ? (alChildElement.ParentNode as XmlElement) != null ? (alChildElement.ParentNode as XmlElement).HasChildren() : false : false;
-                    bool hasChildrenArray = alChildElement.HasChildren();
-                    sbJson.Append(" \"" + SafeJson(childname) + string.Format("\": {0} ", hasChildrenArray ? "[" : string.Empty));   
-                    foreach (object child in alChild)
+                    var hasChildrenArray = alChildElement.HasChildren();
+                    sbJson.Append(" \"" + SafeJson(childname) + string.Format("\": {0} ", hasChildrenArray ? "[" : string.Empty));
+                    foreach (var child in alChild)
                         OutputNode(childname, child, sbJson, false);
                     sbJson.Remove(sbJson.Length - 2, 2);
                     sbJson.AppendFormat(" {0},", hasChildrenArray ? "]" : string.Empty);
@@ -118,10 +118,10 @@ namespace ChargifyNET.Json
             {
                 // Convert  <aa></aa> into "aa":null
                 //          <aa>xx</aa> into "aa":"xx"
-                XmlNode cnode = (XmlNode)nodeValue;
+                var cnode = (XmlNode)nodeValue;
                 if (cnode.Attributes != null && cnode.Attributes.Count == 0)
                 {
-                    XmlNodeList children = cnode.ChildNodes;
+                    var children = cnode.ChildNodes;
                     if (children.Count == 0)
                         nodeValue = null;
                     else if (children.Count == 1 && (children[0] is XmlText innerText))
@@ -130,7 +130,7 @@ namespace ChargifyNET.Json
             }
             // Add nodeValue to ArrayList associated with each nodeName
             // If nodeName doesn't exist then add it
-            object oValuesAl = childNodeNames[nodeName];
+            var oValuesAl = childNodeNames[nodeName];
             ArrayList valuesAl;
             if (oValuesAl == null)
             {
@@ -165,10 +165,10 @@ namespace ChargifyNET.Json
         // Make a string safe for JSON
         private static string SafeJson(string sIn)
         {
-            StringBuilder sbOut = new StringBuilder(sIn.Length);
-            foreach (char ch in sIn)
+            StringBuilder sbOut = new(sIn.Length);
+            foreach (var ch in sIn)
             {
-                if (Char.IsControl(ch) || ch == '\'')
+                if (char.IsControl(ch) || ch == '\'')
                 {
                     int ich = ch;
                     sbOut.Append(@"\u" + ich.ToString("x4"));

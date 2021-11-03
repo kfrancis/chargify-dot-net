@@ -111,7 +111,7 @@ namespace ChargifyNET
         /// <param name="obj">The JsonObject containing subscription data</param>
         private void LoadFromJson(JsonObject obj)
         {
-            foreach (string key in obj.Keys)
+            foreach (var key in obj.Keys)
             {
                 switch (key)
                 {

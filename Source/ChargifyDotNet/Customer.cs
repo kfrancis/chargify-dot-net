@@ -74,7 +74,7 @@ namespace ChargifyNET
         public Customer(string customerXml) : base(customerXml)
         {
             // get the XML into an XML document
-            XmlDocument doc = new XmlDocument();
+            XmlDocument doc = new();
             doc.LoadXml(customerXml);
             if (doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(customerXml));
             // loop through the child nodes of this node
@@ -119,7 +119,7 @@ namespace ChargifyNET
         /// <param name="obj">The JsonObject containing customer data</param>
         private void LoadFromJSON(JsonObject obj)
         {
-            foreach (string key in obj.Keys)
+            foreach (var key in obj.Keys)
             {
                 switch (key)
                 {
@@ -448,20 +448,20 @@ namespace ChargifyNET
             }
 
             // Return true if the fields match.
-            return ChargifyID == ((Customer) obj).ChargifyID &&
-                   Created == ((Customer) obj).Created &&
-                   Email == ((Customer) obj).Email &&
-                   FirstName == ((Customer) obj).FirstName &&
-                   LastName == ((Customer) obj).LastName &&
-                   Organization == ((Customer) obj).Organization &&
-                   ShippingAddress == ((Customer) obj).ShippingAddress &&
-                   ShippingAddress2 == ((Customer) obj).ShippingAddress2 &&
-                   ShippingCity == ((Customer) obj).ShippingCity &&
-                   ShippingCountry == ((Customer) obj).ShippingCountry &&
-                   ShippingState == ((Customer) obj).ShippingState &&
-                   ShippingZip == ((Customer) obj).ShippingZip &&
-                   TaxExempt == ((Customer) obj).TaxExempt &&
-                   SystemID == ((Customer) obj).SystemID;
+            return ChargifyID == ((Customer)obj).ChargifyID &&
+                   Created == ((Customer)obj).Created &&
+                   Email == ((Customer)obj).Email &&
+                   FirstName == ((Customer)obj).FirstName &&
+                   LastName == ((Customer)obj).LastName &&
+                   Organization == ((Customer)obj).Organization &&
+                   ShippingAddress == ((Customer)obj).ShippingAddress &&
+                   ShippingAddress2 == ((Customer)obj).ShippingAddress2 &&
+                   ShippingCity == ((Customer)obj).ShippingCity &&
+                   ShippingCountry == ((Customer)obj).ShippingCountry &&
+                   ShippingState == ((Customer)obj).ShippingState &&
+                   ShippingZip == ((Customer)obj).ShippingZip &&
+                   TaxExempt == ((Customer)obj).TaxExempt &&
+                   SystemID == ((Customer)obj).SystemID;
         }
 
         /// <summary>

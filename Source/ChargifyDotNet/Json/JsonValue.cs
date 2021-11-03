@@ -31,7 +31,7 @@ namespace ChargifyNET.Json
         {
             EatSpaces(str, ref position);
 
-            char ch = str[position];
+            var ch = str[position];
 
             // JsonString
             if (ch == '\"')

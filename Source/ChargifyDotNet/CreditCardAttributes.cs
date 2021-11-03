@@ -227,7 +227,7 @@ namespace ChargifyNET
 
             if (obj is ICreditCardAttributes)
             {
-                return (this == (ICreditCardAttributes) obj);
+                return (this == (ICreditCardAttributes)obj);
             }
             return ReferenceEquals(this, obj);
         }

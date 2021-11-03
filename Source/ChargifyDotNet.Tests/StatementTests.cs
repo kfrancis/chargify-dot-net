@@ -25,7 +25,7 @@ namespace ChargifyDotNetTests
             var result = Chargify.LoadStatementPDF(statementIDs.FirstOrDefault());
 
             var tempPath = Path.GetTempPath();
-            string filePath = string.Format(@"{0}{1}.pdf", tempPath, statementIDs.FirstOrDefault());
+            var filePath = string.Format(@"{0}{1}.pdf", tempPath, statementIDs.FirstOrDefault());
             File.WriteAllBytes(filePath, result);
 
             // Assert

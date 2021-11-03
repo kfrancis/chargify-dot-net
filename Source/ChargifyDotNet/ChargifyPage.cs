@@ -53,12 +53,12 @@ namespace ChargifyNET
                 {
                     // new instance
                     _chargify = new ChargifyConnect();
-                    bool azureDeployed = UsefulExtensions.IsRunningAzure();
+                    var azureDeployed = UsefulExtensions.IsRunningAzure();
                     if (!azureDeployed)
                     {
                         if (ConfigurationManager.GetSection("chargify") is ChargifyAccountRetrieverSection config)
                         {
-                            ChargifyAccountElement accountInfo = config.GetDefaultOrFirst();
+                            var accountInfo = config.GetDefaultOrFirst();
                             _chargify.apiKey = accountInfo.ApiKey;
                             _chargify.Password = accountInfo.ApiPassword;
                             _chargify.URL = accountInfo.Site;

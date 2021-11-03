@@ -32,7 +32,7 @@ namespace ChargifyNET
         public CouponUsage(string couponUsageXml)
         {
             // get the XML into an XML document
-            XmlDocument doc = new XmlDocument();
+            XmlDocument doc = new();
             doc.LoadXml(couponUsageXml);
             if (doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(couponUsageXml));
             // loop through the child nodes of this node
@@ -78,7 +78,7 @@ namespace ChargifyNET
         private void LoadFromJson(JsonObject obj)
         {
             // loop through the keys of this JsonObject to get coupon info, and parse it out
-            foreach (string key in obj.Keys)
+            foreach (var key in obj.Keys)
             {
                 switch (key)
                 {
@@ -136,7 +136,8 @@ namespace ChargifyNET
         /// <summary>
         ///  Product name
         /// </summary>
-        public string ProductName {
+        public string ProductName
+        {
             get { return _productName; }
             set { _productName = value; }
         }
@@ -147,10 +148,10 @@ namespace ChargifyNET
         /// </summary>
         public int ProductId
         {
-            get {  return _productId;}
+            get { return _productId; }
             set { _productId = value; }
         }
-        private int _productId = Int32.MinValue;
+        private int _productId = int.MinValue;
 
         /// <summary>
         /// Revenue from subscriptions that used coupon

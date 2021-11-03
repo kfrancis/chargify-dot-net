@@ -73,7 +73,7 @@ namespace ChargifyDotNetTests
     //        Assert.IsTrue(result.PerPage != int.MinValue);
     //        Assert.IsTrue(result.TotalCount != int.MinValue);
     //        Assert.IsTrue(result.TotalPages != int.MinValue);
-        
+
     //        SetJson(false);
     //    }
 

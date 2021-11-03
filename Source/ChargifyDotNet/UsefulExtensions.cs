@@ -1,4 +1,4 @@
-﻿namespace ChargifyNET
+namespace ChargifyNET
 {
     #region Imports
 
@@ -78,7 +78,7 @@
             if (sourceValue.IsLengthAtLeast(numExposed))
             {
                 var builder = new StringBuilder(sourceValue.Length);
-                int index = maskedString.Length - numExposed;
+                var index = maskedString.Length - numExposed;
 
                 if (style == MaskStyle.AlphaNumericOnly)
                 {
@@ -184,7 +184,7 @@
         /// <param name="length">Length of the mask.</param>
         private static void CreateAlphaNumMask(StringBuilder buffer, string source, char mask, int length)
         {
-            for (int i = 0; i < length; i++)
+            for (var i = 0; i < length; i++)
             {
                 buffer.Append(char.IsLetterOrDigit(source[i])
                                 ? mask
@@ -211,7 +211,7 @@
     {
         #region Utility Extensions
 
-        private static readonly Regex _guidRegex = new Regex(@"^(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}$", RegexOptions.Compiled);
+        private static readonly Regex s_guidRegex = new(@"^(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}$", RegexOptions.Compiled);
 
         /// <summary>
         /// Retunrs the HtmlEncoded string
@@ -230,7 +230,7 @@
         /// <param name="output">The output stream</param>
         public static void CopyStream(this Stream input, Stream output)
         {
-            byte[] b = new byte[32768];
+            var b = new byte[32768];
             int r;
             while ((r = input.Read(b, 0, b.Length)) > 0)
                 output.Write(b, 0, r);
@@ -245,9 +245,9 @@
         /// <returns>True if verified, false otherwise.</returns>
         public static bool IsWebhookRequestValid(this Stream requestStream, string sharedKey, string givenSignature = null)
         {
-            bool retVal = true;
+            var retVal = true;
             string possibleData;
-            using (StreamReader sr = new StreamReader(requestStream))
+            using (StreamReader sr = new(requestStream))
             {
                 requestStream.Position = 0;
                 possibleData = sr.ReadToEnd();
@@ -277,14 +277,14 @@
         /// <returns>The hex hash of the passed in text</returns>
         public static string CalculateHMAC256Signature(string text, string secret)
         {
-            ASCIIEncoding encoding = new ASCIIEncoding();
-            byte[] keyByte = encoding.GetBytes(secret);
+            ASCIIEncoding encoding = new();
+            var keyByte = encoding.GetBytes(secret);
 
-            HMACSHA256 hmacsha256 = new HMACSHA256(keyByte);
-            byte[] messageBytes = encoding.GetBytes(text);
-            byte[] hashMessage = hmacsha256.ComputeHash(messageBytes);
-            string hexaHash = string.Empty;
-            foreach (byte b in hashMessage) { hexaHash += String.Format("{0:x2}", b); }
+            HMACSHA256 hmacsha256 = new(keyByte);
+            var messageBytes = encoding.GetBytes(text);
+            var hashMessage = hmacsha256.ComputeHash(messageBytes);
+            var hexaHash = string.Empty;
+            foreach (var b in hashMessage) { hexaHash += string.Format("{0:x2}", b); }
 
             return hexaHash;
         }
@@ -298,12 +298,12 @@
         /// <returns>True if the signature matches the calculated value, false otherwise.</returns>
         public static bool IsChargifyWebhookContentValid(this string text, string signature, string sharedKey)
         {
-            string unencryptedText = sharedKey + text;
-            byte[] unencryptedData = Encoding.UTF8.GetBytes(unencryptedText);
-            MD5CryptoServiceProvider md5 = new MD5CryptoServiceProvider();
-            byte[] hash = md5.ComputeHash(unencryptedData);
-            string hexaHash = string.Empty;
-            foreach (byte b in hash) { hexaHash += $"{b:x2}"; }
+            var unencryptedText = sharedKey + text;
+            var unencryptedData = Encoding.UTF8.GetBytes(unencryptedText);
+            MD5CryptoServiceProvider md5 = new();
+            var hash = md5.ComputeHash(unencryptedData);
+            var hexaHash = string.Empty;
+            foreach (var b in hash) { hexaHash += $"{b:x2}"; }
 
             // I'm not sure if it could be longer, so just compare the same number as characters.
             return signature == hexaHash.Substring(0, signature.Length);
@@ -318,10 +318,10 @@
         /// <returns>True if the signature matches the calculated value, false otherwise.</returns>
         public static bool IsChargifyWebhookContentValidHMAC(string text, string signature, string sharedKey)
         {
-            byte[] uncryptedData = Encoding.UTF8.GetBytes(text);
+            var uncryptedData = Encoding.UTF8.GetBytes(text);
 
-            HMACSHA256 hmac = new HMACSHA256(Encoding.UTF8.GetBytes(sharedKey));
-            byte[] hash = hmac.ComputeHash(uncryptedData);
+            HMACSHA256 hmac = new(Encoding.UTF8.GetBytes(sharedKey));
+            var hash = hmac.ComputeHash(uncryptedData);
 
             return BitConverter.ToString(hash).Replace("-", "").ToLower() == signature.ToLower();
         }
@@ -334,14 +334,14 @@
         /// <returns>The HMAC-SHA1 signature used to send to Chargify while using the API</returns>
         public static string GetChargifyDirectSignature(this string text, string api_secret)
         {
-            ASCIIEncoding encoding = new ASCIIEncoding();
-            byte[] keyByte = encoding.GetBytes(api_secret);
+            ASCIIEncoding encoding = new();
+            var keyByte = encoding.GetBytes(api_secret);
 
-            HMACSHA1 hmacsha1 = new HMACSHA1(keyByte);
-            byte[] messageBytes = encoding.GetBytes(text);
-            byte[] hashMessage = hmacsha1.ComputeHash(messageBytes);
-            string hexaHash = "";
-            foreach (byte b in hashMessage) { hexaHash += String.Format("{0:x2}", b); }
+            HMACSHA1 hmacsha1 = new(keyByte);
+            var messageBytes = encoding.GetBytes(text);
+            var hashMessage = hmacsha1.ComputeHash(messageBytes);
+            var hexaHash = "";
+            foreach (var b in hashMessage) { hexaHash += string.Format("{0:x2}", b); }
 
             return hexaHash;
         }
@@ -354,11 +354,11 @@
         public static string GetChargifyHostedToken(this string text)
         {
             // Method used as listed here: http://support.chargify.com/faqs/technical/generating-hosted-page-urls
-            byte[] data = Encoding.UTF8.GetBytes(text);
-            SHA1CryptoServiceProvider cryptoTransformSHA1 = new SHA1CryptoServiceProvider();
-            byte[] hash = cryptoTransformSHA1.ComputeHash(data);
-            string hexaHash = "";
-            foreach (byte b in hash) { hexaHash += String.Format("{0:x2}", b); }
+            var data = Encoding.UTF8.GetBytes(text);
+            SHA1CryptoServiceProvider cryptoTransformSHA1 = new();
+            var hash = cryptoTransformSHA1.ComputeHash(data);
+            var hexaHash = "";
+            foreach (var b in hash) { hexaHash += string.Format("{0:x2}", b); }
             // Get only the first 10 characters of the SHA-1 hex digest
             return hexaHash.Substring(0, 10);
         }
@@ -396,13 +396,17 @@
         {
             try
             {
-                XmlDocument Doc = new XmlDocument();
-                Doc.LoadXml(value);
+                XmlDocument doc = new();
+                doc.LoadXml(value);
                 return true;
+            }
+            catch (XmlException)
+            {
+                return false;
             }
             catch (Exception)
             {
-                return false;
+                throw;
             }
         }
 
@@ -417,7 +421,7 @@
             {
                 if (value.StartsWith("[", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    int position = 0;
+                    var position = 0;
                     JsonArray.Parse(value, ref position);
                 }
                 else
@@ -442,7 +446,7 @@
         /// <returns>True if the value is a guid, false otherwise.</returns>
         public static bool IsGuid(this string value)
         {
-            return !string.IsNullOrEmpty(value) && _guidRegex.IsMatch(value);
+            return !string.IsNullOrEmpty(value) && s_guidRegex.IsMatch(value);
         }
 
         /// <summary>
@@ -452,7 +456,7 @@
         /// <returns>The guid object of value.</returns>
         public static Guid ConvertToGuid(this string value)
         {
-            return string.IsNullOrEmpty(value) ? Guid.Empty : (_guidRegex.IsMatch(value) ? new Guid(value) : Guid.Empty);
+            return string.IsNullOrEmpty(value) ? Guid.Empty : (s_guidRegex.IsMatch(value) ? new Guid(value) : Guid.Empty);
         }
 
         /// <summary>
@@ -492,7 +496,7 @@
         /// <returns>The enumerated value that corresponds to the keyed extracted value</returns>
         public static ComponentDowngradeProrationScheme GetJSONContentAsProrationDowngradeScheme(this JsonObject obj, string key)
         {
-            ComponentDowngradeProrationScheme result = ComponentDowngradeProrationScheme.Unknown;
+            var result = ComponentDowngradeProrationScheme.Unknown;
             if (obj != null)
             {
                 if (obj.ContainsKey(key))
@@ -513,7 +517,7 @@
         /// <returns>The ComponentDowngradeProrationScheme value of the node, ComponentDowngradeProrationScheme.Unknown otherwise.</returns>
         public static ComponentDowngradeProrationScheme GetNodeContentAsProrationDowngradeScheme(this XmlNode node)
         {
-            ComponentDowngradeProrationScheme result = ComponentDowngradeProrationScheme.Unknown;
+            var result = ComponentDowngradeProrationScheme.Unknown;
             if (node.FirstChild != null)
             {
                 if (node.FirstChild.Value != null)
@@ -532,7 +536,7 @@
         /// <returns>The enumerated value that corresponds to the keyed extracted value, ComponentUpgradeProrationScheme.Unknown otherwise.</returns>
         public static ComponentUpgradeProrationScheme GetJSONContentAsProrationUpgradeScheme(this JsonObject obj, string key)
         {
-            ComponentUpgradeProrationScheme result = ComponentUpgradeProrationScheme.Unknown;
+            var result = ComponentUpgradeProrationScheme.Unknown;
             if (obj != null)
             {
                 if (obj.ContainsKey(key))
@@ -553,7 +557,7 @@
         /// <returns>The ComponentUpgradeProrationScheme value of the node, ComponentUpgradeProrationScheme.Unknown otherwise.</returns>
         public static ComponentUpgradeProrationScheme GetNodeContentAsProrationUpgradeScheme(this XmlNode node)
         {
-            ComponentUpgradeProrationScheme result = ComponentUpgradeProrationScheme.Unknown;
+            var result = ComponentUpgradeProrationScheme.Unknown;
             if (node.FirstChild != null)
             {
                 if (node.FirstChild.Value != null)
@@ -619,7 +623,7 @@
         {
             if (node.FirstChild != null)
             {
-                if (int.TryParse(node.FirstChild.Value, NumberStyles.Number, CultureInfo.InvariantCulture, out int result))
+                if (int.TryParse(node.FirstChild.Value, NumberStyles.Number, CultureInfo.InvariantCulture, out var result))
                 {
                     return result;
                 }
@@ -634,7 +638,7 @@
         /// <returns>The string value of the node</returns>
         public static string GetNodeContentAsString(this XmlNode node)
         {
-            string result = string.Empty;
+            var result = string.Empty;
             if (node.FirstChild != null)
             {
                 result = node.FirstChild.Value;
@@ -650,7 +654,7 @@
         /// <returns>The string value of the object at key</returns>
         public static string GetJSONContentAsString(this JsonObject obj, string key)
         {
-            string result = string.Empty;
+            var result = string.Empty;
             if (obj != null)
             {
                 if (obj.ContainsKey(key))
@@ -687,7 +691,7 @@
         /// <returns>The integer value of the node</returns>
         public static int GetNodeContentAsInt(this XmlNode node)
         {
-            int result = 0;
+            var result = 0;
             if (node.FirstChild != null)
             {
                 if (!int.TryParse(node.FirstChild.Value, NumberStyles.Number, CultureInfo.InvariantCulture, out result)) result = 0;
@@ -747,7 +751,7 @@
         /// <returns>The integer value of the keyed object</returns>
         public static int GetJSONContentAsInt(this JsonObject obj, string key)
         {
-            int result = 0;
+            var result = 0;
             if (obj != null)
             {
                 if (obj.ContainsKey(key))
@@ -832,19 +836,17 @@
         /// <returns>The object if successful, null otherwise</returns>
         public static T ConvertNode<T>(this XmlNode node) where T : class
         {
-            using (MemoryStream stm = new MemoryStream())
-            using (StreamWriter stw = new StreamWriter(stm))
-            {
-                stw.WriteLine("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
-                stw.WriteLine(node.OuterXml);
-                stw.Flush();
+            using MemoryStream stm = new();
+            using StreamWriter stw = new(stm);
+            stw.WriteLine("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
+            stw.WriteLine(node.OuterXml);
+            stw.Flush();
 
-                stm.Position = 0;
+            stm.Position = 0;
 
-                var ser = new XmlSerializer(typeof(T));
-                T result = (ser.Deserialize(stm) as T);
-                return result;
-            }
+            var ser = new XmlSerializer(typeof(T));
+            var result = (ser.Deserialize(stm) as T);
+            return result;
         }
 
         /// <summary>
@@ -1084,7 +1086,7 @@
         /// <returns>The boolean value of the object at key</returns>
         public static bool GetJSONContentAsBoolean(this JsonObject obj, string key)
         {
-            bool result = false;
+            var result = false;
             if (obj != null)
             {
                 if (obj.ContainsKey(key))
@@ -1145,10 +1147,10 @@
         /// <returns>The boolean value of the node</returns>
         public static bool GetNodeContentAsBoolean(this XmlNode node)
         {
-            bool result = false;
+            var result = false;
             if (node.FirstChild != null)
             {
-                if (!Boolean.TryParse(node.FirstChild.Value, out result)) result = false;
+                if (!bool.TryParse(node.FirstChild.Value, out result)) result = false;
             }
             return result;
         }
@@ -1203,14 +1205,14 @@
         /// <returns>The DateTime value, DateTime.MinValue otherwise.</returns>
         public static DateTime GetJSONContentAsDateTime(this JsonObject obj, string key)
         {
-            DateTime result = DateTime.MinValue;
+            var result = DateTime.MinValue;
             if (obj != null)
             {
                 if (obj.ContainsKey(key))
                 {
                     if (obj[key] is JsonString str)
                     {
-                        string dateStr = str.Value;
+                        var dateStr = str.Value;
                         if (!DateTime.TryParse(dateStr, out result)) result = DateTime.MinValue;
                     }
                 }
@@ -1234,7 +1236,7 @@
                 {
                     if (obj[key] is JsonString str)
                     {
-                        string dateStr = str.Value;
+                        var dateStr = str.Value;
                         if (DateTime.TryParse(dateStr, out var result)) retVal = result != DateTime.MinValue ? (DateTime?)result : null;
                     }
                 }
@@ -1250,7 +1252,7 @@
         /// <returns>The DateTime value of the node</returns>
         public static DateTime GetNodeContentAsDateTime(this XmlNode node)
         {
-            DateTime result = DateTime.MinValue;
+            var result = DateTime.MinValue;
             if (node.FirstChild != null)
             {
                 if (!DateTime.TryParse(node.FirstChild.Value, out result)) result = DateTime.MinValue;
@@ -1281,14 +1283,14 @@
         /// <returns>The Guid value, Guid.Empty otherwise.</returns>
         public static Guid GetJSONContentAsGuid(this JsonObject obj, string key)
         {
-            Guid result = Guid.Empty;
+            var result = Guid.Empty;
             if (obj != null)
             {
                 if (obj.ContainsKey(key))
                 {
                     if (obj[key] is JsonString str)
                     {
-                        string guidStr = str.Value;
+                        var guidStr = str.Value;
                         result = guidStr.ConvertToGuid();
                     }
                 }
@@ -1303,7 +1305,7 @@
         /// <returns>The Guid value of the node</returns>
         public static Guid GetNodeContentAsGuid(this XmlNode node)
         {
-            Guid result = Guid.Empty;
+            var result = Guid.Empty;
             if (node.FirstChild != null)
             {
                 result = node.FirstChild.Value.ConvertToGuid();
@@ -1319,7 +1321,7 @@
         /// <returns>The PricingSchemeType value, PricingSchemeType.Unknown otherwise.</returns>
         public static PricingSchemeType GetJSONContentAsPricingSchemeType(this JsonObject obj, string key)
         {
-            PricingSchemeType result = PricingSchemeType.Unknown;
+            var result = PricingSchemeType.Unknown;
             if (obj != null)
             {
                 if (obj.ContainsKey(key))
@@ -1340,7 +1342,7 @@
         /// <returns>The PricingSchemeType value of the node, PricingSchemeType.Unknown otherwise.</returns>
         public static PricingSchemeType GetNodeContentAsPricingSchemeType(this XmlNode node)
         {
-            PricingSchemeType result = PricingSchemeType.Unknown;
+            var result = PricingSchemeType.Unknown;
             if (node.FirstChild != null)
             {
                 if (node.FirstChild.Value != null)
@@ -1359,7 +1361,7 @@
         /// <returns>The ComponentType value, ComponentType.Unknown otherwise.</returns>
         public static ComponentType GetJSONContentAsComponentType(this JsonObject obj, string key)
         {
-            ComponentType result = ComponentType.Unknown;
+            var result = ComponentType.Unknown;
             if (obj != null)
             {
                 if (obj.ContainsKey(key))
@@ -1380,7 +1382,7 @@
         /// <returns>The ComponentType value of the node, ComponentType.Unknown otherwise.</returns>
         public static ComponentType GetNodeContentAsComponentType(this XmlNode node)
         {
-            ComponentType result = ComponentType.Unknown;
+            var result = ComponentType.Unknown;
             if (node.FirstChild != null)
             {
                 if (node.FirstChild.Value != null)
@@ -1399,7 +1401,7 @@
         /// <returns>The PaymentCollectionMethod value, PaymentCollectionMethod.Unknown otherwise.</returns>
         public static PaymentCollectionMethod GetJSONContentAsPaymentCollectionMethod(this JsonObject obj, string key)
         {
-            PaymentCollectionMethod result = PaymentCollectionMethod.Unknown;
+            var result = PaymentCollectionMethod.Unknown;
             if (obj != null)
             {
                 if (obj.ContainsKey(key))
@@ -1424,14 +1426,14 @@
         /// <returns>The TransactionType value, TransactionType.Unknown otherwise.</returns>
         public static TransactionType GetJSONContentAsTransactionType(this JsonObject obj, string key)
         {
-            TransactionType result = TransactionType.Unknown;
+            var result = TransactionType.Unknown;
             if (obj != null)
             {
                 if (obj.ContainsKey(key))
                 {
                     if (obj[key] is JsonString str)
                     {
-                        string value = str.Value;
+                        var value = str.Value;
                         result = (TransactionType)Enum.Parse(typeof(TransactionType), value, true);
                     }
                 }
@@ -1446,10 +1448,10 @@
         /// <returns>The TransactionType value of the node</returns>
         public static TransactionType GetNodeContentAsTransactionType(this XmlNode node)
         {
-            TransactionType result = TransactionType.Unknown;
+            var result = TransactionType.Unknown;
             if (node.FirstChild != null)
             {
-                string nodeText = node.FirstChild.Value;
+                var nodeText = node.FirstChild.Value;
                 result = (TransactionType)Enum.Parse(typeof(TransactionType), nodeText, true);
             }
             return result;
@@ -1462,7 +1464,7 @@
         /// <returns>The PaymentCollectionMethod value of the node</returns>
         public static PaymentCollectionMethod GetNodeContentAsPaymentCollectionMethod(this XmlNode node)
         {
-            PaymentCollectionMethod result = PaymentCollectionMethod.Unknown;
+            var result = PaymentCollectionMethod.Unknown;
             if (node.FirstChild != null)
             {
                 if (Enum.TryParse(node.FirstChild.Value, true, out PaymentCollectionMethod parsedResult))
@@ -1480,7 +1482,7 @@
         /// <returns>The SubscriptionState value of the node</returns>
         public static SubscriptionState GetNodeContentAsSubscriptionState(this XmlNode node)
         {
-            SubscriptionState result = SubscriptionState.Unknown;
+            var result = SubscriptionState.Unknown;
             if (node.FirstChild != null)
             {
                 result = (SubscriptionState)Enum.Parse(typeof(SubscriptionState), node.FirstChild.Value, true);
@@ -1539,7 +1541,7 @@
         /// <returns>The SubscriptionState value, SubscriptionState.Unknown otherwise.</returns>
         public static SubscriptionState GetJSONContentAsSubscriptionState(this JsonObject obj, string key)
         {
-            SubscriptionState result = SubscriptionState.Unknown;
+            var result = SubscriptionState.Unknown;
             if (obj != null)
             {
                 if (obj.ContainsKey(key))
@@ -1675,7 +1677,7 @@
         /// <returns>The IntervalUnit value, IntervalUnit.Unknown otherwise.</returns>
         public static IntervalUnit GetJSONContentAsIntervalUnit(this JsonObject obj, string key)
         {
-            IntervalUnit result = IntervalUnit.Unknown;
+            var result = IntervalUnit.Unknown;
             if (obj?.ContainsKey(key) == true)
             {
                 if (obj.TryGetValue(key, out var str))
@@ -1699,7 +1701,7 @@
         /// <returns>The IntervalUnit value of the node</returns>
         public static IntervalUnit GetNodeContentAsIntervalUnit(this XmlNode node)
         {
-            IntervalUnit result = IntervalUnit.Unknown;
+            var result = IntervalUnit.Unknown;
             if (node.FirstChild != null)
             {
                 if (!Enum.TryParse<IntervalUnit>(node.FirstChild.Value, true, out result))
@@ -1722,7 +1724,7 @@
         /// <returns>True if defined, false otherwise</returns>
         public static bool CheckEnumIsDefined<T>(this string value)
         {
-            return Enum.GetNames(typeof(T)).Any(x => String.Equals(x, value, StringComparison.CurrentCultureIgnoreCase));
+            return Enum.GetNames(typeof(T)).Any(x => string.Equals(x, value, StringComparison.CurrentCultureIgnoreCase));
         }
 
         /// <summary>
@@ -1731,7 +1733,7 @@
         /// <returns>RoleEnvironment.IsAvailable result if possible, false otherwise.</returns>
         public static bool IsRunningAzure()
         {
-            bool result = false;
+            var result = false;
             Assembly a;
             try
             {
@@ -1740,8 +1742,8 @@
                         "Microsoft.WindowsAzure.ServiceRuntime, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35");
                 if (a != null)
                 {
-                    Type classType = a.GetType("Microsoft.WindowsAzure.ServiceRuntime.RoleEnvironment");
-                    PropertyInfo pi = classType.GetProperty("IsAvailable");
+                    var classType = a.GetType("Microsoft.WindowsAzure.ServiceRuntime.RoleEnvironment");
+                    var pi = classType.GetProperty("IsAvailable");
                     // This is the same as calling RoleEnvironment.IsAvailable, but without requiring it be referenced.
                     result = (bool)pi.GetValue(null, null); // This should get the result of IsAvailable
                 }
@@ -1761,14 +1763,14 @@
         /// <returns>The value of the keyed config string, if applicable. String.Empty otherwise.</returns>
         public static string GetLateBoundRoleEnvironmentValue(string settingName)
         {
-            string result = string.Empty;
+            var result = string.Empty;
             try
             {
-                Assembly a = Assembly.Load("Microsoft.WindowsAzure.ServiceRuntime, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35");
+                var a = Assembly.Load("Microsoft.WindowsAzure.ServiceRuntime, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35");
                 if (a != null)
                 {
-                    Type classType = a.GetType("Microsoft.WindowsAzure.ServiceRuntime.RoleEnvironment");
-                    MethodInfo mi = classType.GetMethod("GetConfigurationSettingValue");
+                    var classType = a.GetType("Microsoft.WindowsAzure.ServiceRuntime.RoleEnvironment");
+                    var mi = classType.GetMethod("GetConfigurationSettingValue");
                     // This is the same as calling RoleEnvironment.GetConfigurationSettingValue(settingName)
                     result = (string)mi.Invoke(null, new object[] { settingName });
                 }
@@ -1794,25 +1796,25 @@
             if (serverResponse.IsXml())
             {
                 Type[] argTypes = { typeof(string) };
-                ConstructorInfo cInfo = typeof(T).GetConstructor(argTypes);
+                var cInfo = typeof(T).GetConstructor(argTypes);
                 if (cInfo != null) return (T)cInfo.Invoke(new object[] { serverResponse });
             }
             else if (serverResponse.IsJSON())
             {
                 // now build the jsonObject object based on response as JSON
-                JsonObject obj = JsonObject.Parse(serverResponse);
+                var obj = JsonObject.Parse(serverResponse);
                 if (!string.IsNullOrEmpty(key))
                 {
                     if (obj.ContainsKey(key) && obj.Keys.Count == 1)
                     {
                         Type[] argTypes = { typeof(JsonObject) };
-                        ConstructorInfo cInfo = typeof(T).GetConstructor(argTypes);
+                        var cInfo = typeof(T).GetConstructor(argTypes);
                         if (cInfo != null) return (T)cInfo.Invoke(new object[] { obj[key] as JsonObject });
                     }
                     else
                     {
                         Type[] argTypes = { typeof(JsonObject) };
-                        ConstructorInfo cInfo = typeof(T).GetConstructor(argTypes);
+                        var cInfo = typeof(T).GetConstructor(argTypes);
                         if (cInfo != null) return (T)cInfo.Invoke(new object[] { obj });
                     }
                 }
@@ -1863,10 +1865,10 @@
         /// </summary>
         /// <typeparam name="T">The type of object you wish to find</typeparam>
         /// <param name="chargify">The ChargifyConnect object</param>
-        /// <param name="ID">The ID (or Handle if Product) to find</param>
-        /// <param name="parentID">The ID of the parent, optional</param>
+        /// <param name="id">The ID (or Handle if Product) to find</param>
+        /// <param name="parentId">The ID of the parent, optional</param>
         /// <returns>The found object if applicable, null otherwise.</returns>
-        public static T Find<T>(this ChargifyConnect chargify, object ID, int? parentID = null)
+        public static T Find<T>(this ChargifyConnect chargify, object id, int? parentId = null)
             where T : ChargifyBase
         {
             T result = null;
@@ -1879,8 +1881,8 @@
                     ICustomer customer = null;
                     // load the object depending on what the ID can be interpreted as,
                     // in this case it's either the ChargifyID (int) or the SystemID (string)
-                    if (ID is string) customer = chargify.LoadCustomer(ID as string);
-                    else if (ID is int customerId) customer = chargify.LoadCustomer(customerId);
+                    if (id is string) customer = chargify.LoadCustomer(id as string);
+                    else if (id is int customerId) customer = chargify.LoadCustomer(customerId);
                     result = (T)customer;
                     break;
 
@@ -1889,7 +1891,7 @@
                     ISubscription subscription = null;
                     // load the object depending on what the ID can be interpreted as,
                     // in this case it's only SubscriptionID (int)
-                    if (ID is int subscriptionId) subscription = chargify.LoadSubscription(subscriptionId);
+                    if (id is int subscriptionId) subscription = chargify.LoadSubscription(subscriptionId);
                     result = (T)subscription;
                     break;
 
@@ -1898,36 +1900,36 @@
                     IProduct product = null;
                     // load the object depending on what the ID can be interpreted as,
                     // in this case it's either the ProductID (int) or the ProductHandle (string)
-                    if (ID is string) product = chargify.LoadProduct(ID as string, true);
-                    else if (ID is int productId) product = chargify.LoadProduct(productId.ToString(), false);
+                    if (id is string) product = chargify.LoadProduct(id as string, true);
+                    else if (id is int productId) product = chargify.LoadProduct(productId.ToString(), false);
                     result = (T)product;
                     break;
 
                 case "statement":
                     if (!typeof(IStatement).IsAssignableFrom(typeof(T))) throw new ArgumentException();
                     IStatement statement = null;
-                    if (ID is int statementId) statement = chargify.LoadStatement(statementId);
+                    if (id is int statementId) statement = chargify.LoadStatement(statementId);
                     result = (T)statement;
                     break;
 
                 case "transaction":
                     if (!typeof(ITransaction).IsAssignableFrom(typeof(T))) throw new ArgumentException();
                     ITransaction transaction = null;
-                    if (ID is int transactionId) transaction = chargify.LoadTransaction(transactionId);
+                    if (id is int transactionId) transaction = chargify.LoadTransaction(transactionId);
                     result = (T)transaction;
                     break;
 
                 case "coupon":
                     if (!typeof(ICoupon).IsAssignableFrom(typeof(T))) throw new ArgumentException();
                     ICoupon coupon = null;
-                    if (ID is int couponId && parentID.HasValue && parentID.Value > 0) coupon = chargify.LoadCoupon(parentID.Value, couponId);
+                    if (id is int couponId && parentId.HasValue && parentId.Value > 0) coupon = chargify.LoadCoupon(parentId.Value, couponId);
                     result = (T)coupon;
                     break;
 
                 case "productfamily":
                     if (!typeof(IProductFamily).IsAssignableFrom(typeof(T))) throw new ArgumentException();
                     IProductFamily productFamily = null;
-                    if (ID is int familyId) productFamily = chargify.LoadProductFamily(familyId);
+                    if (id is int familyId) productFamily = chargify.LoadProductFamily(familyId);
                     result = (T)productFamily;
                     break;
             }
@@ -1943,19 +1945,19 @@
         public static decimal CalculateSubscriptionRevenue(this ChargifyConnect chargify, ISubscription subscription)
         {
             decimal retValue = 0;
-            List<TransactionType> refundKinds = new List<TransactionType>
+            List<TransactionType> refundKinds = new()
             {
                 TransactionType.Payment,
                 TransactionType.Refund
             };
-            IDictionary<int, ITransaction> transactions = chargify.GetTransactionsForSubscription(subscription.SubscriptionID, refundKinds);
+            var transactions = chargify.GetTransactionsForSubscription(subscription.SubscriptionID, refundKinds);
             if ((transactions != null) && (transactions.Count > 0))
             {
                 decimal total = 0;
                 var paymentTransactions = from t in transactions.Values
                                           where t.Type == TransactionType.Payment
                                           select t;
-                foreach (ITransaction paymentTransaction in paymentTransactions)
+                foreach (var paymentTransaction in paymentTransactions)
                 {
                     if (paymentTransaction.Success)
                     {
@@ -1966,7 +1968,7 @@
                 var refundTransactions = from t1 in transactions.Values
                                          where t1.Type == TransactionType.Refund
                                          select t1;
-                foreach (ITransaction refundTransaction in refundTransactions)
+                foreach (var refundTransaction in refundTransactions)
                 {
                     total -= refundTransaction.Amount;
                 }

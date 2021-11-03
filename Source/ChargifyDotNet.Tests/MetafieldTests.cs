@@ -24,7 +24,7 @@ namespace ChargifyDotNetTests
             var result = Chargify.GetMetadata<Customer>();
 
             // Assert
-            Assert.IsNotNull(result);           
+            Assert.IsNotNull(result);
             Assert.IsTrue(result.CurrentPage != int.MinValue);
             Assert.IsTrue(result.PerPage != int.MinValue);
             Assert.IsTrue(result.TotalCount != int.MinValue);
@@ -46,7 +46,7 @@ namespace ChargifyDotNetTests
             var result = Chargify.GetMetadata<Subscription>();
 
             // Assert
-            Assert.IsNotNull(result);     
+            Assert.IsNotNull(result);
             Assert.IsTrue(result.CurrentPage != int.MinValue);
             Assert.IsTrue(result.PerPage != int.MinValue);
             Assert.IsTrue(result.TotalCount != int.MinValue);
@@ -77,7 +77,7 @@ namespace ChargifyDotNetTests
             Assert.IsTrue(result.TotalCount != int.MinValue);
             Assert.IsTrue(result.TotalPages != int.MinValue);
             Assert.AreEqual(result.TotalCount, result.Metadata.Count);
-            Assert.IsTrue(result.Metadata.Where(m => !string.IsNullOrEmpty(m.Name)).Count() > 0);
+            Assert.IsTrue(result.Metadata.Any(m => !string.IsNullOrEmpty(m.Name)));
 
             TestContext.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(result));
 
@@ -101,12 +101,12 @@ namespace ChargifyDotNetTests
 #else
             Trace.WriteLine(string.Format("SubscriptionID: {0}", subscription.SubscriptionID));
 #endif
-            
+
             // Act
             var result = Chargify.GetMetadataFor<Subscription>(subscription.SubscriptionID, null);
 
             // Assert
-            Assert.IsNotNull(result);    
+            Assert.IsNotNull(result);
             Assert.IsTrue(result.CurrentPage != int.MinValue);
             Assert.IsTrue(result.PerPage != int.MinValue);
             Assert.IsTrue(result.TotalCount != int.MinValue);
@@ -128,12 +128,12 @@ namespace ChargifyDotNetTests
             // Arrange
             var customer = Chargify.GetCustomerList().FirstOrDefault().Value as Customer;
             Assert.IsNotNull(customer, "No applicable customer found.");
-            
+
             // Act
             var result = Chargify.GetMetadataFor<Customer>(customer.ChargifyID, null);
 
             // Assert
-            Assert.IsNotNull(result);    
+            Assert.IsNotNull(result);
             Assert.IsTrue(result.CurrentPage != int.MinValue);
             Assert.IsTrue(result.PerPage != int.MinValue);
             Assert.IsTrue(result.TotalCount != int.MinValue);
@@ -169,11 +169,11 @@ namespace ChargifyDotNetTests
             // Arrange
             var customer = Chargify.GetCustomerList().FirstOrDefault().Value as Customer;
             Assert.IsNotNull(customer, "No applicable customer found.");
-            Metadata metadata = new Metadata() { Name = Guid.NewGuid().ToString(), Value = Guid.NewGuid().ToString() };
-            
+            Metadata metadata = new() { Name = Guid.NewGuid().ToString(), Value = Guid.NewGuid().ToString() };
+
             // Act
             var result = Chargify.SetMetadataFor<Customer>(customer.ChargifyID, metadata);
-            
+
             // Assert
             Assert.IsNotNull(result);
             Assert.IsTrue(result.Count >= 1);
@@ -201,7 +201,7 @@ namespace ChargifyDotNetTests
                 new Metadata() { Name = "two", Value = Guid.NewGuid().ToString() },
                 new Metadata() { Name = "three", Value = Guid.NewGuid().ToString() }
             };
-            
+
             // Act
             var result = Chargify.SetMetadataFor<Customer>(customer.ChargifyID, metadata);
 
@@ -224,8 +224,8 @@ namespace ChargifyDotNetTests
             // Arrange
             var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value as Subscription;
             Assert.IsNotNull(subscription, "No applicable subscription found.");
-            Metadata metadata = new Metadata() { Name = Guid.NewGuid().ToString(), Value = Guid.NewGuid().ToString() };
-            
+            Metadata metadata = new() { Name = Guid.NewGuid().ToString(), Value = Guid.NewGuid().ToString() };
+
             // Act
             var result = Chargify.SetMetadataFor<Subscription>(subscription.SubscriptionID, metadata);
 
@@ -256,7 +256,7 @@ namespace ChargifyDotNetTests
                 new Metadata() { Name = "two", Value = Guid.NewGuid().ToString() },
                 new Metadata() { Name = "three", Value = Guid.NewGuid().ToString() }
             };
-            
+
             // Act
             var result = Chargify.SetMetadataFor<Subscription>(subscription.SubscriptionID, metadata);
 

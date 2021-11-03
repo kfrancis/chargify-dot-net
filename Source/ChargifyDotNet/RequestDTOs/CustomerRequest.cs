@@ -74,7 +74,7 @@ namespace ChargifyDotNet.RequestDTOs
 #endif
             if (values.All(elem => !string.IsNullOrWhiteSpace(elem))) stringBuilder.AppendFormat(nodeTemplate, encodedValues);
         }
-#endregion
-        
+        #endregion
+
     }
 }

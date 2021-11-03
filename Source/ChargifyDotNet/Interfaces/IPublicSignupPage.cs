@@ -39,7 +39,7 @@ namespace ChargifyNET
     /// Public Pages (formerly known as Hosted Pages) are highly customizable white label pages
     /// that you can use as the public-facing side of your subscription business.
     /// </summary>
-    public interface IPublicSignupPage: IComparable<IPublicSignupPage>
+    public interface IPublicSignupPage : IComparable<IPublicSignupPage>
     {
         /// <summary>
         /// The ID of the public signup page

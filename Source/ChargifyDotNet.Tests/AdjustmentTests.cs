@@ -22,8 +22,8 @@ namespace ChargifyDotNetTests
             // Arrange
             var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == ChargifyNET.SubscriptionState.Active).Value;
             if (subscription == null) Assert.Inconclusive("No subscription found.");
-            decimal amount = 0m;
-            string memo = "test kf";
+            var amount = 0m;
+            var memo = "test kf";
             var preAdjustmentBalance = subscription.Balance;
 
             // Act
@@ -35,7 +35,7 @@ namespace ChargifyDotNetTests
             Assert.AreEqual(amount, result.Amount);
             Assert.AreEqual(Convert.ToInt32(amount), result.AmountInCents);
             result.Memo.ShouldBe(memo);
-            Assert.AreEqual(preAdjustmentBalance+amount, postAdjustmentSubscription.Balance);
+            Assert.AreEqual(preAdjustmentBalance + amount, postAdjustmentSubscription.Balance);
 
             SetJson(!isJson);
 
@@ -58,8 +58,8 @@ namespace ChargifyDotNetTests
             // Arrange
             var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == ChargifyNET.SubscriptionState.Active).Value;
             if (subscription == null) Assert.Inconclusive("No subscription found.");
-            int amount = 0;
-            string memo = "test kf";
+            var amount = 0;
+            var memo = "test kf";
             var preAdjustmentBalance = subscription.BalanceInCents;
 
             // Act
@@ -71,7 +71,7 @@ namespace ChargifyDotNetTests
             Assert.AreEqual(amount, result.Amount);
             Assert.AreEqual(Convert.ToInt32(amount), result.AmountInCents);
             Assert.AreEqual(memo, result.Memo);
-            Assert.AreEqual(preAdjustmentBalance+amount, postAdjustmentSubscription.BalanceInCents);
+            Assert.AreEqual(preAdjustmentBalance + amount, postAdjustmentSubscription.BalanceInCents);
 
             SetJson(!isJson);
 

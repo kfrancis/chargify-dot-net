@@ -145,7 +145,7 @@ namespace ChargifyNET
         private void LoadFromJson(JsonObject obj)
         {
             // loop through the keys of this JsonObject to get coupon info, and parse it out
-            foreach (string key in obj.Keys)
+            foreach (var key in obj.Keys)
             {
                 switch (key)
                 {
@@ -209,7 +209,7 @@ namespace ChargifyNET
                 return _lineItems;
             }
         }
-        private List<RenewalLineItem> _lineItems = new List<RenewalLineItem>();
+        private List<RenewalLineItem> _lineItems = new();
 
         /// <summary>
         /// The timestamp for the subscription’s next renewal

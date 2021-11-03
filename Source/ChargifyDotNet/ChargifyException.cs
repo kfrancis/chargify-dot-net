@@ -95,67 +95,64 @@ namespace ChargifyNET
         /// <returns>The list of errors returned from Chargify</returns>
         internal static List<ChargifyError> ParseChargifyErrors(HttpWebResponse response)
         {
-            List<ChargifyError> errors = new List<ChargifyError>();
+            List<ChargifyError> errors = new();
             if (response != null)
             {
                 var responseStream = response.GetResponseStream();
                 if (responseStream != null)
                 {
-                    using (StreamReader reader = new StreamReader(responseStream))
+                    using StreamReader reader = new(responseStream);
+                    var errorResponse = reader.ReadToEnd();
+
+                    // Response is frequently " " ...
+                    if (string.IsNullOrEmpty(errorResponse.Trim())) return errors;
+
+                    if (errorResponse.IsXml())
                     {
-                        string errorResponse = reader.ReadToEnd();
-
-                        // Response is frequently " " ...
-                        if (string.IsNullOrEmpty(errorResponse.Trim())) return errors;
-
-                        if (errorResponse.IsXml())
+                        // New way - Linq-y
+                        var xdoc = XDocument.Parse(errorResponse);
+                        if (xdoc.Descendants("error").Any())
                         {
-                            // New way - Linq-y
-                            XDocument xdoc = XDocument.Parse(errorResponse);
-                            if (xdoc.Descendants("error").Any())
-                            {
-                                var results = from e in xdoc.Descendants("error")
-                                              select new ChargifyError
-                                              {
-                                                  Message = e.Value
-                                              };
-                                errors = results.ToList();
-                            }
-                            else
-                            {
-                                var results = from e in xdoc.Descendants("errors")
-                                              select new ChargifyError
-                                              {
-                                                  Message = e.Value
-                                              };
-                                errors = results.ToList();
-                            }
+                            var results = from e in xdoc.Descendants("error")
+                                          select new ChargifyError
+                                          {
+                                              Message = e.Value
+                                          };
+                            errors = results.ToList();
                         }
-                        else if (errorResponse.IsJSON())
+                        else
                         {
-                            // slightly different json response from the usual
-                            int position = 0;
-                            JsonObject obj = JsonObject.Parse(errorResponse, ref position);
-                            if (obj.ContainsKey("errors"))
+                            var results = from e in xdoc.Descendants("errors")
+                                          select new ChargifyError
+                                          {
+                                              Message = e.Value
+                                          };
+                            errors = results.ToList();
+                        }
+                    }
+                    else if (errorResponse.IsJSON())
+                    {
+                        // slightly different json response from the usual
+                        var position = 0;
+                        var obj = JsonObject.Parse(errorResponse, ref position);
+                        if (obj.ContainsKey("errors"))
+                        {
+                            if (obj["errors"] is JsonArray array && array.Length > 0)
                             {
-                                if (obj["errors"] is JsonArray array && array.Length > 0)
+                                for (var i = 0; i <= array.Length - 1; i++)
                                 {
-                                    for (int i = 0; i <= array.Length - 1; i++)
+                                    if ((((JsonString)array.Items[i]) != null) && (!string.IsNullOrEmpty(((JsonString)array.Items[i]).Value)))
                                     {
-                                        if ((((JsonString)array.Items[i]) != null) && (!string.IsNullOrEmpty(((JsonString)array.Items[i]).Value)))
+                                        var errorStr = array.Items[i] as JsonString;
+                                        ChargifyError anError = new(errorStr);
+                                        if (!errors.Contains(anError))
                                         {
-                                            JsonString errorStr = array.Items[i] as JsonString;
-                                            ChargifyError anError = new ChargifyError(errorStr);
-                                            if (!errors.Contains(anError))
-                                            {
-                                                errors.Add(anError);
-                                            }
+                                            errors.Add(anError);
                                         }
                                     }
                                 }
                             }
                         }
-
                     }
                 }
                 return errors;
@@ -265,7 +262,7 @@ namespace ChargifyNET
                 }
             }
             // Used for the LogResponse Action
-            string retVal = string.Empty;
+            var retVal = string.Empty;
             retVal += string.Format("Request: {0}\n", LastDataPosted);
             retVal += string.Format("Response: {0} {1}\n", StatusCode, StatusDescription);
             retVal += string.Format("Errors: {0}\n", string.Join(", ", ErrorMessages.ToList().Select(e => e.Message).ToArray()));

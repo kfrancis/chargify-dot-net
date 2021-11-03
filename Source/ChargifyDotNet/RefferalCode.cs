@@ -1,4 +1,4 @@
-﻿
+
 #region License, Terms and Conditions
 //
 // ReferralCode.cs
@@ -43,8 +43,8 @@ namespace ChargifyNET
     {
         #region Field Keys
         private const string IDKey = "id";
-        private const string SiteIDKey= "site-id";
-        private const string SubscriptionIDKey = "subscription-id";
+        private const string SiteIDKey = "site_id";
+        private const string SubscriptionIDKey = "subscription_id";
         private const string CodeKey = "code";
         #endregion
 
@@ -65,7 +65,7 @@ namespace ChargifyNET
             : base()
         {
             // get the XML into an XML document
-            XmlDocument Doc = new XmlDocument();
+            XmlDocument Doc = new();
             Doc.LoadXml(ReferralCodeXML);
             if (Doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", "ReferralCodeXML");
             // loop through the child nodes of this node
@@ -103,7 +103,7 @@ namespace ChargifyNET
         {
             if (couponObject == null) throw new ArgumentNullException("referralCodeObject");
             if (couponObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild coupon object", "referralCodeObject");
-            this.LoadFromJSON(couponObject);
+            this.LoadFromJSON(couponObject["referral_code"] as JsonObject);
         }
 
         /// <summary>
@@ -113,7 +113,7 @@ namespace ChargifyNET
         private void LoadFromJSON(JsonObject obj)
         {
             // loop through the keys of this JsonObject to get referral code info, and parse it out
-            foreach (string key in obj.Keys)
+            foreach (var key in obj.Keys)
             {
                 switch (key)
                 {
@@ -128,7 +128,7 @@ namespace ChargifyNET
                         break;
                     case CodeKey:
                         _code = obj.GetJSONContentAsString(key);
-                        break; 
+                        break;
                     default:
                         break;
                 }
@@ -148,10 +148,10 @@ namespace ChargifyNET
                     case IDKey:
                         _iD = dataNode.GetNodeContentAsInt();
                         break;
-                    case SiteIDKey:
+                    case "site-id":
                         _siteID = dataNode.GetNodeContentAsInt();
                         break;
-                    case SubscriptionIDKey:
+                    case "subscription-id":
                         _subscriptionID = dataNode.GetNodeContentAsInt();
                         break;
                     case CodeKey:

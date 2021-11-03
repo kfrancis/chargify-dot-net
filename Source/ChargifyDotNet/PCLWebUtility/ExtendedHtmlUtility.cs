@@ -21,9 +21,9 @@ namespace PCLWebUtility
 
         private static string EntityLookup(string entity)
         {
-            string str = "";
-            string str1 = entity;
-            string str2 = str1;
+            var str = "";
+            var str1 = entity;
+            var str2 = str1;
             if (str1 != null)
             {
                 switch (str2)
@@ -1295,10 +1295,10 @@ namespace PCLWebUtility
 
         public static int HexToInt(string hexstr)
         {
-            int num = 0;
+            var num = 0;
             hexstr = hexstr.ToUpper();
-            char[] charArray = hexstr.ToCharArray();
-            for (int i = (int)charArray.Length - 1; i >= 0; i--)
+            var charArray = hexstr.ToCharArray();
+            for (var i = (int)charArray.Length - 1; i >= 0; i--)
             {
                 if (charArray[i] >= '0' && charArray[i] <= '9')
                 {
@@ -1338,13 +1338,13 @@ namespace PCLWebUtility
 
         public static string HtmlEntityEncode(string unicodeText, bool encodeTagsToo)
         {
-            string empty = string.Empty;
-            string str = unicodeText;
-            for (int i = 0; i < str.Length; i++)
+            var empty = string.Empty;
+            var str = unicodeText;
+            for (var i = 0; i < str.Length; i++)
             {
-                char chr = str[i];
+                var chr = str[i];
                 int num = chr;
-                int num1 = num;
+                var num1 = num;
                 if (num1 != 38)
                 {
                     switch (num1)
@@ -1396,10 +1396,10 @@ namespace PCLWebUtility
 
         private static string ResolveEntityAngleAmp(Match matchToProcess)
         {
-            string str = "";
+            var str = "";
             if (matchToProcess.Groups["decimal"].Success)
             {
-                char chr = Convert.ToChar(Convert.ToInt32(matchToProcess.Groups["decimal"].Value));
+                var chr = Convert.ToChar(Convert.ToInt32(matchToProcess.Groups["decimal"].Value));
                 str = chr.ToString();
             }
             else if (!matchToProcess.Groups["hex"].Success)
@@ -1408,7 +1408,7 @@ namespace PCLWebUtility
             }
             else
             {
-                char chr1 = Convert.ToChar(ExtendedHtmlUtility.HexToInt(matchToProcess.Groups["hex"].Value));
+                var chr1 = Convert.ToChar(ExtendedHtmlUtility.HexToInt(matchToProcess.Groups["hex"].Value));
                 str = chr1.ToString();
             }
             return str;
@@ -1416,15 +1416,15 @@ namespace PCLWebUtility
 
         private static string ResolveEntityNotAngleAmp(Match matchToProcess)
         {
-            string str = "";
+            var str = "";
             if (matchToProcess.Groups["decimal"].Success)
             {
-                char chr = Convert.ToChar(Convert.ToInt32(matchToProcess.Groups["decimal"].Value));
+                var chr = Convert.ToChar(Convert.ToInt32(matchToProcess.Groups["decimal"].Value));
                 str = chr.ToString();
             }
             else if (matchToProcess.Groups["hex"].Success)
             {
-                char chr1 = Convert.ToChar(ExtendedHtmlUtility.HexToInt(matchToProcess.Groups["hex"].Value));
+                var chr1 = Convert.ToChar(ExtendedHtmlUtility.HexToInt(matchToProcess.Groups["hex"].Value));
                 str = chr1.ToString();
             }
             else if (!matchToProcess.Groups["html"].Success)
@@ -1433,9 +1433,9 @@ namespace PCLWebUtility
             }
             else
             {
-                string value = matchToProcess.Groups["html"].Value;
-                string lower = value.ToLower();
-                string str1 = lower;
+                var value = matchToProcess.Groups["html"].Value;
+                var lower = value.ToLower();
+                var str1 = lower;
                 str = (lower == null || !(str1 == "lt") && !(str1 == "gt") && !(str1 == "amp") ? ExtendedHtmlUtility.EntityLookup(value) : string.Concat("&", value, ";"));
             }
             return str;

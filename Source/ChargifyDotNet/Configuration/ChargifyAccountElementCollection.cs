@@ -31,9 +31,9 @@
 namespace ChargifyNET.Configuration
 {
 #if NETFULL
-#region Imports 
+    #region Imports 
     using System.Configuration;
-#endregion
+    #endregion
 
     /// <summary>
     /// The collection of Chargify Account elements in web.config
@@ -56,7 +56,7 @@ namespace ChargifyNET.Configuration
         /// <returns></returns>
         protected override object GetElementKey(ConfigurationElement element)
         {
-            return ((ChargifyAccountElement) element).Name;
+            return ((ChargifyAccountElement)element).Name;
         }
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace ChargifyNET.Configuration
         {
             get
             {
-                return (ChargifyAccountElement) BaseGet(index);
+                return (ChargifyAccountElement)BaseGet(index);
             }
             set
             {

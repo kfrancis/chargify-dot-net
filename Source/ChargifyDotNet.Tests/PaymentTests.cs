@@ -19,8 +19,8 @@ namespace ChargifyDotNetTests
 
             // Arrange
             var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == ChargifyNET.SubscriptionState.Active).Value;
-            int amount = 1234; //$12.34
-            string memo = Guid.NewGuid().ToString();
+            var amount = 1234; //$12.34
+            var memo = Guid.NewGuid().ToString();
             var prePaymentBalance = subscription.BalanceInCents;
 
             // Act

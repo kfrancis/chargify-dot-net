@@ -82,7 +82,7 @@ namespace ChargifyNET
         public ProductFamilyAttributes(string productFamilyAttributesXml)
         {
             // get the XML into an XML document
-            XmlDocument doc = new XmlDocument();
+            XmlDocument doc = new();
             doc.LoadXml(productFamilyAttributesXml);
             if (doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(productFamilyAttributesXml));
             // loop through the child nodes of this node
@@ -129,7 +129,7 @@ namespace ChargifyNET
         /// <param name="obj">The JsonObject containing product family attribute data</param>
         private void LoadFromJson(JsonObject obj)
         {
-            foreach (string key in obj.Keys)
+            foreach (var key in obj.Keys)
             {
                 switch (key)
                 {

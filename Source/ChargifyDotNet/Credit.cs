@@ -62,7 +62,7 @@ namespace ChargifyNET
         public Credit(string creditXml)
         {
             // get the XML into an XML document
-            XmlDocument doc = new XmlDocument();
+            XmlDocument doc = new();
             doc.LoadXml(creditXml);
             if (doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(creditXml));
             // loop through the child nodes of this node
@@ -107,7 +107,7 @@ namespace ChargifyNET
         /// <param name="obj">The JsonObject with credit data</param>
         private void LoadFromJson(JsonObject obj)
         {
-            foreach (string key in obj.Keys)
+            foreach (var key in obj.Keys)
             {
                 switch (key)
                 {

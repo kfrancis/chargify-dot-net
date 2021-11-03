@@ -45,7 +45,7 @@ namespace ChargifyDotNetTests
             // Arrange
             var customers = Chargify.GetCustomerList().Keys;
             var referenceValue = customers.FirstOrDefault(systemID => !string.IsNullOrWhiteSpace(systemID));
-            ICustomer customer = Chargify.LoadCustomer(referenceValue);
+            var customer = Chargify.LoadCustomer(referenceValue);
             var products = Chargify.GetProductList().Values;
             var product = products.FirstOrDefault(p => p.PriceInCents > 0 && !p.RequireCreditCard);
             Assert.IsNotNull(product, "No valid product was found.");

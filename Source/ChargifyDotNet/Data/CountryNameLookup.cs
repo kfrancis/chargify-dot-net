@@ -28,10 +28,8 @@ namespace ChargifyNET.Data
 
             if (fileStream != null)
             {
-                using (var reader = new StreamReader(fileStream))
-                {
-                    _countries.LoadXml(reader.ReadToEnd());
-                }
+                using var reader = new StreamReader(fileStream);
+                _countries.LoadXml(reader.ReadToEnd());
             }
         }
 
@@ -42,7 +40,7 @@ namespace ChargifyNET.Data
         /// <returns>Return the name of the country if applicable, String.Empty otherwise.</returns>
         public string GetCountryName(string countryCode2)
         {
-            string result = String.Empty;
+            var result = string.Empty;
             var selectSingleNode = _countries.SelectSingleNode($@"/ISO_3166-1_List_en/ISO_3166-1_Entry/ISO_3166-1_Alpha-2_Code_element[.=""{countryCode2}""]");
             var countryNode = selectSingleNode?.ParentNode;
             var singleCountryNode = countryNode?.SelectSingleNode("ISO_3166-1_Country_name");
@@ -62,7 +60,7 @@ namespace ChargifyNET.Data
         public Dictionary<string, string> GetData()
         {
             Dictionary<string, string> result;
-            XDocument doc = XDocument.Parse(_countries.OuterXml);
+            var doc = XDocument.Parse(_countries.OuterXml);
 
             result = (from c in doc.Descendants("ISO_3166-1_Entry")
                       select new
@@ -70,7 +68,7 @@ namespace ChargifyNET.Data
                           Code = c.Element("ISO_3166-1_Alpha-2_Code_element")?.Value,
                           Name = c.Element("ISO_3166-1_Country_name")?.Value
                       }).ToDictionary(c => c.Code, c => c.Name);
-            
+
             return result;
         }
     }

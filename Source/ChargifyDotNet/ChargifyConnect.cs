@@ -1,4 +1,4 @@
-﻿#region License, Terms and Conditions
+#region License, Terms and Conditions
 
 //
 // ChargifyConnect.cs
@@ -47,7 +47,6 @@ namespace ChargifyNET
     using System.Text;
     using System.Xml;
     using System.Xml.Linq;
-    using System.Xml.Schema;
 
     #endregion
 
@@ -105,12 +104,11 @@ namespace ChargifyNET
 
         #region Properties
 
-        private static string UserAgent => _userAgent ??
-                                           (_userAgent =
+        private static string UserAgent => s_userAgent ??=
                                                string.Format("Chargify.NET Client v" +
-                                                             System.Reflection.Assembly.GetExecutingAssembly().GetName().Version));
+                                                             System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
 
-        private static string _userAgent;
+        private static string s_userAgent;
 
         /// <summary>
         /// Get or set the API key
@@ -189,7 +187,7 @@ namespace ChargifyNET
         {
             get
             {
-                bool result = true;
+                var result = true;
                 if (string.IsNullOrEmpty(apiKey)) result = false;
                 if (string.IsNullOrEmpty(Password)) result = false;
                 if (string.IsNullOrEmpty(URL)) result = false;
@@ -232,25 +230,17 @@ namespace ChargifyNET
         /// <returns>The metadata result containing the response</returns>
         public IMetafield GetMetafields<T>() where T : ChargifyBase
         {
-            string response;
-            switch (typeof(T).Name.ToLowerInvariant())
+            var response = typeof(T).Name.ToLowerInvariant() switch
             {
-                case "customer":
-                    response = DoRequest(string.Format("customers/metafields.{0}", GetMethodExtension()), HttpRequestMethod.Get, null);
-                    break;
-
-                case "subscription":
-                    response = DoRequest(string.Format("subscriptions/metafields.{0}", GetMethodExtension()), HttpRequestMethod.Get, null);
-                    break;
-
-                default:
-                    throw new Exception(string.Format("Must be of type '{0}'", string.Join(", ", _metafieldTypes.ToArray())));
-            }
+                "customer" => DoRequest(string.Format("customers/metafields.{0}", GetMethodExtension()), HttpRequestMethod.Get, null),
+                "subscription" => DoRequest(string.Format("subscriptions/metafields.{0}", GetMethodExtension()), HttpRequestMethod.Get, null),
+                _ => throw new Exception(string.Format("Must be of type '{0}'", string.Join(", ", s_metafieldTypes.ToArray()))),
+            };
             // change the response to the object
             return response.ConvertResponseTo<Metafield>("metafield");
         }
 
-        private static readonly List<string> _metafieldTypes = new List<string> { "Customer", "Subscription" };
+        private static readonly List<string> s_metafieldTypes = new() { "Customer", "Subscription" };
 
         #endregion
 
@@ -268,26 +258,15 @@ namespace ChargifyNET
             // make sure data is valid
             RequireNotNull(nameof(metadatum), metadatum);
             RequireAtLeastZeroElement(nameof(metadatum), metadatum);
-
-            string url;
-            switch (typeof(T).Name)
+            var url = typeof(T).Name switch
             {
-                case nameof(Customer):
-                case nameof(ICustomer):
-                    url = $"customers/{chargifyId}/metadata";
-                    break;
-
-                case nameof(Subscription):
-                case nameof(ISubscription):
-                    url = $"subscriptions/{chargifyId}/metadata";
-                    break;
-
-                default:
-                    throw new Exception($"Must be of type '{string.Join(", ", _metadataTypes.ToArray())}'");
-            }
+                nameof(Customer) or nameof(ICustomer) => $"customers/{chargifyId}/metadata",
+                nameof(Subscription) or nameof(ISubscription) => $"subscriptions/{chargifyId}/metadata",
+                _ => throw new Exception($"Must be of type '{string.Join(", ", s_metadataTypes.ToArray())}'"),
+            };
 
             // now make the request
-            string response = !UseJSON
+            var response = !UseJSON
                 ? DoNewRequest(url, HttpRequestMethod.Post, MetadataRequest.GetMetadatumXml(chargifyId, metadatum))
                 : DoNewRequest(url, HttpRequestMethod.Post, new { metadata = MetadataRequest.GetMetadatumRequest(metadatum) });
 
@@ -301,7 +280,7 @@ namespace ChargifyNET
             }
             else
             {
-                XmlDocument doc = new XmlDocument();
+                XmlDocument doc = new();
                 doc.LoadXml(response); // get the XML into an XML document
                 if (doc.ChildNodes.Count == 0) throw new InvalidOperationException("Returned XML not valid");
                 // loop through the child nodes of this node
@@ -345,31 +324,20 @@ namespace ChargifyNET
         /// <returns>The metadata result containing the response</returns>
         public IMetadataResult GetMetadataFor<T>(long resourceId, int? page = null)
         {
-            string url;
-            switch (typeof(T).Name)
+            var url = typeof(T).Name switch
             {
-                case nameof(Customer):
-                case nameof(ICustomer):
-                    url = string.Format("customers/{0}/metadata.{1}", resourceId, GetMethodExtension());
-                    break;
-
-                case nameof(Subscription):
-                case nameof(ISubscription):
-                    url = string.Format("subscriptions/{0}/metadata.{1}", resourceId, GetMethodExtension());
-                    break;
-
-                default:
-                    throw new Exception(string.Format("Must be of type '{0}'", string.Join(", ", _metadataTypes.ToArray())));
-            }
-
-            string qs = string.Empty;
+                nameof(Customer) or nameof(ICustomer) => string.Format("customers/{0}/metadata.{1}", resourceId, GetMethodExtension()),
+                nameof(Subscription) or nameof(ISubscription) => string.Format("subscriptions/{0}/metadata.{1}", resourceId, GetMethodExtension()),
+                _ => throw new Exception(string.Format("Must be of type '{0}'", string.Join(", ", s_metadataTypes.ToArray()))),
+            };
+            var qs = string.Empty;
 
             // Add the transaction options to the query string ...
             if (page.HasValue && page.Value != 0) { if (qs.Length > 0) { qs += "&"; } qs += string.Format("page={0}", page); }
 
             // Construct the url to access Chargify
             if (!string.IsNullOrEmpty(qs)) { url += "?" + qs; }
-            string response = DoRequest(url);
+            var response = DoRequest(url);
 
             // change the response to the object
             return response.ConvertResponseTo<MetadataResult>("metadata");
@@ -382,27 +350,17 @@ namespace ChargifyNET
         /// <returns>The metadata result containing the response</returns>
         public IMetadataResult GetMetadata<T>()
         {
-            string response;
-            switch (typeof(T).Name)
+            var response = typeof(T).Name switch
             {
-                case nameof(Customer):
-                case nameof(ICustomer):
-                    response = DoRequest(string.Format("customers/metadata.{0}", GetMethodExtension()), HttpRequestMethod.Get, null);
-                    break;
-
-                case nameof(Subscription):
-                case nameof(ISubscription):
-                    response = DoRequest(string.Format("subscriptions/metadata.{0}", GetMethodExtension()), HttpRequestMethod.Get, null);
-                    break;
-
-                default:
-                    throw new Exception(string.Format("Must be of type '{0}'", string.Join(", ", _metadataTypes)));
-            }
+                nameof(Customer) or nameof(ICustomer) => DoRequest(string.Format("customers/metadata.{0}", GetMethodExtension()), HttpRequestMethod.Get, null),
+                nameof(Subscription) or nameof(ISubscription) => DoRequest(string.Format("subscriptions/metadata.{0}", GetMethodExtension()), HttpRequestMethod.Get, null),
+                _ => throw new Exception(string.Format("Must be of type '{0}'", string.Join(", ", s_metadataTypes))),
+            };
             // change the response to the object
             return response.ConvertResponseTo<MetadataResult>("metadata");
         }
 
-        private static readonly List<string> _metadataTypes = new List<string> { nameof(ICustomer), nameof(Customer), nameof(ISubscription), nameof(Subscription) };
+        private static readonly List<string> s_metadataTypes = new() { nameof(ICustomer), nameof(Customer), nameof(ISubscription), nameof(Subscription) };
 
         #endregion
 
@@ -420,7 +378,7 @@ namespace ChargifyNET
                 // make sure data is valid
                 if (chargifyId == int.MinValue) throw new ArgumentNullException("chargifyId");
                 // now make the request
-                string response = DoRequest(string.Format("customers/{0}.{1}", chargifyId, GetMethodExtension()));
+                var response = DoRequest(string.Format("customers/{0}.{1}", chargifyId, GetMethodExtension()));
                 // change the response to the object
                 return response.ConvertResponseTo<Customer>("customer");
             }
@@ -443,7 +401,7 @@ namespace ChargifyNET
                 // make sure data is valid
                 if (systemId == string.Empty) throw new ArgumentException("Empty SystemID not allowed", "systemId");
                 // now make the request
-                string response = DoRequest(string.Format("customers/lookup.{0}?reference={1}", GetMethodExtension(), systemId));
+                var response = DoRequest(string.Format("customers/lookup.{0}?reference={1}", GetMethodExtension(), systemId));
                 // change the response to the object
                 return response.ConvertResponseTo<Customer>("customer");
             }
@@ -576,9 +534,9 @@ namespace ChargifyNET
             // make sure data is OK
             if (customer == null) throw new ArgumentNullException(nameof(customer));
             if (customer.ChargifyID == int.MinValue) throw new ArgumentException("Invalid chargify ID detected", nameof(customer));
-            ICustomer oldCust = LoadCustomer(customer.ChargifyID);
+            var oldCust = LoadCustomer(customer.ChargifyID);
 
-            bool isUpdateRequired = false;
+            var isUpdateRequired = false;
 
             // create XML for creation of customer
             var customerXml = new StringBuilder(GetXmlStringIfApplicable());
@@ -608,7 +566,7 @@ namespace ChargifyNET
                 try
                 {
                     // now make the request
-                    string response = DoRequest(string.Format("customers/{0}.{1}", customer.ChargifyID, GetMethodExtension()), HttpRequestMethod.Put, customerXml.ToString());
+                    var response = DoRequest(string.Format("customers/{0}.{1}", customer.ChargifyID, GetMethodExtension()), HttpRequestMethod.Put, customerXml.ToString());
                     // change the response to the object
                     return response.ConvertResponseTo<Customer>("customer");
                 }
@@ -636,7 +594,7 @@ namespace ChargifyNET
             if (response.IsXml())
             {
                 // now build customer object based on response as XML
-                XmlDocument doc = new XmlDocument();
+                XmlDocument doc = new();
                 doc.LoadXml(response); // get the XML into an XML document
                 if (doc.ChildNodes.Count == 0) throw new InvalidOperationException("Returned XML not valid");
                 // loop through the child nodes of this node
@@ -649,7 +607,7 @@ namespace ChargifyNET
                             if (customerNode.Name == "customer")
                             {
                                 ICustomer loadedCustomer = new Customer(customerNode);
-                                string key = keyByChargifyId ? loadedCustomer.ChargifyID.ToString() : loadedCustomer.SystemID;
+                                var key = keyByChargifyId ? loadedCustomer.ChargifyID.ToString() : loadedCustomer.SystemID;
                                 if (!retValue.ContainsKey(key))
                                 {
                                     retValue.Add(key, loadedCustomer);
@@ -666,15 +624,15 @@ namespace ChargifyNET
             else if (response.IsJSON())
             {
                 // should be expecting an array
-                int position = 0;
-                JsonArray array = JsonArray.Parse(response, ref position);
-                for (int i = 0; i <= array.Length - 1; i++)
+                var position = 0;
+                var array = JsonArray.Parse(response, ref position);
+                for (var i = 0; i <= array.Length - 1; i++)
                 {
                     if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("customer"))
                     {
-                        JsonObject customerObj = (array.Items[i] as JsonObject)["customer"] as JsonObject;
+                        var customerObj = (array.Items[i] as JsonObject)["customer"] as JsonObject;
                         ICustomer loadedCustomer = new Customer(customerObj);
-                        string key = keyByChargifyId ? loadedCustomer.ChargifyID.ToString() : loadedCustomer.SystemID;
+                        var key = keyByChargifyId ? loadedCustomer.ChargifyID.ToString() : loadedCustomer.SystemID;
                         if (!retValue.ContainsKey(key))
                         {
                             retValue.Add(key, loadedCustomer);
@@ -711,7 +669,7 @@ namespace ChargifyNET
             // make sure data is valid
             if (pageNumber < 1) throw new ArgumentException("Page number must be greater than 1", "pageNumber");
             // now make the request
-            string response = DoRequest(string.Format("customers.{0}?page={1}", GetMethodExtension(), pageNumber));
+            var response = DoRequest(string.Format("customers.{0}?page={1}", GetMethodExtension(), pageNumber));
             return ProcessCustomerListResponse(response, keyByChargifyId);
         }
 
@@ -734,13 +692,13 @@ namespace ChargifyNET
         public IDictionary<string, ICustomer> GetCustomerList(bool keyByChargifyId)
         {
             var retValue = new Dictionary<string, ICustomer>();
-            int pageCount = 1000;
-            for (int page = 1; pageCount > 0; page++)
+            var pageCount = 1000;
+            for (var page = 1; pageCount > 0; page++)
             {
-                IDictionary<string, ICustomer> pageList = GetCustomerList(page, keyByChargifyId);
-                foreach (ICustomer cust in pageList.Values)
+                var pageList = GetCustomerList(page, keyByChargifyId);
+                foreach (var cust in pageList.Values)
                 {
-                    string key = keyByChargifyId ? cust.ChargifyID.ToString() : cust.SystemID;
+                    var key = keyByChargifyId ? cust.ChargifyID.ToString() : cust.SystemID;
                     if (!retValue.ContainsKey(key))
                     {
                         retValue.Add(key, cust);
@@ -763,7 +721,7 @@ namespace ChargifyNET
         public IDictionary<string, ICustomer> SearchCustomers(string query)
         {
             // make the request
-            string response = DoRequest(string.Format("customers.{0}?q={1}", GetMethodExtension(), query));
+            var response = DoRequest(string.Format("customers.{0}?q={1}", GetMethodExtension(), query));
             return ProcessCustomerListResponse(response, true);
         }
 
@@ -811,7 +769,7 @@ namespace ChargifyNET
                 // make sure data is valid
                 if (systemId == string.Empty) throw new ArgumentException("Empty SystemID not allowed", "systemId");
 
-                ICustomer customer = LoadCustomer(systemId);
+                var customer = LoadCustomer(systemId);
                 if (customer == null) { throw new ArgumentException("Not a known customer", "systemId"); }
 
                 // now make the request
@@ -861,7 +819,7 @@ namespace ChargifyNET
             if (!string.IsNullOrEmpty(updatedProduct.Description) && existingProduct.Description != updatedProduct.Description) productXml.AppendFormat("<description>{0}</description>", PCLWebUtility.WebUtility.HtmlEncode(updatedProduct.Description));
             productXml.Append("</product>");
 
-            string response = DoRequest(string.Format("products/{0}.{1}", productId, GetMethodExtension()), HttpRequestMethod.Put, productXml.ToString());
+            var response = DoRequest(string.Format("products/{0}.{1}", productId, GetMethodExtension()), HttpRequestMethod.Put, productXml.ToString());
             // change the response to the object
             return response.ConvertResponseTo<Product>("product");
         }
@@ -909,7 +867,7 @@ namespace ChargifyNET
             if (!string.IsNullOrEmpty(description)) productXml.AppendFormat("<description>{0}</description>", PCLWebUtility.WebUtility.HtmlEncode(description));
             productXml.Append("</product>");
             // now make the request
-            string response = DoRequest(string.Format("product_families/{0}/products.{1}", productFamilyId, GetMethodExtension()), HttpRequestMethod.Post, productXml.ToString());
+            var response = DoRequest(string.Format("product_families/{0}/products.{1}", productFamilyId, GetMethodExtension()), HttpRequestMethod.Post, productXml.ToString());
             // change the response to the object
             return response.ConvertResponseTo<Product>("product");
         }
@@ -963,14 +921,14 @@ namespace ChargifyNET
         public IDictionary<int, IProduct> GetProductList()
         {
             // now make the request
-            string response = DoRequest(string.Format("products.{0}", GetMethodExtension()));
+            var response = DoRequest(string.Format("products.{0}", GetMethodExtension()));
             // loop through the child nodes of this node
             var retValue = new Dictionary<int, IProduct>();
             if (response.IsXml())
             {
                 // now build a product list based on response XML
                 // get the XML into an XML document
-                XmlDocument doc = new XmlDocument();
+                XmlDocument doc = new();
                 doc.LoadXml(response);
                 if (doc.ChildNodes.Count == 0) throw new InvalidOperationException("Returned XML not valid");
                 foreach (XmlNode elementNode in doc.ChildNodes)
@@ -998,13 +956,13 @@ namespace ChargifyNET
             else if (response.IsJSON())
             {
                 // should be expecting an array
-                int position = 0;
-                JsonArray array = JsonArray.Parse(response, ref position);
-                for (int i = 0; i <= array.Length - 1; i++)
+                var position = 0;
+                var array = JsonArray.Parse(response, ref position);
+                for (var i = 0; i <= array.Length - 1; i++)
                 {
                     if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("product"))
                     {
-                        JsonObject productObj = (array.Items[i] as JsonObject)["product"] as JsonObject;
+                        var productObj = (array.Items[i] as JsonObject)["product"] as JsonObject;
                         IProduct loadedProduct = new Product(productObj);
                         if (!retValue.ContainsKey(loadedProduct.ID))
                         {
@@ -1044,7 +1002,7 @@ namespace ChargifyNET
             if (!string.IsNullOrEmpty(newFamily.Description)) productFamilyXml.AppendFormat("<description>{0}</description>", PCLWebUtility.WebUtility.HtmlEncode(newFamily.Description));
             productFamilyXml.Append("</product_family>");
             // now make the request
-            string response = DoRequest(string.Format("product_families.{0}", GetMethodExtension()), HttpRequestMethod.Post, productFamilyXml.ToString());
+            var response = DoRequest(string.Format("product_families.{0}", GetMethodExtension()), HttpRequestMethod.Post, productFamilyXml.ToString());
             // change the response to the object
             return response.ConvertResponseTo<ProductFamily>("product_family");
         }
@@ -1056,14 +1014,14 @@ namespace ChargifyNET
         public IDictionary<int, IProductFamily> GetProductFamilyList()
         {
             // now make the request
-            string response = DoRequest(string.Format("product_families.{0}", GetMethodExtension()));
+            var response = DoRequest(string.Format("product_families.{0}", GetMethodExtension()));
             // loop through the child nodes of this node
             var retValue = new Dictionary<int, IProductFamily>();
             if (response.IsXml())
             {
                 // now build a product family list based on response XML
                 // get the XML into an XML document
-                XmlDocument doc = new XmlDocument();
+                XmlDocument doc = new();
                 doc.LoadXml(response);
                 if (doc.ChildNodes.Count == 0) throw new InvalidOperationException("Returned XML not valid");
                 foreach (XmlNode elementNode in doc.ChildNodes)
@@ -1091,13 +1049,13 @@ namespace ChargifyNET
             else if (response.IsJSON())
             {
                 // should be expecting an array
-                int position = 0;
-                JsonArray array = JsonArray.Parse(response, ref position);
-                for (int i = 0; i <= array.Length - 1; i++)
+                var position = 0;
+                var array = JsonArray.Parse(response, ref position);
+                for (var i = 0; i <= array.Length - 1; i++)
                 {
                     if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("product_family"))
                     {
-                        JsonObject productFamilyObj = (array.Items[i] as JsonObject)["product_family"] as JsonObject;
+                        var productFamilyObj = (array.Items[i] as JsonObject)["product_family"] as JsonObject;
                         IProductFamily loadedProductFamily = new ProductFamily(productFamilyObj);
                         if (!retValue.ContainsKey(loadedProductFamily.ID))
                         {
@@ -1181,13 +1139,13 @@ namespace ChargifyNET
         {
             if (string.IsNullOrEmpty(SharedKey)) throw new ArgumentException("SharedKey is required to generate the hosted page url");
 
-            string message = UpdateShortName + "--" + subscriptionId + "--" + SharedKey;
-            string token = message.GetChargifyHostedToken();
-            string prettyId = string.Format("{0}-{1}-{2}", subscriptionId, PCLWebUtility.WebUtility.UrlEncode(firstName.Trim().ToLower()), PCLWebUtility.WebUtility.UrlEncode(lastName.Trim().ToLower()));
-            string methodString = string.Format("{0}/{1}/{2}", UpdateShortName, prettyId, token);
+            var message = UpdateShortName + "--" + subscriptionId + "--" + SharedKey;
+            var token = message.GetChargifyHostedToken();
+            var prettyId = string.Format("{0}-{1}-{2}", subscriptionId, PCLWebUtility.WebUtility.UrlEncode(firstName.Trim().ToLower()), PCLWebUtility.WebUtility.UrlEncode(lastName.Trim().ToLower()));
+            var methodString = string.Format("{0}/{1}/{2}", UpdateShortName, prettyId, token);
             // just in case?
             // methodString = PCLWebUtility.WebUtility.UrlEncode(methodString);
-            string updateUrl = string.Format("{0}{1}{2}", URL?.Replace("chargify.com", "chargifypay.com"), (URL.EndsWith(" / ") ? "" : "/"), methodString);
+            var updateUrl = string.Format("{0}{1}{2}", URL?.Replace("chargify.com", "chargifypay.com"), (URL.EndsWith(" / ") ? "" : "/"), methodString);
             return updateUrl;
         }
 
@@ -1200,11 +1158,11 @@ namespace ChargifyNET
         {
             if (string.IsNullOrEmpty(SharedKey)) throw new ArgumentException("SharedKey is required to generate the hosted page url");
 
-            string message = UpdateShortName + "--" + subscriptionId + "--" + SharedKey;
-            string token = message.GetChargifyHostedToken();
-            string methodString = string.Format("{0}/{1}/{2}", UpdateShortName, subscriptionId, token);
+            var message = UpdateShortName + "--" + subscriptionId + "--" + SharedKey;
+            var token = message.GetChargifyHostedToken();
+            var methodString = string.Format("{0}/{1}/{2}", UpdateShortName, subscriptionId, token);
             // methodString = PCLWebUtility.WebUtility.UrlEncode(methodString);
-            string updateUrl = string.Format("{0}{1}{2}", URL, (URL.EndsWith("/") ? "" : "/"), methodString);
+            var updateUrl = string.Format("{0}{1}{2}", URL, (URL.EndsWith("/") ? "" : "/"), methodString);
             return updateUrl;
         }
 
@@ -1257,9 +1215,9 @@ namespace ChargifyNET
             {
                 // make sure data is valid
                 if (subscriptionId < 0) throw new ArgumentNullException("subscriptionId");
-                string requestString = string.Format("subscriptions/{0}/reactivate.{1}", subscriptionId, GetMethodExtension());
+                var requestString = string.Format("subscriptions/{0}/reactivate.{1}", subscriptionId, GetMethodExtension());
 
-                StringBuilder queryString = new StringBuilder();
+                StringBuilder queryString = new();
 
                 // If includeTrial = true, the reactivated subscription will include a trial if one is available.
                 if (includeTrial) { queryString.Append("include_trial=1"); }
@@ -1280,7 +1238,7 @@ namespace ChargifyNET
                 if (queryString.Length > 0) requestString += "?" + queryString;
 
                 // now make the request
-                string response = DoRequest(requestString, HttpRequestMethod.Put, string.Empty);
+                var response = DoRequest(requestString, HttpRequestMethod.Put, string.Empty);
                 // change the response to the object
                 return response.ConvertResponseTo<Subscription>("subscription");
             }
@@ -1304,7 +1262,7 @@ namespace ChargifyNET
                 // make sure data is valid
                 if (subscriptionId < 0) throw new ArgumentNullException("subscriptionId");
 
-                StringBuilder subscriptionXml = new StringBuilder("");
+                StringBuilder subscriptionXml = new("");
                 if (!string.IsNullOrEmpty(cancellationMessage))
                 {
                     // create XML for creation of customer
@@ -1369,7 +1327,7 @@ namespace ChargifyNET
                 // make sure data is valid
                 if (subscriptionId < 0) throw new ArgumentNullException("subscriptionId");
                 // now make the request
-                string response = DoRequest(string.Format("subscriptions/{0}.{1}", subscriptionId, GetMethodExtension()));
+                var response = DoRequest(string.Format("subscriptions/{0}.{1}", subscriptionId, GetMethodExtension()));
                 // change the response to the object
                 return response.ConvertResponseTo<Subscription>("subscription");
             }
@@ -1389,11 +1347,11 @@ namespace ChargifyNET
         public IDictionary<int, ISubscription> GetSubscriptionList(SubscriptionState state)
         {
             var retValue = new Dictionary<int, ISubscription>();
-            int pageCount = 1000;
-            for (int page = 1; pageCount > 0; page++)
+            var pageCount = 1000;
+            for (var page = 1; pageCount > 0; page++)
             {
-                IDictionary<int, ISubscription> pageList = GetSubscriptionList(page, 50, state);
-                foreach (ISubscription subscription in pageList.Values)
+                var pageList = GetSubscriptionList(page, 50, state);
+                foreach (var subscription in pageList.Values)
                 {
                     if (!retValue.ContainsKey(subscription.SubscriptionID))
                     {
@@ -1416,11 +1374,11 @@ namespace ChargifyNET
         public IDictionary<int, ISubscription> GetSubscriptionList()
         {
             var retValue = new Dictionary<int, ISubscription>();
-            int pageCount = 1000;
-            for (int page = 1; pageCount > 0; page++)
+            var pageCount = 1000;
+            for (var page = 1; pageCount > 0; page++)
             {
-                IDictionary<int, ISubscription> pageList = GetSubscriptionList(page, 50);
-                foreach (ISubscription subscription in pageList.Values)
+                var pageList = GetSubscriptionList(page, 50);
+                foreach (var subscription in pageList.Values)
                 {
                     if (!retValue.ContainsKey(subscription.SubscriptionID))
                     {
@@ -1464,13 +1422,13 @@ namespace ChargifyNET
             if (state != SubscriptionState.Unknown)
                 AppendToQueryString(queryString, "state", state.ToString().ToLower());
 
-            string response = DoNewRequest("subscriptions", queryString);
+            var response = DoNewRequest("subscriptions", queryString);
 
             var retValue = new Dictionary<int, ISubscription>();
             if (response.IsXml())
             {
                 // now build a transaction list based on response XML
-                XmlDocument doc = new XmlDocument();
+                XmlDocument doc = new();
                 doc.LoadXml(response);
                 if (doc.ChildNodes.Count == 0) throw new InvalidOperationException("Returned XML not valid");
                 // loop through the child nodes of this node
@@ -1499,13 +1457,13 @@ namespace ChargifyNET
             else if (response.IsJSON())
             {
                 // should be expecting an array
-                int position = 0;
-                JsonArray array = JsonArray.Parse(response, ref position);
-                for (int i = 0; i <= array.Length - 1; i++)
+                var position = 0;
+                var array = JsonArray.Parse(response, ref position);
+                for (var i = 0; i <= array.Length - 1; i++)
                 {
                     if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("subscription"))
                     {
-                        JsonObject subscriptionObj = (array.Items[i] as JsonObject)["subscription"] as JsonObject;
+                        var subscriptionObj = (array.Items[i] as JsonObject)["subscription"] as JsonObject;
                         ISubscription loadedSubscription = new Subscription(subscriptionObj);
                         if (!retValue.ContainsKey(loadedSubscription.SubscriptionID))
                         {
@@ -1534,12 +1492,12 @@ namespace ChargifyNET
                 // make sure data is valid
                 if (chargifyId == int.MinValue) throw new ArgumentNullException("chargifyId");
                 // now make the request
-                string response = DoRequest(string.Format("customers/{0}/subscriptions.{1}", chargifyId, GetMethodExtension()));
+                var response = DoRequest(string.Format("customers/{0}/subscriptions.{1}", chargifyId, GetMethodExtension()));
                 var retValue = new Dictionary<int, ISubscription>();
                 if (response.IsXml())
                 {
                     // now build customer object based on response XML
-                    XmlDocument doc = new XmlDocument();
+                    XmlDocument doc = new();
                     doc.LoadXml(response); // get the XML into an XML document
                     if (doc.ChildNodes.Count == 0) throw new InvalidOperationException("Returned XML not valid");
                     // loop through the child nodes of this node
@@ -1568,13 +1526,13 @@ namespace ChargifyNET
                 else if (response.IsJSON())
                 {
                     // should be expecting an array
-                    int position = 0;
-                    JsonArray array = JsonArray.Parse(response, ref position);
-                    for (int i = 0; i <= array.Length - 1; i++)
+                    var position = 0;
+                    var array = JsonArray.Parse(response, ref position);
+                    for (var i = 0; i <= array.Length - 1; i++)
                     {
                         if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("subscription"))
                         {
-                            JsonObject subscriptionObj = (array.Items[i] as JsonObject)["subscription"] as JsonObject;
+                            var subscriptionObj = (array.Items[i] as JsonObject)["subscription"] as JsonObject;
                             ISubscription loadedSubscription = new Subscription(subscriptionObj);
                             if (!retValue.ContainsKey(loadedSubscription.SubscriptionID))
                             {
@@ -1606,7 +1564,7 @@ namespace ChargifyNET
             if (options == null) throw new ArgumentNullException(nameof(options));
 
             // Customer
-            bool customerSpecifiedAlready = options.CustomerID.HasValue;
+            var customerSpecifiedAlready = options.CustomerID.HasValue;
 
             if (!string.IsNullOrEmpty(options.CustomerReference))
             {
@@ -1621,7 +1579,7 @@ namespace ChargifyNET
             if (!customerSpecifiedAlready) { throw new ArgumentException("No customer information was specified. Please specify either the CustomerID, CustomerReference or CustomerAttributes and try again.", "options"); }
 
             // Product
-            bool productSpecifiedAlready = options.ProductID.HasValue;
+            var productSpecifiedAlready = options.ProductID.HasValue;
             if (!string.IsNullOrEmpty(options.ProductHandle))
             {
                 if (productSpecifiedAlready) { throw new ArgumentException("Product information should only be specified once", nameof(options)); }
@@ -1638,7 +1596,7 @@ namespace ChargifyNET
             }
 
             // now make the request
-            string response = DoRequest(string.Format("subscriptions.{0}", GetMethodExtension()), HttpRequestMethod.Post, subscriptionXml.ToString());
+            var response = DoRequest(string.Format("subscriptions.{0}", GetMethodExtension()), HttpRequestMethod.Post, subscriptionXml.ToString());
             // change the response to the object
             return response.ConvertResponseTo<Subscription>("subscription");
         }
@@ -1979,7 +1937,7 @@ namespace ChargifyNET
             }
             subscriptionXml.Append("</subscription>");
             // now make the request
-            string response = DoRequest(string.Format("subscriptions.{0}", GetMethodExtension()), HttpRequestMethod.Post, subscriptionXml.ToString());
+            var response = DoRequest(string.Format("subscriptions.{0}", GetMethodExtension()), HttpRequestMethod.Post, subscriptionXml.ToString());
             // change the response to the object
             return response.ConvertResponseTo<Subscription>("subscription");
         }
@@ -2162,12 +2120,12 @@ namespace ChargifyNET
             // make sure that the system ID is unique
             if (LoadCustomer(chargifyId) == null) throw new ArgumentException("Customer not found with that ID", nameof(chargifyId));
 
-            IProduct subscribingProduct = LoadProduct(productHandle);
+            var subscribingProduct = LoadProduct(productHandle);
             if (subscribingProduct == null) throw new ArgumentException("Product not found");
             if (subscribingProduct.RequireCreditCard) throw new ChargifyNetException("Product requires credit card information");
 
             // create XML for creation of customer
-            StringBuilder subscriptionXml = new StringBuilder(GetXmlStringIfApplicable());
+            StringBuilder subscriptionXml = new(GetXmlStringIfApplicable());
             subscriptionXml.Append("<subscription>");
             subscriptionXml.AppendFormat("<product_handle>{0}</product_handle>", productHandle);
             subscriptionXml.AppendFormat("<customer_id>{0}</customer_id>", chargifyId);
@@ -2184,7 +2142,7 @@ namespace ChargifyNET
             subscriptionXml.Append("</subscription>");
 
             // now make the request
-            string response = DoRequest(string.Format("subscriptions.{0}", GetMethodExtension()), HttpRequestMethod.Post, subscriptionXml.ToString());
+            var response = DoRequest(string.Format("subscriptions.{0}", GetMethodExtension()), HttpRequestMethod.Post, subscriptionXml.ToString());
             // change the response to the object
             return response.ConvertResponseTo<Subscription>("subscription");
         }
@@ -2229,7 +2187,7 @@ namespace ChargifyNET
             //if (string.IsNullOrEmpty(BillingCountry)) throw new ArgumentNullException("BillingCountry");
 
             // create XML for creation of customer
-            StringBuilder subscriptionXml = new StringBuilder(GetXmlStringIfApplicable());
+            StringBuilder subscriptionXml = new(GetXmlStringIfApplicable());
             subscriptionXml.Append("<subscription>");
             subscriptionXml.AppendFormat("<product_handle>{0}</product_handle>", productHandle);
             subscriptionXml.AppendFormat("<customer_id>{0}</customer_id>", chargifyId);
@@ -2249,7 +2207,7 @@ namespace ChargifyNET
             if (!string.IsNullOrEmpty(couponCode)) { subscriptionXml.AppendFormat("<coupon_code>{0}</coupon_code>", couponCode); }
             subscriptionXml.Append("</subscription>");
             // now make the request
-            string response = DoRequest(string.Format("subscriptions.{0}", GetMethodExtension()), HttpRequestMethod.Post, subscriptionXml.ToString());
+            var response = DoRequest(string.Format("subscriptions.{0}", GetMethodExtension()), HttpRequestMethod.Post, subscriptionXml.ToString());
             // change the response to the object
             return response.ConvertResponseTo<Subscription>("subscription");
         }
@@ -2293,7 +2251,7 @@ namespace ChargifyNET
             //if (string.IsNullOrEmpty(BillingCountry)) throw new ArgumentNullException("BillingCountry");
 
             // create XML for creation of customer
-            StringBuilder subscriptionXml = new StringBuilder(GetXmlStringIfApplicable());
+            StringBuilder subscriptionXml = new(GetXmlStringIfApplicable());
             subscriptionXml.Append("<subscription>");
             subscriptionXml.AppendFormat("<product_handle>{0}</product_handle>", productHandle);
             subscriptionXml.AppendFormat("<customer_id>{0}</customer_id>", chargifyId);
@@ -2311,7 +2269,7 @@ namespace ChargifyNET
             if (!string.IsNullOrEmpty(couponCode)) { subscriptionXml.AppendFormat("<coupon_code>{0}</coupon_code>", couponCode); }
             subscriptionXml.Append("</subscription>");
             // now make the request
-            string response = DoRequest(string.Format("subscriptions.{0}", GetMethodExtension()), HttpRequestMethod.Post, subscriptionXml.ToString());
+            var response = DoRequest(string.Format("subscriptions.{0}", GetMethodExtension()), HttpRequestMethod.Post, subscriptionXml.ToString());
             // change the response to the object
             return response.ConvertResponseTo<Subscription>("subscription");
         }
@@ -2332,12 +2290,12 @@ namespace ChargifyNET
             // make sure that the system ID is unique
             if (LoadCustomer(systemId) == null) throw new ArgumentException("Customer Not Found", "systemId");
 
-            IProduct subscribingProduct = LoadProduct(productHandle);
+            var subscribingProduct = LoadProduct(productHandle);
             if (subscribingProduct == null) throw new ArgumentException("Product not found", "productHandle");
             if (subscribingProduct.RequireCreditCard) throw new ChargifyNetException("Product requires credit card information");
 
             // create XML for creation of customer
-            StringBuilder subscriptionXml = new StringBuilder(GetXmlStringIfApplicable());
+            StringBuilder subscriptionXml = new(GetXmlStringIfApplicable());
             subscriptionXml.Append("<subscription>");
             subscriptionXml.AppendFormat("<product_handle>{0}</product_handle>", productHandle);
             subscriptionXml.AppendFormat("<customer_reference>{0}</customer_reference>", systemId);
@@ -2345,7 +2303,7 @@ namespace ChargifyNET
             subscriptionXml.Append("</subscription>");
 
             // now make the request
-            string response = DoRequest(string.Format("subscriptions.{0}", GetMethodExtension()), HttpRequestMethod.Post, subscriptionXml.ToString());
+            var response = DoRequest(string.Format("subscriptions.{0}", GetMethodExtension()), HttpRequestMethod.Post, subscriptionXml.ToString());
             // change the response to the object
             return response.ConvertResponseTo<Subscription>("subscription");
         }
@@ -2395,7 +2353,7 @@ namespace ChargifyNET
             //if (string.IsNullOrEmpty(BillingCountry)) throw new ArgumentNullException("BillingCountry");
 
             // create XML for creation of customer
-            StringBuilder subscriptionXml = new StringBuilder(GetXmlStringIfApplicable());
+            StringBuilder subscriptionXml = new(GetXmlStringIfApplicable());
             subscriptionXml.Append("<subscription>");
             subscriptionXml.AppendFormat("<product_handle>{0}</product_handle>", productHandle);
             subscriptionXml.AppendFormat("<customer_reference>{0}</customer_reference>", systemId);
@@ -2418,7 +2376,7 @@ namespace ChargifyNET
             if (!string.IsNullOrEmpty(couponCode)) { subscriptionXml.AppendFormat("<coupon_code>{0}</coupon_code>", couponCode); }
             subscriptionXml.Append("</subscription>");
             // now make the request
-            string response = DoRequest(string.Format("subscriptions.{0}", GetMethodExtension()), HttpRequestMethod.Post, subscriptionXml.ToString());
+            var response = DoRequest(string.Format("subscriptions.{0}", GetMethodExtension()), HttpRequestMethod.Post, subscriptionXml.ToString());
             // change the response to the object
             return response.ConvertResponseTo<Subscription>("subscription");
         }
@@ -2460,7 +2418,7 @@ namespace ChargifyNET
             //if (string.IsNullOrEmpty(BillingCountry)) throw new ArgumentNullException("BillingCountry");
 
             // create XML for creation of customer
-            StringBuilder subscriptionXml = new StringBuilder(GetXmlStringIfApplicable());
+            StringBuilder subscriptionXml = new(GetXmlStringIfApplicable());
             subscriptionXml.Append("<subscription>");
             subscriptionXml.AppendFormat("<product_handle>{0}</product_handle>", productHandle);
             subscriptionXml.AppendFormat("<customer_reference>{0}</customer_reference>", systemId);
@@ -2478,7 +2436,7 @@ namespace ChargifyNET
             if (!string.IsNullOrEmpty(couponCode)) { subscriptionXml.AppendFormat("<coupon_code>{0}</coupon_code>", couponCode); }
             subscriptionXml.Append("</subscription>");
             // now make the request
-            string response = DoRequest(string.Format("subscriptions.{0}", GetMethodExtension()), HttpRequestMethod.Post, subscriptionXml.ToString());
+            var response = DoRequest(string.Format("subscriptions.{0}", GetMethodExtension()), HttpRequestMethod.Post, subscriptionXml.ToString());
             // change the response to the object
             return response.ConvertResponseTo<Subscription>("subscription");
         }
@@ -2506,12 +2464,12 @@ namespace ChargifyNET
             if (string.IsNullOrEmpty(lastName)) throw new ArgumentNullException("lastName");
             if (string.IsNullOrEmpty(emailAddress)) throw new ArgumentNullException("emailAddress");
 
-            ICustomer existingCustomer = LoadCustomer(newSystemId);
-            IProduct subscribingProduct = LoadProduct(productHandle);
+            var existingCustomer = LoadCustomer(newSystemId);
+            var subscribingProduct = LoadProduct(productHandle);
             if (subscribingProduct == null) throw new ArgumentException("Product not found", "productHandle");
 
             // create XML for creation of customer
-            StringBuilder subscriptionXml = new StringBuilder(GetXmlStringIfApplicable());
+            StringBuilder subscriptionXml = new(GetXmlStringIfApplicable());
             subscriptionXml.Append("<subscription>");
             subscriptionXml.AppendFormat("<product_handle>{0}</product_handle>", productHandle);
 
@@ -2521,7 +2479,7 @@ namespace ChargifyNET
                 subscriptionXml.AppendFormat("<first_name>{0}</first_name>", firstName);
                 subscriptionXml.AppendFormat("<last_name>{0}</last_name>", lastName);
                 subscriptionXml.AppendFormat("<email>{0}</email>", emailAddress);
-                if (!String.IsNullOrEmpty(phone)) subscriptionXml.AppendFormat("<phone>{0}</phone>", phone);
+                if (!string.IsNullOrEmpty(phone)) subscriptionXml.AppendFormat("<phone>{0}</phone>", phone);
                 subscriptionXml.AppendFormat("<organization>{0}</organization>", (organization != null) ? PCLWebUtility.WebUtility.HtmlEncode(organization) : "null");
                 subscriptionXml.AppendFormat("<reference>{0}</reference>", newSystemId);
                 subscriptionXml.Append("</customer_attributes>");
@@ -2537,7 +2495,7 @@ namespace ChargifyNET
             subscriptionXml.Append("</subscription>");
 
             // now make the request
-            string response = DoRequest(string.Format("subscriptions.{0}", GetMethodExtension()), HttpRequestMethod.Post, subscriptionXml.ToString());
+            var response = DoRequest(string.Format("subscriptions.{0}", GetMethodExtension()), HttpRequestMethod.Post, subscriptionXml.ToString());
             // change the response to the object
             return response.ConvertResponseTo<Subscription>("subscription");
         }
@@ -2571,7 +2529,7 @@ namespace ChargifyNET
             //    // make sure that the system ID is unique
             //    if (this.LoadCustomer(NewSystemID) != null) throw new ArgumentException("Not unique", "NewSystemID");
             //}
-            IProduct subscribingProduct = LoadProduct(productHandle);
+            var subscribingProduct = LoadProduct(productHandle);
             if (subscribingProduct == null) throw new ArgumentException("Product not found", "productHandle");
             if (subscribingProduct.RequireCreditCard)
             {
@@ -2587,7 +2545,7 @@ namespace ChargifyNET
             subscriptionXml.AppendFormat("<first_name>{0}</first_name>", firstName);
             subscriptionXml.AppendFormat("<last_name>{0}</last_name>", lastName);
             subscriptionXml.AppendFormat("<email>{0}</email>", emailAddress);
-            if (!String.IsNullOrEmpty(phone)) subscriptionXml.AppendFormat("<phone>{0}</phone>", phone);
+            if (!string.IsNullOrEmpty(phone)) subscriptionXml.AppendFormat("<phone>{0}</phone>", phone);
             subscriptionXml.AppendFormat("<organization>{0}</organization>", (organization != null) ? PCLWebUtility.WebUtility.HtmlEncode(organization) : "null");
             subscriptionXml.AppendFormat("<reference>{0}</reference>", newSystemId);
             subscriptionXml.Append("</customer_attributes>");
@@ -2603,10 +2561,10 @@ namespace ChargifyNET
                 subscriptionXml.AppendFormat("<expiration_year>{0}</expiration_year>", paymentProfile.ExpirationYear);
                 subscriptionXml.AppendFormat("<expiration_month>{0}</expiration_month>", paymentProfile.ExpirationMonth);
                 if (paymentProfile.CardType != CardType.Unknown) { subscriptionXml.AppendFormat("<card_type>{0}</card_type>", paymentProfile.CardType.ToString().ToLowerInvariant()); } // Optional
-                if (paymentProfile.LastFour != String.Empty) { subscriptionXml.AppendFormat("<last_four>{0}</last_four>", paymentProfile.LastFour); } // Optional
-                if (paymentProfile.BankName != String.Empty) { subscriptionXml.AppendFormat("<bank_name>{0}</bank_name>", paymentProfile.BankName); }
-                if (paymentProfile.BankRoutingNumber != String.Empty) { subscriptionXml.AppendFormat("<bank_routing_number>{0}</bank_routing_number>", paymentProfile.BankRoutingNumber); }
-                if (paymentProfile.BankAccountNumber != String.Empty) { subscriptionXml.AppendFormat("<bank_account_number>{0}</bank_account_number>", paymentProfile.BankAccountNumber); }
+                if (paymentProfile.LastFour != string.Empty) { subscriptionXml.AppendFormat("<last_four>{0}</last_four>", paymentProfile.LastFour); } // Optional
+                if (paymentProfile.BankName != string.Empty) { subscriptionXml.AppendFormat("<bank_name>{0}</bank_name>", paymentProfile.BankName); }
+                if (paymentProfile.BankRoutingNumber != string.Empty) { subscriptionXml.AppendFormat("<bank_routing_number>{0}</bank_routing_number>", paymentProfile.BankRoutingNumber); }
+                if (paymentProfile.BankAccountNumber != string.Empty) { subscriptionXml.AppendFormat("<bank_account_number>{0}</bank_account_number>", paymentProfile.BankAccountNumber); }
                 if (paymentProfile.BankAccountType != BankAccountType.Unknown) { subscriptionXml.AppendFormat("<bank_account_type>{0}</bank_account_type>", paymentProfile.BankAccountType.ToString().ToLowerInvariant()); }
                 if (paymentProfile.BankAccountHolderType != BankAccountHolderType.Unknown) { subscriptionXml.AppendFormat("<bank_account_holder_type>{0}</bank_account_holder_type>", paymentProfile.BankAccountHolderType.ToString().ToLowerInvariant()); }
                 subscriptionXml.Append("</payment_profile_attributes>");
@@ -2623,7 +2581,7 @@ namespace ChargifyNET
             subscriptionXml.Append("</subscription>");
 
             // now make the request
-            string response = DoRequest(string.Format("subscriptions.{0}", GetMethodExtension()), HttpRequestMethod.Post, subscriptionXml.ToString());
+            var response = DoRequest(string.Format("subscriptions.{0}", GetMethodExtension()), HttpRequestMethod.Post, subscriptionXml.ToString());
             // change the response to the object
             return response.ConvertResponseTo<Subscription>("subscription");
         }
@@ -2733,7 +2691,7 @@ namespace ChargifyNET
             }
             subscriptionXml.Append("</subscription>");
             // now make the request
-            string response = DoRequest(string.Format("subscriptions.{0}", GetMethodExtension()), HttpRequestMethod.Post, subscriptionXml.ToString());
+            var response = DoRequest(string.Format("subscriptions.{0}", GetMethodExtension()), HttpRequestMethod.Post, subscriptionXml.ToString());
             // change the response to the object
             return response.ConvertResponseTo<Subscription>("subscription");
         }
@@ -2863,7 +2821,7 @@ namespace ChargifyNET
             if (!string.IsNullOrWhiteSpace(cvv) && _cvvRequired && ((cvv.Length < 3) || (cvv.Length > 4))) throw new ArgumentException("CVV must be 3 or 4 digits", "cvv");
 
             // make sure subscription exists
-            ISubscription existingSubscription = LoadSubscription(subscriptionId);
+            var existingSubscription = LoadSubscription(subscriptionId);
             if (existingSubscription == null) throw new ArgumentException("Subscription not found", nameof(subscriptionId));
 
             // create XML for creation of customer
@@ -2886,7 +2844,7 @@ namespace ChargifyNET
             try
             {
                 // now make the request
-                string response = DoRequest(string.Format("subscriptions/{0}.{1}", subscriptionId, GetMethodExtension()), HttpRequestMethod.Put, subscriptionXml.ToString());
+                var response = DoRequest(string.Format("subscriptions/{0}.{1}", subscriptionId, GetMethodExtension()), HttpRequestMethod.Put, subscriptionXml.ToString());
                 // change the response to the object
                 return response.ConvertResponseTo<Subscription>("subscription");
             }
@@ -2978,11 +2936,11 @@ namespace ChargifyNET
             if (string.IsNullOrEmpty(productHandle)) throw new ArgumentNullException("productHandle");
 
             // make sure subscription exists
-            ISubscription existingSubscription = LoadSubscription(subscriptionId);
+            var existingSubscription = LoadSubscription(subscriptionId);
             if (existingSubscription == null) throw new ArgumentException("Subscription not found", nameof(subscriptionId));
 
             // create XML for creation of customer
-            StringBuilder migrationXml = new StringBuilder(GetXmlStringIfApplicable());
+            StringBuilder migrationXml = new(GetXmlStringIfApplicable());
             migrationXml.Append("<migration>");
             migrationXml.AppendFormat("<product_handle>{0}</product_handle>", productHandle);
             if (includeTrial) { migrationXml.Append("<include_trial>1</include_trial>"); }
@@ -2991,7 +2949,7 @@ namespace ChargifyNET
             try
             {
                 // now make the request
-                string response = DoRequest(string.Format("subscriptions/{0}/migrations.{1}", subscriptionId, GetMethodExtension()), HttpRequestMethod.Post, migrationXml.ToString());
+                var response = DoRequest(string.Format("subscriptions/{0}/migrations.{1}", subscriptionId, GetMethodExtension()), HttpRequestMethod.Post, migrationXml.ToString());
                 // change the response to the object
                 return response.ConvertResponseTo<Subscription>("subscription");
             }
@@ -3062,7 +3020,7 @@ namespace ChargifyNET
             if (string.IsNullOrEmpty(productHandle)) throw new ArgumentNullException("productHandle");
 
             // make sure subscription exists
-            ISubscription existingSubscription = LoadSubscription(subscriptionId);
+            var existingSubscription = LoadSubscription(subscriptionId);
             if (existingSubscription == null) throw new ArgumentException("Subscription not found", nameof(subscriptionId));
 
             // create XML for creation of customer
@@ -3078,7 +3036,7 @@ namespace ChargifyNET
             try
             {
                 // now make the request
-                string response = DoRequest(string.Format("subscriptions/{0}.{1}", subscriptionId, GetMethodExtension()), HttpRequestMethod.Put, subscriptionXml.ToString());
+                var response = DoRequest(string.Format("subscriptions/{0}.{1}", subscriptionId, GetMethodExtension()), HttpRequestMethod.Put, subscriptionXml.ToString());
                 // change the response to the object
                 return response.ConvertResponseTo<Subscription>("subscription");
             }
@@ -3107,7 +3065,7 @@ namespace ChargifyNET
             try
             {
                 // now make the request
-                string response = DoRequest(string.Format("subscriptions/{0}.{1}", subscriptionId, GetMethodExtension()), HttpRequestMethod.Put, subscriptionXml.ToString());
+                var response = DoRequest(string.Format("subscriptions/{0}.{1}", subscriptionId, GetMethodExtension()), HttpRequestMethod.Put, subscriptionXml.ToString());
                 // change the response to the object
                 return response.ConvertResponseTo<Subscription>("subscription");
             }
@@ -3147,11 +3105,11 @@ namespace ChargifyNET
             if (subscriptionId == int.MinValue) throw new ArgumentNullException("subscriptionId");
 
             // make sure subscription exists
-            ISubscription existingSubscription = LoadSubscription(subscriptionId);
+            var existingSubscription = LoadSubscription(subscriptionId);
             if (existingSubscription == null) throw new ArgumentException("Subscription not found", nameof(subscriptionId));
 
             // create XML for creation of customer
-            StringBuilder subscriptionXml = new StringBuilder(GetXmlStringIfApplicable());
+            StringBuilder subscriptionXml = new(GetXmlStringIfApplicable());
             subscriptionXml.Append("<subscription>");
             //if (!string.IsNullOrEmpty(ProductHandle) && existingSubscription.Product.Handle != ProductHandle)
             subscriptionXml.AppendFormat("<product_handle>{0}</product_handle>", productHandle);
@@ -3174,7 +3132,7 @@ namespace ChargifyNET
                 !string.IsNullOrEmpty(billingAddress) || !string.IsNullOrEmpty(billingCity) || !string.IsNullOrEmpty(billingState) ||
                 !string.IsNullOrEmpty(billingZip) || !string.IsNullOrEmpty(billingCountry))
             {
-                StringBuilder paymentProfileXml = new StringBuilder();
+                StringBuilder paymentProfileXml = new();
                 if ((!string.IsNullOrEmpty(fullNumber)) && (existingSubscription.PaymentProfile.FullNumber != fullNumber)) paymentProfileXml.AppendFormat("<full_number>{0}</full_number>", fullNumber);
                 if ((expirationMonth == null) && (existingSubscription.PaymentProfile.ExpirationMonth != expirationMonth)) paymentProfileXml.AppendFormat("<expiration_month>{0}</expiration_month>", expirationMonth);
                 if ((expirationYear == null) && (existingSubscription.PaymentProfile.ExpirationYear != expirationYear)) paymentProfileXml.AppendFormat("<expiration_year>{0}</expiration_year>", expirationYear);
@@ -3193,7 +3151,7 @@ namespace ChargifyNET
             try
             {
                 // now make the request
-                string response = DoRequest(string.Format("subscriptions.{0}", GetMethodExtension()), HttpRequestMethod.Post, subscriptionXml.ToString());
+                var response = DoRequest(string.Format("subscriptions.{0}", GetMethodExtension()), HttpRequestMethod.Post, subscriptionXml.ToString());
                 // change the response to the object
                 return response.ConvertResponseTo<Subscription>("subscription");
             }
@@ -3215,18 +3173,18 @@ namespace ChargifyNET
             if (subscriptionId == int.MinValue) throw new ArgumentNullException("subscriptionId");
 
             // make sure subscription exists
-            ISubscription existingSubscription = LoadSubscription(subscriptionId);
+            var existingSubscription = LoadSubscription(subscriptionId);
             if (existingSubscription == null) throw new ArgumentException("Subscription not found", nameof(subscriptionId));
 
             // create XML for creation of customer
-            StringBuilder subscriptionXml = new StringBuilder(GetXmlStringIfApplicable());
+            StringBuilder subscriptionXml = new(GetXmlStringIfApplicable());
             subscriptionXml.Append("<subscription>");
             subscriptionXml.AppendFormat("<next_billing_at>{0}</next_billing_at>", nextBillingAt.ToString("o"));
             subscriptionXml.Append("</subscription>");
             try
             {
                 // now make the request
-                string response = DoRequest(string.Format("subscriptions/{0}.{1}", subscriptionId, GetMethodExtension()), HttpRequestMethod.Put, subscriptionXml.ToString());
+                var response = DoRequest(string.Format("subscriptions/{0}.{1}", subscriptionId, GetMethodExtension()), HttpRequestMethod.Put, subscriptionXml.ToString());
                 // change the response to the object
                 return response.ConvertResponseTo<Subscription>("subscription");
             }
@@ -3248,7 +3206,7 @@ namespace ChargifyNET
         {
             if (subscriptionId == int.MinValue) throw new ArgumentNullException("subscriptionId");
 
-            bool isSuccessful = cancelAtEndOfPeriod
+            var isSuccessful = cancelAtEndOfPeriod
                 ? ApplyDelayedCancelToSubscription(subscriptionId, cancellationMessage)
                 : RemoveDelayedCancelFromSubscription(subscriptionId);
 
@@ -3330,11 +3288,11 @@ namespace ChargifyNET
             if (subscriptionId == int.MinValue) throw new ArgumentNullException("subscriptionId");
 
             // make sure subscription exists
-            ISubscription existingSubscription = LoadSubscription(subscriptionId);
+            var existingSubscription = LoadSubscription(subscriptionId);
             if (existingSubscription == null) throw new ArgumentException("Subscription not found", nameof(subscriptionId));
 
             // create XML for creation of customer
-            StringBuilder subscriptionXml = new StringBuilder(GetXmlStringIfApplicable());
+            StringBuilder subscriptionXml = new(GetXmlStringIfApplicable());
             subscriptionXml.Append("<subscription>");
             var paymentCollectionMethodName = Enum.GetName(typeof(PaymentCollectionMethod), paymentCollectionMethod);
             if (paymentCollectionMethodName != null)
@@ -3343,7 +3301,7 @@ namespace ChargifyNET
             try
             {
                 // now make the request
-                string response = DoRequest(string.Format("subscriptions/{0}.{1}", subscriptionId, GetMethodExtension()), HttpRequestMethod.Put, subscriptionXml.ToString());
+                var response = DoRequest(string.Format("subscriptions/{0}.{1}", subscriptionId, GetMethodExtension()), HttpRequestMethod.Put, subscriptionXml.ToString());
                 // change the response to the object
                 return response.ConvertResponseTo<Subscription>("subscription");
             }
@@ -3366,7 +3324,7 @@ namespace ChargifyNET
             if (subscriptionId == int.MinValue) throw new ArgumentNullException("subscriptionId");
 
             // create XML for creation of customer
-            StringBuilder subscriptionXml = new StringBuilder(GetXmlStringIfApplicable());
+            StringBuilder subscriptionXml = new(GetXmlStringIfApplicable());
 
             if (automaticResumeDate.HasValue)
             {
@@ -3382,7 +3340,7 @@ namespace ChargifyNET
             try
             {
                 // now make the request
-                string response = DoRequest(string.Format("subscriptions/{0}/hold.{1}", subscriptionId, GetMethodExtension()), HttpRequestMethod.Post, subscriptionXml.Length > 0 ? subscriptionXml.ToString() : null);
+                var response = DoRequest(string.Format("subscriptions/{0}/hold.{1}", subscriptionId, GetMethodExtension()), HttpRequestMethod.Post, subscriptionXml.Length > 0 ? subscriptionXml.ToString() : null);
                 // change the response to the object
                 return response.ConvertResponseTo<Subscription>("subscription");
             }
@@ -3408,7 +3366,7 @@ namespace ChargifyNET
             try
             {
                 // now make the request
-                string response = DoRequest(string.Format("subscriptions/{0}/resume.{1}", subscriptionId, GetMethodExtension()), HttpRequestMethod.Post, string.Empty);
+                var response = DoRequest(string.Format("subscriptions/{0}/resume.{1}", subscriptionId, GetMethodExtension()), HttpRequestMethod.Post, string.Empty);
                 // change the response to the object
                 return response.ConvertResponseTo<Subscription>("subscription");
             }
@@ -3429,7 +3387,7 @@ namespace ChargifyNET
             if (options == null) throw new ArgumentNullException(nameof(options));
 
             // Customer
-            bool customerSpecifiedAlready = options.CustomerID.HasValue;
+            var customerSpecifiedAlready = options.CustomerID.HasValue;
 
             if (!string.IsNullOrEmpty(options.CustomerReference))
             {
@@ -3444,7 +3402,7 @@ namespace ChargifyNET
             if (!customerSpecifiedAlready) { throw new ArgumentException("No customer information was specified. Please specify either the CustomerID, CustomerReference or CustomerAttributes and try again.", "options"); }
 
             // Product
-            bool productSpecifiedAlready = options.ProductID.HasValue;
+            var productSpecifiedAlready = options.ProductID.HasValue;
             if (!string.IsNullOrEmpty(options.ProductHandle))
             {
                 if (productSpecifiedAlready) { throw new ArgumentException("Product information should only be specified once", nameof(options)); }
@@ -3463,7 +3421,7 @@ namespace ChargifyNET
             try
             {
                 // now make the request
-                string response = DoRequest(string.Format("subscriptions/preview.{0}", GetMethodExtension()), HttpRequestMethod.Post, subscriptionXml.ToString());
+                var response = DoRequest(string.Format("subscriptions/preview.{0}", GetMethodExtension()), HttpRequestMethod.Post, subscriptionXml.ToString());
                 // change the response to the object
                 return response.ConvertResponseTo<SubscriptionPreview>("subscription_preview");
             }
@@ -3557,11 +3515,11 @@ namespace ChargifyNET
             if (productId == int.MinValue) throw new ArgumentNullException("productId");
 
             // make sure subscription exists
-            ISubscription existingSubscription = LoadSubscription(subscriptionId);
+            var existingSubscription = LoadSubscription(subscriptionId);
             if (existingSubscription == null) throw new ArgumentException("Subscription not found", nameof(subscriptionId));
 
             // create XML for creation of customer
-            StringBuilder migrationXml = new StringBuilder(GetXmlStringIfApplicable());
+            StringBuilder migrationXml = new(GetXmlStringIfApplicable());
             migrationXml.Append("<migration>");
             migrationXml.AppendFormat("<product_id>{0}</product_id>", productId);
             if (includeTrial.HasValue) { migrationXml.Append(string.Format("<include_trial>{0}</include_trial>", includeTrial.Value ? "1" : "0")); }
@@ -3576,7 +3534,7 @@ namespace ChargifyNET
             try
             {
                 // now make the request
-                string response = DoRequest(string.Format("subscriptions/{0}/migrations/preview.{1}", subscriptionId, GetMethodExtension()), HttpRequestMethod.Post, migrationXml.ToString());
+                var response = DoRequest(string.Format("subscriptions/{0}/migrations/preview.{1}", subscriptionId, GetMethodExtension()), HttpRequestMethod.Post, migrationXml.ToString());
                 // change the response to the object
                 return response.ConvertResponseTo<Migration>("migration");
             }
@@ -3629,7 +3587,7 @@ namespace ChargifyNET
                 if (productFamilyId < 0) throw new ArgumentException("Invalid ProductFamilyID");
                 if (couponId < 0) throw new ArgumentException("Invalid CouponID");
                 // now make the request
-                string response = DoRequest(string.Format("product_families/{0}/coupons/{1}.{2}", productFamilyId, couponId, GetMethodExtension()));
+                var response = DoRequest(string.Format("product_families/{0}/coupons/{1}.{2}", productFamilyId, couponId, GetMethodExtension()));
                 // change the response to the object
                 return response.ConvertResponseTo<Coupon>("coupon");
             }
@@ -3645,23 +3603,23 @@ namespace ChargifyNET
         /// <summary>
         /// Method for retrieving information about a coupon using the ID of that coupon.
         /// </summary>
-        /// <param name="ProductFamilyID">The ID of the product family that the coupon belongs to</param>
+        /// <param name="productFamilyID">The ID of the product family that the coupon belongs to</param>
         /// <returns>A dictionary of objects if found, empty collection otherwise.</returns>
-        public IDictionary<int, ICoupon> GetAllCoupons(int ProductFamilyID)
+        public IDictionary<int, ICoupon> GetAllCoupons(int productFamilyID)
         {
             var coupons = new Dictionary<int, ICoupon>();
 
             try
             {
                 // make sure data is valid
-                if (ProductFamilyID < 0) throw new ArgumentException("Invalid ProductFamilyID");
+                if (productFamilyID < 0) throw new ArgumentException("Invalid ProductFamilyID");
                 // now make the request
-                string response = this.DoRequest(string.Format("product_families/{0}/coupons.{1}", ProductFamilyID, GetMethodExtension()));
+                var response = this.DoRequest(string.Format("product_families/{0}/coupons.{1}", productFamilyID, GetMethodExtension()));
 
                 if (response.IsXml())
                 {
                     // now build a product list based on response XML
-                    XmlDocument doc = new XmlDocument();
+                    XmlDocument doc = new();
                     doc.LoadXml(response); // get the XML into an XML document
                     if (doc.ChildNodes.Count == 0) throw new InvalidOperationException("Returned XML not valid");
                     // loop through the child nodes of this node
@@ -3674,10 +3632,10 @@ namespace ChargifyNET
                             {
                                 if (couponNode.Name == "coupon")
                                 {
-                                    ICoupon LoadedCoupon = new Coupon(couponNode);
-                                    if (!coupons.ContainsKey(LoadedCoupon.ID))
+                                    var loadedCoupon = new Coupon(couponNode);
+                                    if (!coupons.ContainsKey(loadedCoupon.ID))
                                     {
-                                        coupons.Add(LoadedCoupon.ID, LoadedCoupon);
+                                        coupons.Add(loadedCoupon.ID, loadedCoupon);
                                     }
                                     else
                                     {
@@ -3691,13 +3649,13 @@ namespace ChargifyNET
                 else if (response.IsJSON())
                 {
                     // should be expecting an array
-                    int position = 0;
-                    JsonArray array = JsonArray.Parse(response, ref position);
-                    for (int i = 0; i <= array.Length - 1; i++)
+                    var position = 0;
+                    var array = JsonArray.Parse(response, ref position);
+                    for (var i = 0; i <= array.Length - 1; i++)
                     {
                         if ((array.Items[i] as JsonObject).ContainsKey("coupon"))
                         {
-                            JsonObject couponObj = (array.Items[i] as JsonObject)["coupon"] as JsonObject;
+                            var couponObj = (array.Items[i] as JsonObject)["coupon"] as JsonObject;
                             ICoupon loadedCooupon = new Coupon(couponObj);
                             if (!coupons.ContainsKey(loadedCooupon.ID))
                             {
@@ -3725,23 +3683,23 @@ namespace ChargifyNET
         /// <summary>
         /// Method for retrieving information about a coupon usage using the ID of that coupon.
         /// </summary>
-        /// <param name="CouponID">The ID of the coupon</param>
+        /// <param name="couponId">The ID of the coupon</param>
         /// <returns>The object if found, null otherwise.</returns>
-        public IDictionary<int, ICouponUsage> GetCouponUsage(int CouponID)
+        public IDictionary<int, ICouponUsage> GetCouponUsage(int couponId)
         {
             var coupons = new Dictionary<int, ICouponUsage>();
 
             try
             {
                 // make sure data is valid
-                if (CouponID < 0) throw new ArgumentException("Invalid CouponID");
+                if (couponId < 0) throw new ArgumentException(nameof(couponId));
                 // now make the request
-                string response = this.DoRequest(string.Format("coupons/{0}/usage.{1}", CouponID, GetMethodExtension()));
+                var response = this.DoRequest(string.Format("coupons/{0}/usage.{1}", couponId, GetMethodExtension()));
 
                 if (response.IsXml())
                 {
                     // now build a product list based on response XML
-                    XmlDocument doc = new XmlDocument();
+                    XmlDocument doc = new();
                     doc.LoadXml(response); // get the XML into an XML document
                     if (doc.ChildNodes.Count == 0) throw new InvalidOperationException("Returned XML not valid");
                     // loop through the child nodes of this node
@@ -3754,10 +3712,10 @@ namespace ChargifyNET
                             {
                                 if (couponNode.Name == "object")
                                 {
-                                    ICouponUsage LoadedCoupon = new CouponUsage(couponNode);
-                                    if (!coupons.ContainsKey(LoadedCoupon.ProductId))
+                                    var loadedCoupon = new CouponUsage(couponNode);
+                                    if (!coupons.ContainsKey(loadedCoupon.ProductId))
                                     {
-                                        coupons.Add(LoadedCoupon.ProductId, LoadedCoupon);
+                                        coupons.Add(loadedCoupon.ProductId, loadedCoupon);
                                     }
                                     else
                                     {
@@ -3771,13 +3729,13 @@ namespace ChargifyNET
                 else if (response.IsJSON())
                 {
                     // should be expecting an array
-                    int position = 0;
-                    JsonArray array = JsonArray.Parse(response, ref position);
-                    for (int i = 0; i <= array.Length - 1; i++)
+                    var position = 0;
+                    var array = JsonArray.Parse(response, ref position);
+                    for (var i = 0; i <= array.Length - 1; i++)
                     {
                         if ((array.Items[i] as JsonObject).ContainsKey("name"))
                         {
-                            JsonObject couponUsageObj = (array.Items[i] as JsonObject) as JsonObject;
+                            var couponUsageObj = (array.Items[i] as JsonObject) as JsonObject;
                             ICouponUsage loadedCoouponUsage = new CouponUsage(couponUsageObj);
                             if (!coupons.ContainsKey(loadedCoouponUsage.ProductId))
                             {
@@ -3812,7 +3770,7 @@ namespace ChargifyNET
         {
             try
             {
-                string response = DoRequest(string.Format("product_families/{0}/coupons/find.{1}?code={2}", productFamilyId, GetMethodExtension(), couponCode));
+                var response = DoRequest(string.Format("product_families/{0}/coupons/find.{1}?code={2}", productFamilyId, GetMethodExtension(), couponCode));
                 // change the response to the object
                 return response.ConvertResponseTo<Coupon>("coupon");
             }
@@ -3836,7 +3794,7 @@ namespace ChargifyNET
             // make sure that the SubscriptionID is unique
             if (LoadSubscription(subscriptionId) == null) throw new ArgumentException("Not an SubscriptionID", "subscriptionId");
             if (string.IsNullOrEmpty(couponCode)) throw new ArgumentException("Coupon code is empty", "couponCode");
-            string response = DoRequest(string.Format("subscriptions/{0}/add_coupon.{1}?code={2}", subscriptionId, GetMethodExtension(), couponCode), HttpRequestMethod.Post, null);
+            var response = DoRequest(string.Format("subscriptions/{0}/add_coupon.{1}?code={2}", subscriptionId, GetMethodExtension(), couponCode), HttpRequestMethod.Post, null);
             // change the response to the object
             return response.ConvertResponseTo<Subscription>("subscription");
         }
@@ -3844,17 +3802,17 @@ namespace ChargifyNET
         /// <summary>
         /// Method to remove a coupon to a subscription using the API
         /// </summary>
-        /// <param name="SubscriptionID">The ID of the subscription to modify</param>
-        /// <param name="CouponCode">The code of the coupon to remove from the subscription</param>
+        /// <param name="subscriptionID">The ID of the subscription to modify</param>
+        /// <param name="couponCode">The code of the coupon to remove from the subscription</param>
         /// <returns>True if successful, false otherwise.</returns>
-        public bool RemoveCoupon(int SubscriptionID, string CouponCode)
+        public bool RemoveCoupon(int subscriptionID, string couponCode)
         {
             // make sure that the SubscriptionID is unique
-            if (this.LoadSubscription(SubscriptionID) == null) throw new ArgumentException("Not an SubscriptionID", nameof(SubscriptionID));
-            if (string.IsNullOrEmpty(CouponCode)) throw new ArgumentException("Coupon code is empty", nameof(CouponCode));
+            if (this.LoadSubscription(subscriptionID) == null) throw new ArgumentException("Not an SubscriptionID", nameof(subscriptionID));
+            if (string.IsNullOrEmpty(couponCode)) throw new ArgumentException("Coupon code is empty", nameof(couponCode));
             try
             {
-                string response = this.DoRequest(string.Format("subscriptions/{0}/remove_coupon.{1}?code={2}", SubscriptionID, GetMethodExtension(), CouponCode), HttpRequestMethod.Delete, null);
+                var response = this.DoRequest(string.Format("subscriptions/{0}/remove_coupon.{1}?code={2}", subscriptionID, GetMethodExtension(), couponCode), HttpRequestMethod.Delete, null);
 
                 // change the response to the object
                 return response.Contains("Coupon removed");
@@ -3874,10 +3832,10 @@ namespace ChargifyNET
         public ICoupon CreateCoupon(ICoupon coupon, int productFamilyId)
         {
             if (coupon == null) throw new ArgumentNullException("coupon");
-            string xml = BuildCouponXml(productFamilyId, coupon.Name, coupon.Code, coupon.Description, coupon.Amount, coupon.Percentage, coupon.AllowNegativeBalance,
+            var xml = BuildCouponXml(productFamilyId, coupon.Name, coupon.Code, coupon.Description, coupon.Amount, coupon.Percentage, coupon.AllowNegativeBalance,
                 coupon.IsRecurring, coupon.DurationPeriodCount, coupon.EndDate);
 
-            string response = DoRequest(string.Format("coupons.{0}", GetMethodExtension()), HttpRequestMethod.Post, xml);
+            var response = DoRequest(string.Format("coupons.{0}", GetMethodExtension()), HttpRequestMethod.Post, xml);
             // change the response to the object
             return response.ConvertResponseTo<Coupon>("coupon");
         }
@@ -3893,10 +3851,10 @@ namespace ChargifyNET
             if (coupon.ProductFamilyID <= 0) throw new ArgumentOutOfRangeException(nameof(coupon), "Coupon.ProductFamilyID must be > 0");
             if (coupon.ID <= 0) throw new ArgumentOutOfRangeException(nameof(coupon), "Coupon ID is not valid");
 
-            string xml = BuildCouponXml(coupon.ProductFamilyID, coupon.Name, coupon.Code, coupon.Description, coupon.Amount, coupon.Percentage, coupon.AllowNegativeBalance,
+            var xml = BuildCouponXml(coupon.ProductFamilyID, coupon.Name, coupon.Code, coupon.Description, coupon.Amount, coupon.Percentage, coupon.AllowNegativeBalance,
                 coupon.IsRecurring, coupon.DurationPeriodCount, coupon.EndDate);
 
-            string response = DoRequest(string.Format("coupons/{0}.{1}", coupon.ID, GetMethodExtension()), HttpRequestMethod.Put, xml);
+            var response = DoRequest(string.Format("coupons/{0}.{1}", coupon.ID, GetMethodExtension()), HttpRequestMethod.Put, xml);
             // change the response to the object
             return response.ConvertResponseTo<Coupon>("coupon");
         }
@@ -3932,11 +3890,11 @@ namespace ChargifyNET
                 throw new ArgumentOutOfRangeException("durationPeriodCount", durationPeriodCount, "duration period count must be 0 if not recurring");
 
             // create XML for creation of a credit
-            StringBuilder couponXml = new StringBuilder(GetXmlStringIfApplicable());
+            StringBuilder couponXml = new(GetXmlStringIfApplicable());
             couponXml.Append("<coupon>");
             couponXml.AppendFormat("<name>{0}</name>", PCLWebUtility.WebUtility.HtmlEncode(name));
             couponXml.AppendFormat("<code>{0}</code>", code);
-            if (!String.IsNullOrEmpty(description)) couponXml.AppendFormat("<description>{0}</description>", PCLWebUtility.WebUtility.HtmlEncode(description));
+            if (!string.IsNullOrEmpty(description)) couponXml.AppendFormat("<description>{0}</description>", PCLWebUtility.WebUtility.HtmlEncode(description));
             if (amount > 0) couponXml.AppendFormat("<amount>{0}</amount>", amount.ToChargifyCurrencyFormat());
             if (percentage > 0) couponXml.AppendFormat("<percentage>{0}</percentage>", percentage);
             couponXml.AppendFormat("<allow_negative_balance>{0}</allow_negative_balance>", allowNegativeBalance.ToString().ToLower());
@@ -3983,7 +3941,7 @@ namespace ChargifyNET
             }
 
             // now make the request
-            string response = DoRequest(string.Format("subscriptions/{0}/charges.{1}", subscriptionId, GetMethodExtension()), HttpRequestMethod.Post, xml.ToString());
+            var response = DoRequest(string.Format("subscriptions/{0}/charges.{1}", subscriptionId, GetMethodExtension()), HttpRequestMethod.Post, xml.ToString());
             // change the response to the object
             return response.ConvertResponseTo<Charge>("charge");
         }
@@ -4018,7 +3976,7 @@ namespace ChargifyNET
             // make sure that the SubscriptionID is unique
             if (LoadSubscription(subscriptionId) == null) throw new ArgumentException("Not an SubscriptionID", nameof(subscriptionId));
             // create XML for creation of a charge
-            StringBuilder chargeXml = new StringBuilder(GetXmlStringIfApplicable());
+            StringBuilder chargeXml = new(GetXmlStringIfApplicable());
             chargeXml.Append("<charge>");
             chargeXml.AppendFormat("<amount>{0}</amount>", amount.ToChargifyCurrencyFormat());
             chargeXml.AppendFormat("<memo>{0}</memo>", PCLWebUtility.WebUtility.HtmlEncode(memo));
@@ -4026,7 +3984,7 @@ namespace ChargifyNET
             chargeXml.AppendFormat("<use_negative_balance>{0}</use_negative_balance>", !useNegativeBalance ? "1" : "0");
             chargeXml.Append("</charge>");
             // now make the request
-            string response = DoRequest(string.Format("subscriptions/{0}/charges.{1}", subscriptionId, GetMethodExtension()), HttpRequestMethod.Post, chargeXml.ToString());
+            var response = DoRequest(string.Format("subscriptions/{0}/charges.{1}", subscriptionId, GetMethodExtension()), HttpRequestMethod.Post, chargeXml.ToString());
             // change the response to the object
             return response.ConvertResponseTo<Charge>("charge");
         }
@@ -4063,13 +4021,13 @@ namespace ChargifyNET
             // make sure that the SubscriptionID is unique
             if (LoadSubscription(subscriptionId) == null) throw new ArgumentException("Not an SubscriptionID", nameof(subscriptionId));
             // create XML for creation of a credit
-            StringBuilder creditXml = new StringBuilder(GetXmlStringIfApplicable());
+            StringBuilder creditXml = new(GetXmlStringIfApplicable());
             creditXml.Append("<credit>");
             creditXml.AppendFormat("<amount>{0}</amount>", amount.ToChargifyCurrencyFormat());
             creditXml.AppendFormat("<memo>{0}</memo>", PCLWebUtility.WebUtility.HtmlEncode(memo));
             creditXml.Append("</credit>");
             // now make the request
-            string response = DoRequest(string.Format("subscriptions/{0}/credits.{1}", subscriptionId, GetMethodExtension()), HttpRequestMethod.Post, creditXml.ToString());
+            var response = DoRequest(string.Format("subscriptions/{0}/credits.{1}", subscriptionId, GetMethodExtension()), HttpRequestMethod.Post, creditXml.ToString());
             // change the response to the object
             return response.ConvertResponseTo<Credit>("credit");
         }
@@ -4077,7 +4035,6 @@ namespace ChargifyNET
         #endregion
 
         #region Components
-
 
         public List<ComponentPricePoint> GetPricePoints(int componentID, List<ComponentPricePoint> bulkPricePoints)
         {
@@ -4094,7 +4051,7 @@ namespace ChargifyNET
                 if (componentID < 0) throw new ArgumentNullException(nameof(componentID));
 
                 // now make the request
-                string response = DoRequest(string.Format("components/{0}/price_points/{1}/default.{2}", componentID, pricePointId, GetMethodExtension()), HttpRequestMethod.Put, null);
+                var response = DoRequest(string.Format("components/{0}/price_points/{1}/default.{2}", componentID, pricePointId, GetMethodExtension()), HttpRequestMethod.Put, null);
 
                 // Convert the Chargify response into the object we're looking for
                 return true;
@@ -4114,7 +4071,7 @@ namespace ChargifyNET
                 if (componentID < 0) throw new ArgumentNullException(nameof(componentID));
 
                 // now make the request
-                string response = DoRequest(string.Format("components/{0}/price_points/{1}.{2}", componentID, pricePointId, GetMethodExtension()), HttpRequestMethod.Delete, null);
+                var response = DoRequest(string.Format("components/{0}/price_points/{1}.{2}", componentID, pricePointId, GetMethodExtension()), HttpRequestMethod.Delete, null);
 
                 // Convert the Chargify response into the object we're looking for
                 return response.ConvertResponseTo<ComponentPricePoint>("price_point");
@@ -4127,6 +4084,7 @@ namespace ChargifyNET
                 throw;
             }
         }
+
         public ComponentPricePoint UnarchivePricePoint(int componentID, long pricePointId)
         {
             try
@@ -4136,7 +4094,7 @@ namespace ChargifyNET
                 if (componentID < 0) throw new ArgumentNullException(nameof(componentID));
 
                 // now make the request
-                string response = DoRequest(string.Format("components/{0}/price_points/{1}/unarchive.{2}", componentID, pricePointId, GetMethodExtension()), HttpRequestMethod.Put, null);
+                var response = DoRequest(string.Format("components/{0}/price_points/{1}/unarchive.{2}", componentID, pricePointId, GetMethodExtension()), HttpRequestMethod.Put, null);
 
                 // Convert the Chargify response into the object we're looking for
                 return response.ConvertResponseTo<ComponentPricePoint>("price_point");
@@ -4160,12 +4118,12 @@ namespace ChargifyNET
             // make sure data is valid
             if (componentId == int.MinValue) throw new ArgumentNullException("componentId");
             // now make the request
-            string response = DoRequest(string.Format("components/{0}/price_points.{1}", componentId, GetMethodExtension()));
+            var response = DoRequest(string.Format("components/{0}/price_points.{1}", componentId, GetMethodExtension()));
             var retValue = new Dictionary<long, ComponentPricePoint>();
             if (response.IsXml())
             {
                 // now build a product list based on response XML
-                XmlDocument doc = new XmlDocument();
+                XmlDocument doc = new();
                 doc.LoadXml(response); // get the XML into an XML document
                 if (doc.ChildNodes.Count == 0) throw new InvalidOperationException("Returned XML not valid");
                 // loop through the child nodes of this node
@@ -4194,15 +4152,15 @@ namespace ChargifyNET
             else if (response.IsJSON())
             {
                 // should be expecting an object containing an array
-                JsonObject jObj = JsonObject.Parse(response);
+                var jObj = JsonObject.Parse(response);
 
                 // should be expecting an array
-                JsonArray array = jObj["price_points"] as JsonArray;
-                for (int i = 0; i <= array.Length - 1; i++)
+                var array = jObj["price_points"] as JsonArray;
+                for (var i = 0; i <= array.Length - 1; i++)
                 {
                     if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("prices"))
                     {
-                        JsonObject componentObj = array.Items[i] as JsonObject;
+                        var componentObj = array.Items[i] as JsonObject;
                         var loadedComponent = new ComponentPricePoint(componentObj);
                         if (!retValue.ContainsKey(loadedComponent.Id))
                         {
@@ -4238,7 +4196,7 @@ namespace ChargifyNET
         public ComponentPricePoint CreatePricePoint(int componentID, ComponentPricePoint newPricePoint)
         {
             // create XML for creation of an adjustment
-            StringBuilder pricePointXml = new StringBuilder(GetXmlStringIfApplicable());
+            StringBuilder pricePointXml = new(GetXmlStringIfApplicable());
             //if (GetMethodExtension() == "xml")
             //{
             //    pricePointXml.Append("<price_points>");
@@ -4285,7 +4243,7 @@ namespace ChargifyNET
             //    pricePointXml.Append("</price_points>");
             //}
             // now make the request
-            string response = DoRequest(string.Format("components/{0}/price_points.{1}", componentID, GetMethodExtension()), HttpRequestMethod.Post, pricePointXml.ToString());
+            var response = DoRequest(string.Format("components/{0}/price_points.{1}", componentID, GetMethodExtension()), HttpRequestMethod.Post, pricePointXml.ToString());
             // change the response to the object
             return response.ConvertResponseTo<ComponentPricePoint>("price_point");
         }
@@ -4298,10 +4256,10 @@ namespace ChargifyNET
         /// <returns>The xml formatted prices string</returns>
         private static string FormatPriceXml(IEnumerable<ComponentPrice> prices, bool isJson = false)
         {
-            StringBuilder pricePointXml = new StringBuilder();
+            StringBuilder pricePointXml = new();
             if (prices != null && prices.Any())
             {
-                StringBuilder priceXml = new StringBuilder();
+                StringBuilder priceXml = new();
                 foreach (var price in prices)
                 {
                     if (isJson)
@@ -4362,12 +4320,12 @@ namespace ChargifyNET
             if (componentId == int.MinValue) throw new ArgumentNullException("componentId");
             if (newAllocatedQuantity < 0) throw new ArgumentOutOfRangeException("newAllocatedQuantity");
             // create XML for change of allocation
-            StringBuilder allocationXml = new StringBuilder(GetXmlStringIfApplicable());
+            StringBuilder allocationXml = new(GetXmlStringIfApplicable());
             allocationXml.Append("<component>");
             allocationXml.AppendFormat("<allocated_quantity type=\"integer\">{0}</allocated_quantity>", newAllocatedQuantity);
             allocationXml.Append("</component>");
             // now make the request
-            string response = DoRequest(string.Format("subscriptions/{0}/components/{1}.{2}", subscriptionId, componentId, GetMethodExtension()), HttpRequestMethod.Put, allocationXml.ToString());
+            var response = DoRequest(string.Format("subscriptions/{0}/components/{1}.{2}", subscriptionId, componentId, GetMethodExtension()), HttpRequestMethod.Put, allocationXml.ToString());
             // change the response to the object
             return response.ConvertResponseTo<ComponentAttributes>("component");
         }
@@ -4384,7 +4342,7 @@ namespace ChargifyNET
             if (subscriptionId == int.MinValue) throw new ArgumentNullException("subscriptionId");
             if (componentId == int.MinValue) throw new ArgumentNullException("componentId");
             // now make the request
-            string response = DoRequest(string.Format("subscriptions/{0}/components/{1}.{2}", subscriptionId, componentId, GetMethodExtension()));
+            var response = DoRequest(string.Format("subscriptions/{0}/components/{1}.{2}", subscriptionId, componentId, GetMethodExtension()));
             // change the response to the object
             return response.ConvertResponseTo<ComponentAttributes>("component");
         }
@@ -4400,12 +4358,12 @@ namespace ChargifyNET
             if (subscriptionId == int.MinValue) throw new ArgumentNullException("subscriptionId");
 
             // now make the request
-            string response = DoRequest(string.Format("subscriptions/{0}/components.{1}", subscriptionId, GetMethodExtension()));
+            var response = DoRequest(string.Format("subscriptions/{0}/components.{1}", subscriptionId, GetMethodExtension()));
             var retValue = new Dictionary<int, IComponentAttributes>();
             if (response.IsXml())
             {
                 // now build a product list based on response XML
-                XmlDocument doc = new XmlDocument();
+                XmlDocument doc = new();
                 doc.LoadXml(response); // get the XML into an XML document
                 if (doc.ChildNodes.Count == 0) throw new InvalidOperationException("Returned XML not valid");
                 // loop through the child nodes of this node
@@ -4435,13 +4393,13 @@ namespace ChargifyNET
             else if (response.IsJSON())
             {
                 // should be expecting an array
-                int position = 0;
-                JsonArray array = JsonArray.Parse(response, ref position);
-                for (int i = 0; i <= array.Length - 1; i++)
+                var position = 0;
+                var array = JsonArray.Parse(response, ref position);
+                for (var i = 0; i <= array.Length - 1; i++)
                 {
                     if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("component"))
                     {
-                        JsonObject componentObj = (array.Items[i] as JsonObject)["component"] as JsonObject;
+                        var componentObj = (array.Items[i] as JsonObject)["component"] as JsonObject;
                         IComponentAttributes loadedComponent = new ComponentAttributes(componentObj);
                         if (!retValue.ContainsKey(loadedComponent.ComponentID))
                         {
@@ -4470,12 +4428,12 @@ namespace ChargifyNET
             if (chargifyId == int.MinValue) throw new ArgumentNullException("chargifyId");
 
             // now make the request
-            string response = DoRequest(string.Format("product_families/{0}/components.{1}?include_archived={2}", chargifyId, GetMethodExtension(), includeArchived ? "1" : "0"));
+            var response = DoRequest(string.Format("product_families/{0}/components.{1}?include_archived={2}", chargifyId, GetMethodExtension(), includeArchived ? "1" : "0"));
             var retValue = new Dictionary<int, IComponentInfo>();
             if (response.IsXml())
             {
                 // now build a product list based on response XML
-                XmlDocument doc = new XmlDocument();
+                XmlDocument doc = new();
                 doc.LoadXml(response); // get the XML into an XML document
                 if (doc.ChildNodes.Count == 0) throw new InvalidOperationException("Returned XML not valid");
                 // loop through the child nodes of this node
@@ -4505,13 +4463,13 @@ namespace ChargifyNET
             else if (response.IsJSON())
             {
                 // should be expecting an array
-                int position = 0;
-                JsonArray array = JsonArray.Parse(response, ref position);
-                for (int i = 0; i <= array.Length - 1; i++)
+                var position = 0;
+                var array = JsonArray.Parse(response, ref position);
+                for (var i = 0; i <= array.Length - 1; i++)
                 {
                     if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("component"))
                     {
-                        JsonObject componentObj = (array.Items[i] as JsonObject)["component"] as JsonObject;
+                        var componentObj = (array.Items[i] as JsonObject)["component"] as JsonObject;
                         IComponentInfo loadedComponent = new ComponentInfo(componentObj);
                         if (!retValue.ContainsKey(loadedComponent.ID))
                         {
@@ -4550,12 +4508,12 @@ namespace ChargifyNET
             if (subscriptionId == int.MinValue) throw new ArgumentNullException("subscriptionId");
             if (componentId == int.MinValue) throw new ArgumentNullException("componentId");
             // now make the request
-            string response = DoRequest(string.Format("subscriptions/{0}/components/{1}/usages.{2}", subscriptionId, componentId, GetMethodExtension()));
+            var response = DoRequest(string.Format("subscriptions/{0}/components/{1}/usages.{2}", subscriptionId, componentId, GetMethodExtension()));
             var retValue = new Dictionary<string, IComponent>();
             if (response.IsXml())
             {
                 // now build a product list based on response XML
-                XmlDocument doc = new XmlDocument();
+                XmlDocument doc = new();
                 doc.LoadXml(response); // get the XML into an XML document
                 if (doc.ChildNodes.Count == 0) throw new InvalidOperationException("Returned XML not valid");
                 // loop through the child nodes of this node
@@ -4584,13 +4542,13 @@ namespace ChargifyNET
             else if (response.IsJSON())
             {
                 // should be expecting an array
-                int position = 0;
-                JsonArray array = JsonArray.Parse(response, ref position);
-                for (int i = 0; i <= array.Length - 1; i++)
+                var position = 0;
+                var array = JsonArray.Parse(response, ref position);
+                for (var i = 0; i <= array.Length - 1; i++)
                 {
                     if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("component"))
                     {
-                        JsonObject componentObj = (array.Items[i] as JsonObject)["component"] as JsonObject;
+                        var componentObj = (array.Items[i] as JsonObject)["component"] as JsonObject;
                         IComponent loadedComponent = new Component(componentObj);
                         if (!retValue.ContainsKey(loadedComponent.ID))
                         {
@@ -4623,12 +4581,12 @@ namespace ChargifyNET
             // make sure that the SubscriptionID is unique
             if (LoadSubscription(subscriptionId) == null) throw new ArgumentException("Not an SubscriptionID", "subscriptionId");
             // create XML for addition of usage
-            StringBuilder usageXml = new StringBuilder(GetXmlStringIfApplicable());
+            StringBuilder usageXml = new(GetXmlStringIfApplicable());
             usageXml.Append("<usage>");
             usageXml.AppendFormat("<quantity>{0}</quantity>", quantity);
             usageXml.AppendFormat("<memo>{0}</memo>", PCLWebUtility.WebUtility.HtmlEncode(memo));
             usageXml.Append("</usage>");
-            string response = DoRequest(string.Format("subscriptions/{0}/components/{1}/usages.{2}", subscriptionId, componentId, GetMethodExtension()), HttpRequestMethod.Post, usageXml.ToString());
+            var response = DoRequest(string.Format("subscriptions/{0}/components/{1}/usages.{2}", subscriptionId, componentId, GetMethodExtension()), HttpRequestMethod.Post, usageXml.ToString());
             // change the response to the object
             return response.ConvertResponseTo<Usage>("usage");
         }
@@ -4649,11 +4607,11 @@ namespace ChargifyNET
                 // make sure that the SubscriptionID is unique
                 if (LoadSubscription(subscriptionId) == null) throw new ArgumentException("Not an SubscriptionID", "subscriptionId");
                 // create XML for addition of usage
-                StringBuilder componentXml = new StringBuilder(GetXmlStringIfApplicable());
+                StringBuilder componentXml = new(GetXmlStringIfApplicable());
                 componentXml.Append("<component>");
                 componentXml.AppendFormat("<enabled>{0}</enabled>", setEnabled.ToString(CultureInfo.InvariantCulture));
                 componentXml.Append("</component>");
-                string response = DoRequest(string.Format("subscriptions/{0}/components/{1}.{2}", subscriptionId, componentId, GetMethodExtension()), HttpRequestMethod.Put, componentXml.ToString());
+                var response = DoRequest(string.Format("subscriptions/{0}/components/{1}.{2}", subscriptionId, componentId, GetMethodExtension()), HttpRequestMethod.Put, componentXml.ToString());
                 return response.ConvertResponseTo<ComponentAttributes>("component");
             }
             catch (ChargifyException cex)
@@ -4682,19 +4640,19 @@ namespace ChargifyNET
 
             try
             {
-                string qs = string.Empty;
+                var qs = string.Empty;
                 // Add the request options to the query string
                 if (page != null && page.Value > 0) { if (qs.Length > 0) { qs += "&"; } qs += string.Format("page={0}", page); }
 
                 // now make the request
-                string url = string.Format("subscriptions/{0}/components/{1}/allocations.{2}", subscriptionId, componentId, GetMethodExtension());
+                var url = string.Format("subscriptions/{0}/components/{1}/allocations.{2}", subscriptionId, componentId, GetMethodExtension());
                 if (!string.IsNullOrEmpty(qs)) { url += "?" + qs; }
-                string response = DoRequest(url);
+                var response = DoRequest(url);
                 var retValue = new Dictionary<int, List<IComponentAllocation>>();
                 if (response.IsXml())
                 {
                     // now build a product list based on response XML
-                    XmlDocument doc = new XmlDocument();
+                    XmlDocument doc = new();
                     doc.LoadXml(response); // get the XML into an XML document
                     if (doc.ChildNodes.Count == 0) throw new InvalidOperationException("Returned XML not valid");
                     // loop through the child nodes of this node
@@ -4703,7 +4661,7 @@ namespace ChargifyNET
                     {
                         if (elementNode.Name == ComponentAllocation.AllocationsRootKey)
                         {
-                            List<IComponentAllocation> childComponentAllocations = new List<IComponentAllocation>();
+                            List<IComponentAllocation> childComponentAllocations = new();
                             foreach (XmlNode componentAllocationNode in elementNode.ChildNodes)
                             {
                                 if (componentAllocationNode.Name == ComponentAllocation.AllocationRootKey)
@@ -4723,14 +4681,14 @@ namespace ChargifyNET
                 else if (response.IsJSON())
                 {
                     // should be expecting an array
-                    int position = 0;
-                    JsonArray array = JsonArray.Parse(response, ref position);
-                    List<IComponentAllocation> childComponentAllocations = new List<IComponentAllocation>();
-                    for (int i = 0; i <= array.Length - 1; i++)
+                    var position = 0;
+                    var array = JsonArray.Parse(response, ref position);
+                    List<IComponentAllocation> childComponentAllocations = new();
+                    for (var i = 0; i <= array.Length - 1; i++)
                     {
                         if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey(ComponentAllocation.AllocationRootKey))
                         {
-                            JsonObject componentObj = (array.Items[i] as JsonObject)[ComponentAllocation.AllocationRootKey] as JsonObject;
+                            var componentObj = (array.Items[i] as JsonObject)[ComponentAllocation.AllocationRootKey] as JsonObject;
                             IComponentAllocation loadedComponentAllocation = new ComponentAllocation(componentObj);
                             childComponentAllocations.Add(loadedComponentAllocation);
                         }
@@ -4803,10 +4761,10 @@ namespace ChargifyNET
         {
             try
             {
-                string xml = BuildComponentAllocationXml(quantity, memo, upgradeScheme, downgradeScheme);
+                var xml = BuildComponentAllocationXml(quantity, memo, upgradeScheme, downgradeScheme);
 
                 // perform the request, keep the response
-                string response = DoRequest(string.Format("subscriptions/{0}/components/{1}/allocations.{2}", subscriptionId, componentId, GetMethodExtension()), HttpRequestMethod.Post, xml);
+                var response = DoRequest(string.Format("subscriptions/{0}/components/{1}/allocations.{2}", subscriptionId, componentId, GetMethodExtension()), HttpRequestMethod.Post, xml);
 
                 // change the response to the object
                 return response.ConvertResponseTo<ComponentAllocation>("allocation");
@@ -4832,7 +4790,7 @@ namespace ChargifyNET
             if (quantity < 0 && !quantity.Equals(int.MinValue)) throw new ArgumentOutOfRangeException("quantity", quantity, "Quantity must be valid");
 
             // create XML for creation of a ComponentAllocation
-            StringBuilder componentAllocationXml = new StringBuilder(GetXmlStringIfApplicable());
+            StringBuilder componentAllocationXml = new(GetXmlStringIfApplicable());
             componentAllocationXml.Append("<allocation>");
             componentAllocationXml.Append(string.Format("<quantity>{0}</quantity>", quantity));
             if (!string.IsNullOrEmpty(memo)) { componentAllocationXml.Append(string.Format("<memo>{0}</memo>", PCLWebUtility.WebUtility.HtmlEncode(memo))); }
@@ -4959,7 +4917,7 @@ namespace ChargifyNET
         /// <returns>The dictionary of transaction records if successful, otherwise null.</returns>
         public IDictionary<int, ITransaction> GetTransactionList(int page, int perPage, List<TransactionType> kinds, int sinceId, int maxId, DateTime sinceDate, DateTime untilDate, bool descending = true)
         {
-            string qs = string.Empty;
+            var qs = string.Empty;
 
             // Add the transaction options to the query string ...
             if (page != int.MinValue) { if (qs.Length > 0) { qs += "&"; } qs += string.Format("page={0}", page); }
@@ -4967,7 +4925,7 @@ namespace ChargifyNET
 
             if (kinds != null)
             {
-                foreach (TransactionType kind in kinds)
+                foreach (var kind in kinds)
                 {
                     // Iterate through them all, except for Unknown - which isn't supported, just used internally.
                     if (kind == TransactionType.Unknown) break;
@@ -4986,15 +4944,15 @@ namespace ChargifyNET
             qs += "direction=" + (descending ? "desc" : "asc");
 
             // Construct the url to access Chargify
-            string url = string.Format("transactions.{0}", GetMethodExtension());
+            var url = string.Format("transactions.{0}", GetMethodExtension());
             if (!string.IsNullOrEmpty(qs)) { url += "?" + qs; }
-            string response = DoRequest(url);
+            var response = DoRequest(url);
 
             var retValue = new Dictionary<int, ITransaction>();
             if (response.IsXml())
             {
                 // now build a transaction list based on response XML
-                XmlDocument doc = new XmlDocument();
+                XmlDocument doc = new();
                 doc.LoadXml(response);
                 if (doc.ChildNodes.Count == 0) throw new InvalidOperationException("Returned XML not valid");
                 // loop through the child nodes of this node
@@ -5023,13 +4981,13 @@ namespace ChargifyNET
             else if (response.IsJSON())
             {
                 // should be expecting an array
-                int position = 0;
-                JsonArray array = JsonArray.Parse(response, ref position);
-                for (int i = 0; i <= array.Length - 1; i++)
+                var position = 0;
+                var array = JsonArray.Parse(response, ref position);
+                for (var i = 0; i <= array.Length - 1; i++)
                 {
                     if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("transaction"))
                     {
-                        JsonObject transactionObj = (array.Items[i] as JsonObject)["transaction"] as JsonObject;
+                        var transactionObj = (array.Items[i] as JsonObject)["transaction"] as JsonObject;
                         ITransaction loadedTransaction = new Transaction(transactionObj);
                         if (!retValue.ContainsKey(loadedTransaction.ID))
                         {
@@ -5151,7 +5109,7 @@ namespace ChargifyNET
         /// <returns>A dictionary of transactions if successful, otherwise null.</returns>
         public IDictionary<int, ITransaction> GetTransactionsForSubscription(int subscriptionId, int page, int perPage, List<TransactionType> kinds, int sinceId, int maxId, DateTime sinceDate, DateTime untilDate)
         {
-            string qs = string.Empty;
+            var qs = string.Empty;
 
             if (page != int.MinValue)
             {
@@ -5167,7 +5125,7 @@ namespace ChargifyNET
 
             if (kinds != null)
             {
-                foreach (TransactionType kind in kinds)
+                foreach (var kind in kinds)
                 {
                     // Iterate through them all, except for Unknown - which isn't supported, just used internally.
                     if (kind == TransactionType.Unknown) break;
@@ -5184,14 +5142,14 @@ namespace ChargifyNET
             if (untilDate != DateTime.MinValue) { if (qs.Length > 0) { qs += "&"; } qs += string.Format("until_date={0}", untilDate.ToString(DateTimeFormat)); }
 
             // now make the request
-            string url = string.Format("subscriptions/{0}/transactions.{1}", subscriptionId, GetMethodExtension());
+            var url = string.Format("subscriptions/{0}/transactions.{1}", subscriptionId, GetMethodExtension());
             if (!string.IsNullOrEmpty(qs)) { url += "?" + qs; }
-            string response = DoRequest(url);
+            var response = DoRequest(url);
             var retValue = new Dictionary<int, ITransaction>();
             if (response.IsXml())
             {
                 // now build a transaction list based on response XML
-                XmlDocument doc = new XmlDocument();
+                XmlDocument doc = new();
                 doc.LoadXml(response); // get the XML into an XML document
                 if (doc.ChildNodes.Count == 0) throw new InvalidOperationException("Returned XML not valid");
                 // loop through the child nodes of this node
@@ -5220,13 +5178,13 @@ namespace ChargifyNET
             else if (response.IsJSON())
             {
                 // should be expecting an array
-                int position = 0;
-                JsonArray array = JsonArray.Parse(response, ref position);
-                for (int i = 0; i < array.Length; i++)
+                var position = 0;
+                var array = JsonArray.Parse(response, ref position);
+                for (var i = 0; i < array.Length; i++)
                 {
                     if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("transaction"))
                     {
-                        JsonObject transactionObj = (array.Items[i] as JsonObject)["transaction"] as JsonObject;
+                        var transactionObj = (array.Items[i] as JsonObject)["transaction"] as JsonObject;
                         ITransaction loadedTransaction = new Transaction(transactionObj);
                         if (!retValue.ContainsKey(loadedTransaction.ID))
                         {
@@ -5255,7 +5213,7 @@ namespace ChargifyNET
                 // make sure data is valid
                 if (id < 0) throw new ArgumentNullException("id");
                 // now make the request
-                string response = DoRequest(string.Format("transactions/{0}.{1}", id, GetMethodExtension()));
+                var response = DoRequest(string.Format("transactions/{0}.{1}", id, GetMethodExtension()));
                 // Convert the Chargify response into the object we're looking for
                 return response.ConvertResponseTo<Transaction>("transaction");
             }
@@ -5280,7 +5238,7 @@ namespace ChargifyNET
         /// <returns>The IRefund object indicating successful, or unsuccessful.</returns>
         public IRefund CreateRefund(int subscriptionId, int paymentId, decimal amount, string memo)
         {
-            int amountInCents = Convert.ToInt32(amount * 100);
+            var amountInCents = Convert.ToInt32(amount * 100);
             return CreateRefund(subscriptionId, paymentId, amountInCents, memo);
         }
 
@@ -5299,13 +5257,13 @@ namespace ChargifyNET
             // make sure that the SubscriptionID is unique
             if (LoadSubscription(subscriptionId) == null) throw new ArgumentException("Not an SubscriptionID", "subscriptionId");
             // create XML for addition of refund
-            StringBuilder refundXml = new StringBuilder(GetXmlStringIfApplicable());
+            StringBuilder refundXml = new(GetXmlStringIfApplicable());
             refundXml.Append("<refund>");
             refundXml.AppendFormat("<payment_id>{0}</payment_id>", paymentId);
             refundXml.AppendFormat("<amount_in_cents>{0}</amount_in_cents>", amountInCents);
             refundXml.AppendFormat("<memo>{0}</memo>", PCLWebUtility.WebUtility.HtmlEncode(memo));
             refundXml.Append("</refund>");
-            string response = DoRequest(string.Format("subscriptions/{0}/refunds.{1}", subscriptionId, GetMethodExtension()), HttpRequestMethod.Post, refundXml.ToString());
+            var response = DoRequest(string.Format("subscriptions/{0}/refunds.{1}", subscriptionId, GetMethodExtension()), HttpRequestMethod.Post, refundXml.ToString());
             // change the response to the object
             return response.ConvertResponseTo<Refund>("refund");
         }
@@ -5326,7 +5284,7 @@ namespace ChargifyNET
                 // make sure data is valid
                 if (statementId <= 0) throw new ArgumentNullException("statementId");
                 // now make the request
-                string response = DoRequest(string.Format("statements/{0}.{1}", statementId, GetMethodExtension()));
+                var response = DoRequest(string.Format("statements/{0}.{1}", statementId, GetMethodExtension()));
                 // Convert the Chargify response into the object we're looking for
                 return response.ConvertResponseTo<Statement>("statement");
             }
@@ -5350,7 +5308,7 @@ namespace ChargifyNET
                 if (statementId <= 0) throw new ArgumentNullException("statementId");
 
                 // now make the request
-                byte[] response = DoFileRequest(string.Format("statements/{0}.pdf", statementId), HttpRequestMethod.Get, string.Empty);
+                var response = DoFileRequest(string.Format("statements/{0}.pdf", statementId), HttpRequestMethod.Get, string.Empty);
 
                 return response;
             }
@@ -5380,22 +5338,22 @@ namespace ChargifyNET
         /// <returns>The list of statements, an empty dictionary otherwise.</returns>
         public IList<int> GetStatementIDs(int subscriptionId, int page, int perPage)
         {
-            string qs = string.Empty;
+            var qs = string.Empty;
 
             // Add the transaction options to the query string ...
             if (page != int.MinValue) { if (qs.Length > 0) { qs += "&"; } qs += string.Format("page={0}", page); }
             if (perPage != int.MinValue) { if (qs.Length > 0) { qs += "&"; } qs += string.Format("per_page={0}", perPage); }
 
             // Construct the url to access Chargify
-            string url = string.Format("subscriptions/{0}/statements/ids.{1}", subscriptionId, GetMethodExtension());
+            var url = string.Format("subscriptions/{0}/statements/ids.{1}", subscriptionId, GetMethodExtension());
             if (!string.IsNullOrEmpty(qs)) { url += "?" + qs; }
-            string response = DoRequest(url);
+            var response = DoRequest(url);
 
             var retValue = new List<int>();
             if (response.IsXml())
             {
                 // now build a statement list based on response XML
-                XmlDocument doc = new XmlDocument();
+                XmlDocument doc = new();
                 doc.LoadXml(response);
                 if (doc.ChildNodes.Count == 0) throw new InvalidOperationException("Returned XML not valid");
                 // loop through the child nodes of this node
@@ -5407,7 +5365,7 @@ namespace ChargifyNET
                         {
                             if (statementIdNode.Name == "id")
                             {
-                                int statementId = Convert.ToInt32(statementIdNode.InnerText);
+                                var statementId = Convert.ToInt32(statementIdNode.InnerText);
                                 if (!retValue.Contains(statementId))
                                 {
                                     retValue.Add(statementId);
@@ -5423,15 +5381,15 @@ namespace ChargifyNET
             }
             else if (response.IsJSON())
             {
-                JsonObject statementIdsObj = JsonObject.Parse(response);
+                var statementIdsObj = JsonObject.Parse(response);
                 if (!statementIdsObj.ContainsKey("statement_ids"))
                     throw new InvalidOperationException("Returned JSON not valid");
 
                 if ((statementIdsObj["statement_ids"]) is JsonArray jsonArray)
                 {
-                    for (int i = 0; i <= jsonArray.Length - 1; i++)
+                    for (var i = 0; i <= jsonArray.Length - 1; i++)
                     {
-                        if (!(jsonArray.Items[i] is JsonNumber statementIdValue))
+                        if (jsonArray.Items[i] is not JsonNumber statementIdValue)
                             throw new InvalidOperationException("Statement ID is not a valid number");
                         if (!retValue.Contains(statementIdValue.IntValue))
                         {
@@ -5466,22 +5424,22 @@ namespace ChargifyNET
         /// <returns>The list of statements, an empty dictionary otherwise.</returns>
         public IDictionary<int, IStatement> GetStatementList(int subscriptionId, int page, int perPage)
         {
-            string qs = string.Empty;
+            var qs = string.Empty;
 
             // Add the transaction options to the query string ...
             if (page != int.MinValue) { if (qs.Length > 0) { qs += "&"; } qs += string.Format("page={0}", page); }
             if (perPage != int.MinValue) { if (qs.Length > 0) { qs += "&"; } qs += string.Format("per_page={0}", perPage); }
 
             // Construct the url to access Chargify
-            string url = string.Format("subscriptions/{0}/statements.{1}", subscriptionId, GetMethodExtension());
+            var url = string.Format("subscriptions/{0}/statements.{1}", subscriptionId, GetMethodExtension());
             if (!string.IsNullOrEmpty(qs)) { url += "?" + qs; }
-            string response = DoRequest(url);
+            var response = DoRequest(url);
 
             var retValue = new Dictionary<int, IStatement>();
             if (response.IsXml())
             {
                 // now build a statement list based on response XML
-                XmlDocument doc = new XmlDocument();
+                XmlDocument doc = new();
                 doc.LoadXml(response);
                 if (doc.ChildNodes.Count == 0) throw new InvalidOperationException("Returned XML not valid");
                 // loop through the child nodes of this node
@@ -5510,13 +5468,13 @@ namespace ChargifyNET
             else if (response.IsJSON())
             {
                 // should be expecting an array
-                int position = 0;
-                JsonArray array = JsonArray.Parse(response, ref position);
-                for (int i = 0; i <= array.Length - 1; i++)
+                var position = 0;
+                var array = JsonArray.Parse(response, ref position);
+                for (var i = 0; i <= array.Length - 1; i++)
                 {
                     if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("statement"))
                     {
-                        JsonObject statementObj = (array.Items[i] as JsonObject)["statement"] as JsonObject;
+                        var statementObj = (array.Items[i] as JsonObject)["statement"] as JsonObject;
                         IStatement loadedStatement = new Statement(statementObj);
                         if (!retValue.ContainsKey(loadedStatement.ID))
                         {
@@ -5542,10 +5500,10 @@ namespace ChargifyNET
         /// <returns>The site statistics if applicable.</returns>
         public ISiteStatistics GetSiteStatistics()
         {
-            string response = DoRequest("stats.json");
+            var response = DoRequest("stats.json");
             if (response.IsJSON())
             {
-                JsonObject obj = JsonObject.Parse(response);
+                var obj = JsonObject.Parse(response);
                 ISiteStatistics stats = new SiteStatistics(obj);
                 return stats;
             }
@@ -5620,25 +5578,25 @@ namespace ChargifyNET
         /// <returns>The adjustment object if successful, null otherwise.</returns>
         private IAdjustment CreateAdjustment(int subscriptionId, decimal amount, int amountInCents, string memo, AdjustmentMethod method)
         {
-            int valueInCents = 0;
+            var valueInCents = 0;
             if (amount == decimal.MinValue) valueInCents = amountInCents;
             if (amountInCents == int.MinValue) valueInCents = Convert.ToInt32(amount * 100);
             if (valueInCents == int.MinValue) valueInCents = 0;
-            decimal value = Convert.ToDecimal(valueInCents / 100.0);
+            var value = Convert.ToDecimal(valueInCents / 100.0);
 
             // make sure data is valid
             if (string.IsNullOrEmpty(memo)) throw new ArgumentNullException(nameof(memo));
             // make sure that the SubscriptionID is unique
             if (LoadSubscription(subscriptionId) == null) throw new ArgumentException("Not an SubscriptionID", "subscriptionId");
             // create XML for creation of an adjustment
-            StringBuilder adjustmentXml = new StringBuilder(GetXmlStringIfApplicable());
+            StringBuilder adjustmentXml = new(GetXmlStringIfApplicable());
             adjustmentXml.Append("<adjustment>");
             adjustmentXml.AppendFormat("<amount>{0}</amount>", value.ToChargifyCurrencyFormat());
             adjustmentXml.AppendFormat("<memo>{0}</memo>", PCLWebUtility.WebUtility.HtmlEncode(memo));
             if (method != AdjustmentMethod.Default) { adjustmentXml.AppendFormat("<adjustment_method>{0}</adjustment_method>", method.ToString().ToLowerInvariant()); }
             adjustmentXml.Append("</adjustment>");
             // now make the request
-            string response = DoRequest(string.Format("subscriptions/{0}/adjustments.{1}", subscriptionId, GetMethodExtension()), HttpRequestMethod.Post, adjustmentXml.ToString());
+            var response = DoRequest(string.Format("subscriptions/{0}/adjustments.{1}", subscriptionId, GetMethodExtension()), HttpRequestMethod.Post, adjustmentXml.ToString());
             // change the response to the object
             return response.ConvertResponseTo<Adjustment>("adjustment");
         }
@@ -5658,7 +5616,7 @@ namespace ChargifyNET
                 if (chargifyId < 0) throw new ArgumentNullException("chargifyId");
 
                 // now make the request
-                string response = DoRequest(string.Format("portal/customers/{0}/management_link.{1}", chargifyId, GetMethodExtension()));
+                var response = DoRequest(string.Format("portal/customers/{0}/management_link.{1}", chargifyId, GetMethodExtension()));
 
                 // Convert the Chargify response into the object we're looking for
                 return response.ConvertResponseTo<BillingManagementInfo>("management_link");
@@ -5684,7 +5642,7 @@ namespace ChargifyNET
                 if (chargifyId < 0) throw new ArgumentNullException("chargifyId");
 
                 // now make the request
-                string response = DoRequest(string.Format("portal/customers/{0}/enable.{1}?auto_invite={2}", chargifyId, GetMethodExtension(), autoInvite ? 1 : 0), HttpRequestMethod.Post, null);
+                var response = DoRequest(string.Format("portal/customers/{0}/enable.{1}?auto_invite={2}", chargifyId, GetMethodExtension(), autoInvite ? 1 : 0), HttpRequestMethod.Post, null);
 
                 return true;
             }
@@ -5726,7 +5684,7 @@ namespace ChargifyNET
                 if (chargifyId < 0) throw new ArgumentNullException("chargifyId");
 
                 // now make the request
-                string response = DoRequest(string.Format("portal/customers/{0}/invitations/revoke.{1}", chargifyId, GetMethodExtension()), HttpRequestMethod.Delete, null);
+                var response = DoRequest(string.Format("portal/customers/{0}/invitations/revoke.{1}", chargifyId, GetMethodExtension()), HttpRequestMethod.Delete, null);
 
                 // Convert the Chargify response into the object we're looking for
                 return true;
@@ -5771,8 +5729,8 @@ namespace ChargifyNET
         public IDictionary<int, Invoice> GetInvoiceList()
         {
             // Construct the url to access Chargify
-            string url = string.Format("invoices.{0}", GetMethodExtension());
-            string response = DoRequest(url);
+            var url = string.Format("invoices.{0}", GetMethodExtension());
+            var response = DoRequest(url);
             var retValue = new Dictionary<int, Invoice>();
             if (response.IsXml())
             {
@@ -5821,7 +5779,7 @@ namespace ChargifyNET
             paymentXml.Append("</payment>");
 
             // now make the request
-            string response = DoRequest(string.Format("invoices/{0}/payments.{1}", invoiceId, GetMethodExtension()), HttpRequestMethod.Post, paymentXml.ToString());
+            var response = DoRequest(string.Format("invoices/{0}/payments.{1}", invoiceId, GetMethodExtension()), HttpRequestMethod.Post, paymentXml.ToString());
 
             // change the response to the object
             return response.ConvertResponseTo<Payment>("payment");
@@ -5839,7 +5797,7 @@ namespace ChargifyNET
         /// <remarks>If used against a production site, the result will always be false.</remarks>
         public bool ClearTestSite(SiteCleanupScope? cleanupScope = SiteCleanupScope.Customers)
         {
-            bool retVal = false;
+            var retVal = false;
 
             try
             {
@@ -5851,7 +5809,7 @@ namespace ChargifyNET
                     if (cleanupScopeName != null)
                         qs += string.Format("cleanup_scope={0}", cleanupScopeName.ToLowerInvariant());
                 }
-                string url = string.Format("sites/clear_data.{0}", GetMethodExtension());
+                var url = string.Format("sites/clear_data.{0}", GetMethodExtension());
                 if (!string.IsNullOrEmpty(qs)) { url += "?" + qs; }
 
                 DoRequest(url, HttpRequestMethod.Post, null);
@@ -5906,7 +5864,7 @@ namespace ChargifyNET
             paymentXml.Append("</payment>");
 
             // now make the request
-            string response = DoRequest(string.Format("subscriptions/{0}/payments.{1}", subscriptionId, GetMethodExtension()), HttpRequestMethod.Post, paymentXml.ToString());
+            var response = DoRequest(string.Format("subscriptions/{0}/payments.{1}", subscriptionId, GetMethodExtension()), HttpRequestMethod.Post, paymentXml.ToString());
 
             // change the response to the object
             return response.ConvertResponseTo<Payment>("payment");
@@ -5929,7 +5887,7 @@ namespace ChargifyNET
                 if (id < 0) throw new ArgumentNullException("id");
 
                 // now make the request
-                string response = DoRequest(string.Format("payment_profiles/{0}.{1}", id, GetMethodExtension()));
+                var response = DoRequest(string.Format("payment_profiles/{0}.{1}", id, GetMethodExtension()));
 
                 // Convert the Chargify response into the object we're looking for
                 return response.ConvertResponseTo<PaymentProfileView>("payment_profile");
@@ -5985,7 +5943,7 @@ namespace ChargifyNET
                     if (!string.IsNullOrWhiteSpace(paymentProfile.BankAccountNumber)) xml.AppendFormat("<bank_account_number>{0}</bank_account_number>", paymentProfile.BankAccountNumber);
                 }
                 xml.Append("</payment_profile>");
-                string response = DoRequest(string.Format("payment_profiles/{0}.{1}", paymentProfile.Id, GetMethodExtension()), HttpRequestMethod.Put, xml.ToString());
+                var response = DoRequest(string.Format("payment_profiles/{0}.{1}", paymentProfile.Id, GetMethodExtension()), HttpRequestMethod.Put, xml.ToString());
                 return response.ConvertResponseTo<PaymentProfileView>("payment_profile");
             }
             catch (ChargifyException cex)
@@ -6008,7 +5966,7 @@ namespace ChargifyNET
         public IRenewalDetails PreviewRenewal(int subscriptionId)
         {
             // now make the request
-            string response = DoRequest($"/subscriptions/{subscriptionId}/renewals/preview.{GetMethodExtension()}", HttpRequestMethod.Post, null);
+            var response = DoRequest($"/subscriptions/{subscriptionId}/renewals/preview.{GetMethodExtension()}", HttpRequestMethod.Post, null);
             // change the response to the object
             return response.ConvertResponseTo<RenewalDetails>("renewal_preview");
         }
@@ -6047,7 +6005,7 @@ namespace ChargifyNET
             noteXml.Append("</note>");
 
             // now make the request
-            string response = DoRequest(string.Format("subscriptions/{0}/notes.{1}", subscriptionId, GetMethodExtension()), HttpRequestMethod.Post, noteXml.ToString());
+            var response = DoRequest(string.Format("subscriptions/{0}/notes.{1}", subscriptionId, GetMethodExtension()), HttpRequestMethod.Post, noteXml.ToString());
 
             // change the response to the object
             return response.ConvertResponseTo<Note>("note");
@@ -6064,12 +6022,12 @@ namespace ChargifyNET
             if (subscriptionId == int.MinValue) throw new ArgumentNullException(nameof(subscriptionId));
 
             // now make the request
-            string response = DoRequest(string.Format("subscriptions/{0}/notes.{1}", subscriptionId, GetMethodExtension()));
+            var response = DoRequest(string.Format("subscriptions/{0}/notes.{1}", subscriptionId, GetMethodExtension()));
             var retValue = new Dictionary<int, INote>();
             if (response.IsXml())
             {
                 // now build a product list based on response XML
-                XmlDocument doc = new XmlDocument();
+                XmlDocument doc = new();
                 doc.LoadXml(response); // get the XML into an XML document
                 if (doc.ChildNodes.Count == 0) throw new InvalidOperationException("Returned XML not valid");
                 // loop through the child nodes of this node
@@ -6099,13 +6057,13 @@ namespace ChargifyNET
             else if (response.IsJSON())
             {
                 // should be expecting an array
-                int position = 0;
-                JsonArray array = JsonArray.Parse(response, ref position);
-                for (int i = 0; i <= array.Length - 1; i++)
+                var position = 0;
+                var array = JsonArray.Parse(response, ref position);
+                for (var i = 0; i <= array.Length - 1; i++)
                 {
                     if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("note"))
                     {
-                        JsonObject componentObj = (array.Items[i] as JsonObject)["note"] as JsonObject;
+                        var componentObj = (array.Items[i] as JsonObject)["note"] as JsonObject;
                         INote loadedComponent = new Note(componentObj);
                         if (!retValue.ContainsKey(loadedComponent.ID))
                         {
@@ -6135,7 +6093,7 @@ namespace ChargifyNET
                 // make sure data is valid
                 if (subscriptionId == int.MinValue) throw new ArgumentNullException(nameof(subscriptionId));
                 // now make the request
-                string response = DoRequest(string.Format("subscriptions/{0}/notes/{1}.{2}", subscriptionId, noteId, GetMethodExtension()));
+                var response = DoRequest(string.Format("subscriptions/{0}/notes/{1}.{2}", subscriptionId, noteId, GetMethodExtension()));
                 // change the response to the object
                 return response.ConvertResponseTo<Note>("note");
             }
@@ -6188,9 +6146,9 @@ namespace ChargifyNET
             // make sure data is OK
             if (note == null) throw new ArgumentNullException(nameof(note));
             if (note.ID == int.MinValue) throw new ArgumentException("Invalid chargify ID detected", nameof(note));
-            INote oldNote = LoadNote(note.SubscriptionID, note.ID);
+            var oldNote = LoadNote(note.SubscriptionID, note.ID);
 
-            bool isUpdateRequired = false;
+            var isUpdateRequired = false;
 
             // create XML for updating of note
             var customerXml = new StringBuilder(GetXmlStringIfApplicable());
@@ -6208,7 +6166,7 @@ namespace ChargifyNET
                 try
                 {
                     // now make the request
-                    string response = DoRequest(string.Format("subscriptions/{0}/notes/{1}.{2}", subscriptionId, note.ID, GetMethodExtension()), HttpRequestMethod.Put, customerXml.ToString());
+                    var response = DoRequest(string.Format("subscriptions/{0}/notes/{1}.{2}", subscriptionId, note.ID, GetMethodExtension()), HttpRequestMethod.Put, customerXml.ToString());
                     // change the response to the object
                     return response.ConvertResponseTo<Note>("note");
                 }
@@ -6228,13 +6186,13 @@ namespace ChargifyNET
         /// <summary>
         /// Method for retrieving information about a coupon using the ID of that referral code.
         /// </summary>
-        /// <param name="ReferralCode">Referral code</param>
+        /// <param name="referralCode">Referral code</param>
         /// <returns>The object if found, null otherwise.</returns>
-        public IReferralCode ValidateReferralCode(string ReferralCode)
+        public IReferralCode ValidateReferralCode(string referralCode)
         {
             try
             {
-                string response = this.DoRequest(string.Format("referral_codes/validate.{0}?code={1}", GetMethodExtension(), ReferralCode));
+                var response = this.DoRequest(string.Format("referral_codes/validate.{0}?code={1}", GetMethodExtension(), referralCode));
                 // change the response to the object
                 return response.ConvertResponseTo<ReferralCode>("referral-code");
             }
@@ -6267,14 +6225,14 @@ namespace ChargifyNET
             var retValue = Activator.CreateInstance<Dictionary<int, T>>();
 
             // should be expecting an array
-            int position = 0;
-            JsonArray array = JsonArray.Parse(response, ref position);
-            for (int i = 0; i <= array.Length - 1; i++)
+            var position = 0;
+            var array = JsonArray.Parse(response, ref position);
+            for (var i = 0; i <= array.Length - 1; i++)
             {
                 if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey(key))
                 {
-                    JsonObject jsonObj = (array.Items[i] as JsonObject)[key] as JsonObject;
-                    T value = (T)Activator.CreateInstance(typeof(T), jsonObj);
+                    var jsonObj = (array.Items[i] as JsonObject)[key] as JsonObject;
+                    var value = (T)Activator.CreateInstance(typeof(T), jsonObj);
                     if (!retValue.ContainsKey(value.ID))
                     {
                         retValue.Add(value.ID, value);
@@ -6292,7 +6250,7 @@ namespace ChargifyNET
             where T : class, IChargifyEntity
         {
             // now build an invoice list based on response XML
-            XmlDocument doc = new XmlDocument();
+            XmlDocument doc = new();
             doc.LoadXml(response);
             if (doc.ChildNodes.Count == 0)
                 throw new InvalidOperationException("Returned XML not valid");
@@ -6308,7 +6266,7 @@ namespace ChargifyNET
                     {
                         if (childNode.Name == key)
                         {
-                            T value = (T)Activator.CreateInstance(typeof(T), childNode);
+                            var value = (T)Activator.CreateInstance(typeof(T), childNode);
                             if (!retValue.ContainsKey(value.ID))
                             {
                                 retValue.Add(value.ID, value);
@@ -6340,7 +6298,7 @@ namespace ChargifyNET
 
         private string GetXmlStringIfApplicable()
         {
-            string result = string.Empty;
+            var result = string.Empty;
             if (!UseJSON)
             {
                 result = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
@@ -6385,18 +6343,18 @@ namespace ChargifyNET
             }
 
             // create the URI
-            string addressString = string.Format("{0}{1}{2}", URL, (URL.EndsWith("/") ? "" : "/"), methodString);
+            var addressString = string.Format("{0}{1}{2}", URL, (URL.EndsWith("/") ? "" : "/"), methodString);
             var uriBuilder = new UriBuilder(addressString)
             {
                 Scheme = Uri.UriSchemeHttps,
                 Port = -1 // default port for scheme
             };
-            Uri address = uriBuilder.Uri;
+            var address = uriBuilder.Uri;
 
             // Create the web request
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(address);
+            var request = (HttpWebRequest)WebRequest.Create(address);
             request.Timeout = 180000;
-            string credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes(apiKey + ":" + Password));
+            var credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes(apiKey + ":" + Password));
             request.Headers[HttpRequestHeader.Authorization] = "Basic " + credentials;
 
             // Set type to POST
@@ -6421,28 +6379,26 @@ namespace ChargifyNET
 
             request.UserAgent = UserAgent;
             // send data
-            string dataToPost = postData;
+            var dataToPost = postData;
             if (requestMethod == HttpRequestMethod.Post || requestMethod == HttpRequestMethod.Put || requestMethod == HttpRequestMethod.Delete)
             {
-                bool hasWritten = false;
+                var hasWritten = false;
                 // only write if there's data to write ...
                 if (!string.IsNullOrEmpty(postData))
                 {
                     if (UseJSON)
                     {
-                        XmlDocument doc = new XmlDocument();
+                        XmlDocument doc = new();
                         doc.LoadXml(postData);
                         dataToPost = XmlToJsonConverter.XmlToJson(doc);
                     }
 
                     // Wrap the request stream with a text-based writer
-                    using (StreamWriter writer = new StreamWriter(request.GetRequestStream()))
-                    {
-                        // Write the XML/JSON text into the stream
-                        writer.WriteLine(dataToPost);
-                        writer.Close();
-                        hasWritten = true;
-                    }
+                    using StreamWriter writer = new(request.GetRequestStream());
+                    // Write the XML/JSON text into the stream
+                    writer.WriteLine(dataToPost);
+                    writer.Close();
+                    hasWritten = true;
                 }
 
                 if (!hasWritten && !string.IsNullOrEmpty(postData))
@@ -6460,22 +6416,20 @@ namespace ChargifyNET
                 LogRequest?.Invoke(requestMethod, addressString, dataToPost);
 
                 byte[] retValue = { };
-                using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
+                using (var response = request.GetResponse() as HttpWebResponse)
                 {
                     if (response == null) return retValue;
 
                     var responseStream = response.GetResponseStream();
                     if (responseStream != null)
                     {
-                        using (StreamReader reader = new StreamReader(responseStream))
+                        using StreamReader reader = new(responseStream);
+                        using (var ms = new MemoryStream())
                         {
-                            using (var ms = new MemoryStream())
-                            {
-                                reader.BaseStream.CopyStream(ms);
-                                retValue = ms.ToArray();
-                            }
-                            _lastResponse = response;
+                            reader.BaseStream.CopyStream(ms);
+                            retValue = ms.ToArray();
                         }
+                        _lastResponse = response;
                     }
 
                     LogResponse?.Invoke(response.StatusCode, addressString, string.Empty);
@@ -6489,30 +6443,28 @@ namespace ChargifyNET
                 // build exception and set last response
                 if (wex.Response != null)
                 {
-                    using (HttpWebResponse errorResponse = (HttpWebResponse)wex.Response)
-                    {
-                        var sanitizedPostData = postData;
+                    using var errorResponse = (HttpWebResponse)wex.Response;
+                    var sanitizedPostData = postData;
 
-                        if (!string.IsNullOrEmpty(sanitizedPostData))
+                    if (!string.IsNullOrEmpty(sanitizedPostData))
+                    {
+                        if (sanitizedPostData.Contains("<full_number>"))
                         {
-                            if (sanitizedPostData.Contains("<full_number>"))
+                            var xdoc = XDocument.Parse(sanitizedPostData);
+                            var fullNumberElement = xdoc.Element("subscription")?.Element("credit_card_attributes")?.Element("full_number");
+                            if (fullNumberElement != null)
                             {
-                                var xdoc = XDocument.Parse(sanitizedPostData);
-                                var fullNumberElement = xdoc.Element("subscription")?.Element("credit_card_attributes")?.Element("full_number");
-                                if (fullNumberElement != null)
-                                {
-                                    fullNumberElement.Value = fullNumberElement.Value.Mask('X', 4);
-                                    sanitizedPostData = xdoc.ToString();
-                                }
+                                fullNumberElement.Value = fullNumberElement.Value.Mask('X', 4);
+                                sanitizedPostData = xdoc.ToString();
                             }
                         }
-
-                        newException = new ChargifyException(errorResponse, wex, sanitizedPostData);
-                        _lastResponse = errorResponse;
-
-                        // Use the ChargifyException ToString override to provide the parsed errors
-                        LogResponse?.Invoke(errorResponse.StatusCode, addressString, newException.ToString());
                     }
+
+                    newException = new ChargifyException(errorResponse, wex, sanitizedPostData);
+                    _lastResponse = errorResponse;
+
+                    // Use the ChargifyException ToString override to provide the parsed errors
+                    LogResponse?.Invoke(errorResponse.StatusCode, addressString, newException.ToString());
                 }
                 else
                 {
@@ -6550,19 +6502,19 @@ namespace ChargifyNET
             }
 
             // create the URI
-            string addressString = string.Format("{0}{1}{2}", URL, (URL.EndsWith("/") ? string.Empty : "/"), methodString);
+            var addressString = string.Format("{0}{1}{2}", URL, (URL.EndsWith("/") ? string.Empty : "/"), methodString);
 
             var uriBuilder = new UriBuilder(addressString)
             {
                 Scheme = Uri.UriSchemeHttps,
                 Port = -1 // default port for scheme
             };
-            Uri address = uriBuilder.Uri;
+            var address = uriBuilder.Uri;
 
             // Create the web request
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(address);
+            var request = (HttpWebRequest)WebRequest.Create(address);
             request.Timeout = _timeout;
-            string credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes(apiKey + ":" + Password));
+            var credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes(apiKey + ":" + Password));
             request.Headers[HttpRequestHeader.Authorization] = "Basic " + credentials;
             request.UserAgent = UserAgent;
             request.SendChunked = false;
@@ -6581,33 +6533,31 @@ namespace ChargifyNET
             }
 
             // Send the data (when applicable)
-            string dataToPost = postData;
+            var dataToPost = postData;
             if (requestMethod == HttpRequestMethod.Post || requestMethod == HttpRequestMethod.Put || requestMethod == HttpRequestMethod.Delete)
             {
-                bool hasWritten = false;
+                var hasWritten = false;
                 // only write if there's data to write ...
                 if (!string.IsNullOrEmpty(postData))
                 {
                     if (UseJSON)
                     {
-                        XmlDocument doc = new XmlDocument();
-                        XmlReaderSettings settings = new XmlReaderSettings { NameTable = new NameTable() };
-                        XmlNamespaceManager xmlns = new XmlNamespaceManager(settings.NameTable);
+                        XmlDocument doc = new();
+                        XmlReaderSettings settings = new() { NameTable = new NameTable() };
+                        XmlNamespaceManager xmlns = new(settings.NameTable);
                         xmlns.AddNamespace("json", "http://james.newtonking.com/projects/json");
-                        XmlParserContext context = new XmlParserContext(null, xmlns, "", XmlSpace.Default);
-                        XmlReader reader = XmlReader.Create(new StringReader(postData), settings, context);
+                        XmlParserContext context = new(null, xmlns, "", XmlSpace.Default);
+                        var reader = XmlReader.Create(new StringReader(postData), settings, context);
                         doc.Load(reader);
                         dataToPost = XmlToJsonConverter.XmlToJson(doc);
                     }
 
                     // Wrap the request stream with a text-based writer
-                    using (StreamWriter writer = new StreamWriter(request.GetRequestStream()))
-                    {
-                        // Write the XML/JSON text into the stream
-                        writer.WriteLine(dataToPost);
-                        writer.Close();
-                        hasWritten = true;
-                    }
+                    using StreamWriter writer = new(request.GetRequestStream());
+                    // Write the XML/JSON text into the stream
+                    writer.WriteLine(dataToPost);
+                    writer.Close();
+                    hasWritten = true;
                 }
 
                 if (!hasWritten && !string.IsNullOrEmpty(postData))
@@ -6624,19 +6574,17 @@ namespace ChargifyNET
             {
                 LogRequest?.Invoke(requestMethod, addressString, dataToPost);
 
-                string retValue = string.Empty;
-                using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
+                var retValue = string.Empty;
+                using (var response = request.GetResponse() as HttpWebResponse)
                 {
                     if (response != null)
                     {
                         var responseStream = response.GetResponseStream();
                         if (responseStream != null)
                         {
-                            using (StreamReader reader = new StreamReader(responseStream))
-                            {
-                                retValue = reader.ReadToEnd();
-                                _lastResponse = response;
-                            }
+                            using StreamReader reader = new(responseStream);
+                            retValue = reader.ReadToEnd();
+                            _lastResponse = response;
                         }
                         LogResponse?.Invoke(response.StatusCode, addressString, retValue);
                     }
@@ -6650,30 +6598,28 @@ namespace ChargifyNET
                 // build exception and set last response
                 if (wex.Response != null)
                 {
-                    using (HttpWebResponse errorResponse = (HttpWebResponse)wex.Response)
-                    {
-                        var sanitizedPostData = postData;
+                    using var errorResponse = (HttpWebResponse)wex.Response;
+                    var sanitizedPostData = postData;
 
-                        if (!string.IsNullOrEmpty(sanitizedPostData))
+                    if (!string.IsNullOrEmpty(sanitizedPostData))
+                    {
+                        if (sanitizedPostData.Contains("<full_number>"))
                         {
-                            if (sanitizedPostData.Contains("<full_number>"))
+                            var xdoc = XDocument.Parse(sanitizedPostData);
+                            var fullNumberElement = xdoc.Element("subscription")?.Element("credit_card_attributes")?.Element("full_number");
+                            if (fullNumberElement != null)
                             {
-                                var xdoc = XDocument.Parse(sanitizedPostData);
-                                var fullNumberElement = xdoc.Element("subscription")?.Element("credit_card_attributes")?.Element("full_number");
-                                if (fullNumberElement != null)
-                                {
-                                    fullNumberElement.Value = fullNumberElement.Value.Mask('X', 4);
-                                    sanitizedPostData = xdoc.ToString();
-                                }
+                                fullNumberElement.Value = fullNumberElement.Value.Mask('X', 4);
+                                sanitizedPostData = xdoc.ToString();
                             }
                         }
-
-                        newException = new ChargifyException(errorResponse, wex, sanitizedPostData);
-                        _lastResponse = errorResponse;
-
-                        // Use the ChargifyException ToString override to provide the parsed errors
-                        LogResponse?.Invoke(errorResponse.StatusCode, addressString, newException.ToString());
                     }
+
+                    newException = new ChargifyException(errorResponse, wex, sanitizedPostData);
+                    _lastResponse = errorResponse;
+
+                    // Use the ChargifyException ToString override to provide the parsed errors
+                    LogResponse?.Invoke(errorResponse.StatusCode, addressString, newException.ToString());
                 }
                 else
                 {
@@ -6743,9 +6689,9 @@ namespace ChargifyNET
             }
 
             // Create the web request
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
+            var request = (HttpWebRequest)WebRequest.Create(uri);
             request.Timeout = _timeout;
-            string credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes(apiKey + ":" + Password));
+            var credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes(apiKey + ":" + Password));
             request.Headers[HttpRequestHeader.Authorization] = "Basic " + credentials;
             request.UserAgent = UserAgent;
             request.SendChunked = false;
@@ -6757,8 +6703,8 @@ namespace ChargifyNET
             {
                 if (!UseJSON)
                 {
-                    if (body is string)
-                        postData = (string)body;
+                    if (body is string postBody)
+                        postData = postBody;
                     else
                     {
                         var dataAsJson = JsonConvert.SerializeObject(body);
@@ -6771,8 +6717,8 @@ namespace ChargifyNET
                 }
                 else
                 {
-                    if (body is string)
-                        postData = (string)body;
+                    if (body is string postBody)
+                        postData = postBody;
                     else
                         postData = JsonConvert.SerializeObject(body);
                     request.ContentType = "application/json";
@@ -6786,12 +6732,10 @@ namespace ChargifyNET
                 if (!string.IsNullOrEmpty(postData))
                 {
                     // Wrap the request stream with a text-based writer
-                    using (StreamWriter writer = new StreamWriter(request.GetRequestStream()))
-                    {
-                        // Write the XML/JSON text into the stream
-                        writer.WriteLine(postData);
-                        writer.Close();
-                    }
+                    using StreamWriter writer = new(request.GetRequestStream());
+                    // Write the XML/JSON text into the stream
+                    writer.WriteLine(postData);
+                    writer.Close();
                 }
                 else request.ContentLength = 0;
             }
@@ -6800,19 +6744,17 @@ namespace ChargifyNET
             {
                 LogRequest?.Invoke(requestMethod, uri.AbsolutePath, postData);
 
-                string retValue = string.Empty;
-                using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
+                var retValue = string.Empty;
+                using (var response = request.GetResponse() as HttpWebResponse)
                 {
                     if (response != null)
                     {
                         var responseStream = response.GetResponseStream();
                         if (responseStream != null)
                         {
-                            using (StreamReader reader = new StreamReader(responseStream))
-                            {
-                                retValue = reader.ReadToEnd();
-                                _lastResponse = response;
-                            }
+                            using StreamReader reader = new(responseStream);
+                            retValue = reader.ReadToEnd();
+                            _lastResponse = response;
                         }
                         LogResponse?.Invoke(response.StatusCode, uri.AbsolutePath, retValue);
                     }
@@ -6826,30 +6768,28 @@ namespace ChargifyNET
                 // build exception and set last response
                 if (wex.Response != null)
                 {
-                    using (HttpWebResponse errorResponse = (HttpWebResponse)wex.Response)
-                    {
-                        var sanitizedPostData = postData;
+                    using var errorResponse = (HttpWebResponse)wex.Response;
+                    var sanitizedPostData = postData;
 
-                        if (!string.IsNullOrEmpty(sanitizedPostData))
+                    if (!string.IsNullOrEmpty(sanitizedPostData))
+                    {
+                        if (sanitizedPostData.Contains("<full_number>"))
                         {
-                            if (sanitizedPostData.Contains("<full_number>"))
+                            var xdoc = XDocument.Parse(sanitizedPostData);
+                            var fullNumberElement = xdoc.Element("subscription")?.Element("credit_card_attributes")?.Element("full_number");
+                            if (fullNumberElement != null)
                             {
-                                var xdoc = XDocument.Parse(sanitizedPostData);
-                                var fullNumberElement = xdoc.Element("subscription")?.Element("credit_card_attributes")?.Element("full_number");
-                                if (fullNumberElement != null)
-                                {
-                                    fullNumberElement.Value = fullNumberElement.Value.Mask('X', 4);
-                                    sanitizedPostData = xdoc.ToString();
-                                }
+                                fullNumberElement.Value = fullNumberElement.Value.Mask('X', 4);
+                                sanitizedPostData = xdoc.ToString();
                             }
                         }
-
-                        newException = new ChargifyException(errorResponse, wex, sanitizedPostData);
-                        _lastResponse = errorResponse;
-
-                        // Use the ChargifyException ToString override to provide the parsed errors
-                        LogResponse?.Invoke(errorResponse.StatusCode, uri.AbsoluteUri, newException.ToString());
                     }
+
+                    newException = new ChargifyException(errorResponse, wex, sanitizedPostData);
+                    _lastResponse = errorResponse;
+
+                    // Use the ChargifyException ToString override to provide the parsed errors
+                    LogResponse?.Invoke(errorResponse.StatusCode, uri.AbsoluteUri, newException.ToString());
                 }
                 else
                 {
@@ -6886,12 +6826,12 @@ namespace ChargifyNET
         /// <param name="str"></param>
         private void RequireNotNull(string name, object str)
         {
-            if (str == null || (str is string && string.IsNullOrWhiteSpace((string)str))) throw new ArgumentNullException($"{name}");
+            if (str == null || (str is string strVal && string.IsNullOrWhiteSpace(strVal))) throw new ArgumentNullException($"{name}");
         }
 
         private void RequireArgument(string name, object str, string exceptionReason)
         {
-            if (str == null || (str is string && string.IsNullOrWhiteSpace((string)str))) throw new ArgumentException($"{name}", exceptionReason);
+            if (str == null || (str is string strVal && string.IsNullOrWhiteSpace(strVal))) throw new ArgumentException($"{name}", exceptionReason);
         }
 
         private void RequireAtLeastOneElement<T>(string name, IList<T> list)

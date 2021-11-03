@@ -70,7 +70,7 @@ namespace ChargifyNET
         public ProductFamily(string productFamilyXml)
         {
             // get the XML into an XML document
-            XmlDocument doc = new XmlDocument();
+            XmlDocument doc = new();
             doc.LoadXml(productFamilyXml);
             if (doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(productFamilyXml));
             // loop through the child nodes of this node
@@ -115,7 +115,7 @@ namespace ChargifyNET
         /// <param name="obj">The JsonObject containing product family data</param>
         private void LoadJsonData(JsonObject obj)
         {
-            foreach (string key in obj.Keys)
+            foreach (var key in obj.Keys)
             {
                 switch (key)
                 {

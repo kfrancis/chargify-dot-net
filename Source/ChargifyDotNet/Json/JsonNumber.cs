@@ -57,7 +57,7 @@ namespace ChargifyNET.Json
         {
             EatSpaces(str, ref position);
 
-            int startPos = position;
+            var startPos = position;
             while (IsNumberPart(str[position]))
                 position++;
 

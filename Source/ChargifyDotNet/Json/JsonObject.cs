@@ -104,7 +104,7 @@ namespace ChargifyNET.Json
             if (str.Trim().EndsWith("}") == false)
                 throw new JsonParseException("Json string does not terminates with '}': " + str);
 
-            int startPos = 0;
+            var startPos = 0;
             return Parse(str, ref startPos);
         }
 
@@ -118,10 +118,10 @@ namespace ChargifyNET.Json
             if (str[position] != '{')
                 throw new JsonParseException(str, position);
 
-            JsonObject jsonObject = new JsonObject();
+            JsonObject jsonObject = new();
 
             // Read all the pairs
-            bool continueReading = true;
+            var continueReading = true;
 
             // Read starting '{'
             position++;
@@ -131,8 +131,8 @@ namespace ChargifyNET.Json
                 if (str[position] != '}')
                 {
                     // Read string
-                    JsonString jsonString = JsonString.Parse(str, ref position);
-                    string key = jsonString.Value;
+                    var jsonString = JsonString.Parse(str, ref position);
+                    var key = jsonString.Value;
 
                     // Read seperator ':'
                     EatSpaces(str, ref position);
@@ -141,7 +141,7 @@ namespace ChargifyNET.Json
                     position++;
 
                     // Read value
-                    JsonValue value = ParseValue(str, ref position);
+                    var value = ParseValue(str, ref position);
 
                     jsonObject.Add(key, value);
                 }

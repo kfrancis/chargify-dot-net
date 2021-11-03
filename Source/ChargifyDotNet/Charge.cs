@@ -72,7 +72,7 @@ namespace ChargifyNET
         public Charge(string chargeXml)
         {
             // get the XML into an XML document
-            XmlDocument doc = new XmlDocument();
+            XmlDocument doc = new();
             doc.LoadXml(chargeXml);
             if (doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(chargeXml));
             // loop through the child nodes of this node
@@ -113,7 +113,7 @@ namespace ChargifyNET
 
         private void LoadFromJson(JsonObject obj)
         {
-            foreach (string key in obj.Keys)
+            foreach (var key in obj.Keys)
             {
                 switch (key)
                 {

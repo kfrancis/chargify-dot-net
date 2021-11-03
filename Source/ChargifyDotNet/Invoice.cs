@@ -39,7 +39,7 @@ namespace ChargifyNET
         public Invoice(string invoiceXml)
         {
             // get the XML into an XML document
-            XmlDocument doc = new XmlDocument();
+            XmlDocument doc = new();
             doc.LoadXml(invoiceXml);
             if (doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(invoiceXml));
             // loop through the child nodes of this node
@@ -81,7 +81,7 @@ namespace ChargifyNET
         private void LoadFromJson(JsonObject obj)
         {
             // loop through the keys of this JsonObject to get invoice info, and parse it out
-            foreach (string key in obj.Keys)
+            foreach (var key in obj.Keys)
             {
                 switch (key)
                 {
@@ -120,12 +120,12 @@ namespace ChargifyNET
                         break;
                     case ChargesKey:
                         _charges = new List<ICharge>();
-                        JsonArray chargesArray = obj[key] as JsonArray;
+                        var chargesArray = obj[key] as JsonArray;
                         if (chargesArray != null)
                         {
                             foreach (var jsonValue in chargesArray.Items)
                             {
-                                var charge = (JsonObject) jsonValue;
+                                var charge = (JsonObject)jsonValue;
                                 _charges.Add(charge.GetJSONContentAsCharge("charge"));
                             }
                         }
@@ -182,7 +182,7 @@ namespace ChargifyNET
                         _number = dataNode.GetNodeContentAsString();
                         break;
                     case ChargesKey:
-                         _charges = new List<ICharge>();
+                        _charges = new List<ICharge>();
                         foreach (XmlNode childNode in dataNode.ChildNodes)
                         {
                             switch (childNode.Name)
@@ -199,7 +199,7 @@ namespace ChargifyNET
             }
         }
         #endregion
-        
+
         #region IInvoice Members
         /// <summary>
         /// The subscription unique id within Chargify
@@ -263,7 +263,7 @@ namespace ChargifyNET
         /// <summary>
         /// Gives the current outstanding invoice balance in the number of dollars and cents
         /// </summary>
-        public decimal AmountDue { get { return Convert.ToDecimal(_amountDueInCents) / 100; }  }
+        public decimal AmountDue { get { return Convert.ToDecimal(_amountDueInCents) / 100; } }
 
         /// <summary>
         /// The unique (to this site) identifier for this invoice
@@ -275,13 +275,13 @@ namespace ChargifyNET
         /// A list of charges applied to this invoice
         /// </summary>
         public List<ICharge> Charges { get { return _charges; } }
-        private List<ICharge> _charges = new List<ICharge>();
+        private List<ICharge> _charges = new();
 
         /// <summary>
         /// A list of the financial transactions that modify the amount due
         /// </summary>
         public List<IInvoicePaymentAndCredit> PaymentsAndCredits { get { return _paymentsAndCredits; } }
-        private readonly List<IInvoicePaymentAndCredit> _paymentsAndCredits = new List<IInvoicePaymentAndCredit>();
+        private readonly List<IInvoicePaymentAndCredit> _paymentsAndCredits = new();
         #endregion
     }
 }

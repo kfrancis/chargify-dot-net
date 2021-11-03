@@ -41,7 +41,7 @@ namespace ChargifyDotNetTests
                 Assert.IsTrue(chEx.ErrorMessages.Any(e => e.Message == "Last name: cannot be blank."));
                 Assert.IsTrue(chEx.ErrorMessages.Any(e => e.Message == "Email address: cannot be blank."));
             }
-            
+
             SetJson(!isJson);
         }
 
@@ -55,9 +55,9 @@ namespace ChargifyDotNetTests
             SetJson(isJson);
 
             // Arrange
-            string referenceID = Guid.NewGuid().ToString();
-            var customer = new Customer() 
-            { 
+            var referenceID = Guid.NewGuid().ToString();
+            var customer = new Customer()
+            {
                 FirstName = Faker.Name.FirstName(),
                 LastName = Faker.Name.LastName(),
                 Email = Faker.Internet.Email(),
@@ -108,9 +108,9 @@ namespace ChargifyDotNetTests
             SetJson(isJson);
 
             // Arrange
-            string referenceID = Guid.NewGuid().ToString();
-            var customer = new Customer() 
-            { 
+            var referenceID = Guid.NewGuid().ToString();
+            var customer = new Customer()
+            {
                 FirstName = Faker.Name.FirstName(),
                 LastName = Faker.Name.LastName(),
                 Email = Faker.Internet.Email(),
@@ -130,7 +130,7 @@ namespace ChargifyDotNetTests
             var createdCustomer = Chargify.CreateCustomer(customer);
             Chargify.RevokeBillingPortalAccess(createdCustomer.ChargifyID);
             // Assert
-            
+
             try
             {
                 Chargify.GetManagementLink(createdCustomer.ChargifyID);
@@ -145,7 +145,7 @@ namespace ChargifyDotNetTests
             }
 
             Chargify.DeleteCustomer(createdCustomer.ChargifyID);
-            
+
             SetJson(!isJson);
         }
 
@@ -159,9 +159,9 @@ namespace ChargifyDotNetTests
             SetJson(isJson);
 
             // Arrange
-            string referenceID = Guid.NewGuid().ToString();
-            var customer = new Customer() 
-            { 
+            var referenceID = Guid.NewGuid().ToString();
+            var customer = new Customer()
+            {
                 FirstName = Faker.Name.FirstName(),
                 LastName = Faker.Name.LastName(),
                 Email = Faker.Internet.Email(),
@@ -185,7 +185,7 @@ namespace ChargifyDotNetTests
             // Assert
             var managementLink = Chargify.GetManagementLink(createdCustomer.ChargifyID);
             Assert.IsNotNull(managementLink);
-            
+
 
             Chargify.DeleteCustomer(createdCustomer.ChargifyID);
 
@@ -202,9 +202,9 @@ namespace ChargifyDotNetTests
             SetJson(isJson);
 
             // Arrange
-            string referenceID = Guid.NewGuid().ToString();
-            var customer = new Customer() 
-            { 
+            var referenceID = Guid.NewGuid().ToString();
+            var customer = new Customer()
+            {
                 FirstName = Faker.Name.FirstName(),
                 LastName = Faker.Name.LastName(),
                 Email = Faker.Internet.Email(),
@@ -224,7 +224,7 @@ namespace ChargifyDotNetTests
             var createdCustomer = Chargify.CreateCustomer(customer);
             Chargify.RevokeBillingPortalAccess(createdCustomer.SystemID);
             // Assert
-            
+
             try
             {
                 Chargify.GetManagementLink(createdCustomer.ChargifyID);
@@ -253,9 +253,9 @@ namespace ChargifyDotNetTests
             SetJson(isJson);
 
             // Arrange
-            string referenceID = Guid.NewGuid().ToString();
-            var customer = new Customer() 
-            { 
+            var referenceID = Guid.NewGuid().ToString();
+            var customer = new Customer()
+            {
                 FirstName = Faker.Name.FirstName(),
                 LastName = Faker.Name.LastName(),
                 Email = Faker.Internet.Email(),
@@ -279,7 +279,7 @@ namespace ChargifyDotNetTests
             // Assert
             var managementLink = Chargify.GetManagementLink(createdCustomer.ChargifyID);
             Assert.IsNotNull(managementLink);
-            
+
 
             Chargify.DeleteCustomer(createdCustomer.ChargifyID);
 
@@ -296,8 +296,8 @@ namespace ChargifyDotNetTests
             SetJson(isJson);
 
             // Arrange
-            string referenceID = Guid.NewGuid().ToString();
-            var customer = new Customer() 
+            var referenceID = Guid.NewGuid().ToString();
+            var customer = new Customer()
             {
                 FirstName = Faker.Name.FirstName(),
                 LastName = Faker.Name.LastName(),
@@ -334,7 +334,7 @@ namespace ChargifyDotNetTests
             SetJson(isJson);
 
             // Arrange
-            string referenceID = Guid.NewGuid().ToString();
+            var referenceID = Guid.NewGuid().ToString();
             var customer = new Customer()
             {
                 FirstName = Faker.Name.FirstName(),
@@ -372,7 +372,7 @@ namespace ChargifyDotNetTests
             SetJson(isJson);
 
             // Arrange
-            string referenceID = Guid.NewGuid().ToString();
+            var referenceID = Guid.NewGuid().ToString();
             var customer = new Customer()
             {
                 FirstName = StringWithAmpersand,
@@ -410,7 +410,7 @@ namespace ChargifyDotNetTests
             SetJson(isJson);
 
             // Arrange
-            string referenceID = Guid.NewGuid().ToString();
+            var referenceID = Guid.NewGuid().ToString();
             var customer = new Customer()
             {
                 FirstName = StringWithNonUnicodeCharacters,
@@ -448,7 +448,7 @@ namespace ChargifyDotNetTests
             SetJson(isJson);
 
             // Arrange
-            string referenceID = Guid.NewGuid().ToString();
+            var referenceID = Guid.NewGuid().ToString();
             var customer = new Customer()
             {
                 FirstName = Faker.Name.FirstName(),
@@ -486,7 +486,7 @@ namespace ChargifyDotNetTests
             SetJson(isJson);
 
             // Arrange
-            string referenceID = Guid.NewGuid().ToString();
+            var referenceID = Guid.NewGuid().ToString();
             var customer = new Customer()
             {
                 FirstName = Faker.Name.FirstName(),
@@ -524,7 +524,7 @@ namespace ChargifyDotNetTests
             SetJson(isJson);
 
             // Arrange
-            string referenceID = Guid.NewGuid().ToString();
+            var referenceID = Guid.NewGuid().ToString();
             var customer = new Customer()
             {
                 FirstName = Faker.Name.FirstName(),
@@ -564,14 +564,14 @@ namespace ChargifyDotNetTests
             var customers = Chargify.GetCustomerList().Keys;
             // Load test customer via reference value (ASP.NET Membership ID)
             var referenceValue = customers.FirstOrDefault(systemID => !string.IsNullOrWhiteSpace(systemID));
-            ICustomer customer = Chargify.LoadCustomer(referenceValue);
+            var customer = Chargify.LoadCustomer(referenceValue);
             Assert.IsNotNull(customer);
             Assert.IsTrue(string.IsNullOrWhiteSpace(customer.FirstName) == false);
             Assert.IsTrue(string.IsNullOrWhiteSpace(customer.LastName) == false);
             Assert.IsTrue(string.IsNullOrWhiteSpace(customer.SystemID) == false);
             Assert.AreEqual(referenceValue, customer.SystemID);
 
-            ICustomer customer1 = Chargify.LoadCustomer(customer.ChargifyID);
+            var customer1 = Chargify.LoadCustomer(customer.ChargifyID);
             Assert.IsNotNull(customer1);
             Assert.AreEqual(customer.FirstName, customer1.FirstName);
             Assert.AreEqual(customer.LastName, customer1.LastName);
@@ -592,7 +592,7 @@ namespace ChargifyDotNetTests
             var isJson = method == "json";
             SetJson(isJson);
 
-            IDictionary<string, ICustomer> customerList = Chargify.GetCustomerList();
+            var customerList = Chargify.GetCustomerList();
             Assert.IsNotNull(customerList);
             Assert.AreNotEqual(0, customerList.Count);
 
@@ -611,7 +611,7 @@ namespace ChargifyDotNetTests
             // Arrange
             var customers = Chargify.GetCustomerList().Keys;
             var referenceValue = customers.FirstOrDefault(systemID => !string.IsNullOrWhiteSpace(systemID));
-            ICustomer customer = Chargify.LoadCustomer(referenceValue);
+            var customer = Chargify.LoadCustomer(referenceValue);
 
             // Act
             var updatedCustomer = Chargify.UpdateCustomer(customer);
@@ -635,7 +635,7 @@ namespace ChargifyDotNetTests
             var customers = Chargify.GetCustomerList().Keys;
             // Load test customer via reference value (ASP.NET Membership ID)
             var referenceValue = customers.FirstOrDefault(systemID => !string.IsNullOrWhiteSpace(systemID));
-            ICustomer customer = Chargify.LoadCustomer(referenceValue);
+            var customer = Chargify.LoadCustomer(referenceValue);
             Assert.IsNotNull(customer);
 
             // Change the customer's "Organization" property
@@ -643,14 +643,14 @@ namespace ChargifyDotNetTests
             var oldAddress2 = customer.ShippingAddress2;
             var newAddress1 = Guid.NewGuid().ToString().Replace("-", string.Empty).ToUpperInvariant();
             var newAddress2 = Guid.NewGuid().ToString().Replace("-", string.Empty).ToUpperInvariant();
-            string company = Faker.Company.CompanyName();
+            var company = Faker.Company.CompanyName();
             customer.Organization = company;
             customer.ShippingAddress = newAddress1;
             customer.ShippingAddress2 = newAddress2;
             Assert.AreEqual(company, customer.Organization);
 
             // Update the customer and check the result
-            ICustomer result = Chargify.UpdateCustomer(customer);
+            var result = Chargify.UpdateCustomer(customer);
             Assert.IsNotNull(result);
             Assert.AreEqual(company, result.Organization);
             Assert.AreEqual(newAddress1, result.ShippingAddress);
@@ -660,7 +660,7 @@ namespace ChargifyDotNetTests
             customer.Organization = string.Empty;
             customer.ShippingAddress = oldAddress1;
             customer.ShippingAddress2 = oldAddress2;
-            ICustomer result1 = Chargify.UpdateCustomer(customer);
+            var result1 = Chargify.UpdateCustomer(customer);
             Assert.IsNotNull(result1);
             Assert.AreEqual(string.Empty, result1.Organization);
             Assert.AreEqual(oldAddress1, result1.ShippingAddress);

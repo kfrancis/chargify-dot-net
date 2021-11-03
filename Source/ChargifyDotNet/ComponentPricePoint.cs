@@ -72,7 +72,7 @@ namespace ChargifyDotNet
         public ComponentPricePoint(string componentPricePointXml)
         {
             // get the XML into an XML document
-            XmlDocument doc = new XmlDocument();
+            XmlDocument doc = new();
             doc.LoadXml(componentPricePointXml);
             if (doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(componentPricePointXml));
             // loop through the child nodes of this node
@@ -119,7 +119,7 @@ namespace ChargifyDotNet
         /// <param name="obj">The JsonObject containing product data</param>
         private void LoadFromJson(JsonObject obj)
         {
-            foreach (string key in obj.Keys)
+            foreach (var key in obj.Keys)
             {
                 switch (key)
                 {
@@ -347,7 +347,7 @@ namespace ChargifyDotNet
         /// <param name="obj">The JsonObject containing product data</param>
         private void LoadFromJson(JsonObject obj)
         {
-            foreach (string key in obj.Keys)
+            foreach (var key in obj.Keys)
             {
                 switch (key)
                 {

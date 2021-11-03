@@ -48,7 +48,7 @@ namespace ChargifyDotNetTests
             if (subscription == null) Assert.Inconclusive("A valid subscription could not be found.");
 
             // Act
-            bool balanceResult = false;
+            var balanceResult = false;
             if (subscription.BalanceInCents > 0)
             {
                 balanceResult = client.ResetSubscriptionBalance(subscription.SubscriptionID);
@@ -58,7 +58,8 @@ namespace ChargifyDotNetTests
             TestContext.WriteLine($"{retrievedSubscription.SubscriptionID}");
 
             // Assert
-            if (subscription.BalanceInCents > 0) {
+            if (subscription.BalanceInCents > 0)
+            {
                 Assert.IsNotNull(balanceResult);
                 Assert.IsTrue(balanceResult == true);
             }
@@ -93,12 +94,12 @@ namespace ChargifyDotNetTests
             var amountToCharge = 1.00m;
 
             // Act
-            bool balanceResult = false;
+            var balanceResult = false;
             if (subscription.BalanceInCents > 0)
             {
                 balanceResult = client.ResetSubscriptionBalance(subscription.SubscriptionID);
             }
-            var adjustmentResult = client.CreateAdjustment(subscription.SubscriptionID,amountToCharge, "Credit before charge");
+            var adjustmentResult = client.CreateAdjustment(subscription.SubscriptionID, amountToCharge, "Credit before charge");
             var result = client.CreateCharge(subscription.SubscriptionID, amountToCharge, "Test Charge", useNegativeBalance: true);
             //var retrievedSubscription = client.Find<Subscription>(subscription.SubscriptionID);
 
@@ -142,7 +143,7 @@ namespace ChargifyDotNetTests
             var amountToCharge = 1.00m;
 
             // Act
-            bool balanceResult = false;
+            var balanceResult = false;
             if (subscription.BalanceInCents > 0)
             {
                 balanceResult = client.ResetSubscriptionBalance(subscription.SubscriptionID);

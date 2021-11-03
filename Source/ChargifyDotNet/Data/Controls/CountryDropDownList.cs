@@ -23,11 +23,11 @@ namespace ChargifyNET.Controls
         {
             if (!Page.IsPostBack)
             {
-                CountryNameLookup lookup = new CountryNameLookup();
-                foreach (KeyValuePair<string, string> country in lookup.GetData())
+                CountryNameLookup lookup = new();
+                foreach (var country in lookup.GetData())
                 {
                     // Since the data comes in as Unicode, we need to ASCII encode it for HTML.                    
-                    string countryName = Encoding.ASCII.GetString(Encoding.Unicode.GetBytes(country.Value));
+                    var countryName = Encoding.ASCII.GetString(Encoding.Unicode.GetBytes(country.Value));
                     Items.Add(new ListItem(countryName, country.Key));
                 }
             }

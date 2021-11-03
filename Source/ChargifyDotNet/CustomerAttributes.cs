@@ -119,7 +119,7 @@ namespace ChargifyNET
         public CustomerAttributes(string customerAttributesXml)
         {
             // get the XML into an XML document
-            XmlDocument doc = new XmlDocument();
+            XmlDocument doc = new();
             doc.LoadXml(customerAttributesXml);
             if (doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(customerAttributesXml));
             // loop through the child nodes of this node
@@ -163,7 +163,7 @@ namespace ChargifyNET
         /// <param name="obj">The JsonObject containing customer attribute data</param>
         private void LoadFromJson(JsonObject obj)
         {
-            foreach (string key in obj.Keys)
+            foreach (var key in obj.Keys)
             {
                 switch (key)
                 {

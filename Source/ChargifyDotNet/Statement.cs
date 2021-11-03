@@ -93,7 +93,7 @@ namespace ChargifyNET
         public Statement(string statementXml)
         {
             // get the XML into an XML document
-            XmlDocument doc = new XmlDocument();
+            XmlDocument doc = new();
             doc.LoadXml(statementXml);
             if (doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(statementXml));
             // loop through the child nodes of this node
@@ -138,7 +138,7 @@ namespace ChargifyNET
         /// <param name="obj">The JsonObject to retrieve the values from</param>
         private void LoadFromJson(JsonObject obj)
         {
-            foreach (string key in obj.Keys)
+            foreach (var key in obj.Keys)
             {
                 switch (key)
                 {
@@ -233,12 +233,12 @@ namespace ChargifyNET
                         break;
                     case TrasactionsKey:
                         _transactions = new List<ITransaction>();
-                        JsonArray transactionsArray = obj[key] as JsonArray;
+                        var transactionsArray = obj[key] as JsonArray;
                         if (transactionsArray != null)
                         {
                             foreach (var jsonValue in transactionsArray.Items)
                             {
-                                var transaction = (JsonObject) jsonValue;
+                                var transaction = (JsonObject)jsonValue;
                                 _transactions.Add(new Transaction(transaction));
                             }
                         }
@@ -628,7 +628,7 @@ namespace ChargifyNET
         {
             get { return _transactions; }
         }
-        private List<ITransaction> _transactions = new List<ITransaction>();
+        private List<ITransaction> _transactions = new();
 
         /// <summary>
         /// A collection of the events associated with the statement

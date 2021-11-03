@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using ChargifyNET;
 using ChargifyDotNetTests.Base;
 using System.Linq;
@@ -22,7 +22,7 @@ namespace ChargifyDotNetTests
             var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value as Subscription;
             Assert.IsNotNull(subscription, "No suitable subscription could be found.");
             var noteBody = Guid.NewGuid().ToString();
-            Random rand = new Random();
+            Random rand = new();
             var isSticky = rand.Next(0, 1) == 1;
 
             // Act
@@ -48,10 +48,10 @@ namespace ChargifyDotNetTests
             // Arrange
             var subList = Chargify.GetSubscriptionList();
             var firstSubscription = subList.FirstOrDefault(s => s.Value.State == SubscriptionState.Active && Chargify.GetNotesForSubscription(s.Key) != null && Chargify.GetNotesForSubscription(s.Key).Any()).Value as Subscription;
-            Assert.IsNotNull(firstSubscription, "No suitable subscription could be found.");
+            if (firstSubscription == null) Assert.Inconclusive("No suitable subscription could be found.");
             var note = Chargify.GetNotesForSubscription(firstSubscription.SubscriptionID).FirstOrDefault().Value;
             var secondSubscription = subList.FirstOrDefault(s => s.Value.State == SubscriptionState.Active && Chargify.GetNotesForSubscription(s.Key) == null || !Chargify.GetNotesForSubscription(s.Key).Any()).Value as Subscription;
-            Assert.IsNotNull(secondSubscription, "No suitable second subscription could be found.");
+            if (secondSubscription == null) Assert.Inconclusive("No suitable second subscription could be found.");
             note.SubscriptionID = secondSubscription.SubscriptionID;
 
             // Act
@@ -77,7 +77,7 @@ namespace ChargifyDotNetTests
             // Arrange
             var subList = Chargify.GetSubscriptionList();
             var subscription = subList.FirstOrDefault(s => s.Value.State == SubscriptionState.Active && Chargify.GetNotesForSubscription(s.Key) != null && Chargify.GetNotesForSubscription(s.Key).Any()).Value as Subscription;
-            Assert.IsNotNull(subscription, "No suitable subscription could be found.");
+            if (subscription == null) Assert.Inconclusive("No suitable subscription could be found.");
             var note = Chargify.GetNotesForSubscription(subscription.SubscriptionID).FirstOrDefault().Value;
             Assert.IsNotNull(note, "No suitable note could be found");
 

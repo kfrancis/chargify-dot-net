@@ -1,4 +1,4 @@
-﻿using ChargifyDotNetTests.Base;
+using ChargifyDotNetTests.Base;
 using System.Linq;
 using ChargifyNET;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -81,8 +81,8 @@ namespace ChargifyDotNetTests
             if (subscription == null) Assert.Inconclusive("A valid subscription could not be found.");
             var component = Chargify.GetComponentsForProductFamily(productFamily.ID, false).FirstOrDefault(c => c.Value.Kind == ComponentType.Metered_Component).Value;
             if (component == null) Assert.Inconclusive("A valid component could not be found.");
-            int usageQuantity = 5;
-            string usageDescription = "testing";
+            var usageQuantity = 5;
+            var usageDescription = "testing";
 
             // Act
             var usageResult = Chargify.AddUsage(subscription.SubscriptionID, component.ID, usageQuantity, usageDescription);
@@ -113,7 +113,7 @@ namespace ChargifyDotNetTests
             Assert.IsNotNull(product, "Product couldn't be found");
             var referenceId = Guid.NewGuid().ToString();
             var newCustomer = new CustomerAttributes("Scott", "Pilgrim", "demonhead_sucks@scottpilgrim.com", "Chargify", referenceId);
-            var newPaymentInfo = GetTestPaymentMethod(newCustomer);
+            var newPaymentInfo = ComponentTests.GetTestPaymentMethod(newCustomer);
             // Find components that allow for a simple allocated_quantity = 1 to work for this simple test
             var components = Chargify.GetComponentsForProductFamily(product.ProductFamily.ID).Values.Where(c => c.Kind == ComponentType.Quantity_Based_Component || c.Kind == ComponentType.On_Off_Component);
             var componentsToUse = components.Take(2).ToList();
@@ -178,7 +178,7 @@ namespace ChargifyDotNetTests
         [TestMethod]
         public void PricePoints_Create(string method)
         {
-            bool isJson = method == "json";
+            var isJson = method == "json";
             SetJson(isJson);
 
             // Arrange
@@ -189,7 +189,6 @@ namespace ChargifyDotNetTests
             var priceFaker = new Faker<ComponentPrice>()
                 .RuleFor(c => c.ComponentId, f => subscriptionComponent.ComponentID)
                 .RuleFor(c => c.StartingQuantity, f => f.Random.Number(1, 5000))
-                //.RuleFor(c => c.EndingQuantity, f => f.Random.Long())
                 .RuleFor(c => c.UnitPrice, f => f.Finance.Amount());
 
             var pricePointFaker = new Faker<ComponentPricePoint>()
@@ -205,11 +204,11 @@ namespace ChargifyDotNetTests
             //.RuleFor(c => c.OveragePricingScheme, f => f.Random.Bool(0.1f) ? f.PickRandom<PricingSchemeType>() : PricingSchemeType.Unknown)
             //.RuleFor(c => c.OveragePricingPrices, (f, c) => c.OveragePricingScheme != PricingSchemeType.Unknown ? priceFaker.GenerateBetween(1, f.Random.Number(2, 4)) : null);
 
-            ComponentPricePoint newPricePoint = pricePointFaker.Generate(1).Single();
+            var newPricePoint = pricePointFaker.Generate(1).Single();
             newPricePoint = ComponentTests.FixPricePoints(newPricePoint);
 
             // Act
-            ComponentPricePoint result = Chargify.CreatePricePoint(subscriptionComponent.ComponentID, newPricePoint);
+            var result = Chargify.CreatePricePoint(subscriptionComponent.ComponentID, newPricePoint);
 
             // Assert
             result.ShouldNotBeNull();
@@ -262,7 +261,7 @@ namespace ChargifyDotNetTests
         private static List<ComponentPrice> FixStartEndQuantities(List<ComponentPrice> priceList)
         {
             var listCopy = priceList.ToList();
-            for (int i = 0; i <= listCopy.Count() - 1; i++)
+            for (var i = 0; i <= listCopy.Count - 1; i++)
             {
                 if (i == 0)
                 {
@@ -283,7 +282,7 @@ namespace ChargifyDotNetTests
         [TestMethod]
         public void PricePoints_PromoteToDefault(string method)
         {
-            bool isJson = method == "json";
+            var isJson = method == "json";
             SetJson(isJson);
 
             // Arrange
@@ -310,7 +309,7 @@ namespace ChargifyDotNetTests
         [TestMethod]
         public void PricePoints_CreateBulk(string method)
         {
-            bool isJson = method == "json";
+            var isJson = method == "json";
             SetJson(isJson);
 
             // Arrange
@@ -327,7 +326,7 @@ namespace ChargifyDotNetTests
         [TestMethod]
         public void PricePoints_Update(string method)
         {
-            bool isJson = method == "json";
+            var isJson = method == "json";
 
             SetJson(isJson);
 
@@ -345,7 +344,7 @@ namespace ChargifyDotNetTests
         [TestMethod]
         public void PricePoints_Archive(string method)
         {
-            bool isJson = method == "json";
+            var isJson = method == "json";
             SetJson(isJson);
 
             // Arrange
@@ -373,7 +372,7 @@ namespace ChargifyDotNetTests
         [TestMethod]
         public void PricePoints_Read(string method)
         {
-            bool isJson = method == "json";
+            var isJson = method == "json";
             SetJson(isJson);
 
             // Arrange
@@ -397,7 +396,7 @@ namespace ChargifyDotNetTests
         [TestMethod]
         public void PricePoints_Unarchive(string method)
         {
-            bool isJson = method == "json";
+            var isJson = method == "json";
             SetJson(isJson);
 
             // Arrange
@@ -425,7 +424,7 @@ namespace ChargifyDotNetTests
         [TestMethod]
         public void PricePoints_UpdatePrices(string method)
         {
-            bool isJson = method == "json";
+            var isJson = method == "json";
             SetJson(isJson);
 
             // Arrange
@@ -442,7 +441,7 @@ namespace ChargifyDotNetTests
         [TestMethod]
         public void PricePoints_CreatePrices(string method)
         {
-            bool isJson = method == "json";
+            var isJson = method == "json";
             SetJson(isJson);
 
             // Arrange
@@ -453,7 +452,7 @@ namespace ChargifyDotNetTests
             SetJson(!isJson);
         }
 
-        private CreditCardAttributes GetTestPaymentMethod(CustomerAttributes customer)
+        private static CreditCardAttributes GetTestPaymentMethod(CustomerAttributes customer)
         {
             var retVal = new CreditCardAttributes()
             {
