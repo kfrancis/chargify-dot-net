@@ -1678,12 +1678,14 @@
             IntervalUnit result = IntervalUnit.Unknown;
             if (obj?.ContainsKey(key) == true)
             {
-                JsonString str = obj[key] as JsonString;
-                if (str.Value != null)
+                if (obj.TryGetValue(key, out var str))
                 {
-                    if (!Enum.TryParse<IntervalUnit>(str.Value, true, out result))
+                    if (str is JsonString jsonString && str != null)
                     {
-                        result = IntervalUnit.Unknown;
+                        if (!Enum.TryParse<IntervalUnit>(jsonString.Value, true, out result))
+                        {
+                            result = IntervalUnit.Unknown;
+                        }
                     }
                 }
             }

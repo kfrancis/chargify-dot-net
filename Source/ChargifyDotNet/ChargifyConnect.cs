@@ -2664,20 +2664,20 @@ namespace ChargifyNET
                                                         string billingCountry, string couponCode, int componentId, int allocatedQuantity)
         {
             // make sure data is valid
-            if (string.IsNullOrEmpty(productHandle)) throw new ArgumentNullException("productHandle");
+            if (string.IsNullOrEmpty(productHandle)) throw new ArgumentNullException(nameof(productHandle));
             var product = LoadProduct(productHandle);
             if (product == null) throw new ArgumentException("The product doesn't exist", productHandle);
             if ((componentId != int.MinValue) && (allocatedQuantity == int.MinValue)) throw new ArgumentNullException("allocatedQuantity");
 
-            if (string.IsNullOrEmpty(firstName)) throw new ArgumentNullException("firstName");
-            if (string.IsNullOrEmpty(lastName)) throw new ArgumentNullException("lastName");
-            if (string.IsNullOrEmpty(emailAddress)) throw new ArgumentNullException("emailAddress");
-            if (string.IsNullOrEmpty(fullNumber)) throw new ArgumentNullException("fullNumber");
+            if (string.IsNullOrEmpty(firstName)) throw new ArgumentNullException(nameof(firstName));
+            if (string.IsNullOrEmpty(lastName)) throw new ArgumentNullException(nameof(lastName));
+            if (string.IsNullOrEmpty(emailAddress)) throw new ArgumentNullException(nameof(emailAddress));
+            if (string.IsNullOrEmpty(fullNumber)) throw new ArgumentNullException(nameof(fullNumber));
             //if (NewSystemID == string.Empty) throw new ArgumentNullException("NewSystemID");
-            if ((expirationMonth <= 0) && (expirationMonth > 12)) throw new ArgumentException("Not within range", "expirationMonth");
-            if (expirationYear < DateTime.Today.Year) throw new ArgumentException("Not within range", "expirationYear");
-            if (_cvvRequired && string.IsNullOrEmpty(cvv)) throw new ArgumentNullException("cvv");
-            if (_cvvRequired && ((cvv.Length < 3) || (cvv.Length > 4))) throw new ArgumentException("CVV must be 3 or 4 digits", "cvv");
+            if ((expirationMonth <= 0) && (expirationMonth > 12)) throw new ArgumentException("Not within range", nameof(expirationMonth));
+            if (new DateTime(expirationYear, expirationMonth, 1) < DateTime.Now) throw new ArgumentException("Not within range", nameof(expirationYear));
+            if (_cvvRequired && string.IsNullOrEmpty(cvv)) throw new ArgumentNullException(nameof(cvv));
+            if (_cvvRequired && ((cvv.Length < 3) || (cvv.Length > 4))) throw new ArgumentException("CVV must be 3 or 4 digits", nameof(cvv));
 
             // Don't throw exceptions, as there's no product property (yet) to know if the product requires these fields.
             //if (string.IsNullOrEmpty(BillingAddress)) throw new ArgumentNullException("BillingAddress");

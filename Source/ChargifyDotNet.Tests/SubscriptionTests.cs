@@ -812,16 +812,6 @@ namespace ChargifyDotNetTests
             Assert.IsTrue(newSubscription.ProductPrice == product.Price);
             Assert.IsTrue(!string.IsNullOrWhiteSpace(newSubscription.ReferralCode));
             Assert.AreEqual(product.TrialInterval > 0 ? SubscriptionState.Trialing : SubscriptionState.Active, newSubscription.State);
-            if (Chargify.UseJSON)
-            {
-                Assert.AreEqual(true, data.IsJSON());
-                Assert.AreEqual(false, data.IsXml());
-            }
-            else
-            {
-                Assert.AreEqual(true, data.IsXml());
-                Assert.AreEqual(false, data.IsJSON());
-            }
 
             // Cleanup
             Assert.IsTrue(Chargify.DeleteSubscription(newSubscription.SubscriptionID, "Automatic cancel due to test"));
@@ -1211,8 +1201,8 @@ namespace ChargifyDotNetTests
             {
                 FirstName = customer.FirstName,
                 LastName = customer.LastName,
-                ExpirationMonth = 1,
-                ExpirationYear = 2020,
+                ExpirationMonth = DateTime.Now.AddMonths(1).Month,
+                ExpirationYear = DateTime.Now.AddYears(1).Year,
                 FullNumber = "1",
                 CVV = "123",
                 BillingAddress = "123 Main St.",
