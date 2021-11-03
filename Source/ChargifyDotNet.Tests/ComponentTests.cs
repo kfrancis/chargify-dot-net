@@ -141,13 +141,13 @@ namespace ChargifyDotNetTests
         }
 
         [DataTestMethod]
-        [DataRow(false)]
-        [DataRow(true)]
+        [DataRow("xml")]
+        [DataRow("json")]
 
         [TestMethod]
-        public void PricePoints_Create(bool isJson)
+        public void PricePoints_Create(string method)
         {
-            SetJson(isJson);
+            SetJson(method == "json");
 
             // Arrange
             var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value;
@@ -187,7 +187,7 @@ namespace ChargifyDotNetTests
             result.PricingScheme.ShouldBe(newPricePoint.PricingScheme);
             result.Prices.Count.ShouldBe(newPricePoint.Prices.Count);
 
-            SetJson(!isJson);
+            SetJson(method != "json");
         }
 
         /// <summary>
@@ -246,11 +246,12 @@ namespace ChargifyDotNetTests
         }
 
         [DataTestMethod]
-        [DataRow(false)]
-        [DataRow(true)]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void PricePoints_PromoteToDefault(bool isJson)
+        public void PricePoints_PromoteToDefault(string method)
         {
+            bool isJson = method == "json";
             SetJson(isJson);
 
             // Arrange
@@ -258,34 +259,26 @@ namespace ChargifyDotNetTests
             if (subscription == null) Assert.Inconclusive("A valid subscription could not be found.");
             var subscriptionComponent = Chargify.GetComponentInfoForSubscription(subscription.SubscriptionID, 1526150);
 
-            var defaultPricePoint = subscriptionComponent.PricePoints.FirstOrDefault(x => x.Default == true);
-            var firstNonDefaultPricePoint = subscriptionComponent.PricePoints.FirstOrDefault(x => x.Default != true);
+            var pricePoints = Chargify.GetPricePoints(subscriptionComponent.ComponentID).Values;
+
+            var defaultPricePoint = pricePoints.FirstOrDefault(x => x.Default == true);
+            var firstNonDefaultPricePoint = pricePoints.FirstOrDefault(x => x.Default != true);
+
+            var result = Chargify.SetPricePointDefault(defaultPricePoint.ComponentId, firstNonDefaultPricePoint.Id);
+
+            result.ShouldNotBeNull();
+            result.ShouldBeTrue();
 
             SetJson(!isJson);
         }
 
         [DataTestMethod]
-        [DataRow(false)]
-        [DataRow(true)]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void PricePoints_CreateBulk(bool isJson)
+        public void PricePoints_CreateBulk(string method)
         {
-            SetJson(isJson);
-
-            // Arrange
-            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value;
-            if (subscription == null) Assert.Inconclusive("A valid subscription could not be found.");
-            var subscriptionComponent = Chargify.GetComponentInfoForSubscription(subscription.SubscriptionID, 1526150);
-
-            SetJson(!isJson);
-        }
-
-        [DataTestMethod]
-        [DataRow(false)]
-        [DataRow(true)]
-        [TestMethod]
-        public void PricePoints_Update(bool isJson)
-        {
+            bool isJson = method == "json";
             SetJson(isJson);
 
             // Arrange
@@ -297,11 +290,30 @@ namespace ChargifyDotNetTests
         }
 
         [DataTestMethod]
-        [DataRow(false)]
-        [DataRow(true)]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void PricePoints_Archive(bool isJson)
+        public void PricePoints_Update(string method)
         {
+            bool isJson = method == "json";
+
+            SetJson(isJson);
+
+            // Arrange
+            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value;
+            if (subscription == null) Assert.Inconclusive("A valid subscription could not be found.");
+            var subscriptionComponent = Chargify.GetComponentInfoForSubscription(subscription.SubscriptionID, 1526150);
+
+            SetJson(!isJson);
+        }
+
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
+        [TestMethod]
+        public void PricePoints_Archive(string method)
+        {
+            bool isJson = method == "json";
             SetJson(isJson);
 
             // Arrange
@@ -321,11 +333,12 @@ namespace ChargifyDotNetTests
         }
 
         [DataTestMethod]
-        [DataRow(false)]
-        [DataRow(true)]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void PricePoints_Read(bool isJson)
+        public void PricePoints_Read(string method)
         {
+            bool isJson = method == "json";
             SetJson(isJson);
 
             // Arrange
@@ -338,16 +351,18 @@ namespace ChargifyDotNetTests
 
             result.ShouldNotBeNull();
             result.ShouldAllBe(x => x.Value.ComponentId == subscriptionComponent.ComponentID);
+            result.Values.Count.ShouldBe(subscriptionComponent.PricePoints.Count());
 
             SetJson(!isJson);
         }
 
         [DataTestMethod]
-        [DataRow(false)]
-        [DataRow(true)]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void PricePoints_Unarchive(bool isJson)
+        public void PricePoints_Unarchive(string method)
         {
+            bool isJson = method == "json";
             SetJson(isJson);
 
             // Arrange
@@ -367,11 +382,12 @@ namespace ChargifyDotNetTests
         }
 
         [DataTestMethod]
-        [DataRow(false)]
-        [DataRow(true)]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void PricePoints_UpdatePrices(bool isJson)
+        public void PricePoints_UpdatePrices(string method)
         {
+            bool isJson = method == "json";
             SetJson(isJson);
 
             // Arrange
@@ -383,11 +399,12 @@ namespace ChargifyDotNetTests
         }
 
         [DataTestMethod]
-        [DataRow(false)]
-        [DataRow(true)]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void PricePoints_CreatePrices(bool isJson)
+        public void PricePoints_CreatePrices(string method)
         {
+            bool isJson = method == "json";
             SetJson(isJson);
 
             // Arrange

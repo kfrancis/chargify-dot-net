@@ -4084,9 +4084,25 @@ namespace ChargifyNET
             throw new NotImplementedException();
         }
 
-        public ComponentPricePoint SetPricePointDefault(int componentID, long pricePointId)
+        public bool SetPricePointDefault(long componentID, long pricePointId)
         {
-            throw new NotImplementedException();
+            //components/{component_id}/price_points/{price_point_id}/default.json
+            try
+            {
+                // make sure data is valid
+                if (pricePointId < 0) throw new ArgumentNullException(nameof(pricePointId));
+                if (componentID < 0) throw new ArgumentNullException(nameof(componentID));
+
+                // now make the request
+                string response = DoRequest(string.Format("components/{0}/price_points/{1}/default.{2}", componentID, pricePointId, GetMethodExtension()), HttpRequestMethod.Put, null);
+
+                // Convert the Chargify response into the object we're looking for
+                return true;
+            }
+            catch (ChargifyException)
+            {
+                return false;
+            }
         }
 
         public ComponentPricePoint ArchivePricePoint(int componentID, long pricePointId)
