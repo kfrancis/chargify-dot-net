@@ -7021,8 +7021,8 @@
         </member>
         <member name="P:ChargifyNET.IRenewalDetails.UncalculatedTaxes">
             <summary>
-            A boolean indicating whether or not additional taxes will be calculated at the time of renewal. 
-            This will be true if you are using Avalara and the address of the subscription is 
+            A boolean indicating whether or not additional taxes will be calculated at the time of renewal.
+            This will be true if you are using Avalara and the address of the subscription is
             in one of your defined taxable regions.
             </summary>
         </member>
