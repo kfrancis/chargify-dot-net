@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using ChargifyNET;
 using System.Net;
 using Bogus;
@@ -14,7 +14,7 @@ namespace ChargifyDotNetTests.Base
         ///</summary>
         public TestContext TestContext { get; set; }
 
-        public ChargifyConnect Chargify => _chargify ?? (_chargify = new ChargifyConnect
+        public ChargifyConnect Chargify => _chargify ??= new ChargifyConnect
         {
             apiKey = "",
             Password = "X",
@@ -22,7 +22,7 @@ namespace ChargifyDotNetTests.Base
             SharedKey = "123456789",
             UseJSON = false,
             ProtocolType = SecurityProtocolType.Tls12
-        });
+        };
 
         private ChargifyConnect _chargify;
 
@@ -77,11 +77,12 @@ namespace ChargifyDotNetTests.Base
             return retVal;
         }
 
-        public static Faker Faker => new Faker("en");
+        public static Faker Faker => new("en");
 
         internal void SetJson(bool useJson)
         {
-            if (Chargify != null) {
+            if (Chargify != null)
+            {
                 _chargify.UseJSON = useJson;
             }
         }

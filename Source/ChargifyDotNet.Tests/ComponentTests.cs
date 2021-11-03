@@ -182,7 +182,7 @@ namespace ChargifyDotNetTests
             SetJson(isJson);
 
             // Arrange
-            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value;
+            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active && s.Value.Product.ID == 5830949).Value;
             if (subscription == null) Assert.Inconclusive("A valid subscription could not be found.");
             var subscriptionComponent = Chargify.GetComponentInfoForSubscription(subscription.SubscriptionID, 1526150);
 
@@ -286,7 +286,7 @@ namespace ChargifyDotNetTests
             SetJson(isJson);
 
             // Arrange
-            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value;
+            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active && s.Value.Product.ID == 5830949).Value;
             if (subscription == null) Assert.Inconclusive("A valid subscription could not be found.");
             var subscriptionComponent = Chargify.GetComponentInfoForSubscription(subscription.SubscriptionID, 1526150);
 
@@ -313,7 +313,7 @@ namespace ChargifyDotNetTests
             SetJson(isJson);
 
             // Arrange
-            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value;
+            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active && s.Value.Product.ID == 5830949).Value;
             if (subscription == null) Assert.Inconclusive("A valid subscription could not be found.");
             var subscriptionComponent = Chargify.GetComponentInfoForSubscription(subscription.SubscriptionID, 1526150);
 
@@ -331,7 +331,7 @@ namespace ChargifyDotNetTests
             SetJson(isJson);
 
             // Arrange
-            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value;
+            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active && s.Value.Product.ID == 5830949).Value;
             if (subscription == null) Assert.Inconclusive("A valid subscription could not be found.");
             var subscriptionComponent = Chargify.GetComponentInfoForSubscription(subscription.SubscriptionID, 1526150);
 
@@ -348,7 +348,7 @@ namespace ChargifyDotNetTests
             SetJson(isJson);
 
             // Arrange
-            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value;
+            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active && s.Value.Product.ID == 5830949).Value;
             if (subscription == null) Assert.Inconclusive("A valid subscription could not be found.");
             var subscriptionComponent = Chargify.GetComponentInfoForSubscription(subscription.SubscriptionID, 1526150);
 
@@ -376,7 +376,7 @@ namespace ChargifyDotNetTests
             SetJson(isJson);
 
             // Arrange
-            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value;
+            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active && s.Value.Product.ID == 5830949).Value;
             if (subscription == null) Assert.Inconclusive("A valid subscription could not be found.");
             var subscriptionComponent = Chargify.GetComponentInfoForSubscription(subscription.SubscriptionID, 1526150);
 
@@ -400,7 +400,7 @@ namespace ChargifyDotNetTests
             SetJson(isJson);
 
             // Arrange
-            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value;
+            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active && s.Value.Product.ID == 5830949).Value;
             if (subscription == null) Assert.Inconclusive("A valid subscription could not be found.");
             var subscriptionComponent = Chargify.GetComponentInfoForSubscription(subscription.SubscriptionID, 1526150);
 
@@ -428,9 +428,18 @@ namespace ChargifyDotNetTests
             SetJson(isJson);
 
             // Arrange
-            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value;
+            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active && s.Value.Product.ID == 5830949).Value;
             if (subscription == null) Assert.Inconclusive("A valid subscription could not be found.");
             var subscriptionComponent = Chargify.GetComponentInfoForSubscription(subscription.SubscriptionID, 1526150);
+
+            var pricePoints = Chargify.GetPricePoints(subscriptionComponent.ComponentID)?.Values.ToList();
+            var firstPricePoint = pricePoints.FirstOrDefault();
+            if (firstPricePoint == null) Assert.Inconclusive();
+
+            var firstPrice = firstPricePoint.Prices.FirstOrDefault();
+            firstPrice.UnitPrice += 1;
+
+            //Chargify.UpdatePriceInPricePoint(subscriptionComponent.ComponentID, firstPrice);
 
             SetJson(!isJson);
         }
@@ -445,7 +454,7 @@ namespace ChargifyDotNetTests
             SetJson(isJson);
 
             // Arrange
-            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value;
+            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active && s.Value.Product.ID == 5830949).Value;
             if (subscription == null) Assert.Inconclusive("A valid subscription could not be found.");
             var subscriptionComponent = Chargify.GetComponentInfoForSubscription(subscription.SubscriptionID, 1526150);
 
