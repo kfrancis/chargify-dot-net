@@ -9,9 +9,15 @@ namespace ChargifyDotNetTests
     [TestClass]
     public class NoteTests : ChargifyTestBase
     {
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Notes_CanCreate()
+        public void Notes_CanCreate(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value as Subscription;
             Assert.IsNotNull(subscription, "No suitable subscription could be found.");
@@ -26,11 +32,19 @@ namespace ChargifyDotNetTests
             Assert.IsNotNull(result);
             Assert.AreEqual(noteBody, result.Body);
             Assert.AreEqual(isSticky, result.Sticky);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Notes_CanCopy()
+        public void Notes_CanCopy(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var subList = Chargify.GetSubscriptionList();
             var firstSubscription = subList.FirstOrDefault(s => s.Value.State == SubscriptionState.Active && Chargify.GetNotesForSubscription(s.Key) != null && Chargify.GetNotesForSubscription(s.Key).Any()).Value as Subscription;
@@ -47,11 +61,19 @@ namespace ChargifyDotNetTests
             Assert.IsNotNull(result);
             Assert.AreNotEqual(firstSubscription.SubscriptionID, result.SubscriptionID);
             Assert.AreEqual(secondSubscription.SubscriptionID, result.SubscriptionID);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Notes_CanLoad()
+        public void Notes_CanLoad(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var subList = Chargify.GetSubscriptionList();
             var subscription = subList.FirstOrDefault(s => s.Value.State == SubscriptionState.Active && Chargify.GetNotesForSubscription(s.Key) != null && Chargify.GetNotesForSubscription(s.Key).Any()).Value as Subscription;
@@ -69,11 +91,19 @@ namespace ChargifyDotNetTests
             Assert.AreEqual(note.Sticky, result.Sticky);
             Assert.AreEqual(note.CreatedAt, result.CreatedAt);
             Assert.AreEqual(note.UpdatedAt, result.UpdatedAt);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Notes_CanGetForSubscription()
+        public void Notes_CanGetForSubscription(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var subList = Chargify.GetSubscriptionList();
             var firstSubscription = subList.FirstOrDefault(s => s.Value.State == SubscriptionState.Active && Chargify.GetNotesForSubscription(s.Key) != null && Chargify.GetNotesForSubscription(s.Key).Any()).Value as Subscription;
@@ -90,11 +120,19 @@ namespace ChargifyDotNetTests
             Assert.IsNotNull(secondResult);
             Assert.AreEqual(0, secondResult.Count);
             Assert.IsTrue(firstResult.Count > 0);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Notes_CanUpdate()
+        public void Notes_CanUpdate(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active && Chargify.GetNotesForSubscription(s.Key) != null && Chargify.GetNotesForSubscription(s.Key).Any()).Value as Subscription;
             if (subscription == null) Assert.Inconclusive("A valid subscription could not be found.");
@@ -113,11 +151,19 @@ namespace ChargifyDotNetTests
             Assert.AreEqual(updatedBody, result.Body);
             Assert.AreEqual(updatedSticky, result.Sticky);
             Assert.AreEqual(note.SubscriptionID, result.SubscriptionID);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Notes_CanDelete()
+        public void Notes_CanDelete(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active && Chargify.GetNotesForSubscription(s.Key) != null && Chargify.GetNotesForSubscription(s.Key).Any()).Value as Subscription;
             Assert.IsNotNull(subscription, "No suitable subscription could be found.");
@@ -129,6 +175,8 @@ namespace ChargifyDotNetTests
 
             // Assert
             Assert.IsTrue(result);
+
+            SetJson(!isJson);
         }
     }
 }

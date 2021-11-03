@@ -8,9 +8,15 @@ namespace ChargifyDotNetTests
     [TestClass]
     public class StatementTests : ChargifyTestBase
     {
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Statements_Can_Get_PDF()
+        public void Statements_Can_Get_PDF(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == ChargifyNET.SubscriptionState.Active).Value;
             var statementIDs = Chargify.GetStatementIDs(subscription.SubscriptionID);
@@ -31,6 +37,8 @@ namespace ChargifyDotNetTests
             // Cleanup
             File.Delete(filePath);
             Assert.IsFalse(File.Exists(filePath));
+
+            SetJson(!isJson);
         }
     }
 }

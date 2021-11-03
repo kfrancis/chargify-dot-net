@@ -12,11 +12,17 @@ namespace ChargifyDotNetTests
     {
         private const string StringWithNonUnicodeCharacters = "ÄäËëÏïÖöÜüŸß";
         private const string StringWithAmpersand = "Foo&Bar";
+
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Customer_CreateWithError()
+        public void Customer_CreateWithError(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
-            Chargify.UseJSON = true;
             var customer = new Customer()
             {
                 FirstName = Faker.Name.FirstName()
@@ -35,12 +41,19 @@ namespace ChargifyDotNetTests
                 Assert.IsTrue(chEx.ErrorMessages.Any(e => e.Message == "Last name: cannot be blank."));
                 Assert.IsTrue(chEx.ErrorMessages.Any(e => e.Message == "Email address: cannot be blank."));
             }
-            Chargify.UseJSON = false;
+            
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Customer_CreateCustomer()
+        public void Customer_CreateCustomer(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             string referenceID = Guid.NewGuid().ToString();
             var customer = new Customer() 
@@ -81,11 +94,19 @@ namespace ChargifyDotNetTests
             Assert.IsTrue(createdCustomer.TaxExempt);
 
             Chargify.DeleteCustomer(createdCustomer.ChargifyID);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Can_revoke_billing_portal_access()
+        public void Can_revoke_billing_portal_access(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             string referenceID = Guid.NewGuid().ToString();
             var customer = new Customer() 
@@ -124,11 +145,19 @@ namespace ChargifyDotNetTests
             }
 
             Chargify.DeleteCustomer(createdCustomer.ChargifyID);
+            
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Can_enable_billing_portal_access()
+        public void Can_enable_billing_portal_access(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             string referenceID = Guid.NewGuid().ToString();
             var customer = new Customer() 
@@ -159,12 +188,19 @@ namespace ChargifyDotNetTests
             
 
             Chargify.DeleteCustomer(createdCustomer.ChargifyID);
+
+            SetJson(!isJson);
         }
 
-
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Can_revoke_billing_portal_access_by_system_id()
+        public void Can_revoke_billing_portal_access_by_system_id(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             string referenceID = Guid.NewGuid().ToString();
             var customer = new Customer() 
@@ -203,11 +239,19 @@ namespace ChargifyDotNetTests
             }
 
             Chargify.DeleteCustomer(createdCustomer.ChargifyID);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Can_enable_billing_portal_access_by_system_Id()
+        public void Can_enable_billing_portal_access_by_system_Id(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             string referenceID = Guid.NewGuid().ToString();
             var customer = new Customer() 
@@ -238,11 +282,19 @@ namespace ChargifyDotNetTests
             
 
             Chargify.DeleteCustomer(createdCustomer.ChargifyID);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Customer_AmpersandForOrganization()
+        public void Customer_AmpersandForOrganization(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             string referenceID = Guid.NewGuid().ToString();
             var customer = new Customer() 
@@ -268,11 +320,19 @@ namespace ChargifyDotNetTests
             Assert.IsNotNull(createdCustomer);
             //Assert.IsInstanceOfType(createdCustomer, typeof(Customer));
             Assert.IsTrue(createdCustomer.Organization == customer.Organization);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Customer_NonUnicodeForOrganization()
+        public void Customer_NonUnicodeForOrganization(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             string referenceID = Guid.NewGuid().ToString();
             var customer = new Customer()
@@ -298,11 +358,19 @@ namespace ChargifyDotNetTests
             Assert.IsNotNull(createdCustomer);
             //Assert.IsInstanceOfType(createdCustomer, typeof(Customer));
             Assert.IsTrue(createdCustomer.Organization == customer.Organization);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Customer_AmpersandCharactersForFirstName()
+        public void Customer_AmpersandCharactersForFirstName(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             string referenceID = Guid.NewGuid().ToString();
             var customer = new Customer()
@@ -328,10 +396,19 @@ namespace ChargifyDotNetTests
             Assert.IsNotNull(createdCustomer);
             //Assert.IsInstanceOfType(createdCustomer, typeof(Customer));
             Assert.IsTrue(createdCustomer.FirstName == customer.FirstName);
+
+            SetJson(!isJson);
         }
+
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Customer_NonUnicodeCharactersForFirstName()
+        public void Customer_NonUnicodeCharactersForFirstName(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             string referenceID = Guid.NewGuid().ToString();
             var customer = new Customer()
@@ -357,12 +434,19 @@ namespace ChargifyDotNetTests
             Assert.IsNotNull(createdCustomer);
             //Assert.IsInstanceOfType(createdCustomer, typeof(Customer));
             Assert.IsTrue(createdCustomer.FirstName == customer.FirstName);
+
+            SetJson(!isJson);
         }
 
-
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Customer_AmpersandCharactersForLastName()
+        public void Customer_AmpersandCharactersForLastName(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             string referenceID = Guid.NewGuid().ToString();
             var customer = new Customer()
@@ -388,10 +472,19 @@ namespace ChargifyDotNetTests
             Assert.IsNotNull(createdCustomer);
             //Assert.IsInstanceOfType(createdCustomer, typeof(Customer));
             Assert.IsTrue(createdCustomer.FirstName == customer.FirstName);
+
+            SetJson(!isJson);
         }
+
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Customer_NonUnicodeCharactersForLastName()
+        public void Customer_NonUnicodeCharactersForLastName(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             string referenceID = Guid.NewGuid().ToString();
             var customer = new Customer()
@@ -417,12 +510,19 @@ namespace ChargifyDotNetTests
             Assert.IsNotNull(createdCustomer);
             //Assert.IsInstanceOfType(createdCustomer, typeof(Customer));
             Assert.IsTrue(createdCustomer.FirstName == customer.FirstName);
+
+            SetJson(!isJson);
         }
 
-      
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Customer_NonUnicodeCharactersForEmailAddress()
+        public void Customer_NonUnicodeCharactersForEmailAddress(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             string referenceID = Guid.NewGuid().ToString();
             var customer = new Customer()
@@ -448,11 +548,19 @@ namespace ChargifyDotNetTests
             Assert.IsNotNull(createdCustomer);
             //Assert.IsInstanceOfType(createdCustomer, typeof(Customer));
             Assert.IsTrue(createdCustomer.FirstName == customer.FirstName);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Customer_ReadSingleCustomer()
+        public void Customer_ReadSingleCustomer(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             var customers = Chargify.GetCustomerList().Keys;
             // Load test customer via reference value (ASP.NET Membership ID)
             var referenceValue = customers.FirstOrDefault(systemID => !string.IsNullOrWhiteSpace(systemID));
@@ -468,22 +576,38 @@ namespace ChargifyDotNetTests
             Assert.AreEqual(customer.FirstName, customer1.FirstName);
             Assert.AreEqual(customer.LastName, customer1.LastName);
             Assert.AreEqual(customer.SystemID, customer1.SystemID);
+
+            SetJson(!isJson);
         }
 
         /// <summary>
         /// Get the list of customers
         /// </summary>
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Customer_ListCustomers()
+        public void Customer_ListCustomers(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             IDictionary<string, ICustomer> customerList = Chargify.GetCustomerList();
             Assert.IsNotNull(customerList);
             Assert.AreNotEqual(0, customerList.Count);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Customer_Update_Nothing()
+        public void Customer_Update_Nothing(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var customers = Chargify.GetCustomerList().Keys;
             var referenceValue = customers.FirstOrDefault(systemID => !string.IsNullOrWhiteSpace(systemID));
@@ -494,11 +618,19 @@ namespace ChargifyDotNetTests
 
             // Assert
             Assert.IsNotNull(updatedCustomer);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Customer_UpdateCustomer()
+        public void Customer_UpdateCustomer(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Load our test customer
             var customers = Chargify.GetCustomerList().Keys;
             // Load test customer via reference value (ASP.NET Membership ID)
@@ -533,6 +665,8 @@ namespace ChargifyDotNetTests
             Assert.AreEqual(string.Empty, result1.Organization);
             Assert.AreEqual(oldAddress1, result1.ShippingAddress);
             Assert.AreEqual(oldAddress2, result1.ShippingAddress2);
+
+            SetJson(!isJson);
         }
     }
 }

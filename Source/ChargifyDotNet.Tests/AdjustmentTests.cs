@@ -3,15 +3,22 @@ using System.Linq;
 using ChargifyDotNetTests.Base;
 using System.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Shouldly;
 
 namespace ChargifyDotNetTests
 {
     [TestClass]
     public class AdjustmentTests : ChargifyTestBase
     {
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Adjustment_Can_Adjust_Zero_Decimal()
+        public void Adjustment_Can_Adjust_Zero_Decimal(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == ChargifyNET.SubscriptionState.Active).Value;
             if (subscription == null) Assert.Inconclusive("No subscription found.");
@@ -27,8 +34,10 @@ namespace ChargifyDotNetTests
             Assert.IsNotNull(result);
             Assert.AreEqual(amount, result.Amount);
             Assert.AreEqual(Convert.ToInt32(amount), result.AmountInCents);
-            Assert.AreEqual(memo, result.Memo);
+            result.Memo.ShouldBe(memo);
             Assert.AreEqual(preAdjustmentBalance+amount, postAdjustmentSubscription.Balance);
+
+            SetJson(!isJson);
 
 #if !NUNIT
             TestContext.WriteLine("SubscriptionID: {0}", subscription.SubscriptionID);
@@ -37,9 +46,15 @@ namespace ChargifyDotNetTests
 #endif
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Adjustment_Can_Adjust_Zero_Integer()
+        public void Adjustment_Can_Adjust_Zero_Integer(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == ChargifyNET.SubscriptionState.Active).Value;
             if (subscription == null) Assert.Inconclusive("No subscription found.");
@@ -57,6 +72,8 @@ namespace ChargifyDotNetTests
             Assert.AreEqual(Convert.ToInt32(amount), result.AmountInCents);
             Assert.AreEqual(memo, result.Memo);
             Assert.AreEqual(preAdjustmentBalance+amount, postAdjustmentSubscription.BalanceInCents);
+
+            SetJson(!isJson);
 
 #if !NUNIT
             TestContext.WriteLine("SubscriptionID: {0}", subscription.SubscriptionID);

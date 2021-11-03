@@ -9,9 +9,15 @@ namespace ChargifyDotNetTests
     [TestClass]
     public class ProductFamilyTests : ChargifyTestBase
     {
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void ProductFamily_Can_Create_Simple()
+        public void ProductFamily_Can_Create_Simple(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var newFamily = new ProductFamily() {
                 Name = string.Format("Test{0}", Guid.NewGuid().ToString())
@@ -25,11 +31,19 @@ namespace ChargifyDotNetTests
             //Assert.IsInstanceOfType(result, typeof(IProductFamily));
             Assert.AreEqual(newFamily.Name, result.Name, "Name didn't match");
             Assert.AreEqual(newFamily.Name.ToLowerInvariant(), result.Handle, "Handle wasn't as expected");
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void ProductFamily_Can_Create_Complex()
+        public void ProductFamily_Can_Create_Complex(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var newFamily = new ProductFamily() {
                 Name = string.Format("Test{0}", Guid.NewGuid().ToString()),
@@ -48,11 +62,19 @@ namespace ChargifyDotNetTests
             Assert.AreEqual(newFamily.Description, result.Description, "Description didn't match");
             Assert.AreEqual(newFamily.Handle, result.Handle, "Handle didn't match");
             //Assert.AreEqual(newFamily.AccountingCode, result.AccountingCode, "Accounting Code didn't match");
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void ProductFamily_Can_Get_Listing()
+        public void ProductFamily_Can_Get_Listing(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Act
             var result = Chargify.GetProductFamilyList();
 
@@ -60,11 +82,19 @@ namespace ChargifyDotNetTests
             Assert.IsNotNull(result);
             //Assert.IsInstanceOfType(result, typeof(Dictionary<int, IProductFamily>));
             Assert.IsTrue(result.Count > 0);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void ProductFamily_Can_Retrieve_ByHandle()
+        public void ProductFamily_Can_Retrieve_ByHandle(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var familyListing = Chargify.GetProductFamilyList();
 
@@ -74,11 +104,19 @@ namespace ChargifyDotNetTests
             Assert.IsNotNull(result);
             //Assert.IsInstanceOfType(result, typeof(IProductFamily));
             Assert.AreEqual(familyListing.Values.FirstOrDefault().ID, result.ID, "IDs didn't match");
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void ProductFamily_Can_Retrieve_ByID()
+        public void ProductFamily_Can_Retrieve_ByID(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var familyListing = Chargify.GetProductFamilyList();
 
@@ -88,6 +126,8 @@ namespace ChargifyDotNetTests
             Assert.IsNotNull(result);
             //Assert.IsInstanceOfType(result, typeof(IProductFamily));
             Assert.AreEqual(familyListing.Values.FirstOrDefault().ID, result.ID, "IDs didn't match");
+
+            SetJson(!isJson);
         }
     }
 }

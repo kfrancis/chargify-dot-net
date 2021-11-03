@@ -82,9 +82,15 @@ namespace ChargifyDotNetTests
             }
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod, Ignore]
-        public void Sites_Can_Clear_All()
+        public void Sites_Can_Clear_All(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var productFamilyCount = Chargify.GetProductFamilyList().Count;
             var productCount = Chargify.GetProductList().Count;
@@ -109,11 +115,19 @@ namespace ChargifyDotNetTests
             Assert.AreEqual(0, newProductCount);
             Assert.AreEqual(0, newSubscriptionCount);
             Assert.AreEqual(0, newCustomerCount);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod, Ignore]
-        public void Sites_Can_Clear_Customers()
+        public void Sites_Can_Clear_Customers(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var productFamilyCount = Chargify.GetProductFamilyList().Count;
             var productCount = Chargify.GetProductList().Count;
@@ -138,11 +152,19 @@ namespace ChargifyDotNetTests
             Assert.AreNotEqual(0, newProductCount);
             Assert.AreEqual(0, newSubscriptionCount);
             Assert.AreEqual(0, newCustomerCount);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod, Ignore]
-        public void Sites_Default_Clear_Clears_Customers()
+        public void Sites_Default_Clear_Clears_Customers(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var productFamilyCount = Chargify.GetProductFamilyList().Count;
             var productCount = Chargify.GetProductList().Count;
@@ -167,6 +189,8 @@ namespace ChargifyDotNetTests
             Assert.AreNotEqual(0, newProductCount);
             Assert.AreEqual(0, newSubscriptionCount);
             Assert.AreEqual(0, newCustomerCount);
+
+            SetJson(!isJson);
         }
 
         private CreditCardAttributes GetTestPaymentMethod(CustomerAttributes customer)

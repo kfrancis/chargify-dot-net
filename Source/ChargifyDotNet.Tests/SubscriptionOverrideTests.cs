@@ -9,9 +9,15 @@ namespace ChargifyDotNetTests
     [TestClass]
     public class SubscriptionOverrideTests : ChargifyTestBase
     {
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void SubOverride_Can_Override()
+        public void SubOverride_Can_Override(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value;
             DateTime now = DateTime.Now;
@@ -34,6 +40,8 @@ namespace ChargifyDotNetTests
             Assert.AreNotEqual(subscription.CancellationMessage, retrievedSubscription.CancellationMessage);
             Assert.IsTrue(IsDateTimeEqual(expiresAt, retrievedSubscription.ExpiresAt));
             Assert.IsFalse(IsDateTimeEqual(subscription.ExpiresAt, retrievedSubscription.ExpiresAt));
+
+            SetJson(!isJson);
         }
 
         public static bool IsDateTimeEqual(DateTime expected, DateTime actual)

@@ -9,9 +9,15 @@ namespace ChargifyDotNetTests
     [TestClass]
     public class SubscriptionPreviewTests : ChargifyTestBase
     {
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void SubscriptionPreview_CanCreate()
+        public void SubscriptionPreview_CanCreate(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value as Subscription;
             Assert.IsNotNull(subscription, "No suitable subscription could be found.");
@@ -29,6 +35,8 @@ namespace ChargifyDotNetTests
             Assert.IsNotNull(result);
             Assert.IsInstanceOfType(result, typeof(ISubscriptionPreview));
             Assert.AreEqual(1, result.SubscriptionPreviewResult.CurrentBillingManifest.LineItems.Count);
+
+            SetJson(!isJson);
         }
     }
 }

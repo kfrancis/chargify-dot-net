@@ -9,9 +9,15 @@ namespace ChargifyDotNetTests
     [TestClass]
     public class MigrationTests : ChargifyTestBase
     {
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Migration_Preview()
+        public void Migration_Preview(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == ChargifyNET.SubscriptionState.Active).Value;
             var alternateProduct = Chargify.GetProductList().Values.FirstOrDefault(p => p.ID != subscription.Product.ID);
@@ -31,6 +37,7 @@ namespace ChargifyDotNetTests
                 Assert.Fail(string.Join(", ", chEx.ErrorMessages));
             }
 
+            SetJson(!isJson);
         }
     }
 }

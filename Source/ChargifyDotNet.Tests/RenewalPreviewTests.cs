@@ -9,9 +9,15 @@ namespace ChargifyDotNetTests
     [TestClass]
     public class RenewalPreviewTests : ChargifyTestBase
     {
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void RenewalPreview_CanCreate()
+        public void RenewalPreview_CanCreate(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value as Subscription;
             Assert.IsNotNull(subscription, "No suitable subscription could be found.");
@@ -32,6 +38,8 @@ namespace ChargifyDotNetTests
             Assert.IsTrue(result.UncalculatedTaxes == true || result.UncalculatedTaxes == false);
             Assert.IsNotNull(result.LineItems);
             Assert.IsTrue(result.LineItems.Any());
+
+            SetJson(!isJson);
         }
     }
 }

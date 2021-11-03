@@ -10,9 +10,15 @@ namespace ChargifyDotNetTests
     [TestClass]
     public class InvoiceTests : ChargifyTestBase
     {
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Invoices_Can_Get_List()
+        public void Invoices_Can_Get_List(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Act
             var result = Chargify.GetInvoiceList();
 
@@ -23,11 +29,19 @@ namespace ChargifyDotNetTests
             var anInvoice = result.FirstOrDefault().Value;
             Assert.IsTrue(result.FirstOrDefault().Key == anInvoice.ID);
             Assert.AreNotEqual(int.MinValue, anInvoice.ID);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Can_Create_Invoice_Subscription_For_Existing_Customer()
+        public void Can_Create_Invoice_Subscription_For_Existing_Customer(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var customers = Chargify.GetCustomerList().Keys;
             var referenceValue = customers.FirstOrDefault(systemID => !string.IsNullOrWhiteSpace(systemID));
@@ -58,11 +72,19 @@ namespace ChargifyDotNetTests
 
             // Cleanup
             Assert.IsTrue(Chargify.DeleteSubscription(result.SubscriptionID, "Automatic cancel due to test"));
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Can_Create_Invoice_Subscription()
+        public void Can_Create_Invoice_Subscription(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var product = Chargify.GetProductList().Values.DefaultIfEmpty(null).FirstOrDefault(p => p.PriceInCents > 0 && p.RequireCreditCard == false);
             if (product == null) { Assert.Inconclusive("No product to test"); return; }
@@ -92,11 +114,19 @@ namespace ChargifyDotNetTests
 
             // Cleanup
             Assert.IsTrue(Chargify.DeleteSubscription(newSubscription.SubscriptionID, "Automatic cancel due to test"));
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Invoice_Can_Add_Payment()
+        public void Invoice_Can_Add_Payment(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var invoices = Chargify.GetInvoiceList().Values;
             if (!invoices.Any()) Assert.Inconclusive("There are no valid invoices for use in this test.");
@@ -112,11 +142,19 @@ namespace ChargifyDotNetTests
             Assert.AreEqual(memo, result.Memo);
             Assert.AreEqual(invoice.AmountDue, result.Amount);
             Assert.AreEqual(invoice.AmountDueInCents, result.AmountInCents);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Invoice_Can_Add_Payment_Cents()
+        public void Invoice_Can_Add_Payment_Cents(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var invoices = Chargify.GetInvoiceList().Values;
             if (!invoices.Any()) Assert.Inconclusive("There are no valid invoices for use in this test.");
@@ -132,6 +170,8 @@ namespace ChargifyDotNetTests
             Assert.AreEqual(memo, result.Memo);
             Assert.AreEqual(invoice.AmountDue, result.Amount);
             Assert.AreEqual(invoice.AmountDueInCents, result.AmountInCents);
+
+            SetJson(!isJson);
         }
     }
 }

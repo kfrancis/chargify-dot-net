@@ -9,11 +9,17 @@ namespace ChargifyDotNetTests
     [TestClass]
     public class AllocationTests : ChargifyTestBase
     {
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void ComponentAllocation_Can_Get_List()
+        public void ComponentAllocation_Can_Get_List(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
-            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active && Chargify.GetComponentsForSubscription(s.Key) != null).Value;
+            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active && Chargify.GetComponentsForSubscription(s.Key).Any()).Value;
             if (subscription == null) Assert.Inconclusive("A valid subscription could not be found.");
             var component = Chargify.GetComponentsForSubscription(subscription.SubscriptionID).FirstOrDefault(c => (c.Value.Kind == "quantity_based_component" || c.Value.Kind == "on_off_component") && c.Value.AllocatedQuantity > 0).Value;
             if (component == null) Assert.Inconclusive("A valid component could not be found.");
@@ -25,11 +31,19 @@ namespace ChargifyDotNetTests
             Assert.IsNotNull(result);
             //Assert.IsInstanceOfType(result, typeof(Dictionary<int, List<IComponentAllocation>>));
             Assert.IsTrue(result.Values.Count > 0, "There is no allocation history");
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void ComponentAllocation_Can_Create_Using_Object()
+        public void ComponentAllocation_Can_Create_Using_Object(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value;
             if (subscription == null) Assert.Inconclusive("A valid subscription could not be found.");
@@ -53,11 +67,19 @@ namespace ChargifyDotNetTests
             Assert.AreEqual(allocation.Memo, result.Memo, "The memo text differs");
             Assert.AreEqual(allocation.UpgradeScheme, result.UpgradeScheme, "The upgrade scheme received isn't the same as submitted");
             Assert.AreEqual(allocation.DowngradeScheme, result.DowngradeScheme, "The downgrade scheme received isn't the same as submitted");
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void ComponentAllocation_Can_Create_Using_Quantity_Only()
+        public void ComponentAllocation_Can_Create_Using_Quantity_Only(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active && Chargify.GetComponentsForSubscription(s.Key) != null).Value;
             if (subscription == null) Assert.Inconclusive("A valid subscription could not be found.");
@@ -85,6 +107,8 @@ namespace ChargifyDotNetTests
             // Can't really tell the following, but the default for a site with no changes is to not prorate.
             Assert.AreEqual(ComponentUpgradeProrationScheme.No_Prorate, result.UpgradeScheme);
             Assert.AreEqual(ComponentDowngradeProrationScheme.No_Prorate, result.DowngradeScheme);
+
+            SetJson(!isJson);
         }
     }
 }

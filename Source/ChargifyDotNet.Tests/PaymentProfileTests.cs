@@ -12,38 +12,15 @@ namespace ChargifyDotNetTests
     [TestClass]
     public class PaymentProfileTests : ChargifyTestBase
     {
-        public PaymentProfileTests()
-        {
-            //
-            // TODO: Add constructor logic here
-            //
-        }
-
-        #region Additional test attributes
-        //
-        // You can use the following additional attributes as you write your tests:
-        //
-        // Use ClassInitialize to run code before running the first test in the class
-        // [ClassInitialize()]
-        // public static void MyClassInitialize(TestContext testContext) { }
-        //
-        // Use ClassCleanup to run code after all tests in a class have run
-        // [ClassCleanup()]
-        // public static void MyClassCleanup() { }
-        //
-        // Use TestInitialize to run code before running each test 
-        // [SetUp]
-        // public void MyTestInitialize() { }
-        //
-        // Use TestCleanup to run code after each test has run
-        // [TestCleanup()]
-        // public void MyTestCleanup() { }
-        //
-        #endregion
-
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void PaymentProfile_CanUpdate()
+        public void PaymentProfile_CanUpdate(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active && s.Value.PaymentProfile != null).Value;
             var loadedSubscription = Chargify.LoadSubscription(subscription.SubscriptionID);
@@ -59,11 +36,19 @@ namespace ChargifyDotNetTests
             Assert.IsNotNull(result);
             Assert.AreEqual(originalPaymentProfile.FirstName, result.FirstName);
             Assert.AreEqual(originalPaymentProfile.LastName, result.LastName);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void PaymentProfile_Can_Perform_PartialUpdate()
+        public void PaymentProfile_Can_Perform_PartialUpdate(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active && s.Value.PaymentProfile != null).Value;
             var loadedSubscription = Chargify.LoadSubscription(subscription.SubscriptionID);
@@ -91,11 +76,19 @@ namespace ChargifyDotNetTests
             Assert.AreNotEqual(subscription.PaymentProfile.BillingCity, result.BillingCity);
             Assert.AreNotEqual(subscription.PaymentProfile.BillingState, result.BillingState);
             Assert.AreNotEqual(subscription.PaymentProfile.BillingZip, result.BillingZip);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void PaymentProfile_GetSinglePaymentProfileByID()
+        public void PaymentProfile_GetSinglePaymentProfileByID(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active && s.Value.PaymentProfile != null).Value;
             var loadedSubscription = Chargify.LoadSubscription(subscription.SubscriptionID);
@@ -128,6 +121,8 @@ namespace ChargifyDotNetTests
             Assert.AreEqual(loadedSubscription.PaymentProfile.BankAccountType, result.BankAccountType);
             Assert.AreEqual(loadedSubscription.PaymentProfile.BankName, result.BankName);
             Assert.AreEqual(loadedSubscription.PaymentProfile.BankRoutingNumber, result.BankRoutingNumber);
+
+            SetJson(!isJson);
         }
     }
 }

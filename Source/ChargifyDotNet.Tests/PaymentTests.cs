@@ -8,9 +8,15 @@ namespace ChargifyDotNetTests
     [TestClass]
     public class PaymentTests : ChargifyTestBase
     {
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Payment_Create()
+        public void Payment_Create(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == ChargifyNET.SubscriptionState.Active).Value;
             int amount = 1234; //$12.34
@@ -27,6 +33,8 @@ namespace ChargifyDotNetTests
             Assert.AreEqual(amount, result.AmountInCents);
             Assert.AreEqual(memo, result.Memo);
             TestContext.WriteLine("SubscriptionID: {0}", subscription.SubscriptionID);
+
+            SetJson(!isJson);
         }
     }
 }

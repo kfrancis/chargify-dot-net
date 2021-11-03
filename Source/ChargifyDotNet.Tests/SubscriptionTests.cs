@@ -12,9 +12,15 @@ namespace ChargifyDotNetTests
     {
         #region Tests
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Subscription_Can_Pause_Indefinately()
+        public void Subscription_Can_Pause_Indefinately(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value as Subscription;
 
@@ -26,11 +32,19 @@ namespace ChargifyDotNetTests
             Assert.AreEqual(SubscriptionState.On_Hold, result.State);
             result = Chargify.ResumeSubscription(subscription.SubscriptionID);
             Assert.AreEqual(SubscriptionState.Active, result.State);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Subscription_Can_Pause_FixedTime()
+        public void Subscription_Can_Pause_FixedTime(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value as Subscription;
             if (subscription == null) Assert.Inconclusive("A valid subscription could not be found.");
@@ -42,11 +56,19 @@ namespace ChargifyDotNetTests
             // Assert
             Assert.IsNotNull(result);
             Assert.AreEqual(SubscriptionState.On_Hold, result.State);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Subscription_Can_Resume()
+        public void Subscription_Can_Resume(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.On_Hold).Value as Subscription;
             Assert.IsNotNull(subscription, "Can't find any 'on_hold' subscriptions");
@@ -57,11 +79,19 @@ namespace ChargifyDotNetTests
             // Assert
             Assert.IsNotNull(result);
             Assert.AreEqual(SubscriptionState.Active, result.State);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Subscription_Can_Cancel_Delayed_Product_Change()
+        public void Subscription_Can_Cancel_Delayed_Product_Change(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active && s.Value.PaymentProfile != null && s.Value.NextProductId <= 0).Value;
             var otherProduct = Chargify.GetProductList().FirstOrDefault(p => p.Key != subscription.Product.ID);
@@ -74,11 +104,19 @@ namespace ChargifyDotNetTests
             // Assert
             Assert.IsNotNull(result);
             Assert.IsTrue(result.NextProductId <= 0);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Subscription_Create_UsingOptions_ProductHandle()
+        public void Subscription_Create_UsingOptions_ProductHandle(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var exampleCustomer = Chargify.GetCustomerList().Values.DefaultIfEmpty(null).FirstOrDefault();
             Assert.IsNotNull(exampleCustomer, "Customer not found");
@@ -99,11 +137,19 @@ namespace ChargifyDotNetTests
             Assert.IsNotNull(result);
             Assert.AreEqual(product.Handle, result.Product.Handle);
             Assert.AreEqual(exampleCustomer.ChargifyID, result.Customer.ChargifyID);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod, ExpectedException(typeof(ArgumentException))]
-        public void Subscription_Create_UsingOptions_TooManyProducts()
+        public void Subscription_Create_UsingOptions_TooManyProducts(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var exampleCustomer = Chargify.GetCustomerList().Values.DefaultIfEmpty(defaultValue: null).FirstOrDefault();
             var paymentInfo = GetTestPaymentMethod(exampleCustomer.ToCustomerAttributes() as CustomerAttributes);
@@ -118,11 +164,19 @@ namespace ChargifyDotNetTests
 
             // Act
             var result = Chargify.CreateSubscription(options);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod, ExpectedException(typeof(ArgumentException))]
-        public void Subscription_Create_UsingOptions_MissingProduct()
+        public void Subscription_Create_UsingOptions_MissingProduct(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var exampleCustomer = Chargify.GetCustomerList().Values.DefaultIfEmpty(defaultValue: null).FirstOrDefault();
             var paymentInfo = GetTestPaymentMethod(exampleCustomer.ToCustomerAttributes() as CustomerAttributes);
@@ -134,31 +188,52 @@ namespace ChargifyDotNetTests
 
             // Act
             var result = Chargify.CreateSubscription(options);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod, ExpectedException(typeof(ArgumentException))]
-        public void Subscription_Create_UsingOptions_MissingAllDetails()
+        public void Subscription_Create_UsingOptions_MissingAllDetails(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var options = new SubscriptionCreateOptions();
 
             // Act
             var result = Chargify.CreateSubscription(options);
+
+            SetJson(!isJson);
         }
 
         [TestMethod, ExpectedException(typeof(ArgumentNullException))]
-        public void Subscription_Create_UsingOptions_Null()
+        public void Subscription_Create_UsingOptions_Null(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             SubscriptionCreateOptions options = null;
 
             // Act
             var result = Chargify.CreateSubscription(options);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Subscription_Create_Using_Existing_Customer()
+        public void Subscription_Create_Using_Existing_Customer(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var client = Chargify;
             var product = Chargify.GetProductList().Values.FirstOrDefault();
@@ -173,11 +248,19 @@ namespace ChargifyDotNetTests
             Assert.AreEqual(exampleCustomer.FirstName, newSubscription.Customer.FirstName);
             Assert.AreEqual(exampleCustomer.LastName, newSubscription.Customer.LastName);
             Assert.AreEqual(exampleCustomer.ChargifyID, newSubscription.Customer.ChargifyID);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Subscription_Can_Load_By_State()
+        public void Subscription_Can_Load_By_State(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var subscriptions = Chargify.GetSubscriptionList().Where(s => s.Value.State == SubscriptionState.Active);
 
@@ -186,12 +269,19 @@ namespace ChargifyDotNetTests
 
             // Assert
             Assert.AreEqual(result.Count(), subscriptions.Count());
+
+            SetJson(!isJson);
         }
 
-
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Subscription_Can_Load_many_results_By_State()
+        public void Subscription_Can_Load_many_results_By_State(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var state = SubscriptionState.Active;
 
@@ -201,12 +291,19 @@ namespace ChargifyDotNetTests
             // Assert
             Assert.IsTrue(result.Any());
             Assert.IsTrue(result.All(s => s.Value.State == state));
+
+            SetJson(!isJson);
         }
 
-
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Subscription_Can_Get_PaymentProfile_Id()
+        public void Subscription_Can_Get_PaymentProfile_Id(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var client = Chargify;
 
@@ -218,11 +315,19 @@ namespace ChargifyDotNetTests
             Assert.IsNotNull(loadedSubscription);
             Assert.IsNotNull(loadedSubscription.PaymentProfile);
             Assert.IsTrue(loadedSubscription.PaymentProfile.Id >= 0);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Subscription_Can_Get_ProductVersion()
+        public void Subscription_Can_Get_ProductVersion(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var client = Chargify;
 
@@ -232,11 +337,19 @@ namespace ChargifyDotNetTests
             // Assert
             Assert.IsNotNull(subscription);
             Assert.IsTrue(subscription.ProductVersionNumber >= 0);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod, ExpectedException(typeof(ChargifyException))]
-        public void Subscription_Does_PartialUpdate_Fail()
+        public void Subscription_Does_PartialUpdate_Fail(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var client = Chargify;
             var subscription = client.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value;
@@ -264,11 +377,19 @@ namespace ChargifyDotNetTests
 
             // Act
             var result = client.UpdateSubscriptionCreditCard(subscription.SubscriptionID, newAttributes);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Subscription_Can_Update_Payment_FirstLast()
+        public void Subscription_Can_Update_Payment_FirstLast(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var client = Chargify;
             var subscription = client.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value;
@@ -304,11 +425,19 @@ namespace ChargifyDotNetTests
             Assert.IsNotNull(replacedSubscription);
             Assert.AreEqual(oldFirst, replacedSubscription.PaymentProfile.FirstName);
             Assert.AreEqual(oldLast, replacedSubscription.PaymentProfile.LastName);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Subscription_Can_Update_PaymentCollectionMethod()
+        public void Subscription_Can_Update_PaymentCollectionMethod(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var client = Chargify;
             var subscription = client.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value;
@@ -323,11 +452,19 @@ namespace ChargifyDotNetTests
             Assert.IsInstanceOfType(updatedSubscription, typeof(Subscription));
             Assert.IsNotNull(updatedSubscription);
             Assert.IsTrue(subscription.PaymentCollectionMethod != updatedSubscription.PaymentCollectionMethod);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Subscription_ReactivateExpired()
+        public void Subscription_ReactivateExpired(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Expired).Value;
             if (subscription != null)
@@ -345,11 +482,19 @@ namespace ChargifyDotNetTests
                 Assert.IsNotNull(reactivateResult);
                 Assert.IsTrue(reactivateResult.State == SubscriptionState.Active);
             }
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Subscription_Can_EditProduct_WithDelay()
+        public void Subscription_Can_EditProduct_WithDelay(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active && s.Value.PaymentProfile != null).Value as Subscription;
             var otherProduct = Chargify.GetProductList().Values.Where(p => p.Handle != subscription.Product.Handle).FirstOrDefault();
@@ -362,11 +507,19 @@ namespace ChargifyDotNetTests
             Assert.AreEqual(subscription.Product.Handle, result.Product.Handle);
             Assert.AreNotEqual(int.MinValue, subscription.NextProductId);
             Assert.AreEqual(otherProduct.ID, result.NextProductId);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Subscription_Can_EditProduct_NoDelay()
+        public void Subscription_Can_EditProduct_NoDelay(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active && s.Value.PaymentProfile != null).Value as Subscription;
             var otherProduct = Chargify.GetProductList().Values.Where(p => p.Handle != subscription.Product.Handle).FirstOrDefault();
@@ -377,10 +530,19 @@ namespace ChargifyDotNetTests
             // Assert
             Assert.IsNotNull(result);
             Assert.AreEqual(otherProduct.Handle, result.Product.Handle);
+
+            SetJson(!isJson);
         }
+
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Subscription_Can_Be_Purged() 
+        public void Subscription_Can_Be_Purged(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var trialingProduct = Chargify.GetProductList().Values.FirstOrDefault(p => p.TrialInterval > 0);
             var referenceId = Guid.NewGuid().ToString();
@@ -396,10 +558,19 @@ namespace ChargifyDotNetTests
             var purgedSubscription = Chargify.Find<Subscription>(createdSubscription.SubscriptionID);
 
             Assert.IsNull(purgedSubscription);
+
+            SetJson(!isJson);
         }
+
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Subscription_Can_Reactivate_Without_Trial()
+        public void Subscription_Can_Reactivate_Without_Trial(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var trialingProduct = Chargify.GetProductList().Values.FirstOrDefault(p => p.TrialInterval > 0 && !string.IsNullOrEmpty(p.Handle));
             var referenceId = Guid.NewGuid().ToString();
@@ -423,11 +594,19 @@ namespace ChargifyDotNetTests
             Assert.IsInstanceOfType(result, typeof(ISubscription));
             Assert.IsTrue(result.State != foundSubscription.State);
             Assert.IsTrue(result.State == SubscriptionState.Active);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Subscription_Can_Reactivate_With_Trial()
+        public void Subscription_Can_Reactivate_With_Trial(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var trialingProduct = Chargify.GetProductList().Values.FirstOrDefault(p => p.TrialInterval > 0 && !string.IsNullOrEmpty(p.Handle));
             var referenceId = Guid.NewGuid().ToString();
@@ -450,11 +629,19 @@ namespace ChargifyDotNetTests
             Assert.IsInstanceOfType(result, typeof(ISubscription));
             Assert.IsTrue(result.State != foundSubscription.State);
             Assert.IsTrue(result.State == SubscriptionState.Trialing);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Subscription_Reactivation()
+        public void Subscription_Reactivation(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var product = Chargify.GetProductList().Values.FirstOrDefault();
             var referenceId = Guid.NewGuid().ToString();
@@ -479,11 +666,19 @@ namespace ChargifyDotNetTests
             Assert.IsTrue(foundSubscription.State == SubscriptionState.Canceled);
             Assert.IsNotNull(newSubscription);
             Assert.IsTrue(resultSubscription.State == SubscriptionState.Active);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Subscription_Create_With_SpecialChars()
+        public void Subscription_Create_With_SpecialChars(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             var product = Chargify.GetProductList().Values.FirstOrDefault();
             var referenceId = Guid.NewGuid().ToString();
             var expMonth = DateTime.Now.AddMonths(1).Month;
@@ -522,11 +717,19 @@ namespace ChargifyDotNetTests
 
             // Cleanup
             Assert.IsTrue(Chargify.DeleteSubscription(newSubscription.SubscriptionID, "Automatic cancel due to test"));
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Subscription_Create_IsFullNumberMasked()
+        public void Subscription_Create_IsFullNumberMasked(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var product = Chargify.GetProductList().Values.FirstOrDefault();
             var referenceId = Guid.NewGuid().ToString();
@@ -553,11 +756,19 @@ namespace ChargifyDotNetTests
                 Assert.IsFalse(chEx.LastDataPosted.Contains(newPaymentInfo.FullNumber), chEx.LastDataPosted);
                 Assert.IsTrue(chEx.LastDataPosted.Contains(newPaymentInfo.FullNumber.Mask('X', 4)));
             }
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Subscription_Create()
+        public void Subscription_Create(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var product = Chargify.GetProductList().Values.FirstOrDefault();
             var referenceId = Guid.NewGuid().ToString();
@@ -614,11 +825,19 @@ namespace ChargifyDotNetTests
 
             // Cleanup
             Assert.IsTrue(Chargify.DeleteSubscription(newSubscription.SubscriptionID, "Automatic cancel due to test"));
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Subscription_Create_WithComponent()
+        public void Subscription_Create_WithComponent(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var product = Chargify.GetProductList().Values.FirstOrDefault();
             var productFamily = Chargify.GetProductFamilyList().Values.FirstOrDefault();
@@ -664,11 +883,19 @@ namespace ChargifyDotNetTests
 
             // Cleanup
             Assert.IsTrue(Chargify.DeleteSubscription(newSubscription.SubscriptionID, "Automatic cancel due to test"));
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Subscription_Create_WithTwoComponents()
+        public void Subscription_Create_WithTwoComponents(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var product = Chargify.GetProductList().Values.FirstOrDefault();
             var referenceId = Guid.NewGuid().ToString();
@@ -716,11 +943,19 @@ namespace ChargifyDotNetTests
 
             // Cleanup
             Assert.IsTrue(Chargify.DeleteSubscription(newSubscription.SubscriptionID, "Automatic cancel due to test"));
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Subscription_Create_WithCouponAfterSignup()
+        public void Subscription_Create_WithCouponAfterSignup(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var product = Chargify.GetProductList().Values.FirstOrDefault();
             var newCustomer = new CustomerAttributes("Scott", "Pilgrim", "demonhead_sucks@scottpilgrim.com", "Chargify", Guid.NewGuid().ToString());
@@ -742,11 +977,19 @@ namespace ChargifyDotNetTests
             Assert.IsNotNull(updatedSubscription);
             Assert.IsInstanceOfType(updatedSubscription, typeof(ISubscription));
             Assert.IsTrue(updatedSubscription.CouponCode == couponCode);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Subscription_UpdateBillingDate()
+        public void Subscription_UpdateBillingDate(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value;
             var billingDate = subscription.NextAssessmentAt;
@@ -760,11 +1003,19 @@ namespace ChargifyDotNetTests
             // Cleanup
             var restoredSubscription = Chargify.UpdateBillingDateForSubscription(updatedSubscription.SubscriptionID, billingDate);
             Assert.IsTrue(billingDate == restoredSubscription.NextAssessmentAt);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Can_create_delayed_cancel()
+        public void Can_create_delayed_cancel(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             var existingSubscription = Chargify.GetSubscriptionList().Values.FirstOrDefault(s => s.State == SubscriptionState.Active && s.PaymentProfile != null && s.PaymentProfile.Id > 0) as Subscription;
             ValidateRun(() => existingSubscription != null, "No applicable subscription found.");
             ValidateRun(() => existingSubscription.PaymentProfile.Id > 0, "No payment profile found");
@@ -775,11 +1026,19 @@ namespace ChargifyDotNetTests
             var updatedSubscription = Chargify.UpdateDelayedCancelForSubscription(newSubscription.SubscriptionID, true, "Testing Delayed Cancel");
 
             Assert.IsTrue(updatedSubscription.CancelAtEndOfPeriod);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Can_undo_delayed_cancel()
+        public void Can_undo_delayed_cancel(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             var existingSubscription = Chargify.GetSubscriptionList().Values.FirstOrDefault(s => s.State == SubscriptionState.Active && s.PaymentProfile != null && s.PaymentProfile.Id > 0) as Subscription;
             ValidateRun(() => existingSubscription != null, "No applicable subscription found.");
             ValidateRun(() => existingSubscription.PaymentProfile.Id > 0, "No payment profile found");
@@ -794,11 +1053,19 @@ namespace ChargifyDotNetTests
                 false, "Testing Undo Delayed Cancel");
 
             Assert.IsFalse(updatedSubscription.CancelAtEndOfPeriod);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Chargify_exception_is_thrown_when_setting_delayed_cancel_of_invalid_subscription_to_true()
+        public void Chargify_exception_is_thrown_when_setting_delayed_cancel_of_invalid_subscription_to_true(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             AssertTheFollowingThrowsException(() =>
             {
                 Chargify.UpdateDelayedCancelForSubscription(GetRandomNegativeInt(), true,
@@ -809,11 +1076,19 @@ namespace ChargifyDotNetTests
                     var exception = (ChargifyException)e;
                     Assert.AreEqual(exception.ErrorMessages.First(), "Subscription not found");
                 });
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Chargify_exception_is_thrown_when_setting_delayed_cancel_of_invalid_subscription_to_false()
+        public void Chargify_exception_is_thrown_when_setting_delayed_cancel_of_invalid_subscription_to_false(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             AssertTheFollowingThrowsException(() =>
             {
                 Chargify.UpdateDelayedCancelForSubscription(GetRandomNegativeInt(), false,
@@ -824,11 +1099,19 @@ namespace ChargifyDotNetTests
                     var exception = (ChargifyException)e;
                     Assert.AreEqual(exception.ErrorMessages.First(), "Subscription not found");
                 });
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod, Ignore]
-        public void Subscription_Update()
+        public void Subscription_Update(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active && s.Value.PaymentProfile != null).Value as Subscription;
             string originalEmail = subscription.Customer.Email;
@@ -846,11 +1129,19 @@ namespace ChargifyDotNetTests
             updatedSubscription.Customer.Email = originalEmail;
             var restoredSubscription = Chargify.Save<Subscription>(updatedSubscription);
             Assert.IsTrue(restoredSubscription.Customer.Email == updatedSubscription.Customer.Email);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod, Ignore]
-        public void Subscription_Load_Where_State_Is_TrialEnded()
+        public void Subscription_Load_Where_State_Is_TrialEnded(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Trial_Ended).Value as Subscription;
             Assert.IsNotNull(subscription, "No applicable subscription found.");
@@ -862,11 +1153,19 @@ namespace ChargifyDotNetTests
             Assert.IsNotNull(retreivedSubscription);
             Assert.IsTrue(retreivedSubscription.State == SubscriptionState.Trial_Ended);
             Assert.IsInstanceOfType(retreivedSubscription, typeof(Subscription));
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Subscription_Load_ComponentsFor()
+        public void Subscription_Load_ComponentsFor(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value as Subscription;
             Assert.IsNotNull(subscription, "No applicable subscription found.");
@@ -877,11 +1176,19 @@ namespace ChargifyDotNetTests
             // Assert
             Assert.IsNotNull(subscriptionComponents);
             Assert.IsTrue(subscriptionComponents.Count > 0);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Subscription_Create_Using_ExistingProfile()
+        public void Subscription_Create_Using_ExistingProfile(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var existingSubscription = Chargify.GetSubscriptionList().Values.FirstOrDefault(s => s.State == SubscriptionState.Active && s.PaymentProfile != null && s.PaymentProfile.Id > 0) as Subscription;
             Assert.IsNotNull(existingSubscription, "No applicable subscription found.");
@@ -893,6 +1200,8 @@ namespace ChargifyDotNetTests
             // Assert
             Assert.IsNotNull(newSubscription);
             Assert.AreEqual(existingSubscription.PaymentProfile.Id, newSubscription.PaymentProfile.Id);
+
+            SetJson(!isJson);
         }
         #endregion
 

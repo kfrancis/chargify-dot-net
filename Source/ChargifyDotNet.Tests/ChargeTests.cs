@@ -9,10 +9,15 @@ namespace ChargifyDotNetTests
     [TestClass]
     public class ChargeTests : ChargifyTestBase
     {
-
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Charges_Can_Charge_With_Tax()
+        public void Charges_Can_Charge_With_Tax(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active && s.Value.PaymentProfile.MaskedCardNumber.EndsWith("1") && s.Value.Balance == 0m).Value as Subscription;
             if (subscription == null) Assert.Inconclusive("A valid subscription could not be found.");
@@ -24,11 +29,19 @@ namespace ChargifyDotNetTests
             // Assert
             Assert.AreEqual(true, result.Success);
             Assert.AreEqual(chargeOptions.Amount, result.Amount);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Charges_Can_Charge_Successfully()
+        public void Charges_Can_Charge_Successfully(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var client = Chargify;
             var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active && s.Value.PaymentProfile.MaskedCardNumber.EndsWith("1") && s.Value.Balance == 0m).Value as Subscription;
@@ -60,11 +73,19 @@ namespace ChargifyDotNetTests
             Assert.IsTrue(result.ID != int.MinValue);
             Assert.IsTrue(result.Success == true);
             Assert.IsTrue(retrievedSubscription.BalanceInCents == 0, "Expected $0, returned {0:C2}", retrievedSubscription.Balance);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Charges_Can_Charge_And_Use_Negative_Balance()
+        public void Charges_Can_Charge_And_Use_Negative_Balance(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var client = Chargify;
             var subscription = client.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value as Subscription;
@@ -101,11 +122,19 @@ namespace ChargifyDotNetTests
             //Assert.IsTrue(result.PaymentID.HasValue == false);
             //Assert.IsTrue(result.ID != int.MinValue);
             //Assert.IsTrue(result.Success == true);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Charges_Can_Charge_With_Delay()
+        public void Charges_Can_Charge_With_Delay(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var client = Chargify;
             var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value as Subscription;
@@ -140,6 +169,8 @@ namespace ChargifyDotNetTests
             Assert.IsTrue(result.Success == true);
             Assert.IsTrue(result.EndingBalance == amountToCharge, "Expected {0:C2}, received {1:C2}", amountToCharge, result.EndingBalance);
             Assert.IsTrue(retrievedSubscription.Balance == amountToCharge, "Expected {0:C2}, balance is {1:C2}", amountToCharge, retrievedSubscription.Balance);
+
+            SetJson(!isJson);
         }
     }
 }

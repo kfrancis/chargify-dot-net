@@ -14,9 +14,15 @@ namespace ChargifyDotNetTests
     [TestClass]
     public class ComponentTests : ChargifyTestBase
     {
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Components_Can_Load_PriceBrackets()
+        public void Components_Can_Load_PriceBrackets(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var productFamily = Chargify.GetProductFamilyList().Values.FirstOrDefault();
             if (productFamily == null) Assert.Inconclusive("A valid product family could not be found.");
@@ -33,12 +39,19 @@ namespace ChargifyDotNetTests
             Assert.IsTrue(components.FirstOrDefault(c => c.Prices != null && c.Prices.Count > 0).Prices.First().StartingQuantity != int.MinValue);
             Assert.IsTrue(components.FirstOrDefault(c => c.Prices != null && c.Prices.Count > 0).Prices.First().EndingQuantity != int.MinValue);
             Assert.IsTrue(components.FirstOrDefault(c => c.Prices != null && c.Prices.Count > 0).Prices.First().UnitPrice != int.MinValue);
+
+            SetJson(!isJson);
         }
 
-
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Components_Load_ForSubscription()
+        public void Components_Load_ForSubscription(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value;
             if (subscription == null) Assert.Inconclusive("A valid subscription could not be found.");
@@ -48,11 +61,19 @@ namespace ChargifyDotNetTests
 
             // Assert
             Assert.IsNotNull(results);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Components_AddUsage_ForSubscription()
+        public void Components_AddUsage_ForSubscription(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var productFamily = Chargify.GetProductFamilyList().Values.FirstOrDefault();
             if (productFamily == null) Assert.Inconclusive("A valid product family could not be found.");
@@ -71,14 +92,22 @@ namespace ChargifyDotNetTests
             //Assert.IsInstanceOfType(usageResult, typeof(IUsage));
             Assert.IsTrue(usageResult.Memo == usageDescription);
             Assert.IsTrue(usageResult.Quantity == usageQuantity);
+
+            SetJson(!isJson);
         }
 
         /// <summary>
         /// For @praveen-prakash
         /// </summary>
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Components_Create_Subscription_Multiple_Components()
+        public void Components_Create_Subscription_Multiple_Components(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var product = Chargify.GetProductList().Values.FirstOrDefault();
             Assert.IsNotNull(product, "Product couldn't be found");
@@ -138,6 +167,8 @@ namespace ChargifyDotNetTests
 
             // Cleanup
             Assert.IsTrue(Chargify.DeleteSubscription(newSubscription.SubscriptionID, "Automatic cancel due to test"));
+
+            SetJson(!isJson);
         }
 
         [DataTestMethod]

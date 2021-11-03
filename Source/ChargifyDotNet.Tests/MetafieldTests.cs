@@ -11,9 +11,15 @@ namespace ChargifyDotNetTests
     [TestClass]
     public class MetadataTests : ChargifyTestBase
     {
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Metadata_Can_List_Customer_XML()
+        public void Metadata_Can_List_Customer(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Act
             var result = Chargify.GetMetadata<Customer>();
 
@@ -23,30 +29,19 @@ namespace ChargifyDotNetTests
             Assert.IsTrue(result.PerPage != int.MinValue);
             Assert.IsTrue(result.TotalCount != int.MinValue);
             Assert.IsTrue(result.TotalPages != int.MinValue);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Metadata_Can_List_Customer_JSON()
+        public void Metadata_Can_List_Subscription(string method)
         {
-            // Arrange
-            SetJson(true);
+            var isJson = method == "json";
+            SetJson(isJson);
 
-            // Act
-            var result = Chargify.GetMetadata<Customer>();
-
-            // Assert
-            Assert.IsNotNull(result);
-            Assert.IsTrue(result.CurrentPage != int.MinValue);
-            Assert.IsTrue(result.PerPage != int.MinValue);
-            Assert.IsTrue(result.TotalCount != int.MinValue);
-            Assert.IsTrue(result.TotalPages != int.MinValue);
-
-            SetJson(false);
-        }
-
-        [TestMethod]
-        public void Metadata_Can_List_Subscription_XML()
-        {
             // Act
             var result = Chargify.GetMetadata<Subscription>();
 
@@ -56,30 +51,19 @@ namespace ChargifyDotNetTests
             Assert.IsTrue(result.PerPage != int.MinValue);
             Assert.IsTrue(result.TotalCount != int.MinValue);
             Assert.IsTrue(result.TotalPages != int.MinValue);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Metadata_Can_List_Subscription_JSON()
+        public void Metadata_Can_Read_Specific_Subscription(string method)
         {
-            // Arrange
-            SetJson(true);
+            var isJson = method == "json";
+            SetJson(isJson);
 
-            // Act
-            var result = Chargify.GetMetadata<Subscription>();
-
-            // Assert
-            Assert.IsNotNull(result);    
-            Assert.IsTrue(result.CurrentPage != int.MinValue);
-            Assert.IsTrue(result.PerPage != int.MinValue);
-            Assert.IsTrue(result.TotalCount != int.MinValue);
-            Assert.IsTrue(result.TotalPages != int.MinValue);
-        
-            SetJson(false);
-        }
-
-        [TestMethod]
-        public void Metadata_Can_Read_Specific_Subscription()
-        {
             // Arrange
             var subscription = Chargify.GetSubscriptionList().Values.FirstOrDefault(s => Chargify.GetMetadataFor<Subscription>(s.SubscriptionID, null).TotalCount > 0) as Subscription;
             if (subscription == null) Assert.Inconclusive("No valid subscription with metadata found for this test.");
@@ -97,12 +81,18 @@ namespace ChargifyDotNetTests
 
             TestContext.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(result));
 
-            SetJson(false);
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Metadata_Can_Read_Subscription()
+        public void Metadata_Can_Read_Subscription(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value as Subscription;
             Assert.IsNotNull(subscription, "No applicable subscription found.");
@@ -122,11 +112,19 @@ namespace ChargifyDotNetTests
             Assert.IsTrue(result.TotalCount != int.MinValue);
             Assert.IsTrue(result.TotalPages != int.MinValue);
             Assert.AreEqual(result.TotalCount, result.Metadata.Count);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Metadata_Can_Read_Customer()
+        public void Metadata_Can_Read_Customer(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var customer = Chargify.GetCustomerList().FirstOrDefault().Value as Customer;
             Assert.IsNotNull(customer, "No applicable customer found.");
@@ -141,17 +139,33 @@ namespace ChargifyDotNetTests
             Assert.IsTrue(result.TotalCount != int.MinValue);
             Assert.IsTrue(result.TotalPages != int.MinValue);
             Assert.AreEqual(result.TotalCount, result.Metadata.Count);
+
+            SetJson(!isJson);
         }
 
-        [TestMethod]
-        public void Metadata_Can_Update()
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
+        [TestMethod, Ignore]
+        public void Metadata_Can_Update(string method)
         {
-            
+            var isJson = method == "json";
+            SetJson(isJson);
+
+            // something?
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Metadata_Can_Set_Customers_Single()
+        public void Metadata_Can_Set_Customers_Single(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var customer = Chargify.GetCustomerList().FirstOrDefault().Value as Customer;
             Assert.IsNotNull(customer, "No applicable customer found.");
@@ -165,11 +179,19 @@ namespace ChargifyDotNetTests
             Assert.IsTrue(result.Count >= 1);
             Assert.IsTrue(result.Select(m => m.Name == metadata.Name).Count() == 1);
             Assert.IsTrue(result.Select(m => m.Value == metadata.Value).Count() == 1);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Metadata_Can_Set_Customers_List()
+        public void Metadata_Can_Set_Customers_List(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var customer = Chargify.GetCustomerList().FirstOrDefault().Value as Customer;
             Assert.IsNotNull(customer, "No applicable customer found.");
@@ -186,11 +208,19 @@ namespace ChargifyDotNetTests
             // Assert
             Assert.IsNotNull(result);
             Assert.AreEqual(metadata.Count, result.Count);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Metadata_Can_Set_Subscription_Single()
+        public void Metadata_Can_Set_Subscription_Single(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value as Subscription;
             Assert.IsNotNull(subscription, "No applicable subscription found.");
@@ -204,11 +234,19 @@ namespace ChargifyDotNetTests
             Assert.IsTrue(result.Count >= 1);
             Assert.IsTrue(result.Select(m => m.Name == metadata.Name).Count() == 1);
             Assert.IsTrue(result.Select(m => m.Value == metadata.Value).Count() == 1);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Metadata_Can_Set_Subscription_List()
+        public void Metadata_Can_Set_Subscription_List(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value as Subscription;
             Assert.IsNotNull(subscription, "No applicable subscription found.");
@@ -225,6 +263,8 @@ namespace ChargifyDotNetTests
             // Assert
             Assert.IsNotNull(result);
             Assert.AreEqual(metadata.Count, result.Count);
+
+            SetJson(!isJson);
         }
     }
 }

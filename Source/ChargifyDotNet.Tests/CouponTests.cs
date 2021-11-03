@@ -10,9 +10,15 @@ namespace ChargifyDotNetTests
     [TestClass]
     public class CouponTests : ChargifyTestBase
     {
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Coupon_Read()
+        public void Coupon_Read(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var productFamily = Chargify.GetProductFamilyList().Values.FirstOrDefault();
             if (productFamily == null) Assert.Inconclusive("A valid product family could not be found.");
@@ -28,11 +34,19 @@ namespace ChargifyDotNetTests
             Assert.IsTrue(result.AmountInCents > 0);
             Assert.IsTrue(result.Amount == (Convert.ToDecimal(result.AmountInCents)/100));
             Assert.AreEqual(result.ID, couponID);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Coupon_Read_Percentage()
+        public void Coupon_Read_Percentage(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var productFamily = Chargify.GetProductFamilyList().Values.FirstOrDefault();
             if (productFamily == null) Assert.Inconclusive("A valid product family could not be found.");
@@ -51,11 +65,19 @@ namespace ChargifyDotNetTests
             Assert.AreEqual(result.ID, couponID);
 
             TestContext.WriteLine($"Coupon percentage: {coupon.Percentage}");
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Coupon_Create()
+        public void Coupon_Create(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var productFamily = Chargify.GetProductFamilyList().Values.FirstOrDefault();
             if (productFamily == null) Assert.Inconclusive("A valid product family could not be found.");
@@ -83,11 +105,19 @@ namespace ChargifyDotNetTests
             Assert.IsTrue(createdCoupon.Name == newCoupon.Name);
             Assert.IsTrue(createdCoupon.Description == newCoupon.Description);
             Assert.IsTrue(createdCoupon.Code == newCoupon.Code);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Coupon_Update()
+        public void Coupon_Update(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var productFamily = Chargify.GetProductFamilyList().Values.FirstOrDefault();
             if (productFamily == null) Assert.Inconclusive("A valid product family could not be found.");
@@ -108,11 +138,19 @@ namespace ChargifyDotNetTests
             updatedCoupon.Name = originalName;
             var restoredCoupon = Chargify.UpdateCoupon(updatedCoupon);
             Assert.IsTrue(restoredCoupon.Name == originalName);
+
+            SetJson(!isJson);
         }
 
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
         [TestMethod]
-        public void Coupon_Remove()
+        public void Coupon_Remove(string method)
         {
+            var isJson = method == "json";
+            SetJson(isJson);
+
             // Arrange
             var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active && !string.IsNullOrEmpty(s.Value.CouponCode)).Value as Subscription;
             if (subscription == null) Assert.Inconclusive("A valid subscription could not be found.");
@@ -122,6 +160,8 @@ namespace ChargifyDotNetTests
 
             // Assert
             Assert.IsTrue(result);
+
+            SetJson(!isJson);
         }
     }
 }
