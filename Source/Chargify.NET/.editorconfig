@@ -145,3 +145,6 @@ dotnet_style_qualification_for_event=false:silent
 dotnet_analyzer_diagnostic.category-Style.severity = silent
 # CS1591: Missing XML comment for publicly visible type or member
 dotnet_diagnostic.CS1591.severity = none
+
+# IDE0045: Convert to conditional expression
+dotnet_diagnostic.IDE0045.severity = none
