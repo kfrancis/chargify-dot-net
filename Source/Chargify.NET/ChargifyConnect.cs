@@ -42,6 +42,7 @@ namespace ChargifyNET
     using Newtonsoft.Json;
     using System.Linq;
     using System.Xml.Linq;
+    using System.Security.Policy;
     #endregion
 
     /// <summary>
@@ -285,6 +286,12 @@ namespace ChargifyNET
             }
 
             return retVal;
+        }
+
+        public void DeleteMetadataField(int subscriptionId, string name)
+        {
+            string url = $"subscriptions/{subscriptionId}/metadata.{GetMethodExtension()}?name={name}";
+            DoRequest(url, HttpRequestMethod.Delete, null);
         }
 
         /// <summary>
