@@ -53,6 +53,16 @@ namespace ChargifyNET
         /// The ID of the component itself
         /// </summary>
         int ComponentID { get; }
+
+        /// <summary>
+        ///  The api handle for the component
+        /// </summary>
+        string ComponentHandle { get; }
+
+        string Currency { get; }
+
+        int PricePointId { get; }
+
         /// <summary>
         /// The quantity allocated to this subscription
         /// </summary>

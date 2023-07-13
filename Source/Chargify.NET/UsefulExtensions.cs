@@ -548,6 +548,14 @@
                     {
                         result = value.IntValue;
                     }
+                    else
+                    {
+                        JsonString stringValue = obj[key] as JsonString;
+                        if (stringValue != null && int.TryParse(stringValue.Value, out int parsedResult))
+                        {
+                            return parsedResult;
+                        }
+                    }                    
                 }
             }
             return result;

@@ -29,6 +29,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using System.Xml;
@@ -70,6 +71,7 @@ namespace ChargifyNET
         private const string SignupRevenueKey = "signup_revenue";
         private const string DelayedCancelAtKey = "delayed_cancel_at";
         private const string CouponCodeKey = "coupon_code";
+        private const string CouponCodesKey = "coupon_codes";
         private const string TotalRevenueInCentsKey = "total_revenue_in_cents";
         private const string CustomerKey = "customer";
         private const string PaymentProfileAsCreditCardKey = "credit_card";
@@ -207,6 +209,17 @@ namespace ChargifyNET
                         break;
                     case CouponCodeKey:
                         _couponCode = obj.GetJSONContentAsString(key);
+                        break;
+                    case CouponCodesKey:
+                        JsonArray codesArray = obj[key] as JsonArray;
+                        if (codesArray != null)
+                        {
+                            foreach (JsonValue jsonValue in codesArray.Items)
+                            {
+                                string couponCode = jsonValue.ToString();
+                                _couponCodes.Add(couponCode);
+                            }
+                        }
                         break;
                     case ProductKey:
                         _product = obj.GetJSONContentAsProduct(key);
@@ -496,6 +509,18 @@ namespace ChargifyNET
             }
         }
         private string _couponCode = string.Empty;
+
+        /// <summary>
+        /// Get the coupon code currently applied (if applicable) to the subscription
+        /// </summary>
+        public IEnumerable<string> CouponCodes
+        {
+            get
+            {
+                return _couponCodes;
+            }
+        }
+        private List<string> _couponCodes = new List<string>();
 
         /// <summary>
         /// Timestamp relating to the start of the current (recurring) period

@@ -33,6 +33,7 @@ namespace ChargifyNET
 {
     #region Imports
     using System;
+    using System.Collections.Generic;
     using System.Xml.Serialization;
     #endregion
 
@@ -250,6 +251,12 @@ namespace ChargifyNET
         /// Get the coupon code currently applied (if applicable) to the subscription
         /// </summary>
         string CouponCode { get; }
+
+        /// <summary>
+        /// Get the coupon codes currently applied (if applicable) to the subscription
+        /// </summary>
+        IEnumerable<string> CouponCodes { get; }
+
         /// <summary>
         /// The version of the product currently subscribed. NOTE: we have not exposed versions 
         /// (yet) elsewhere in the API, but if you change the price of your product the versions 

@@ -222,6 +222,8 @@ namespace ChargifyNET
         /// <returns>A dictionary of objects if found, empty collection otherwise.</returns>
         IDictionary<int, ICoupon> GetAllCoupons(int ProductFamilyID);
 
+        ICoupon GetCouponByCode(string couponCode, int ProductFamilyID);
+
         /// <summary>
         /// Method for retrieving information about a coupon usage using the ID of that coupon.
         /// </summary>
@@ -1461,6 +1463,7 @@ namespace ChargifyNET
         /// <param name="per_page">The number of results to return per page</param>
         /// <returns>The list of statements, an empty dictionary otherwise.</returns>
         IDictionary<int, IStatement> GetStatementList(int SubscriptionID, int page, int per_page);
+        IComponentPricePointInfo GetComponentPricePointInformationById(int pricePointId);
         #endregion
     }
 }

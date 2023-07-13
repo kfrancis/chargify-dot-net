@@ -167,7 +167,7 @@ namespace ChargifyNET
                         _durationPeriodCount = obj.GetJSONContentAsInt(key);
                         break;
                     case PercentageKey:
-                        _percentage = obj.GetJSONContentAsInt(key);
+                        _percentage = obj.GetJSONContentAsDecimal(key);
                         break;
                     case RecurringKey:
                         _isRecurring = obj.GetJSONContentAsBoolean(key);
@@ -386,12 +386,12 @@ namespace ChargifyNET
         /// <summary>
         /// If percentage based, the percentage. Int.MinValue otherwise.
         /// </summary>
-        public int Percentage
+        public decimal Percentage
         {
             get { return _percentage; }
             set { _percentage = value; }
         }
-        private int _percentage = int.MinValue;
+        private decimal _percentage = decimal.MinValue;
 
         /// <summary>
         /// Is this a recurring coupon?

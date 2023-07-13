@@ -3742,6 +3742,53 @@ namespace ChargifyNET
         }
 
         /// <summary>
+        /// Method for retrieving information about a coupon using the ID of that coupon.
+        /// </summary>
+        /// <param name="ProductFamilyID">The ID of the product family that the coupon belongs to</param>
+        /// <returns>A dictionary of objects if found, empty collection otherwise.</returns>
+        public ICoupon GetCouponByCode(string couponCode, int ProductFamilyID = 0)
+        {
+            try
+            {
+                // make sure data is valid
+                if (ProductFamilyID < 0) throw new ArgumentException("Invalid ProductFamilyID");
+                // now make the request
+                string requestPath = string.Format("coupons/find.{0}?code={1}", GetMethodExtension(), couponCode);
+                if (ProductFamilyID > 0)
+                {
+                    requestPath = string.Format("{0}&product_family_id={1}", requestPath, ProductFamilyID);
+                }
+
+                string response = DoRequest(requestPath);
+
+                if (response.IsXml())
+                {
+                    throw new NotImplementedException();
+                }
+                else if (response.IsJSON())
+                {
+                    // should be expecting an array
+                    int position = 0;
+                    JsonObject outerObject = JsonObject.Parse(response, ref position);
+                    if (outerObject.ContainsKey("coupon"))
+                    {
+                            JsonObject couponObj = outerObject["coupon"] as JsonObject;
+                            return new Coupon(couponObj);
+                    }
+                }
+            }
+            catch (ChargifyException cex)
+            {
+                // Throw if anything but not found, since not found is telling us that it's working correctly
+                // but that there just isn't a coupon with that ID.
+                if (cex.StatusCode == HttpStatusCode.NotFound) return null;
+                throw cex;
+            }
+
+            throw new ArgumentException("Coupon not found");
+        }
+
+        /// <summary>
         /// Method for retrieving information about a coupon usage using the ID of that coupon.
         /// </summary>
         /// <param name="CouponID">The ID of the coupon</param>
@@ -3934,7 +3981,7 @@ namespace ChargifyNET
         /// <param name="durationPeriodCount">How long does the coupon last?</param>
         /// <param name="endDate">At what point will the coupon no longer be valid?</param>
         /// <returns></returns>
-        private string BuildCouponXml(int productFamilyId, string name, string code, string description, decimal amount, int percentage, bool allowNegativeBalance,
+        private string BuildCouponXml(int productFamilyId, string name, string code, string description, decimal amount, decimal percentage, bool allowNegativeBalance,
             bool recurring, int durationPeriodCount, DateTime endDate)
         {
             // make sure data is valid
@@ -4125,6 +4172,58 @@ namespace ChargifyNET
             string response = DoRequest(string.Format("subscriptions/{0}/components/{1}.{2}", subscriptionId, componentId, GetMethodExtension()));
             // change the response to the object
             return response.ConvertResponseTo<ComponentAttributes>("component");
+        }
+
+        public IComponentPricePointInfo GetComponentPricePointInformationById(int pricePointId)
+        {
+            if (pricePointId == int.MinValue) throw new ArgumentNullException(nameof(pricePointId));
+            string requestPath = string.Format("components_price_points.{0}", GetMethodExtension());
+
+            // Build the query string properly, in case we want to make the method more general in the future.
+            var query = HttpUtility.ParseQueryString(string.Empty);
+            query["filter[ids]"] = pricePointId.ToString();
+            requestPath = requestPath + "?" + query.ToString();
+            
+            string response = DoRequest(requestPath.ToString());
+            Dictionary<int, IComponentPricePointInfo> retDict = new Dictionary<int, IComponentPricePointInfo>();
+
+            if (response.IsXml())
+            {
+                throw new NotSupportedException("XML is deprecated in this API");
+            }
+
+            else if (response.IsJSON())
+            {
+                // should be expecting an array
+                int position = 0;
+                JsonObject jsonObject = JsonObject.Parse(response, ref position);
+
+                if (jsonObject != null && jsonObject.ContainsKey("price_points"))
+                {
+                    JsonArray pricePointsArray = jsonObject["price_points"] as JsonArray;
+                    for (int i = 0; i <= pricePointsArray.Length - 1; i++)
+                    {
+                        JsonObject pricePointObject = (pricePointsArray.Items[i] as JsonObject);
+                        IComponentPricePointInfo componentPricePointInfo = new ComponentPricePointInfo(pricePointObject);
+                        if (!retDict.ContainsKey(componentPricePointInfo.Id))
+                        {
+                            retDict.Add(componentPricePointInfo.Id, componentPricePointInfo);
+                        }
+                        else
+                        {
+                            throw new InvalidOperationException("Duplicate PricePoint Id values detected");
+                        }
+                    }
+                }
+            }
+            // we're querying 
+            IComponentPricePointInfo retValue = retDict.Values.FirstOrDefault();
+            if (retValue == null)
+            {
+                throw new ArgumentException("Invalid Price Point Id");
+            }
+
+            return retValue;
         }
 
         /// <summary>

@@ -47,6 +47,9 @@ namespace ChargifyNET
         private const string ComponentIdKey = "component_id";
         private const string SubscriptionIdKey = "subscription_id";
         private const string NameKey = "name";
+        private const string ComponentHandleKey = "component_handle";
+        private const string CurrencyKey = "currency";
+        private const string PricePointIdKey = "price_point_id";
         private const string UnitNameKey = "unit_name";
         private const string KindKey = "kind";
         private const string PricingSchemeKey = "pricing_scheme";
@@ -119,6 +122,15 @@ namespace ChargifyNET
                         break;
                     case ComponentIdKey:
                         _componentId = obj.GetJSONContentAsInt(key);
+                        break;
+                    case ComponentHandleKey:
+                        _componentHandle = obj.GetJSONContentAsString(key);
+                        break;
+                    case CurrencyKey:
+                         _currency = obj.GetJSONContentAsString(key);
+                        break;
+                    case PricePointIdKey:
+                        _pricePointId = obj.GetJSONContentAsInt(key);
                         break;
                     case SubscriptionIdKey:
                         _subscriptionId = obj.GetJSONContentAsInt(key);
@@ -223,6 +235,33 @@ namespace ChargifyNET
             get { return _componentId; }
         }
         private int _componentId = int.MinValue;
+
+        /// <summary>
+        /// The ID of the component itself
+        /// </summary>
+        public string ComponentHandle
+        {
+            get { return _componentHandle; }
+        }
+        private string _componentHandle = string.Empty;
+
+        /// <summary>
+        /// The ID of the component itself
+        /// </summary>
+        public string Currency
+        {
+            get { return _currency; }
+        }
+        private string _currency = string.Empty;
+
+        /// <summary>
+        /// The ID of the component itself
+        /// </summary>
+        public int PricePointId
+        {
+            get { return _pricePointId; }
+        }
+        private int _pricePointId = int.MinValue;
 
         /// <summary>
         /// The quantity allocated to this subscription

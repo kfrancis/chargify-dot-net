@@ -118,7 +118,7 @@ namespace ChargifyNET
         /// <summary>
         /// If percentage based, the percentage. Int.MinValue otherwise.
         /// </summary>
-        int Percentage { get; set; }
+        decimal Percentage { get; set; }
 
         /// <summary>
         /// Is this a recurring coupon?
