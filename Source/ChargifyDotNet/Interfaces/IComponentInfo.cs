@@ -54,6 +54,10 @@ namespace ChargifyNET
         /// </summary>
         On_Off_Component,
         /// <summary>
+        /// Pre Paid UsageComponent
+        /// </summary>
+        Prepaid_Usage_Component
+        /// <summary>
         /// Unknown Transaction Type
         /// </summary>
         Unknown = -1
