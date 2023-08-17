@@ -38,7 +38,7 @@ namespace ChargifyNET
     /// <summary>
     /// Components are a way to offer Customers a product that is billed on a per-usage basis.
     /// </summary>
-    public interface IComponent : IComparable<IComponent>
+    public interface IComponentUsage : IComparable<IComponentUsage>
     {
         /// <summary>
         /// The ID for this component

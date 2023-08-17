@@ -34,6 +34,8 @@ namespace ChargifyNET
     #region Imports
     using System;
     using System.Collections.Generic;
+    using System.Text.Json;
+    using System.Text.Json.Serialization;
     #endregion
 
     /// <summary>
@@ -57,6 +59,32 @@ namespace ChargifyNET
         /// Unknown Transaction Type
         /// </summary>
         Unknown = -1
+    }
+
+    public class ComponentTypeConverter : JsonConverter<ComponentType>
+    {
+        public override ComponentType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            string value = reader.GetString().Replace("_", "").ToLowerInvariant();
+
+            switch (value)
+            {
+                case "metered_component":
+                    return ComponentType.Metered_Component;
+                case "quantity_based_component":
+                    return ComponentType.Quantity_Based_Component;
+                case "on_off_component":
+                    return ComponentType.On_Off_Component;
+                default:
+                    return ComponentType.Unknown;
+            }
+        }
+
+        // This is read only - we don't need a write method
+        public override void Write(Utf8JsonWriter writer, ComponentType value, JsonSerializerOptions options)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     /// <summary>

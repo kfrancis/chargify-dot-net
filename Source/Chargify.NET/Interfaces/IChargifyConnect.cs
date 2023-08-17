@@ -123,7 +123,7 @@ namespace ChargifyNET
         /// <param name="Page">The result page to get. Defaults to 1</param>
         /// <param name="SinceDate">The earliest date to fetch results from. Optional.</param>
         /// <returns>A dictionary of usages if there are results, null otherwise.</returns>
-        IDictionary<string, IComponent> GetComponentList(int SubscriptionID, int ComponentID, int Page, DateTimeOffset? SinceDate);
+        IDictionary<string, IComponentUsage> GetComponentList(int SubscriptionID, int ComponentID, int Page, DateTimeOffset? SinceDate);
         /// <summary>
         /// Method for getting a list of components for a specific product family
         /// </summary>
@@ -1463,7 +1463,8 @@ namespace ChargifyNET
         /// <param name="per_page">The number of results to return per page</param>
         /// <returns>The list of statements, an empty dictionary otherwise.</returns>
         IDictionary<int, IStatement> GetStatementList(int SubscriptionID, int page, int per_page);
-        IComponentPricePointInfo GetComponentPricePointInformationById(int pricePointId);
+        List<ComponentPricePointInfo> GetComponentPricePointInformationById(int componentId, bool includeCurrencyPrices = false);
+        Component LookupComponent(string handle, bool includeCurrencyPrices = false);
         #endregion
     }
 }

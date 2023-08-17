@@ -1,197 +1,120 @@
-﻿
-#region License, Terms and Conditions
-//
-// Component.cs
-//
-// Authors: Kori Francis <twitter.com/djbyter>, David Ball
-// Copyright (C) 2010 Clinical Support Systems, Inc. All rights reserved.
-// 
-//  THIS FILE IS LICENSED UNDER THE MIT LICENSE AS OUTLINED IMMEDIATELY BELOW:
-//
-//  Permission is hereby granted, free of charge, to any person obtaining a
-//  copy of this software and associated documentation files (the "Software"),
-//  to deal in the Software without restriction, including without limitation
-//  the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//  and/or sell copies of the Software, and to permit persons to whom the
-//  Software is furnished to do so, subject to the following conditions:
-//
-//  The above copyright notice and this permission notice shall be included in
-//  all copies or substantial portions of the Software.
-//
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//  DEALINGS IN THE SOFTWARE.
-//
-#endregion
-
-namespace ChargifyNET
+﻿namespace ChargifyNET
 {
-    #region Imports
     using System;
-    using System.Xml;
-    using Json;
-    #endregion
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Text.Json.Serialization;
+    using System.Threading.Tasks;
+    using ChargifyNET.Json;
 
-    /// <summary>
-    /// Metered Components are a way to offer Customers a product that is billed on a per-usage basis.
-    /// </summary>
-    public class Component : ChargifyBase, IComponent, IComparable<Component>
+
+    public class Component : IComparable<Component>, IComponentPricePointInfo
     {
-        #region Field Keys
-        private const string IdKey = "id";
-        private const string QuantityKey = "quantity";
-        private const string MemoKey = "memo";
-        #endregion
+        [JsonPropertyName("id")]
+        public int Id { get; set; }
 
-        #region Constructors
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        private Component()
-        { }
+        [JsonPropertyName("name")]
+        public string Name { get;set; }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="componentXml">An XML string containing a component node</param>
-        public Component(string componentXml)
-        {
-            // get the XML into an XML document
-            XmlDocument doc = new XmlDocument();
-            doc.LoadXml(componentXml);
-            if (doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(componentXml));
-            // loop through the child nodes of this node
-            foreach (XmlNode elementNode in doc.ChildNodes)
-            {
-                if (elementNode.Name == "usage")
-                {
-                    LoadFromNode(elementNode);
-                    return;
-                }
-            }
-            // if we get here, then no component info was found
-            throw new ArgumentException("XML does not contain component information", nameof(componentXml));
-        }
+        [JsonPropertyName("handle")]
+        public string Handle { get; set; }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="usageNode">An xml node with usage information</param>
-        internal Component(XmlNode usageNode)
-        {
-            if (usageNode == null) throw new ArgumentNullException(nameof(usageNode));
-            if (usageNode.Name != "usage") throw new ArgumentException("Not a vaild usage node", nameof(usageNode));
-            if (usageNode.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(usageNode));
-            LoadFromNode(usageNode);
-        }
+        [JsonPropertyName("pricing_scheme")]
+        public string PricingScheme { get; set; }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="usageObject">An JsonObject with usage information</param>
-        public Component(JsonObject usageObject)
-        {
-            if (usageObject == null) throw new ArgumentNullException(nameof(usageObject));
-            if (usageObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild usage object", nameof(usageObject));
-            LoadFromJson(usageObject);
-        }
+        [JsonPropertyName("unit_name")]
+        public string UnitName { get; set; }
 
-        private void LoadFromJson(JsonObject obj)
-        {
-            // loop through the keys of this JsonObject to get product info, and parse it out
-            foreach (string key in obj.Keys)
-            {
-                switch (key)
-                {
-                    case IdKey:
-                        _id = obj.GetJSONContentAsString(key);
-                        break;
-                    case QuantityKey:
-                        _quantity = obj.GetJSONContentAsInt(key);
-                        break;
-                    case MemoKey:
-                        _memo = obj.GetJSONContentAsString(key);
-                        break;
-                }
-            }
-        }
+        [JsonPropertyName("unit_price")]
+        public decimal UnitPrice { get; set; }
 
-        private void LoadFromNode(XmlNode usageNode)
-        {
-            // loop through the nodes to get product info
-            foreach (XmlNode dataNode in usageNode.ChildNodes)
-            {
-                switch (dataNode.Name)
-                {
-                    case IdKey:
-                        _id = dataNode.GetNodeContentAsString();
-                        break;
-                    case QuantityKey:
-                        _quantity = dataNode.GetNodeContentAsInt();
-                        break;
-                    case MemoKey:
-                        _memo = dataNode.GetNodeContentAsString();
-                        break;
-                }
-            }
-        }
-        #endregion
+        [JsonPropertyName("product_family_id")]
+        public int ProductFamilyId { get; set; }
 
-        #region IMeteredComponent Members
+        [JsonPropertyName("product_family_name")]
+        public string ProductFamilyName { get; set; }
+
+        [JsonPropertyName("price_per_unit_in_cents")]
+        public int? PricePerUnitInCents { get; set; }
+
+        [JsonPropertyName("kind")]
+        public ComponentType Kind { get; set; }
+
+        [JsonPropertyName("archived")]
+        public bool Archived { get; set; }
+
+        [JsonPropertyName("taxable")]
+        public bool Taxable { get; set; }
+
+        [JsonPropertyName("description")]
+        public string Description { get; set; }
+
+        [JsonPropertyName("default_price_point_id")]
+        public int DefaultPricePointId { get; set; }
+
+        [JsonPropertyName("prices")]
+        public IEnumerable<ComponentPricePointPrice> Prices { get; set; }
+
+        [JsonPropertyName("price_point_count")]
+        public int PricePointCount { get; set; }
+
+        [JsonPropertyName("price_points_url")]
+        public string PricePointsUrl { get; set; }
+
+        [JsonPropertyName("default_price_point_name")]
+        public string DefaultPricePointName { get; set; }
+
+        [JsonPropertyName("tax_code")]
+        public string TaxCode { get; set; }
+
+        [JsonPropertyName("recurring")]
+        public bool Recurring { get; set; }
+
+        [JsonPropertyName("upgrade_charge")]
+        public string UpgradeCharge { get; set; }
+
+        [JsonPropertyName("downgrade_credit")]
+        public string DowngradeCredit { get; set; }
+
+        [JsonPropertyName("created_at")]
+        public DateTime? CreatedAt { get; set; }
+
+        [JsonPropertyName("updated_at")]
+        public DateTime? UpdatedAt { get; set; }
+
+        [JsonPropertyName("archived_at")]
+        public DateTime? ArchivedAt { get; set; }
+
+        [JsonPropertyName("hide_date_range_on_invoice")]
+        public bool HideDateRangeOnInvoice { get; set; }
+
+        [JsonPropertyName("allow_fractional_quantities")]
+        public bool AllowFractionalQuantities { get; set; }
+
+        [JsonPropertyName("use_site_exchange_rate")]
+        public bool UseSiteExchangeRate { get; set; }
+
+        [JsonPropertyName("item_category")]
+        public string ItemCategory { get;set; }
+
+        [JsonPropertyName("accounting_code")]
+        public string AccountingCode { get; set; }
+
+        [JsonPropertyName("currency_prices")]
+        public IEnumerable<ComponentPricePointCurrencyPrice> CurrencyPrices { get; set; }
+
+        [JsonIgnore]
+        public bool TaxIncluded => false;
+
+        #region IComparable<ComponentInfo> Members
 
         /// <summary>
-        /// The ID for this metered component
-        /// </summary>
-        public string ID
-        {
-            get { return _id; }
-        }
-        private string _id = string.Empty;
-
-        /// <summary>
-        /// The amount of units used
-        /// </summary>
-        public int Quantity
-        {
-            get { return _quantity; }
-        }
-        private int _quantity;
-
-        /// <summary>
-        /// An optional description for this metered component
-        /// </summary>
-        public string Memo
-        {
-            get { return _memo; }
-        }
-        private string _memo = string.Empty;
-
-        #endregion
-
-        #region IComparable<IComponent> Members
-
-        /// <summary>
-        /// Compare this IComponent to another
-        /// </summary>
-        public int CompareTo(IComponent other)
-        {
-            return string.Compare(ID, other.ID, StringComparison.InvariantCultureIgnoreCase);
-        }
-
-        #endregion
-
-        #region IComparable<Component> Members
-
-        /// <summary>
-        /// Compare this Component to another
+        /// Compare this ComponentInfo to another
         /// </summary>
         public int CompareTo(Component other)
         {
-            return string.Compare(ID, other.ID, StringComparison.InvariantCultureIgnoreCase);
+            return this.Id.CompareTo(other.Id);
         }
 
         #endregion

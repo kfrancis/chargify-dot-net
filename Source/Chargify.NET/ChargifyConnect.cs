@@ -43,6 +43,7 @@ namespace ChargifyNET
     using System.Linq;
     using System.Xml.Linq;
     using System.Security.Policy;
+    using System.Text.Json;
     #endregion
 
     /// <summary>
@@ -4174,56 +4175,49 @@ namespace ChargifyNET
             return response.ConvertResponseTo<ComponentAttributes>("component");
         }
 
-        public IComponentPricePointInfo GetComponentPricePointInformationById(int pricePointId)
+        public List<ComponentPricePointInfo> GetComponentPricePointInformationById(int componentId, bool includeCurrencyPrices = false)
         {
-            if (pricePointId == int.MinValue) throw new ArgumentNullException(nameof(pricePointId));
-            string requestPath = string.Format("components_price_points.{0}", GetMethodExtension());
+            if (componentId == int.MinValue) throw new ArgumentNullException(nameof(componentId));
+            string requestPath = string.Format("components/{0}/price_points.{1}", componentId, GetMethodExtension());
 
-            // Build the query string properly, in case we want to make the method more general in the future.
             var query = HttpUtility.ParseQueryString(string.Empty);
-            query["filter[ids]"] = pricePointId.ToString();
+            if (includeCurrencyPrices)
+            {
+                query["currency_prices"] = "true";
+            }
+
             requestPath = requestPath + "?" + query.ToString();
             
             string response = DoRequest(requestPath.ToString());
-            Dictionary<int, IComponentPricePointInfo> retDict = new Dictionary<int, IComponentPricePointInfo>();
 
             if (response.IsXml())
             {
                 throw new NotSupportedException("XML is deprecated in this API");
             }
-
             else if (response.IsJSON())
             {
-                // should be expecting an array
-                int position = 0;
-                JsonObject jsonObject = JsonObject.Parse(response, ref position);
-
-                if (jsonObject != null && jsonObject.ContainsKey("price_points"))
+                try
                 {
-                    JsonArray pricePointsArray = jsonObject["price_points"] as JsonArray;
-                    for (int i = 0; i <= pricePointsArray.Length - 1; i++)
+                    var jsonNode = JsonDocument.Parse(response).RootElement.GetProperty("price_points");
+                    var responseObject = System.Text.Json.JsonSerializer.Deserialize<List<ComponentPricePointInfo>>(jsonNode, new JsonSerializerOptions()
                     {
-                        JsonObject pricePointObject = (pricePointsArray.Items[i] as JsonObject);
-                        IComponentPricePointInfo componentPricePointInfo = new ComponentPricePointInfo(pricePointObject);
-                        if (!retDict.ContainsKey(componentPricePointInfo.Id))
-                        {
-                            retDict.Add(componentPricePointInfo.Id, componentPricePointInfo);
-                        }
-                        else
-                        {
-                            throw new InvalidOperationException("Duplicate PricePoint Id values detected");
-                        }
-                    }
+                        NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowReadingFromString
+                    });
+                    return responseObject;
+                }
+                catch (KeyNotFoundException ex)
+                {
+                    throw new ArgumentException("Invalid Price Point Id", ex);
+                }
+                catch (Exception ex)
+                {
+                    throw;
                 }
             }
-            // we're querying 
-            IComponentPricePointInfo retValue = retDict.Values.FirstOrDefault();
-            if (retValue == null)
+            else
             {
                 throw new ArgumentException("Invalid Price Point Id");
             }
-
-            return retValue;
         }
 
         /// <summary>
@@ -4385,7 +4379,7 @@ namespace ChargifyNET
         /// <param name="page">The result page to get. Defaults to 1</param>
         /// <param name="sinceDate">The earliest date to fetch results from. Optional.</param>
         /// <returns>A dictionary of usages if there are results, null otherwise.</returns>
-        public IDictionary<string, IComponent> GetComponentList(int subscriptionId, int componentId, int page = 1, DateTimeOffset? sinceDate = null)
+        public IDictionary<string, IComponentUsage> GetComponentList(int subscriptionId, int componentId, int page = 1, DateTimeOffset? sinceDate = null)
         {
             // make sure data is valid
             if (subscriptionId == int.MinValue) throw new ArgumentNullException("subscriptionId");
@@ -4400,7 +4394,7 @@ namespace ChargifyNET
 
             // now make the request
             string response = DoRequest(query);
-            Dictionary<string, IComponent> retValue = new Dictionary<string, IComponent>();
+            Dictionary<string, IComponentUsage> retValue = new Dictionary<string, IComponentUsage>();
             if (response.IsXml())
             {
                 // now build a product list based on response XML
@@ -4416,7 +4410,7 @@ namespace ChargifyNET
                         {
                             if (usageNode.Name == "usage")
                             {
-                                IComponent loadedComponent = new Component(usageNode);
+                                IComponentUsage loadedComponent = new ComponentUsage(usageNode);
                                 if (!retValue.ContainsKey(loadedComponent.ID))
                                 {
                                     retValue.Add(loadedComponent.ID, loadedComponent);
@@ -4441,7 +4435,7 @@ namespace ChargifyNET
                     if (jsonObject != null && jsonObject.ContainsKey("component"))
                     {
                         JsonObject componentObj = (array.Items[i] as JsonObject)["component"] as JsonObject;
-                        IComponent loadedComponent = new Component(componentObj);
+                        IComponentUsage loadedComponent = new ComponentUsage(componentObj);
                         if (!retValue.ContainsKey(loadedComponent.ID))
                         {
                             retValue.Add(loadedComponent.ID, loadedComponent);
@@ -4456,6 +4450,46 @@ namespace ChargifyNET
             // return the list
             return retValue;
         }
+
+        /// <summary>
+        /// Find a single component by the component handle.
+        /// </summary>
+        /// <param name="handle"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        public Component LookupComponent(string handle, bool includeCurrencyPrices = false)
+        {
+            if (string.IsNullOrWhiteSpace(handle))
+            {
+                throw new ArgumentException("Invalid handle", nameof(handle));
+            }
+
+            var query = HttpUtility.ParseQueryString(string.Empty);
+            query["handle"] = handle;
+
+            if (includeCurrencyPrices)
+            {
+                query["currency_prices"] = "true";
+            }
+
+            string requestPath = $"components/lookup.{GetMethodExtension()}?{query}";
+
+            // now make the request
+            string response = DoRequest(requestPath);
+
+            var jsonOptions = new JsonSerializerOptions()
+            {
+                NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowReadingFromString,
+            };
+            jsonOptions.Converters.Add(new ComponentTypeConverter());
+
+            var jsonNode = JsonDocument.Parse(response).RootElement.GetProperty("component");
+            var responseObject = System.Text.Json.JsonSerializer.Deserialize<Component>(jsonNode, jsonOptions);
+
+            return responseObject;
+        }
+
+
 
         /// <summary>
         /// Method for adding a metered component usage to the subscription

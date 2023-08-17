@@ -5,18 +5,10 @@
 
     public interface IComponentPricePointInfo
     {
-        string ArchivedAt { get; }
-        int ComponentId { get; }
-        DateTime CreatedAt { get; }
-        bool Default { get; }
-        string Handle { get; }
-        int Id { get; }
-        string Name { get; }
-        List<IComponentPricePointPrice> Prices { get; }
-        string PricingScheme { get; }
+        IEnumerable<ComponentPricePointCurrencyPrice> CurrencyPrices { get; set; }
+
+        IEnumerable<ComponentPricePointPrice> Prices { get; set; }
+
         bool TaxIncluded { get; }
-        string Type { get; }
-        DateTime UpdatedAt { get; }
-        bool UseSiteExchangeRate { get; }
     }
 }
