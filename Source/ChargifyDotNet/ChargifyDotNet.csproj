@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.0;net8.0</TargetFrameworks>
@@ -19,7 +19,6 @@
     <IsPackable>true</IsPackable>
 
     <!-- Build Configuration -->
-    <!-- Disable automatic pack on build; CI will build then pack explicitly -->
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
@@ -35,17 +34,17 @@
   <PropertyGroup>
     <!-- Enable NuGet package auditing -->
     <NuGetAudit>true</NuGetAudit>
-
-    <!-- Audit direct and transitive packages -->
     <NuGetAuditMode>all</NuGetAuditMode>
-
-    <!-- Report low, moderate, high and critical advisories -->
     <NuGetAuditLevel>low</NuGetAuditLevel>
+    <WarningsAsErrors Condition="$(ContinuousIntegrationBuild) == 'true' OR '$(Configuration)' == 'Release'">(WarningsAsErrors);NU1900;NU1901;NU1902;NU1903;NU1904</WarningsAsErrors>
+  </PropertyGroup>
 
-    <!-- Fails the build on CI or on release when a vulnerability is detected -->
-    <WarningsAsErrors Condition="$(ContinuousIntegrationBuild) == 'true' OR '$(Configuration)' == 'Release'">
-      (WarningsAsErrors);NU1900;NU1901;NU1902;NU1903;NU1904
-    </WarningsAsErrors>
+  <!-- Release build settings for all target frameworks: produce portable PDBs (not embedded) -->
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <DebugType>portable</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    <Deterministic>true</Deterministic>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(Configuration)' == 'Debug'">
@@ -57,27 +56,23 @@
 
 	<ItemGroup>
 		<EmbeddedResource Include="Data\ISO_3166-1_list_en.xml" />
-    <PackageReference Include="DotNet.ReproducibleBuilds" Version="1.2.39">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
 		<PackageReference Include="MinVer" Version="6.0.0">
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.*" />
+		<!-- Proper reproducible builds package reference -->
+		<PackageReference Include="DotNet.ReproducibleBuilds" Version="1.2.39" PrivateAssets="all" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<Compile Update="WebhookHandler.cs" />
 	</ItemGroup>
 
-	<!-- .NET Standard 2.0 references, compilation flags and build options -->
 	<PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0'">
 		<DefineConstants>NETCORE;NETSTANDARD;NETSTANDARD2_0</DefineConstants>
 	</PropertyGroup>
 
-	<!-- .NET 4.5 references, compilation flags and build options -->
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
 		<Reference Include="mscorlib" />
 		<Reference Include="System" />
@@ -99,14 +94,11 @@
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
 		<DebugType>full</DebugType>
 		<DebugSymbols>true</DebugSymbols>
-		<!-- Use relative path for documentation file -->
 		<DocumentationFile>$(MSBuildProjectDirectory)/ChargifyDotNet.xml</DocumentationFile>
 		<NoWarn>1701;1702;1591</NoWarn>
 	</PropertyGroup>
+	<!-- Release netstandard group: change embedded to portable handled by global Release group above -->
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.0|AnyCPU'">
-		<DebugType>embedded</DebugType>
-		<DebugSymbols>true</DebugSymbols>
-		<!-- Use relative path for documentation file -->
 		<DocumentationFile>$(MSBuildProjectDirectory)/ChargifyDotNet.xml</DocumentationFile>
 	</PropertyGroup>
 
