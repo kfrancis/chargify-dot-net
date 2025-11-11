@@ -1,30 +1,166 @@
 using System;
+using System.Diagnostics;
+using System.IO;
 using System.Net;
 using Bogus;
+using ChargifyDotNet.Tests.Base; // settings class
 using ChargifyNET;
+using Microsoft.Extensions.Configuration; // added
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ChargifyDotNet.Tests
 {
-    public class ChargifyTestBase
+    public abstract class ChargifyTestBase
     {
+        // ReSharper disable once MemberCanBeProtected.Global
+        public TestContext TestContext { get; set; } = null!;
+        private Stopwatch? _testSw;
+
+        [TestInitialize]
+        public void BaseInit()
+        {
+            _testSw = Stopwatch.StartNew();
+            TestContext.WriteLine($"[START] {TestContext.TestName} @ {DateTimeOffset.Now:O}");
+        }
+
+        [TestCleanup]
+        public void BaseCleanup()
+        {
+            _testSw?.Stop();
+            TestContext.WriteLine($"[END] {TestContext.TestName} after {_testSw?.Elapsed.TotalMilliseconds:F0} ms");
+        }
+
         /// <summary>
-        /// Gets or sets the test context which provides
-        /// information about and functionality for the current test run.
-        ///</summary>
-        protected TestContext TestContext { get; set; }
+        /// Writes a message to the current test output stream.
+        /// </summary>
+        /// <remarks>This method is typically used to provide additional diagnostic information during
+        /// test execution. The output is visible in the test results or logs, depending on the test runner.</remarks>
+        /// <param name="message">The message to write to the test output. Can be null or empty.</param>
+        [Conditional("DEBUG")]
+        protected void Log(string message) => TestContext.WriteLine(message);
+
+        [Conditional("DEBUG")]
+        protected void Log(string format, params object?[] args) => TestContext.WriteLine(format, args);
+
+        /// <summary>
+        /// Begins a timed test step with the specified name and returns a disposable scope that logs the step's
+        /// completion and elapsed time when disposed.
+        /// </summary>
+        /// <remarks>Use this method to measure and log the duration of a specific test step. The step
+        /// name is written to the test context at the start and upon completion, along with the elapsed time. This
+        /// method is intended for use within a test framework that supports <see cref="TestContext"/> output.</remarks>
+        /// <param name="name">The name of the test step to display in the log output. Cannot be null.</param>
+        /// <returns>An <see cref="IDisposable"/> that, when disposed, logs the completion of the test step along with the
+        /// elapsed time in milliseconds.</returns>
+        protected Scope Step(string name)
+        {
+            TestContext.WriteLine($"→ {name}...");
+            return new Scope(this, name);
+        }
+
+        /// <summary>
+        /// Provides a scope that executes a specified action when disposed.
+        /// </summary>
+        /// <remarks>Use this class to ensure that a cleanup or finalization action is performed when the
+        /// scope is exited, typically in a using statement. This is useful for managing resources or performing custom
+        /// teardown logic.</remarks>
+        public sealed class Scope : IDisposable
+        {
+            private readonly ChargifyTestBase _owner;
+            private readonly string _name;
+            private readonly Stopwatch _sw = Stopwatch.StartNew();
+            private bool _completed;
+
+            internal Scope(ChargifyTestBase owner, string name)
+            {
+                _owner = owner;
+                _name = name;
+            }
+
+            public void Complete(string? note = null)
+            {
+                if (_completed) return;
+                _completed = true;
+                _sw.Stop();
+                var suffix = string.IsNullOrEmpty(note) ? "" : $" - {note}";
+                _owner.TestContext.WriteLine($"✓ {_name} [{_sw.Elapsed.TotalMilliseconds:F0} ms]{suffix}");
+            }
+
+            public void Dispose()
+            {
+                if (!_completed) Complete("auto-completed on dispose");
+            }
+        }
+
+        private static readonly Lazy<ChargifySettings> s_settings = new(LoadSettings);
 
         protected ChargifyConnect Chargify => _chargify ??= new ChargifyConnect
         {
-            apiKey = "",
-            Password = "X",
-            URL = "https://subdomain.chargify.com/",
-            SharedKey = "123456789",
-            UseJSON = false,
-            ProtocolType = SecurityProtocolType.Tls12
+            apiKey = s_settings.Value.ApiKey ?? string.Empty,
+            Password = s_settings.Value.Password ?? string.Empty,
+            URL = s_settings.Value.Url ?? string.Empty,
+            SharedKey = s_settings.Value.SharedKey ?? string.Empty,
+            UseJSON = s_settings.Value.UseJson,
+            ProtocolType = ParseProtocol(s_settings.Value.Protocol)
         };
 
-        private ChargifyConnect _chargify;
+        private ChargifyConnect? _chargify;
+
+        private static ChargifySettings LoadSettings()
+        {
+            // Base path: test project directory
+            var basePath = AppContext.BaseDirectory;
+
+            var configRootPath = FindSettingsDirectory(basePath);
+
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(configRootPath)
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
+                .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: false)
+                .AddEnvironmentVariables(prefix: "CHARGIFY_"); // allow env overrides e.g. CHARGIFY_ApiKey
+
+            var config = builder.Build();
+            var section = config.GetSection("Chargify");
+            var settings = section.Get<ChargifySettings>() ?? new ChargifySettings();
+
+            // Environment variable fallback (upper-case names) if binder didn't map
+            settings.ApiKey ??= config["CHARGIFY_APIKEY"];
+            settings.Password ??= config["CHARGIFY_PASSWORD"];
+            settings.Url ??= config["CHARGIFY_URL"];
+            settings.SharedKey ??= config["CHARGIFY_SHAREDKEY"];
+            if (string.IsNullOrEmpty(settings.Protocol)) settings.Protocol = config["CHARGIFY_PROTOCOL"] ?? "Tls12";
+            if (!settings.UseJson && bool.TryParse(config["CHARGIFY_USEJSON"], out var useJson)) settings.UseJson = useJson;
+
+            return settings;
+
+            // For net48 tests AppContext.BaseDirectory points to bin/Debug/net48; move up until project file directory if needed
+            // We'll search upwards for appsettings.json if not found directly.
+            static string FindSettingsDirectory(string start)
+            {
+                var dir = new DirectoryInfo(start);
+                while (dir != null)
+                {
+                    var potential = Path.Combine(dir.FullName, "appsettings.json");
+                    if (File.Exists(potential)) return dir.FullName;
+                    dir = dir.Parent;
+                }
+                return start;
+            }
+        }
+
+        private static SecurityProtocolType ParseProtocol(string protocol)
+        {
+            if (string.IsNullOrWhiteSpace(protocol)) return SecurityProtocolType.Tls12;
+            try
+            {
+                return (SecurityProtocolType)Enum.Parse(typeof(SecurityProtocolType), protocol, ignoreCase: true);
+            }
+            catch
+            {
+                return SecurityProtocolType.Tls12;
+            }
+        }
 
         /// <summary>
         /// Method that allows me to use Faker methods in place rather than writing a bunch of specific "GetRandom.." methods.

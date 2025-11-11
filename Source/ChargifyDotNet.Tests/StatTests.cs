@@ -7,7 +7,7 @@ namespace ChargifyDotNetTests
     [TestClass]
     public class StatTests : ChargifyTestBase
     {
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -23,7 +23,7 @@ namespace ChargifyDotNetTests
             // Assert
             Assert.IsNotNull(stats);
             //Assert.IsInstanceOfType(stats, typeof(ChargifyNET.SiteStatistics));
-            Assert.IsTrue(stats.TotalSubscriptions == allSubscriptions.Count);
+            Assert.AreEqual(allSubscriptions.Count, stats.TotalSubscriptions);
 
             SetJson(!isJson);
         }

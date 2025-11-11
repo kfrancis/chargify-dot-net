@@ -12,7 +12,7 @@ namespace ChargifyDotNetTests
     [TestClass]
     public class MetadataTests : ChargifyTestBase
     {
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -26,15 +26,15 @@ namespace ChargifyDotNetTests
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.IsTrue(result.CurrentPage != int.MinValue);
-            Assert.IsTrue(result.PerPage != int.MinValue);
-            Assert.IsTrue(result.TotalCount != int.MinValue);
-            Assert.IsTrue(result.TotalPages != int.MinValue);
+            Assert.AreNotEqual(int.MinValue, result.CurrentPage);
+            Assert.AreNotEqual(int.MinValue, result.PerPage);
+            Assert.AreNotEqual(int.MinValue, result.TotalCount);
+            Assert.AreNotEqual(int.MinValue, result.TotalPages);
 
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -48,15 +48,15 @@ namespace ChargifyDotNetTests
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.IsTrue(result.CurrentPage != int.MinValue);
-            Assert.IsTrue(result.PerPage != int.MinValue);
-            Assert.IsTrue(result.TotalCount != int.MinValue);
-            Assert.IsTrue(result.TotalPages != int.MinValue);
+            Assert.AreNotEqual(int.MinValue, result.CurrentPage);
+            Assert.AreNotEqual(int.MinValue, result.PerPage);
+            Assert.AreNotEqual(int.MinValue, result.TotalCount);
+            Assert.AreNotEqual(int.MinValue, result.TotalPages);
 
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -73,11 +73,11 @@ namespace ChargifyDotNetTests
             var result = Chargify.GetMetadataFor<Subscription>(subscription.SubscriptionID, null);
 
             Assert.IsNotNull(result);
-            Assert.IsTrue(result.CurrentPage != int.MinValue);
-            Assert.IsTrue(result.PerPage != int.MinValue);
-            Assert.IsTrue(result.TotalCount != int.MinValue);
-            Assert.IsTrue(result.TotalPages != int.MinValue);
-            Assert.AreEqual(result.TotalCount, result.Metadata.Count);
+            Assert.AreNotEqual(int.MinValue, result.CurrentPage);
+            Assert.AreNotEqual(int.MinValue, result.PerPage);
+            Assert.AreNotEqual(int.MinValue, result.TotalCount);
+            Assert.AreNotEqual(int.MinValue, result.TotalPages);
+            Assert.HasCount(result.TotalCount, result.Metadata);
             Assert.IsTrue(result.Metadata.Any(m => !string.IsNullOrEmpty(m.Name)));
 
             TestContext.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(result));
@@ -85,7 +85,7 @@ namespace ChargifyDotNetTests
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -95,7 +95,7 @@ namespace ChargifyDotNetTests
             SetJson(isJson);
 
             // Arrange
-            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value as Subscription;
+            var subscription = Chargify.GetSubscriptionList(SubscriptionState.Active).FirstOrDefault().Value as Subscription;
             Assert.IsNotNull(subscription, "No applicable subscription found.");
 #if !NUNIT
             TestContext.WriteLine("SubscriptionID: {0}", subscription.SubscriptionID);
@@ -108,16 +108,16 @@ namespace ChargifyDotNetTests
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.IsTrue(result.CurrentPage != int.MinValue);
-            Assert.IsTrue(result.PerPage != int.MinValue);
-            Assert.IsTrue(result.TotalCount != int.MinValue);
-            Assert.IsTrue(result.TotalPages != int.MinValue);
-            Assert.AreEqual(result.TotalCount, result.Metadata.Count);
+            Assert.AreNotEqual(int.MinValue, result.CurrentPage);
+            Assert.AreNotEqual(int.MinValue, result.PerPage);
+            Assert.AreNotEqual(int.MinValue, result.TotalCount);
+            Assert.AreNotEqual(int.MinValue, result.TotalPages);
+            Assert.HasCount(result.TotalCount, result.Metadata);
 
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -135,16 +135,16 @@ namespace ChargifyDotNetTests
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.IsTrue(result.CurrentPage != int.MinValue);
-            Assert.IsTrue(result.PerPage != int.MinValue);
-            Assert.IsTrue(result.TotalCount != int.MinValue);
-            Assert.IsTrue(result.TotalPages != int.MinValue);
-            Assert.AreEqual(result.TotalCount, result.Metadata.Count);
+            Assert.AreNotEqual(int.MinValue, result.CurrentPage);
+            Assert.AreNotEqual(int.MinValue, result.PerPage);
+            Assert.AreNotEqual(int.MinValue, result.TotalCount);
+            Assert.AreNotEqual(int.MinValue, result.TotalPages);
+            Assert.HasCount(result.TotalCount, result.Metadata);
 
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod, Ignore]
@@ -158,7 +158,7 @@ namespace ChargifyDotNetTests
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -177,14 +177,14 @@ namespace ChargifyDotNetTests
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.IsTrue(result.Count >= 1);
-            Assert.IsTrue(result.Select(m => m.Name == metadata.Name).Count() == 1);
-            Assert.IsTrue(result.Select(m => m.Value == metadata.Value).Count() == 1);
+            Assert.IsGreaterThanOrEqualTo(1, result.Count);
+            Assert.AreEqual(1, result.Select(m => m.Name == metadata.Name).Count());
+            Assert.AreEqual(1, result.Select(m => m.Value == metadata.Value).Count());
 
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -198,9 +198,9 @@ namespace ChargifyDotNetTests
             Assert.IsNotNull(customer, "No applicable customer found.");
             var metadata = new List<Metadata>()
             {
-                new Metadata() { Name = "one", Value = Guid.NewGuid().ToString() },
-                new Metadata() { Name = "two", Value = Guid.NewGuid().ToString() },
-                new Metadata() { Name = "three", Value = Guid.NewGuid().ToString() }
+                new() { Name = "one", Value = Guid.NewGuid().ToString() },
+                new() { Name = "two", Value = Guid.NewGuid().ToString() },
+                new() { Name = "three", Value = Guid.NewGuid().ToString() }
             };
 
             // Act
@@ -208,12 +208,12 @@ namespace ChargifyDotNetTests
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(metadata.Count, result.Count);
+            Assert.HasCount(metadata.Count, result);
 
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -223,7 +223,7 @@ namespace ChargifyDotNetTests
             SetJson(isJson);
 
             // Arrange
-            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value as Subscription;
+            var subscription = Chargify.GetSubscriptionList(SubscriptionState.Active).FirstOrDefault().Value as Subscription;
             Assert.IsNotNull(subscription, "No applicable subscription found.");
             Metadata metadata = new() { Name = Guid.NewGuid().ToString(), Value = Guid.NewGuid().ToString() };
 
@@ -232,14 +232,14 @@ namespace ChargifyDotNetTests
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.IsTrue(result.Count >= 1);
-            Assert.IsTrue(result.Select(m => m.Name == metadata.Name).Count() == 1);
-            Assert.IsTrue(result.Select(m => m.Value == metadata.Value).Count() == 1);
+            Assert.IsGreaterThanOrEqualTo(1, result.Count);
+            Assert.AreEqual(1, result.Select(m => m.Name == metadata.Name).Count());
+            Assert.AreEqual(1, result.Select(m => m.Value == metadata.Value).Count());
 
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -249,13 +249,13 @@ namespace ChargifyDotNetTests
             SetJson(isJson);
 
             // Arrange
-            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value as Subscription;
+            var subscription = Chargify.GetSubscriptionList(SubscriptionState.Active).FirstOrDefault().Value as Subscription;
             Assert.IsNotNull(subscription, "No applicable subscription found.");
             var metadata = new List<Metadata>()
             {
-                new Metadata() { Name = "one", Value = Guid.NewGuid().ToString() },
-                new Metadata() { Name = "two", Value = Guid.NewGuid().ToString() },
-                new Metadata() { Name = "three", Value = Guid.NewGuid().ToString() }
+                new() { Name = "one", Value = Guid.NewGuid().ToString() },
+                new() { Name = "two", Value = Guid.NewGuid().ToString() },
+                new() { Name = "three", Value = Guid.NewGuid().ToString() }
             };
 
             // Act
@@ -263,7 +263,7 @@ namespace ChargifyDotNetTests
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(metadata.Count, result.Count);
+            Assert.HasCount(metadata.Count, result);
 
             SetJson(!isJson);
         }

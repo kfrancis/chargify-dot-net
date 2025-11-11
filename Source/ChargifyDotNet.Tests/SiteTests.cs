@@ -83,7 +83,7 @@ namespace ChargifyDotNetTests
             }
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod, Ignore]
@@ -120,7 +120,7 @@ namespace ChargifyDotNetTests
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod, Ignore]
@@ -157,7 +157,7 @@ namespace ChargifyDotNetTests
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod, Ignore]

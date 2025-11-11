@@ -10,7 +10,7 @@ namespace ChargifyDotNetTests
     [TestClass]
     public class RenewalPreviewTests : ChargifyTestBase
     {
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -20,7 +20,7 @@ namespace ChargifyDotNetTests
             SetJson(isJson);
 
             // Arrange
-            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value as Subscription;
+            var subscription = Chargify.GetSubscriptionList(SubscriptionState.Active).FirstOrDefault().Value as Subscription;
             Assert.IsNotNull(subscription, "No suitable subscription could be found.");
 
             // Act

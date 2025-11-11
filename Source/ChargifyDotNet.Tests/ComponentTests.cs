@@ -15,7 +15,7 @@ namespace ChargifyDotNetTests
     [TestClass]
     public class ComponentTests : ChargifyTestBase
     {
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -31,20 +31,23 @@ namespace ChargifyDotNetTests
             if (familyComponents == null || !familyComponents.Any()) Assert.Inconclusive("Valid components could not be found.");
 
             // Act
-            var components = familyComponents.Where(c => c.PricingScheme != PricingSchemeType.Per_Unit && c.Prices != null && c.Prices.Count > 0).ToList();
+            var components = familyComponents.Where(c => c.PricingScheme != PricingSchemeType.Per_Unit && c.Prices is
+            {
+                Count: > 0
+            }).ToList();
 
             // Assert
             Assert.IsNotNull(components);
             //Assert.IsInstanceOfType(components, typeof(List<IComponentInfo>));
             Assert.IsTrue(components.Where(c => c.Prices.Any()).Any());
-            Assert.IsTrue(components.FirstOrDefault(c => c.Prices != null && c.Prices.Count > 0).Prices.First().StartingQuantity != int.MinValue);
-            Assert.IsTrue(components.FirstOrDefault(c => c.Prices != null && c.Prices.Count > 0).Prices.First().EndingQuantity != int.MinValue);
-            Assert.IsTrue(components.FirstOrDefault(c => c.Prices != null && c.Prices.Count > 0).Prices.First().UnitPrice != int.MinValue);
+            Assert.AreNotEqual(int.MinValue, components.FirstOrDefault(c => c.Prices is { Count: > 0 }).Prices.First().StartingQuantity);
+            Assert.AreNotEqual(int.MinValue, components.FirstOrDefault(c => c.Prices is { Count: > 0 }).Prices.First().EndingQuantity);
+            Assert.AreNotEqual(int.MinValue, components.FirstOrDefault(c => c.Prices is { Count: > 0 }).Prices.First().UnitPrice);
 
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -54,7 +57,7 @@ namespace ChargifyDotNetTests
             SetJson(isJson);
 
             // Arrange
-            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value;
+            var subscription = Chargify.GetSubscriptionList(SubscriptionState.Active).FirstOrDefault().Value;
             if (subscription == null) Assert.Inconclusive("A valid subscription could not be found.");
 
             // Act
@@ -66,7 +69,7 @@ namespace ChargifyDotNetTests
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -78,7 +81,7 @@ namespace ChargifyDotNetTests
             // Arrange
             var productFamily = Chargify.GetProductFamilyList().Values.FirstOrDefault();
             if (productFamily == null) Assert.Inconclusive("A valid product family could not be found.");
-            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value;
+            var subscription = Chargify.GetSubscriptionList(SubscriptionState.Active).FirstOrDefault().Value;
             if (subscription == null) Assert.Inconclusive("A valid subscription could not be found.");
             var component = Chargify.GetComponentsForProductFamily(productFamily.ID, false).FirstOrDefault(c => c.Value.Kind == ComponentType.Metered_Component).Value;
             if (component == null) Assert.Inconclusive("A valid component could not be found.");
@@ -91,8 +94,8 @@ namespace ChargifyDotNetTests
             // Assert
             Assert.IsNotNull(usageResult);
             //Assert.IsInstanceOfType(usageResult, typeof(IUsage));
-            Assert.IsTrue(usageResult.Memo == usageDescription);
-            Assert.IsTrue(usageResult.Quantity == usageQuantity);
+            Assert.AreEqual(usageDescription, usageResult.Memo);
+            Assert.AreEqual(usageQuantity, usageResult.Quantity);
 
             SetJson(!isJson);
         }
@@ -100,7 +103,7 @@ namespace ChargifyDotNetTests
         /// <summary>
         /// For @praveen-prakash
         /// </summary>
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -125,8 +128,8 @@ namespace ChargifyDotNetTests
                 ProductHandle = product.Handle,
                 Components = new System.Collections.Generic.List<ComponentDetails>
                 {
-                    new ComponentDetails() { ComponentID = componentsToUse.First().ID, AllocatedQuantity = 1 },
-                    new ComponentDetails() { ComponentID = componentsToUse.Last().ID, AllocatedQuantity = 1 }
+                    new() { ComponentID = componentsToUse.First().ID, AllocatedQuantity = 1 },
+                    new() { ComponentID = componentsToUse.Last().ID, AllocatedQuantity = 1 }
                 }
             };
 
@@ -142,24 +145,24 @@ namespace ChargifyDotNetTests
             Assert.IsNotNull(newSubscription);
             Assert.IsNotNull(newSubscription.Customer);
             Assert.IsNotNull(newSubscription.PaymentProfile);
-            Assert.IsTrue(newSubscription.SubscriptionID > int.MinValue);
-            Assert.IsTrue(newSubscription.Customer.ChargifyID > int.MinValue);
-            Assert.IsTrue(newSubscription.Customer.FirstName == newCustomer.FirstName);
-            Assert.IsTrue(newSubscription.Customer.LastName == newCustomer.LastName);
-            Assert.IsTrue(newSubscription.Customer.Email == newCustomer.Email);
-            Assert.IsTrue(newSubscription.Customer.Organization == newCustomer.Organization);
-            Assert.IsTrue(newSubscription.Customer.SystemID == referenceId);
-            Assert.IsTrue(newSubscription.PaymentProfile.FirstName == newPaymentInfo.FirstName);
-            Assert.IsTrue(newSubscription.PaymentProfile.LastName == newPaymentInfo.LastName);
-            Assert.IsTrue(newSubscription.PaymentProfile.ExpirationMonth == newPaymentInfo.ExpirationMonth);
-            Assert.IsTrue(newSubscription.PaymentProfile.ExpirationYear == newPaymentInfo.ExpirationYear);
-            Assert.IsTrue(newSubscription.PaymentProfile.BillingAddress == newPaymentInfo.BillingAddress);
+            Assert.IsGreaterThan(int.MinValue, newSubscription.SubscriptionID);
+            Assert.IsGreaterThan(int.MinValue, newSubscription.Customer.ChargifyID);
+            Assert.AreEqual(newCustomer.FirstName, newSubscription.Customer.FirstName);
+            Assert.AreEqual(newCustomer.LastName, newSubscription.Customer.LastName);
+            Assert.AreEqual(newCustomer.Email, newSubscription.Customer.Email);
+            Assert.AreEqual(newCustomer.Organization, newSubscription.Customer.Organization);
+            Assert.AreEqual(referenceId, newSubscription.Customer.SystemID);
+            Assert.AreEqual(newPaymentInfo.FirstName, newSubscription.PaymentProfile.FirstName);
+            Assert.AreEqual(newPaymentInfo.LastName, newSubscription.PaymentProfile.LastName);
+            Assert.AreEqual(newPaymentInfo.ExpirationMonth, newSubscription.PaymentProfile.ExpirationMonth);
+            Assert.AreEqual(newPaymentInfo.ExpirationYear, newSubscription.PaymentProfile.ExpirationYear);
+            Assert.AreEqual(newPaymentInfo.BillingAddress, newSubscription.PaymentProfile.BillingAddress);
             //Assert.IsTrue(newSubscription.PaymentProfile.BillingAddress2 == newPaymentInfo.BillingAddress2);
-            Assert.IsTrue(newSubscription.PaymentProfile.BillingCity == newPaymentInfo.BillingCity);
-            Assert.IsTrue(newSubscription.PaymentProfile.BillingCountry == newPaymentInfo.BillingCountry);
-            Assert.IsTrue(newSubscription.PaymentProfile.BillingState == newPaymentInfo.BillingState);
-            Assert.IsTrue(newSubscription.PaymentProfile.BillingZip == newPaymentInfo.BillingZip);
-            Assert.IsTrue(usedComponents.Count() == componentsToUse.Count);
+            Assert.AreEqual(newPaymentInfo.BillingCity, newSubscription.PaymentProfile.BillingCity);
+            Assert.AreEqual(newPaymentInfo.BillingCountry, newSubscription.PaymentProfile.BillingCountry);
+            Assert.AreEqual(newPaymentInfo.BillingState, newSubscription.PaymentProfile.BillingState);
+            Assert.AreEqual(newPaymentInfo.BillingZip, newSubscription.PaymentProfile.BillingZip);
+            Assert.AreEqual(componentsToUse.Count, usedComponents.Count());
             foreach (var component in usedComponents)
             {
                 Assert.IsTrue(componentsToUse.Any(x => x.ID == component.Key));
@@ -172,7 +175,7 @@ namespace ChargifyDotNetTests
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
 
@@ -183,7 +186,7 @@ namespace ChargifyDotNetTests
             SetJson(isJson);
 
             // Arrange
-            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active && s.Value.Product.ID == 5830949).Value;
+            var subscription = Chargify.GetSubscriptionList(SubscriptionState.Active).FirstOrDefault(s => s.Value.Product.ID == 5830949).Value;
             if (subscription == null) Assert.Inconclusive("A valid subscription could not be found.");
             var subscriptionComponent = Chargify.GetComponentInfoForSubscription(subscription.SubscriptionID, 1526150);
 
@@ -277,7 +280,7 @@ namespace ChargifyDotNetTests
             return listCopy;
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -287,7 +290,7 @@ namespace ChargifyDotNetTests
             SetJson(isJson);
 
             // Arrange
-            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active && s.Value.Product.ID == 5830949).Value;
+            var subscription = Chargify.GetSubscriptionList(SubscriptionState.Active).FirstOrDefault(s => s.Value.Product.ID == 5830949).Value;
             if (subscription == null) Assert.Inconclusive("A valid subscription could not be found.");
             var subscriptionComponent = Chargify.GetComponentInfoForSubscription(subscription.SubscriptionID, 1526150);
 
@@ -303,7 +306,7 @@ namespace ChargifyDotNetTests
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -313,14 +316,14 @@ namespace ChargifyDotNetTests
             SetJson(isJson);
 
             // Arrange
-            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active && s.Value.Product.ID == 5830949).Value;
+            var subscription = Chargify.GetSubscriptionList(SubscriptionState.Active).FirstOrDefault(s => s.Value.Product.ID == 5830949).Value;
             if (subscription == null) Assert.Inconclusive("A valid subscription could not be found.");
             var subscriptionComponent = Chargify.GetComponentInfoForSubscription(subscription.SubscriptionID, 1526150);
 
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -331,14 +334,14 @@ namespace ChargifyDotNetTests
             SetJson(isJson);
 
             // Arrange
-            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active && s.Value.Product.ID == 5830949).Value;
+            var subscription = Chargify.GetSubscriptionList(SubscriptionState.Active).FirstOrDefault(s => s.Value.Product.ID == 5830949).Value;
             if (subscription == null) Assert.Inconclusive("A valid subscription could not be found.");
             var subscriptionComponent = Chargify.GetComponentInfoForSubscription(subscription.SubscriptionID, 1526150);
 
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -348,7 +351,7 @@ namespace ChargifyDotNetTests
             SetJson(isJson);
 
             // Arrange
-            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active && s.Value.Product.ID == 5830949).Value;
+            var subscription = Chargify.GetSubscriptionList(SubscriptionState.Active).FirstOrDefault(s => s.Value.Product.ID == 5830949).Value;
             if (subscription == null) Assert.Inconclusive("A valid subscription could not be found.");
             var subscriptionComponent = Chargify.GetComponentInfoForSubscription(subscription.SubscriptionID, 1526150);
 
@@ -366,7 +369,7 @@ namespace ChargifyDotNetTests
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -376,7 +379,7 @@ namespace ChargifyDotNetTests
             SetJson(isJson);
 
             // Arrange
-            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active && s.Value.Product.ID == 5830949).Value;
+            var subscription = Chargify.GetSubscriptionList(SubscriptionState.Active).FirstOrDefault(s => s.Value.Product.ID == 5830949).Value;
             if (subscription == null) Assert.Inconclusive("A valid subscription could not be found.");
             var subscriptionComponent = Chargify.GetComponentInfoForSubscription(subscription.SubscriptionID, 1526150);
 
@@ -390,7 +393,7 @@ namespace ChargifyDotNetTests
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -400,7 +403,7 @@ namespace ChargifyDotNetTests
             SetJson(isJson);
 
             // Arrange
-            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active && s.Value.Product.ID == 5830949).Value;
+            var subscription = Chargify.GetSubscriptionList(SubscriptionState.Active).FirstOrDefault(s => s.Value.Product.ID == 5830949).Value;
             if (subscription == null) Assert.Inconclusive("A valid subscription could not be found.");
             var subscriptionComponent = Chargify.GetComponentInfoForSubscription(subscription.SubscriptionID, 1526150);
 
@@ -418,7 +421,7 @@ namespace ChargifyDotNetTests
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -428,7 +431,7 @@ namespace ChargifyDotNetTests
             SetJson(isJson);
 
             // Arrange
-            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active && s.Value.Product.ID == 5830949).Value;
+            var subscription = Chargify.GetSubscriptionList(SubscriptionState.Active).FirstOrDefault(s => s.Value.Product.ID == 5830949).Value;
             if (subscription == null) Assert.Inconclusive("A valid subscription could not be found.");
             var subscriptionComponent = Chargify.GetComponentInfoForSubscription(subscription.SubscriptionID, 1526150);
 
@@ -444,7 +447,7 @@ namespace ChargifyDotNetTests
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -454,7 +457,7 @@ namespace ChargifyDotNetTests
             SetJson(isJson);
 
             // Arrange
-            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active && s.Value.Product.ID == 5830949).Value;
+            var subscription = Chargify.GetSubscriptionList(SubscriptionState.Active).FirstOrDefault(s => s.Value.Product.ID == 5830949).Value;
             if (subscription == null) Assert.Inconclusive("A valid subscription could not be found.");
             var subscriptionComponent = Chargify.GetComponentInfoForSubscription(subscription.SubscriptionID, 1526150);
 

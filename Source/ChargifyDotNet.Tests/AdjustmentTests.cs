@@ -1,8 +1,7 @@
 using System;
 using System.Linq;
-using ChargifyDotNetTests.Base;
-using System.Diagnostics;
 using ChargifyDotNet.Tests;
+using ChargifyNET;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shouldly;
 
@@ -11,8 +10,6 @@ namespace ChargifyDotNetTests
     [TestClass]
     public class AdjustmentTests : ChargifyTestBase
     {
-
-        [DataTestMethod]
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -22,33 +19,48 @@ namespace ChargifyDotNetTests
             SetJson(isJson);
 
             // Arrange
-            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == ChargifyNET.SubscriptionState.Active).Value;
-            if (subscription == null) Assert.Inconclusive("No subscription found.");
+            ISubscription subscription;
+            using (Step("Get active subscription"))
+            {
+                subscription = Chargify.GetSubscriptionList(SubscriptionState.Active)
+                    .FirstOrDefault().Value;
+            }
+            if (subscription == null)
+            {
+                Assert.Inconclusive("No subscription found.");
+            }
+
             var amount = 0m;
             var memo = "test kf";
             var preAdjustmentBalance = subscription.Balance;
 
             // Act
-            var result = Chargify.CreateAdjustment(subscription.SubscriptionID, amount, memo);
-            var postAdjustmentSubscription = Chargify.LoadSubscription(subscription.SubscriptionID);
+            IAdjustment result;
+            using (Step("Create adjustment"))
+            {
+                result = Chargify.CreateAdjustment(subscription.SubscriptionID, amount, memo);
+            }
+            ISubscription postAdjustmentSubscription;
+            using (Step("Reload subscription"))
+            {
+                postAdjustmentSubscription = Chargify.LoadSubscription(subscription.SubscriptionID);
+            }
 
             // Assert
-            Assert.IsNotNull(result);
-            Assert.AreEqual(amount, result.Amount);
-            Assert.AreEqual(Convert.ToInt32(amount), result.AmountInCents);
-            result.Memo.ShouldBe(memo);
-            Assert.AreEqual(preAdjustmentBalance + amount, postAdjustmentSubscription.Balance);
+            using (Step("Assertions"))
+            {
+                Assert.IsNotNull(result);
+                Assert.AreEqual(amount, result.Amount);
+                Assert.AreEqual(Convert.ToInt32(amount), result.AmountInCents);
+                result.Memo.ShouldBe(memo);
+                Assert.AreEqual(preAdjustmentBalance + amount, postAdjustmentSubscription.Balance);
+            }
 
             SetJson(!isJson);
 
-#if !NUNIT
-            TestContext.WriteLine("SubscriptionID: {0}", subscription.SubscriptionID);
-#else
-            Trace.WriteLine(string.Format("SubscriptionID: {0}", subscription.SubscriptionID));
-#endif
+            Log("SubscriptionID: {0}", subscription.SubscriptionID);
         }
 
-        [DataTestMethod]
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -58,30 +70,46 @@ namespace ChargifyDotNetTests
             SetJson(isJson);
 
             // Arrange
-            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == ChargifyNET.SubscriptionState.Active).Value;
-            if (subscription == null) Assert.Inconclusive("No subscription found.");
+            ISubscription subscription;
+            using (Step("Get active subscription"))
+            {
+                subscription = Chargify.GetSubscriptionList()
+                    .FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value;
+            }
+            if (subscription == null)
+            {
+                Assert.Inconclusive("No subscription found.");
+            }
+
             var amount = 0;
             var memo = "test kf";
             var preAdjustmentBalance = subscription.BalanceInCents;
 
             // Act
-            var result = Chargify.CreateAdjustment(subscription.SubscriptionID, amount, memo);
-            var postAdjustmentSubscription = Chargify.LoadSubscription(subscription.SubscriptionID);
+            IAdjustment result;
+            using (Step("Create adjustment"))
+            {
+                result = Chargify.CreateAdjustment(subscription.SubscriptionID, amount, memo);
+            }
+            ISubscription postAdjustmentSubscription;
+            using (Step("Reload subscription"))
+            {
+                postAdjustmentSubscription = Chargify.LoadSubscription(subscription.SubscriptionID);
+            }
 
             // Assert
-            Assert.IsNotNull(result);
-            Assert.AreEqual(amount, result.Amount);
-            Assert.AreEqual(Convert.ToInt32(amount), result.AmountInCents);
-            Assert.AreEqual(memo, result.Memo);
-            Assert.AreEqual(preAdjustmentBalance + amount, postAdjustmentSubscription.BalanceInCents);
+            using (Step("Assertions"))
+            {
+                Assert.IsNotNull(result);
+                Assert.AreEqual(amount, result.Amount);
+                Assert.AreEqual(Convert.ToInt32(amount), result.AmountInCents);
+                Assert.AreEqual(memo, result.Memo);
+                Assert.AreEqual(preAdjustmentBalance + amount, postAdjustmentSubscription.BalanceInCents);
+            }
 
             SetJson(!isJson);
 
-#if !NUNIT
-            TestContext.WriteLine("SubscriptionID: {0}", subscription.SubscriptionID);
-#else
-            Trace.WriteLine(string.Format("SubscriptionID: {0}", subscription.SubscriptionID));
-#endif
+            Log("SubscriptionID: {0}", subscription.SubscriptionID);
         }
     }
 }

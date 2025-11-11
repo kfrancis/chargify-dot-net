@@ -67,7 +67,7 @@ namespace ChargifyDotNetTests
             Assert.IsNotNull(basicProduct);
             Assert.AreEqual("basic", basicProduct.Handle);
             Assert.IsNotNull(basicProduct.PublicSignupPages);
-            Assert.IsTrue(basicProduct.PublicSignupPages.Count > 0);
+            Assert.IsNotEmpty(basicProduct.PublicSignupPages);
             Assert.IsFalse(string.IsNullOrWhiteSpace(basicProduct.PublicSignupPages.FirstOrDefault().URL));
         }
 

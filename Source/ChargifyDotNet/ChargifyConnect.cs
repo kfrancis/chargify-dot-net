@@ -1458,25 +1458,12 @@ namespace ChargifyNET
             }
             else if (response.IsJSON())
             {
-                // should be expecting an array
-                var position = 0;
-                var array = JsonArray.Parse(response, ref position);
-                for (var i = 0; i <= array.Length - 1; i++)
-                {
-                    if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("subscription"))
-                    {
-                        var subscriptionObj = (array.Items[i] as JsonObject)["subscription"] as JsonObject;
-                        ISubscription loadedSubscription = new Subscription(subscriptionObj);
-                        if (!retValue.ContainsKey(loadedSubscription.SubscriptionID))
-                        {
-                            retValue.Add(loadedSubscription.SubscriptionID, loadedSubscription);
-                        }
-                        else
-                        {
-                            throw new InvalidOperationException("Duplicate SubscriptionID values detected");
-                        }
-                    }
-                }
+                ParseJsonArrayToDictionary(
+                    response: response,
+                    jsonKey: "subscription",
+                    factory: (jsonObject) => new Subscription(jsonObject),
+                    keySelector: (subscription) => subscription.SubscriptionID,
+                    targetDictionary: retValue);
             }
             // return the list
             return retValue;

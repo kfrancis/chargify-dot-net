@@ -10,7 +10,7 @@ namespace ChargifyDotNetTests
     [TestClass]
     public class NoteTests : ChargifyTestBase
     {
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -20,7 +20,7 @@ namespace ChargifyDotNetTests
             SetJson(isJson);
 
             // Arrange
-            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value as Subscription;
+            var subscription = Chargify.GetSubscriptionList(SubscriptionState.Active).FirstOrDefault().Value as Subscription;
             Assert.IsNotNull(subscription, "No suitable subscription could be found.");
             var noteBody = Guid.NewGuid().ToString();
             Random rand = new();
@@ -37,7 +37,7 @@ namespace ChargifyDotNetTests
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -66,7 +66,7 @@ namespace ChargifyDotNetTests
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -96,7 +96,7 @@ namespace ChargifyDotNetTests
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -119,13 +119,13 @@ namespace ChargifyDotNetTests
             // Assert
             Assert.IsNotNull(firstResult);
             Assert.IsNotNull(secondResult);
-            Assert.AreEqual(0, secondResult.Count);
-            Assert.IsTrue(firstResult.Count > 0);
+            Assert.IsEmpty(secondResult);
+            Assert.IsNotEmpty(firstResult);
 
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -135,7 +135,7 @@ namespace ChargifyDotNetTests
             SetJson(isJson);
 
             // Arrange
-            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active && Chargify.GetNotesForSubscription(s.Key) != null && Chargify.GetNotesForSubscription(s.Key).Any()).Value as Subscription;
+            var subscription = Chargify.GetSubscriptionList(SubscriptionState.Active).FirstOrDefault(s => Chargify.GetNotesForSubscription(s.Key) != null && Chargify.GetNotesForSubscription(s.Key).Any()).Value as Subscription;
             if (subscription == null) Assert.Inconclusive("A valid subscription could not be found.");
             var notes = Chargify.GetNotesForSubscription(subscription.SubscriptionID);
             var note = notes.FirstOrDefault().Value;
@@ -156,7 +156,7 @@ namespace ChargifyDotNetTests
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -166,7 +166,7 @@ namespace ChargifyDotNetTests
             SetJson(isJson);
 
             // Arrange
-            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active && Chargify.GetNotesForSubscription(s.Key) != null && Chargify.GetNotesForSubscription(s.Key).Any()).Value as Subscription;
+            var subscription = Chargify.GetSubscriptionList(SubscriptionState.Active).FirstOrDefault(s => Chargify.GetNotesForSubscription(s.Key) != null && Chargify.GetNotesForSubscription(s.Key).Any()).Value as Subscription;
             Assert.IsNotNull(subscription, "No suitable subscription could be found.");
             var notes = Chargify.GetNotesForSubscription(subscription.SubscriptionID);
             Assert.IsNotNull(notes.FirstOrDefault());

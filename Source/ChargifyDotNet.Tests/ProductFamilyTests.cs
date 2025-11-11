@@ -10,7 +10,7 @@ namespace ChargifyDotNetTests
     [TestClass]
     public class ProductFamilyTests : ChargifyTestBase
     {
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -37,7 +37,7 @@ namespace ChargifyDotNetTests
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -69,7 +69,7 @@ namespace ChargifyDotNetTests
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -84,12 +84,12 @@ namespace ChargifyDotNetTests
             // Assert
             Assert.IsNotNull(result);
             //Assert.IsInstanceOfType(result, typeof(Dictionary<int, IProductFamily>));
-            Assert.IsTrue(result.Count > 0);
+            Assert.IsNotEmpty(result);
 
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -111,7 +111,7 @@ namespace ChargifyDotNetTests
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]

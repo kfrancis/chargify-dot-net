@@ -11,7 +11,7 @@ namespace ChargifyDotNetTests
     [TestClass]
     public class CouponTests : ChargifyTestBase
     {
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -31,15 +31,15 @@ namespace ChargifyDotNetTests
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.IsTrue(result.AmountInCents != int.MinValue);
-            Assert.IsTrue(result.AmountInCents > 0);
-            Assert.IsTrue(result.Amount == (Convert.ToDecimal(result.AmountInCents) / 100));
+            Assert.AreNotEqual(int.MinValue, result.AmountInCents);
+            Assert.IsGreaterThan(0, result.AmountInCents);
+            Assert.AreEqual(Convert.ToDecimal(result.AmountInCents) / 100, result.Amount);
             Assert.AreEqual(result.ID, couponID);
 
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -60,8 +60,8 @@ namespace ChargifyDotNetTests
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.IsTrue(result.Percentage != decimal.MinValue);
-            Assert.IsTrue(result.Percentage > 0);
+            Assert.AreNotEqual(decimal.MinValue, result.Percentage);
+            Assert.IsGreaterThan(0, result.Percentage);
             Assert.AreEqual(coupon.Percentage, result.Percentage);
             Assert.AreEqual(result.ID, couponID);
 
@@ -70,7 +70,7 @@ namespace ChargifyDotNetTests
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -102,15 +102,15 @@ namespace ChargifyDotNetTests
             // Assert
             Assert.IsNotNull(createdCoupon);
             //Assert.IsInstanceOfType(createdCoupon, typeof(ICoupon));
-            Assert.IsTrue(createdCoupon.AllowNegativeBalance == newCoupon.AllowNegativeBalance);
-            Assert.IsTrue(createdCoupon.Name == newCoupon.Name);
-            Assert.IsTrue(createdCoupon.Description == newCoupon.Description);
-            Assert.IsTrue(createdCoupon.Code == newCoupon.Code);
+            Assert.AreEqual(newCoupon.AllowNegativeBalance, createdCoupon.AllowNegativeBalance);
+            Assert.AreEqual(newCoupon.Name, createdCoupon.Name);
+            Assert.AreEqual(newCoupon.Description, createdCoupon.Description);
+            Assert.AreEqual(newCoupon.Code, createdCoupon.Code);
 
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -133,17 +133,17 @@ namespace ChargifyDotNetTests
             // Assert
             Assert.IsNotNull(updatedCoupon);
             //Assert.IsInstanceOfType(updatedCoupon, typeof(ICoupon));
-            Assert.IsTrue(updatedCoupon.Name == originalName + "_1");
+            Assert.AreEqual(originalName + "_1", updatedCoupon.Name);
 
             // Cleanup
             updatedCoupon.Name = originalName;
             var restoredCoupon = Chargify.UpdateCoupon(updatedCoupon);
-            Assert.IsTrue(restoredCoupon.Name == originalName);
+            Assert.AreEqual(originalName, restoredCoupon.Name);
 
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -153,7 +153,7 @@ namespace ChargifyDotNetTests
             SetJson(isJson);
 
             // Arrange
-            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active && !string.IsNullOrEmpty(s.Value.CouponCode)).Value as Subscription;
+            var subscription = Chargify.GetSubscriptionList(SubscriptionState.Active).FirstOrDefault(s => !string.IsNullOrEmpty(s.Value.CouponCode)).Value as Subscription;
             if (subscription == null) Assert.Inconclusive("A valid subscription could not be found.");
 
             // Act

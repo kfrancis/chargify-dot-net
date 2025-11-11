@@ -10,7 +10,7 @@ namespace ChargifyDotNetTests
     [TestClass]
     public class MigrationTests : ChargifyTestBase
     {
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -20,7 +20,7 @@ namespace ChargifyDotNetTests
             SetJson(isJson);
 
             // Arrange
-            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == ChargifyNET.SubscriptionState.Active).Value;
+            var subscription = Chargify.GetSubscriptionList(SubscriptionState.Active).FirstOrDefault().Value;
             var alternateProduct = Chargify.GetProductList().Values.FirstOrDefault(p => p.ID != subscription.Product.ID);
             Assert.IsNotNull(alternateProduct, "No suitable alternative product found.");
 
