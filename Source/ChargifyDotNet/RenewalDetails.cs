@@ -1,4 +1,4 @@
-﻿
+
 #region License, Terms and Conditions
 //
 // RenewalDetails.cs
@@ -209,7 +209,7 @@ namespace ChargifyNET
                 return _lineItems;
             }
         }
-        private List<RenewalLineItem> _lineItems = new();
+        private List<RenewalLineItem> _lineItems = [];
 
         /// <summary>
         /// The timestamp for the subscription’s next renewal

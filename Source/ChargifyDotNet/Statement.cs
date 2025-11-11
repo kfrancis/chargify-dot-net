@@ -1,4 +1,4 @@
-﻿
+
 #region License, Terms and Conditions
 //
 // Statement.cs
@@ -232,7 +232,7 @@ namespace ChargifyNET
                         _customerBillingZip = obj.GetJSONContentAsString(key);
                         break;
                     case TrasactionsKey:
-                        _transactions = new List<ITransaction>();
+                        _transactions = [];
                         var transactionsArray = obj[key] as JsonArray;
                         if (transactionsArray != null)
                         {
@@ -352,7 +352,7 @@ namespace ChargifyNET
                         _customerBillingZip = dataNode.GetNodeContentAsString();
                         break;
                     case TrasactionsKey:
-                        _transactions = new List<ITransaction>();
+                        _transactions = [];
                         foreach (XmlNode childNode in dataNode.ChildNodes)
                         {
                             switch (childNode.Name)
@@ -628,7 +628,7 @@ namespace ChargifyNET
         {
             get { return _transactions; }
         }
-        private List<ITransaction> _transactions = new();
+        private List<ITransaction> _transactions = [];
 
         /// <summary>
         /// A collection of the events associated with the statement

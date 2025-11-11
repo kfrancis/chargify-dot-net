@@ -197,4 +197,6 @@ FakesAssemblies/
 .nuget/NuGet.exe
 *.bat
 /Bogus.Premium.LicenseKey
-Source/ChargifyDotNet.Tests/appsettings.Development.json
+
+# Local sensitive config overrides
+appsettings.Development.json

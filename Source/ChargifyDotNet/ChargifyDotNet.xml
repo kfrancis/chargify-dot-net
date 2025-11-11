@@ -980,8 +980,8 @@
             <param name="productHandle">The handle to the product</param>
             <param name="customerAttributes">The attributes for the new customer</param>
             <param name="creditCardAttributes">The credit card attributes</param>
-            <param name="couponCode">The discount coupon code</param>
             <param name="nextBillingAt">Specify the time of first assessment</param>
+            <param name="couponCode">The discount coupon code</param>
             <returns>The new subscription object</returns>
         </member>
         <member name="M:ChargifyNET.ChargifyConnect.CreateSubscriptionUsingCoupon(System.String,ChargifyNET.ICustomerAttributes,ChargifyNET.ICreditCardAttributes,System.String,System.Int32,System.Int32)">
@@ -1449,9 +1449,9 @@
             </summary>
             <param name="subscriptionId">SubscriptionID</param>
             <param name="productId">ProductID</param>
-            <param name="includeCoupons">Should the migration preview consider subscription coupons?</param>
-            <param name="includeInitialCharge">Should the migration preview consider a setup fee</param>
             <param name="includeTrial">Should the migration preview consider the product trial?</param>
+            <param name="includeInitialCharge">Should the migration preview consider a setup fee</param>
+            <param name="includeCoupons">Should the migration preview consider subscription coupons?</param>
             <returns></returns>
         </member>
         <member name="M:ChargifyNET.ChargifyConnect.PreviewMigrateSubscriptionProduct(System.Int32,System.Int32)">
@@ -1484,6 +1484,56 @@
             </summary>
             <param name="productFamilyID">The ID of the product family that the coupon belongs to</param>
             <returns>A dictionary of objects if found, empty collection otherwise.</returns>
+        </member>
+        <member name="M:ChargifyNET.ChargifyConnect.ParseJsonArrayToDictionary``1(System.String,System.String,System.Func{ChargifyNET.Json.JsonObject,``0},System.Func{``0,System.String},System.String)">
+            <summary>
+            Parses a JSON array response and converts items to a dictionary
+            </summary>
+            <typeparam name="T">The type of objects to create</typeparam>
+            <param name="response">The JSON response string</param>
+            <param name="jsonKey">The key to look for in each JSON object (e.g., "customer", "product_family")</param>
+            <param name="factory">Function to create object from JsonObject</param>
+            <param name="keySelector">Function to extract the dictionary key from the created object</param>
+            <param name="itemTypeName">Name for error messages (optional, defaults to jsonKey)</param>
+            <returns>Dictionary with the parsed objects</returns>
+        </member>
+        <member name="M:ChargifyNET.ChargifyConnect.ParseJsonArrayToDictionary``2(System.String,System.String,System.Func{ChargifyNET.Json.JsonObject,``0},System.Func{``0,``1},System.String)">
+            <summary>
+            Parses a JSON array response and converts items to a dictionary
+            </summary>
+            <typeparam name="T">The type of objects to create</typeparam>
+            <typeparam name="TKey">The type of the dictionary key</typeparam>
+            <param name="response">The JSON response string</param>
+            <param name="jsonKey">The key to look for in each JSON object (e.g., "customer", "product_family")</param>
+            <param name="factory">Function to create object from JsonObject</param>
+            <param name="keySelector">Function to extract the dictionary key from the created object</param>
+            <param name="itemTypeName">Name for error messages (optional, defaults to jsonKey)</param>
+            <returns>Dictionary with the parsed objects</returns>
+        </member>
+        <member name="M:ChargifyNET.ChargifyConnect.ParseJsonArrayToDictionary``1(System.String,System.String,System.Func{ChargifyNET.Json.JsonObject,``0},System.Func{``0,System.String},System.Collections.Generic.Dictionary{System.String,``0},System.String)">
+            <summary>
+            Parses a JSON array response and adds items to an existing dictionary
+            </summary>
+            <typeparam name="T">The type of objects to create</typeparam>
+            <param name="response">The JSON response string</param>
+            <param name="jsonKey">The key to look for in each JSON object</param>
+            <param name="factory">Function to create object from JsonObject</param>
+            <param name="keySelector">Function to extract the dictionary key from the created object</param>
+            <param name="targetDictionary">The dictionary to add items to</param>
+            <param name="itemTypeName">Name for error messages (optional, defaults to jsonKey)</param>
+        </member>
+        <member name="M:ChargifyNET.ChargifyConnect.ParseJsonArrayToDictionary``2(System.String,System.String,System.Func{ChargifyNET.Json.JsonObject,``0},System.Func{``0,``1},System.Collections.Generic.Dictionary{``1,``0},System.String)">
+            <summary>
+            Parses a JSON array response and adds items to an existing dictionary
+            </summary>
+            <typeparam name="T">The type of objects to create</typeparam>
+            <typeparam name="TKey">The type of the dictionary key</typeparam>
+            <param name="response">The JSON response string</param>
+            <param name="jsonKey">The key to look for in each JSON object</param>
+            <param name="factory">Function to create object from JsonObject</param>
+            <param name="keySelector">Function to extract the dictionary key from the created object</param>
+            <param name="targetDictionary">The dictionary to add items to</param>
+            <param name="itemTypeName">Name for error messages (optional, defaults to jsonKey)</param>
         </member>
         <member name="M:ChargifyNET.ChargifyConnect.GetCouponUsage(System.Int32)">
             <summary>
@@ -1570,8 +1620,8 @@
             <param name="subscriptionId">The subscription that will be charged</param>
             <param name="amount">The amount to charge the customer</param>
             <param name="memo">A description of the charge</param>
-            <param name="delayCharge">(Optional) Should the charge be billed during the next assessment? Default = false</param>
             <param name="useNegativeBalance">(Optional) Should the subscription balance be taken into consideration? Default = true</param>
+            <param name="delayCharge">(Optional) Should the charge be billed during the next assessment? Default = false</param>
             <returns>The charge details</returns>
         </member>
         <member name="M:ChargifyNET.ChargifyConnect.CreateCredit(System.Int32,ChargifyNET.ICredit)">
@@ -1728,7 +1778,7 @@
             <summary>
             Method for getting a list of transactions
             </summary>
-            <param name="descending">Should the results in in descending order?</param>
+            <param name="descending">Should the results in descending order?</param>
             <returns>The dictionary of transaction records if successful, otherwise null.</returns>
         </member>
         <member name="M:ChargifyNET.ChargifyConnect.GetTransactionList(System.Collections.Generic.List{ChargifyNET.TransactionType},System.Boolean)">
@@ -1736,7 +1786,7 @@
             Method for getting a list of transactions
             </summary>
             <param name="kinds">A list of the types of transactions to return.</param>
-            <param name="descending">Should the results in in descending order?</param>
+            <param name="descending">Should the results in descending order?</param>
             <returns>The dictionary of transaction records if successful, otherwise null.</returns>
         </member>
         <member name="M:ChargifyNET.ChargifyConnect.GetTransactionList(System.Collections.Generic.List{ChargifyNET.TransactionType},System.Int32,System.Int32,System.Boolean)">
@@ -1746,7 +1796,7 @@
             <param name="kinds">A list of transaction types to return.</param>
             <param name="sinceId">Returns transactions with an ID greater than or equal to the one specified. Use int.MinValue to not specify a since_id.</param>
             <param name="maxId">Returns transactions with an id less than or equal to the one specified. Use int.MinValue to not specify a max_id.</param>
-            <param name="descending">Should the results in in descending order?</param>
+            <param name="descending">Should the results in descending order?</param>
             <returns>The dictionary of transaction records if successful, otherwise null.</returns>
         </member>
         <member name="M:ChargifyNET.ChargifyConnect.GetTransactionList(System.Collections.Generic.List{ChargifyNET.TransactionType},System.Int32,System.Int32,System.DateTime,System.DateTime,System.Boolean)">
@@ -1758,7 +1808,7 @@
             <param name="maxId">Returns transactions with an id less than or equal to the one specified. Use int.MinValue to not specify a max_id.</param>
             <param name="sinceDate">Returns transactions with a created_at date greater than or equal to the one specified. Use DateTime.MinValue to not specify a since_date.</param>
             <param name="untilDate">Returns transactions with a created_at date less than or equal to the one specified. Use DateTime.MinValue to not specify an until_date.</param>
-            <param name="descending">Should the results in in descending order?</param>
+            <param name="descending">Should the results in descending order?</param>
             <returns>The dictionary of transaction records if successful, otherwise null.</returns>
         </member>
         <member name="M:ChargifyNET.ChargifyConnect.GetTransactionList(System.Int32,System.Int32,System.Boolean)">
@@ -1767,7 +1817,7 @@
             </summary>
             <param name="page">The page number</param>
             <param name="perPage">The number of results per page (used for pagination)</param>
-            <param name="descending">Should the results in in descending order?</param>
+            <param name="descending">Should the results in descending order?</param>
             <returns>The dictionary of transaction records if successful, otherwise null.</returns>
         </member>
         <member name="M:ChargifyNET.ChargifyConnect.GetTransactionList(System.Int32,System.Int32,System.Collections.Generic.List{ChargifyNET.TransactionType},System.Boolean)">
@@ -1777,7 +1827,7 @@
             <param name="page">The page number</param>
             <param name="perPage">The number of results per page (used for pagination)</param>
             <param name="kinds">A list of the types of transactions to return.</param>
-            <param name="descending">Should the results in in descending order?</param>
+            <param name="descending">Should the results in descending order?</param>
             <returns>The dictionary of transaction records if successful, otherwise null.</returns>
         </member>
         <member name="M:ChargifyNET.ChargifyConnect.GetTransactionList(System.Int32,System.Int32,System.Collections.Generic.List{ChargifyNET.TransactionType},System.Int32,System.Int32,System.Boolean)">
@@ -1789,7 +1839,7 @@
             <param name="kinds">A list of transaction types to return.</param>
             <param name="sinceId">Returns transactions with an ID greater than or equal to the one specified. Use int.MinValue to not specify a since_id.</param>
             <param name="maxId">Returns transactions with an id less than or equal to the one specified. Use int.MinValue to not specify a max_id.</param>
-            <param name="descending">Should the results in in descending order?</param>
+            <param name="descending">Should the results in descending order?</param>
             <returns>The dictionary of transaction records if successful, otherwise null.</returns>
         </member>
         <member name="M:ChargifyNET.ChargifyConnect.GetTransactionList(System.Int32,System.Int32,System.Collections.Generic.List{ChargifyNET.TransactionType},System.Int32,System.Int32,System.DateTime,System.DateTime,System.Boolean)">
@@ -1803,7 +1853,7 @@
             <param name="maxId">Returns transactions with an id less than or equal to the one specified. Use int.MinValue to not specify a max_id.</param>
             <param name="sinceDate">Returns transactions with a created_at date greater than or equal to the one specified. Use DateTime.MinValue to not specify a since_date.</param>
             <param name="untilDate">Returns transactions with a created_at date less than or equal to the one specified. Use DateTime.MinValue to not specify an until_date.</param>
-            <param name="descending">Should the results in in descending order?</param>
+            <param name="descending">Should the results in descending order?</param>
             <returns>The dictionary of transaction records if successful, otherwise null.</returns>
         </member>
         <member name="M:ChargifyNET.ChargifyConnect.GetTransactionsForSubscription(System.Int32)">
@@ -2321,17 +2371,49 @@
         </member>
         <member name="M:ChargifyNET.ChargifyException.#ctor(System.Net.HttpWebResponse,System.Net.WebException)">
             <summary>
-            Constructor
+            Constructor for HttpWebResponse (legacy WebRequest usage)
             </summary>
             <param name="errorResponse">The response that caused the exception</param>
-            <param name="wex">The original web exception.  This becomes the inner exception of ths exception</param>
+            <param name="wex">The original web exception.  This becomes the inner exception to this exception</param>
         </member>
         <member name="M:ChargifyNET.ChargifyException.#ctor(System.Net.HttpWebResponse,System.Net.WebException,System.String)">
             <summary>
-            Constructor
+            Constructor for HttpWebResponse with post data (legacy WebRequest usage)
             </summary>
             <param name="errorResponse">The response that caused the exception</param>
-            <param name="wex">The original web exception.  This becomes the inner exception of ths exception</param>
+            <param name="wex">The original web exception.  This becomes the inner exception to this exception</param>
+            <param name="postData">The data posted that could have potentially caused the exception.</param>
+        </member>
+        <member name="M:ChargifyNET.ChargifyException.#ctor(System.Net.HttpStatusCode,System.String,System.Exception)">
+            <summary>
+            Constructor for HttpClient usage
+            </summary>
+            <param name="statusCode">The HTTP status code</param>
+            <param name="statusDescription">The status description</param>
+            <param name="innerException">The original exception that caused this exception</param>
+        </member>
+        <member name="M:ChargifyNET.ChargifyException.#ctor(System.Net.HttpStatusCode,System.String,System.Exception,System.String)">
+            <summary>
+            Constructor for HttpClient usage with post data
+            </summary>
+            <param name="statusCode">The HTTP status code</param>
+            <param name="statusDescription">The status description</param>
+            <param name="innerException">The original exception that caused this exception</param>
+            <param name="postData">The data posted that could have potentially caused the exception.</param>
+        </member>
+        <member name="M:ChargifyNET.ChargifyException.#ctor(System.Net.Http.HttpResponseMessage,System.Exception)">
+            <summary>
+            Constructor for HttpClient usage with HttpResponseMessage
+            </summary>
+            <param name="response">The HTTP response message</param>
+            <param name="innerException">The original exception that caused this exception</param>
+        </member>
+        <member name="M:ChargifyNET.ChargifyException.#ctor(System.Net.Http.HttpResponseMessage,System.Exception,System.String)">
+            <summary>
+            Constructor for HttpClient usage with HttpResponseMessage and post data
+            </summary>
+            <param name="response">The HTTP response message</param>
+            <param name="innerException">The original exception that caused this exception</param>
             <param name="postData">The data posted that could have potentially caused the exception.</param>
         </member>
         <member name="P:ChargifyNET.ChargifyException.StatusDescription">
@@ -2415,89 +2497,92 @@
         </member>
         <member name="T:ChargifyNET.ComponentAllocation">
             <summary>
-            Specific class when getting or setting information specfic to a components allocation history
+                Specific class when getting or setting information specfic to a components allocation history
             </summary>
             <remarks>See http://docs.chargify.com/api-allocations </remarks>
         </member>
         <member name="F:ChargifyNET.ComponentAllocation.AllocationRootKey">
             <summary>
-            The XML or JSON key of which the child values correspond to the members of the ComponentAllocation class
+                The XML or JSON key of which the child values correspond to the members of the ComponentAllocation class
             </summary>
         </member>
         <member name="F:ChargifyNET.ComponentAllocation.AllocationsRootKey">
             <summary>
-            The XML key which represents a collection of ComponentAllocation's
+                The XML key which represents a collection of ComponentAllocation's
             </summary>
         </member>
         <member name="M:ChargifyNET.ComponentAllocation.#ctor">
             <summary>
-            Default Constructor
+                Default Constructor
             </summary>
         </member>
         <member name="M:ChargifyNET.ComponentAllocation.#ctor(System.String)">
             <summary>
-            Constructor
+                Constructor
             </summary>
             <param name="componentAllocationXml">The raw XML containing the component allocation node</param>
         </member>
         <member name="M:ChargifyNET.ComponentAllocation.#ctor(ChargifyNET.Json.JsonObject)">
             <summary>
-            Constructor
+                Constructor
             </summary>
             <param name="componentAllocationObject">The JSON component allocation object</param>
         </member>
         <member name="M:ChargifyNET.ComponentAllocation.#ctor(System.Xml.XmlNode)">
             <summary>
-            Constructor
+                Constructor
             </summary>
             <param name="componentAllocationNode">The XML component allocation node</param>
         </member>
+        <member name="M:ChargifyNET.ComponentAllocation.CompareTo(ChargifyNET.ComponentAllocation)">
+            <summary>
+            Compares the current ComponentAllocation instance with another and returns an integer that indicates their
+            relative order.
+            </summary>
+            <param name="other">The ComponentAllocation instance to compare with the current instance.</param>
+            <returns>A value less than zero if this instance precedes <paramref name="other"/> in the sort order; zero if they
+            are equal; or a value greater than zero if this instance follows <paramref name="other"/>.</returns>
+        </member>
         <member name="P:ChargifyNET.ComponentAllocation.Quantity">
             <summary>
-            The allocated quantity set in to effect by the allocation
+                The allocated quantity set in to effect by the allocation
             </summary>
         </member>
         <member name="P:ChargifyNET.ComponentAllocation.PreviousQuantity">
             <summary>
-            The allocated quantity that was in effect before this allocation was created
+                The allocated quantity that was in effect before this allocation was created
             </summary>
         </member>
         <member name="P:ChargifyNET.ComponentAllocation.ComponentID">
             <summary>
-            The integer component ID for the allocation. This references a component that you have created in your Product setup
+                The integer component ID for the allocation. This references a component that you have created in your Product
+                setup
             </summary>
         </member>
         <member name="P:ChargifyNET.ComponentAllocation.SubscriptionID">
             <summary>
-            The integer subscription ID for the allocation. This references a unique subscription in your Site
+                The integer subscription ID for the allocation. This references a unique subscription in your Site
             </summary>
         </member>
         <member name="P:ChargifyNET.ComponentAllocation.Memo">
             <summary>
-            The memo passed when the allocation was created
+                The memo passed when the allocation was created
             </summary>
         </member>
         <member name="P:ChargifyNET.ComponentAllocation.TimeStamp">
             <summary>
-            The time that the allocation was recorded, in ISO 8601 format and UTC timezone, i.e. 2012-11-20T22:00:37Z
+                The time that the allocation was recorded, in ISO 8601 format and UTC timezone, i.e. 2012-11-20T22:00:37Z
             </summary>
         </member>
         <member name="P:ChargifyNET.ComponentAllocation.UpgradeScheme">
             <summary>
-            The scheme used if the proration was an upgrade. This is only present when the allocation was created mid-period.
+                The scheme used if the proration was an upgrade. This is only present when the allocation was created mid-period.
             </summary>
         </member>
         <member name="P:ChargifyNET.ComponentAllocation.DowngradeScheme">
             <summary>
-            The scheme used if the proration was a downgrade. This is only present when the allocation was created mid-period.
+                The scheme used if the proration was a downgrade. This is only present when the allocation was created mid-period.
             </summary>
-        </member>
-        <member name="M:ChargifyNET.ComponentAllocation.CompareTo(ChargifyNET.ComponentAllocation)">
-            <summary>
-            
-            </summary>
-            <param name="other"></param>
-            <returns></returns>
         </member>
         <member name="T:ChargifyNET.ComponentAttributes">
             <summary>
@@ -4296,7 +4381,7 @@
         </member>
         <member name="M:ChargifyNET.IChargifyConnect.UpdateNote(System.Int32,ChargifyNET.INote)">
             <summary>
-            
+            Update note
             </summary>
             <param name="SubscriptionID">The related subscription id</param>
             <param name="UpdatedNote">The updated note information</param>
@@ -5538,6 +5623,11 @@
         <member name="F:ChargifyNET.ComponentType.On_Off_Component">
             <summary>
             On/Off Component
+            </summary>
+        </member>
+        <member name="F:ChargifyNET.ComponentType.Prepaid_Usage_Component">
+            <summary>
+            Pre Paid UsageComponent
             </summary>
         </member>
         <member name="F:ChargifyNET.ComponentType.Unknown">
@@ -8731,7 +8821,7 @@
         </member>
         <member name="P:ChargifyNET.Migration.ProratedAdjustmentInCents">
             <summary>
-            
+            Get the prorated adjustment, in cents
             </summary>
         </member>
         <member name="P:ChargifyNET.Migration.ChargeInCents">
@@ -10695,7 +10785,7 @@
         </member>
         <member name="P:ChargifyNET.SubscriptionPreview.SubscriptionPreviewResult">
             <summary>
-            
+            The subscription preview result
             </summary>
         </member>
         <member name="T:ChargifyNET.Transaction">

@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using ChargifyDotNetTests.Base;
 using System.Linq;
+using ChargifyDotNet.Tests;
 using ChargifyNET;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -9,7 +10,7 @@ namespace ChargifyDotNetTests
     [TestClass]
     public class SubscriptionOverrideTests : ChargifyTestBase
     {
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -19,7 +20,7 @@ namespace ChargifyDotNetTests
             SetJson(isJson);
 
             // Arrange
-            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value;
+            var subscription = Chargify.GetSubscriptionList(SubscriptionState.Active).FirstOrDefault().Value;
             var now = DateTime.Now;
             var activatedAt = now.AddDays(-4);
             var canceledAt = now;

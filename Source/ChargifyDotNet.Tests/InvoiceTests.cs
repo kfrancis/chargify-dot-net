@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.Linq;
 using ChargifyNET;
 using ChargifyDotNetTests.Base;
 using Bogus;
+using ChargifyDotNet.Tests;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ChargifyDotNetTests
@@ -10,7 +11,7 @@ namespace ChargifyDotNetTests
     [TestClass]
     public class InvoiceTests : ChargifyTestBase
     {
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -25,15 +26,15 @@ namespace ChargifyDotNetTests
             // Assert
             Assert.IsNotNull(result);
             //Assert.IsInstanceOfType(result, typeof(Dictionary<int, Invoice>));
-            Assert.IsTrue(result.Count > 0);
+            Assert.IsNotEmpty(result);
             var anInvoice = result.FirstOrDefault().Value;
-            Assert.IsTrue(result.FirstOrDefault().Key == anInvoice.ID);
+            Assert.AreEqual(anInvoice.ID, result.FirstOrDefault().Key);
             Assert.AreNotEqual(int.MinValue, anInvoice.ID);
 
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -58,17 +59,17 @@ namespace ChargifyDotNetTests
             Assert.IsNotNull(result);
             Assert.IsNotNull(result.Customer);
             Assert.IsNull(result.PaymentProfile);
-            Assert.IsTrue(result.SubscriptionID > int.MinValue);
-            Assert.IsTrue(result.Customer.ChargifyID > int.MinValue);
-            Assert.IsTrue(result.Customer.FirstName == customer.FirstName);
-            Assert.IsTrue(result.Customer.LastName == customer.LastName);
-            Assert.IsTrue(result.Customer.Email == customer.Email);
-            Assert.IsTrue(result.Customer.Phone == customer.Phone);
-            Assert.IsTrue(result.Customer.Organization == customer.Organization);
-            Assert.IsTrue(result.Customer.SystemID == customer.SystemID);
-            Assert.IsTrue(result.ProductPriceInCents == product.PriceInCents);
-            Assert.IsTrue(result.ProductPrice == product.Price);
-            Assert.IsTrue(result.PaymentCollectionMethod == PaymentCollectionMethod.Remittance);
+            Assert.IsGreaterThan(int.MinValue, result.SubscriptionID);
+            Assert.IsGreaterThan(int.MinValue, result.Customer.ChargifyID);
+            Assert.AreEqual(customer.FirstName, result.Customer.FirstName);
+            Assert.AreEqual(customer.LastName, result.Customer.LastName);
+            Assert.AreEqual(customer.Email, result.Customer.Email);
+            Assert.AreEqual(customer.Phone, result.Customer.Phone);
+            Assert.AreEqual(customer.Organization, result.Customer.Organization);
+            Assert.AreEqual(customer.SystemID, result.Customer.SystemID);
+            Assert.AreEqual(product.PriceInCents, result.ProductPriceInCents);
+            Assert.AreEqual(product.Price, result.ProductPrice);
+            Assert.AreEqual(PaymentCollectionMethod.Remittance, result.PaymentCollectionMethod);
 
             // Cleanup
             Assert.IsTrue(Chargify.DeleteSubscription(result.SubscriptionID, "Automatic cancel due to test"));
@@ -76,7 +77,7 @@ namespace ChargifyDotNetTests
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -100,17 +101,17 @@ namespace ChargifyDotNetTests
             Assert.IsNotNull(newSubscription);
             Assert.IsNotNull(newSubscription.Customer);
             Assert.IsNull(newSubscription.PaymentProfile);
-            Assert.IsTrue(newSubscription.SubscriptionID > int.MinValue);
-            Assert.IsTrue(newSubscription.Customer.ChargifyID > int.MinValue);
-            Assert.IsTrue(newSubscription.Customer.FirstName == newCustomer.FirstName);
-            Assert.IsTrue(newSubscription.Customer.LastName == newCustomer.LastName);
-            Assert.IsTrue(newSubscription.Customer.Email == newCustomer.Email);
-            Assert.IsTrue(newSubscription.Customer.Phone == newCustomer.Phone);
-            Assert.IsTrue(newSubscription.Customer.Organization == newCustomer.Organization);
-            Assert.IsTrue(newSubscription.Customer.SystemID == referenceID);
-            Assert.IsTrue(newSubscription.ProductPriceInCents == product.PriceInCents);
-            Assert.IsTrue(newSubscription.ProductPrice == product.Price);
-            Assert.IsTrue(newSubscription.PaymentCollectionMethod == PaymentCollectionMethod.Remittance);
+            Assert.IsGreaterThan(int.MinValue, newSubscription.SubscriptionID);
+            Assert.IsGreaterThan(int.MinValue, newSubscription.Customer.ChargifyID);
+            Assert.AreEqual(newCustomer.FirstName, newSubscription.Customer.FirstName);
+            Assert.AreEqual(newCustomer.LastName, newSubscription.Customer.LastName);
+            Assert.AreEqual(newCustomer.Email, newSubscription.Customer.Email);
+            Assert.AreEqual(newCustomer.Phone, newSubscription.Customer.Phone);
+            Assert.AreEqual(newCustomer.Organization, newSubscription.Customer.Organization);
+            Assert.AreEqual(referenceID, newSubscription.Customer.SystemID);
+            Assert.AreEqual(product.PriceInCents, newSubscription.ProductPriceInCents);
+            Assert.AreEqual(product.Price, newSubscription.ProductPrice);
+            Assert.AreEqual(PaymentCollectionMethod.Remittance, newSubscription.PaymentCollectionMethod);
 
             // Cleanup
             Assert.IsTrue(Chargify.DeleteSubscription(newSubscription.SubscriptionID, "Automatic cancel due to test"));
@@ -118,7 +119,7 @@ namespace ChargifyDotNetTests
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -146,7 +147,7 @@ namespace ChargifyDotNetTests
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]

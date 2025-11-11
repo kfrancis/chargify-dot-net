@@ -1,5 +1,6 @@
-﻿using ChargifyDotNetTests.Base;
+using ChargifyDotNetTests.Base;
 using System.Linq;
+using ChargifyDotNet.Tests;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ChargifyDotNetTests
@@ -7,7 +8,7 @@ namespace ChargifyDotNetTests
     [TestClass]
     public class PortalTests : ChargifyTestBase
     {
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -26,7 +27,7 @@ namespace ChargifyDotNetTests
             Assert.IsNotNull(result);
             //Assert.IsInstanceOfType(result, typeof(BillingManagementInfo));
             Assert.IsFalse(string.IsNullOrWhiteSpace(result.URL));
-            Assert.IsTrue(result.FetchCount >= 1);
+            Assert.IsGreaterThanOrEqualTo(1, result.FetchCount);
 
             SetJson(!isJson);
         }

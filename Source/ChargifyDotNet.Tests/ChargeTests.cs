@@ -1,15 +1,16 @@
-﻿using System.Linq;
+using System.Linq;
 using ChargifyDotNetTests.Base;
 using ChargifyNET;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using ChargifyDotNet.Tests;
 
 namespace ChargifyDotNetTests
 {
     [TestClass]
     public class ChargeTests : ChargifyTestBase
     {
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -19,7 +20,7 @@ namespace ChargifyDotNetTests
             SetJson(isJson);
 
             // Arrange
-            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active && s.Value.PaymentProfile.MaskedCardNumber.EndsWith("1") && s.Value.Balance == 0m).Value as Subscription;
+            var subscription = Chargify.GetSubscriptionList(SubscriptionState.Active).FirstOrDefault(s => s.Value.PaymentProfile.MaskedCardNumber.EndsWith("1") && s.Value.Balance == 0m).Value as Subscription;
             if (subscription == null) Assert.Inconclusive("A valid subscription could not be found.");
             var chargeOptions = new ChargeCreateOptions() { Amount = 1.23m, Taxable = true, Memo = Guid.NewGuid().ToString() };
 
@@ -27,13 +28,13 @@ namespace ChargifyDotNetTests
             var result = Chargify.CreateCharge(subscription.SubscriptionID, chargeOptions);
 
             // Assert
-            Assert.AreEqual(true, result.Success);
+            Assert.IsTrue(result.Success);
             Assert.AreEqual(chargeOptions.Amount, result.Amount);
 
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -44,7 +45,7 @@ namespace ChargifyDotNetTests
 
             // Arrange
             var client = Chargify;
-            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active && s.Value.PaymentProfile.MaskedCardNumber.EndsWith("1") && s.Value.Balance == 0m).Value as Subscription;
+            var subscription = Chargify.GetSubscriptionList(SubscriptionState.Active).FirstOrDefault(s => s.Value.PaymentProfile.MaskedCardNumber.EndsWith("1") && s.Value.Balance == 0m).Value as Subscription;
             if (subscription == null) Assert.Inconclusive("A valid subscription could not be found.");
 
             // Act
@@ -60,11 +61,9 @@ namespace ChargifyDotNetTests
             // Assert
             if (subscription.BalanceInCents > 0)
             {
-                Assert.IsNotNull(balanceResult);
-                Assert.IsTrue(balanceResult == true);
+                Assert.IsTrue(balanceResult);
             }
             Assert.IsNotNull(result);
-            //Assert.IsInstanceOfType(result, typeof(Charge));
             Assert.IsTrue(result.SubscriptionID == subscription.SubscriptionID);
             Assert.IsTrue(result.ProductID == subscription.Product.ID);
             Assert.IsTrue(result.Kind == "one_time");
@@ -73,12 +72,12 @@ namespace ChargifyDotNetTests
             Assert.IsTrue(result.PaymentID != int.MinValue);
             Assert.IsTrue(result.ID != int.MinValue);
             Assert.IsTrue(result.Success == true);
-            Assert.IsTrue(retrievedSubscription.BalanceInCents == 0, "Expected $0, returned {0:C2}", retrievedSubscription.Balance);
+            Assert.IsTrue(retrievedSubscription.BalanceInCents == 0);
 
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -89,7 +88,7 @@ namespace ChargifyDotNetTests
 
             // Arrange
             var client = Chargify;
-            var subscription = client.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value as Subscription;
+            var subscription = client.GetSubscriptionList(SubscriptionState.Active).FirstOrDefault().Value as Subscription;
             if (subscription == null) Assert.Inconclusive("A valid subscription could not be found.");
             var amountToCharge = 1.00m;
 
@@ -106,19 +105,18 @@ namespace ChargifyDotNetTests
             // Assert
             if (subscription.BalanceInCents > 0)
             {
-                Assert.IsNotNull(balanceResult);
-                Assert.IsTrue(balanceResult == true);
+                Assert.IsTrue(balanceResult);
             }
             Assert.IsNotNull(adjustmentResult);
             //Assert.IsInstanceOfType(adjustmentResult, typeof(Adjustment));
-            Assert.IsTrue(adjustmentResult.Amount == amountToCharge);
+            Assert.AreEqual(amountToCharge, adjustmentResult.Amount);
             Assert.IsNotNull(result);
             //Assert.IsInstanceOfType(result, typeof(Charge));
-            Assert.IsTrue(result.SubscriptionID == subscription.SubscriptionID);
-            Assert.IsTrue(result.ProductID == subscription.Product.ID);
-            Assert.IsTrue(result.Kind == "one_time");
-            Assert.IsTrue(result.ChargeType == "Charge");
-            Assert.IsTrue(result.TransactionType == "charge");
+            Assert.AreEqual(subscription.SubscriptionID, result.SubscriptionID);
+            Assert.AreEqual(subscription.Product.ID, result.ProductID);
+            Assert.AreEqual("one_time", result.Kind);
+            Assert.AreEqual("Charge", result.ChargeType);
+            Assert.AreEqual("charge", result.TransactionType);
             //Assert.IsTrue(result.EndingBalance == amountToCharge);  // TODO: Test currently fails here, bug in Chargify.
             //Assert.IsTrue(result.PaymentID.HasValue == false);
             //Assert.IsTrue(result.ID != int.MinValue);
@@ -127,7 +125,7 @@ namespace ChargifyDotNetTests
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -138,7 +136,7 @@ namespace ChargifyDotNetTests
 
             // Arrange
             var client = Chargify;
-            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == SubscriptionState.Active).Value as Subscription;
+            var subscription = Chargify.GetSubscriptionList(SubscriptionState.Active).FirstOrDefault().Value as Subscription;
             if (subscription == null) Assert.Inconclusive("A valid subscription could not be found.");
             var amountToCharge = 1.00m;
 
@@ -154,22 +152,21 @@ namespace ChargifyDotNetTests
             // Assert
             if (subscription.BalanceInCents > 0)
             {
-                Assert.IsNotNull(balanceResult);
-                Assert.IsTrue(balanceResult == true);
+                Assert.IsTrue(balanceResult);
             }
             Assert.IsNotNull(result);
             //Assert.IsInstanceOfType(result, typeof(Charge));
-            Assert.IsTrue(result.SubscriptionID == subscription.SubscriptionID);
-            Assert.IsTrue(result.ProductID == subscription.Product.ID);
-            Assert.IsTrue(result.Amount == amountToCharge);
-            Assert.IsTrue(result.Kind == "delay_capture");
-            Assert.IsTrue(result.ChargeType == "Charge");
-            Assert.IsTrue(result.TransactionType == "charge");
-            Assert.IsTrue(result.PaymentID.HasValue == false);
-            Assert.IsTrue(result.ID != int.MinValue);
-            Assert.IsTrue(result.Success == true);
-            Assert.IsTrue(result.EndingBalance == amountToCharge, "Expected {0:C2}, received {1:C2}", amountToCharge, result.EndingBalance);
-            Assert.IsTrue(retrievedSubscription.Balance == amountToCharge, "Expected {0:C2}, balance is {1:C2}", amountToCharge, retrievedSubscription.Balance);
+            Assert.AreEqual(subscription.SubscriptionID, result.SubscriptionID);
+            Assert.AreEqual(subscription.Product.ID, result.ProductID);
+            Assert.AreEqual(amountToCharge, result.Amount);
+            Assert.AreEqual("delay_capture", result.Kind);
+            Assert.AreEqual("Charge", result.ChargeType);
+            Assert.AreEqual("charge", result.TransactionType);
+            Assert.AreEqual(false, result.PaymentID.HasValue);
+            Assert.AreNotEqual(int.MinValue, result.ID);
+            Assert.AreEqual(true, result.Success);
+            Assert.AreEqual(amountToCharge, result.EndingBalance);
+            Assert.AreEqual(amountToCharge, retrievedSubscription.Balance);
 
             SetJson(!isJson);
         }

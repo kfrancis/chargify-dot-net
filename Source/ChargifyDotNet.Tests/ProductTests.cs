@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using ChargifyDotNet.Tests;
 using ChargifyDotNetTests.Base;
 using ChargifyNET;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -66,7 +67,7 @@ namespace ChargifyDotNetTests
             Assert.IsNotNull(basicProduct);
             Assert.AreEqual("basic", basicProduct.Handle);
             Assert.IsNotNull(basicProduct.PublicSignupPages);
-            Assert.IsTrue(basicProduct.PublicSignupPages.Count > 0);
+            Assert.IsNotEmpty(basicProduct.PublicSignupPages);
             Assert.IsFalse(string.IsNullOrWhiteSpace(basicProduct.PublicSignupPages.FirstOrDefault().URL));
         }
 

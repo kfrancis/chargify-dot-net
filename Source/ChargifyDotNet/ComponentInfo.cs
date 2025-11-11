@@ -1,4 +1,4 @@
-﻿
+
 #region License, Terms and Conditions
 //
 // ComponentInfo.cs
@@ -154,7 +154,7 @@ namespace ChargifyNET
                         _unitPrice = obj.GetJSONContentAsDecimal(key);
                         break;
                     case PricesKey:
-                        _prices = new List<IPriceBracketInfo>();
+                        _prices = [];
                         var pricesArray = obj[key] as JsonArray;
                         if (pricesArray != null)
                         {
@@ -237,7 +237,7 @@ namespace ChargifyNET
                         _unitPrice = dataNode.GetNodeContentAsDecimal();
                         break;
                     case PricesKey:
-                        _prices = new List<IPriceBracketInfo>();
+                        _prices = [];
                         foreach (XmlNode priceNode in dataNode.ChildNodes)
                         {
                             var bracketInfo = new PriceBracketInfo();
@@ -385,7 +385,7 @@ namespace ChargifyNET
         {
             get { return _prices; }
         }
-        private List<IPriceBracketInfo> _prices = new();
+        private List<IPriceBracketInfo> _prices = [];
 
         /// <summary>
         /// Boolean flag describing whether a component is archived or not

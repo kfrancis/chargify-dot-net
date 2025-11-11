@@ -1,6 +1,8 @@
-﻿using System.IO;
-using ChargifyDotNetTests.Base;
+using System.IO;
 using System.Linq;
+using ChargifyDotNet.Tests;
+using ChargifyDotNetTests.Base;
+using ChargifyNET;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ChargifyDotNetTests
@@ -8,7 +10,7 @@ namespace ChargifyDotNetTests
     [TestClass]
     public class StatementTests : ChargifyTestBase
     {
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -18,7 +20,7 @@ namespace ChargifyDotNetTests
             SetJson(isJson);
 
             // Arrange
-            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == ChargifyNET.SubscriptionState.Active).Value;
+            var subscription = Chargify.GetSubscriptionList(SubscriptionState.Active).FirstOrDefault().Value;
             var statementIDs = Chargify.GetStatementIDs(subscription.SubscriptionID);
 
             // Act
