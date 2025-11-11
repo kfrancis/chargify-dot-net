@@ -44,6 +44,7 @@ namespace ChargifyNET
     using System.Net;
     using System.Net.Http;
     using System.Text;
+    using System.Text.RegularExpressions;
     using System.Xml;
     using System.Xml.Linq;
     using ChargifyDotNet;
@@ -129,7 +130,7 @@ namespace ChargifyNET
         /// <summary>
         /// SharedKey used for url generation
         /// </summary>
-        public string SharedKey { get; set; }
+        public string? SharedKey { get; set; }
 
         /// <summary>
         /// Should Chargify.NET use JSON for output? XML by default, always XML for input.
@@ -1137,18 +1138,48 @@ namespace ChargifyNET
         /// <param name="lastName">The last name of the customer to add to the pretty url</param>
         /// <param name="subscriptionId">The ID of the subscription to update</param>
         /// <returns>The secure url of the update page</returns>
-        public string GetPrettySubscriptionUpdateURL(string firstName, string lastName, int subscriptionId)
+        public string GetPrettySubscriptionUpdateURL(string? firstName, string? lastName, int subscriptionId)
         {
-            if (string.IsNullOrEmpty(SharedKey)) throw new ArgumentException("SharedKey is required to generate the hosted page url");
+            if (string.IsNullOrEmpty(SharedKey))
+                throw new ArgumentException("SharedKey is required to generate the hosted page url");
 
             var message = UpdateShortName + "--" + subscriptionId + "--" + SharedKey;
             var token = message.GetChargifyHostedToken();
-            var prettyId = string.Format("{0}-{1}-{2}", subscriptionId, PCLWebUtility.WebUtility.UrlEncode(firstName.Trim().ToLower()), PCLWebUtility.WebUtility.UrlEncode(lastName.Trim().ToLower()));
-            var methodString = string.Format("{0}/{1}/{2}", UpdateShortName, prettyId, token);
-            // just in case?
-            // methodString = PCLWebUtility.WebUtility.UrlEncode(methodString);
-            var updateUrl = string.Format("{0}{1}{2}", URL?.Replace("chargify.com", "chargifypay.com"), URL.EndsWith(" / ") ? "" : "/", methodString);
-            return updateUrl;
+
+            var first = Slug(firstName);
+            var last = Slug(lastName);
+
+            // build {subId[-first[-last]]}
+            var prettyId = subscriptionId.ToString();
+            var nameParts = new[] { first, last }.Where(x => !string.IsNullOrEmpty(x)).ToArray();
+            if (nameParts.Length > 0) prettyId += "-" + string.Join("-", nameParts);
+
+            // switch to chargifypay host, normalize once
+            var baseUrl = (URL ?? "").Replace("chargify.com", "chargifypay.com");
+
+            var path = Combine(UpdateShortName, prettyId, token);
+            var final = new Uri(new Uri(Combine(baseUrl, "") + "/"), path); // ensure single trailing slash on base
+
+            return final.ToString();
+        }
+
+        static string Slug(string? s)
+        {
+            if (string.IsNullOrWhiteSpace(s)) return string.Empty;
+            var sb = new StringBuilder();
+            foreach (var c in s.Normalize(NormalizationForm.FormD))
+                if (CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark) sb.Append(c);
+            var ascii = sb.ToString().Normalize(NormalizationForm.FormC);
+
+            var slug = Regex.Replace(ascii, @"[^A-Za-z0-9]+", "-"); // non-alnum -> "-"
+            slug = Regex.Replace(slug, "-+", "-").Trim('-');       // collapse/trim
+            return slug.ToLowerInvariant();
+        }
+
+        static string Combine(params string[] parts)
+        {
+            // Join with "/" while skipping empties; prevents accidental "//"
+            return string.Join("/", parts.Where(p => !string.IsNullOrEmpty(p)).Select(p => p.Trim('/')));
         }
 
         /// <summary>
