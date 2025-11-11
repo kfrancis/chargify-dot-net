@@ -1,0 +1,39 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="Mixed Platforms" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/.nuget/">
+    <File Path=".nuget/packages.config" />
+  </Folder>
+  <Folder Name="/lib/">
+    <Project Path="Source/ChargifyDotNet/ChargifyDotNet.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path=".gitattributes" />
+    <File Path=".github/workflows/nuget_publish.yml" />
+    <File Path=".gitignore" />
+    <File Path=".tfignore" />
+    <File Path="Directory.Build.props" />
+    <File Path="NuGet.config" />
+    <File Path="README.md" />
+    <File Path="version.json" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="Source/ChargifyDotNet.Tests/ChargifyDotNet.Tests.csproj" />
+    <Project Path="Source/ConsumerApp.Net40/ConsumerApp.Net40.csproj">
+      <Build Solution="*|Mixed Platforms" Project="false" />
+    </Project>
+    <Project Path="Source/ConsumerApp.Net452/ConsumerApp.Net452.csproj">
+      <Build Solution="*|Mixed Platforms" Project="false" />
+    </Project>
+    <Project Path="Source/ConsumerApp.NetCore/ConsumerApp.NetCore.csproj">
+      <Build Solution="*|Mixed Platforms" Project="false" />
+    </Project>
+  </Folder>
+  <Properties Name="TestCaseManagementSettings" Scope="PostLoad">
+    <Property Name="CategoryFile" Value="Chargify.vsmdi" />
+  </Properties>
+</Solution>
