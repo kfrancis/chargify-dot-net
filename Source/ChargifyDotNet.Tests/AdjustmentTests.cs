@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.Linq;
 using ChargifyDotNetTests.Base;
 using System.Diagnostics;
+using ChargifyDotNet.Tests;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shouldly;
 
@@ -10,6 +11,7 @@ namespace ChargifyDotNetTests
     [TestClass]
     public class AdjustmentTests : ChargifyTestBase
     {
+
         [DataTestMethod]
         [DataRow("xml")]
         [DataRow("json")]

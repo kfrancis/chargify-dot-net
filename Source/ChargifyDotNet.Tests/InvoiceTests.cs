@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.Linq;
 using ChargifyNET;
 using ChargifyDotNetTests.Base;
 using Bogus;
+using ChargifyDotNet.Tests;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ChargifyDotNetTests

@@ -8,6 +8,7 @@ using Shouldly;
 using Bogus;
 using System.Collections.Generic;
 using Bogus.Extensions;
+using ChargifyDotNet.Tests;
 
 namespace ChargifyDotNetTests
 {
@@ -297,8 +298,7 @@ namespace ChargifyDotNetTests
 
             var result = Chargify.SetPricePointDefault(defaultPricePoint.ComponentId, firstNonDefaultPricePoint.Id);
 
-            result.ShouldNotBeNull();
-            result.ShouldBeTrue();
+            Assert.IsTrue(result, "Expected SetPricePointDefault to return true");
 
             SetJson(!isJson);
         }

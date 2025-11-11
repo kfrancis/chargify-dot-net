@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace ChargifyNET.Json
 {
@@ -26,7 +26,7 @@ namespace ChargifyNET.Json
             _value = value;
         }
 
-        static readonly char[] JsonDecodeStopChars = { '\\', '\"' };
+        static readonly char[] JsonDecodeStopChars = ['\\', '\"'];
 
         static string JsonDecode(string str, ref int position)
         {

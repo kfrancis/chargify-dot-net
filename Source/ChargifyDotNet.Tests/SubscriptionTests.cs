@@ -4,6 +4,7 @@ using ChargifyNET;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Linq;
+using ChargifyDotNet.Tests;
 using Shouldly;
 
 namespace ChargifyDotNetTests
@@ -145,13 +146,11 @@ namespace ChargifyDotNetTests
         [DataTestMethod]
         [DataRow("xml")]
         [DataRow("json")]
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [TestMethod]
         public void Subscription_Create_UsingOptions_TooManyProducts(string method)
         {
             var isJson = method == "json";
             SetJson(isJson);
-
-            // Arrange
             var exampleCustomer = Chargify.GetCustomerList().Values.DefaultIfEmpty(defaultValue: null).FirstOrDefault();
             var paymentInfo = SubscriptionTests.GetTestPaymentMethod(exampleCustomer.ToCustomerAttributes() as CustomerAttributes);
             var product = Chargify.GetProductList().Values.FirstOrDefault();
@@ -162,26 +161,23 @@ namespace ChargifyDotNetTests
                 ProductHandle = product.Handle,
                 ProductID = product.ID
             };
-
-            // Act
-            var result = Chargify.CreateSubscription(options);
-
-            result.ShouldNotBeNull();
-            result.Product.Handle.ShouldBe(product.Handle);
-
+            try
+            {
+                var _ = Chargify.CreateSubscription(options);
+                Assert.Fail("Expected ArgumentException was not thrown");
+            }
+            catch (ArgumentException) { }
             SetJson(!isJson);
         }
 
         [DataTestMethod]
         [DataRow("xml")]
         [DataRow("json")]
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [TestMethod]
         public void Subscription_Create_UsingOptions_MissingProduct(string method)
         {
             var isJson = method == "json";
             SetJson(isJson);
-
-            // Arrange
             var exampleCustomer = Chargify.GetCustomerList().Values.DefaultIfEmpty(defaultValue: null).FirstOrDefault();
             var paymentInfo = SubscriptionTests.GetTestPaymentMethod(exampleCustomer.ToCustomerAttributes() as CustomerAttributes);
             var options = new SubscriptionCreateOptions()
@@ -189,43 +185,48 @@ namespace ChargifyDotNetTests
                 CustomerID = exampleCustomer.ChargifyID,
                 CreditCardAttributes = paymentInfo
             };
-
-            // Act
-            var result = Chargify.CreateSubscription(options);
-
+            try
+            {
+                var _ = Chargify.CreateSubscription(options);
+                Assert.Fail("Expected ArgumentException was not thrown");
+            }
+            catch (ArgumentException) { }
             SetJson(!isJson);
         }
 
         [DataTestMethod]
         [DataRow("xml")]
         [DataRow("json")]
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [TestMethod]
         public void Subscription_Create_UsingOptions_MissingAllDetails(string method)
         {
             var isJson = method == "json";
             SetJson(isJson);
-
-            // Arrange
             var options = new SubscriptionCreateOptions();
-
-            // Act
-            var result = Chargify.CreateSubscription(options);
-
+            try
+            {
+                var _ = Chargify.CreateSubscription(options);
+                Assert.Fail("Expected ArgumentException was not thrown");
+            }
+            catch (ArgumentException) { }
             SetJson(!isJson);
         }
 
-        [TestMethod, ExpectedException(typeof(ArgumentNullException))]
+        [DataTestMethod]
+        [DataRow("xml")]
+        [DataRow("json")]
+        [TestMethod]
         public void Subscription_Create_UsingOptions_Null(string method)
         {
             var isJson = method == "json";
             SetJson(isJson);
-
-            // Arrange
             SubscriptionCreateOptions options = null;
-
-            // Act
-            var result = Chargify.CreateSubscription(options);
-
+            try
+            {
+                var _ = Chargify.CreateSubscription(options);
+                Assert.Fail("Expected ArgumentNullException was not thrown");
+            }
+            catch (ArgumentNullException) { }
             SetJson(!isJson);
         }
 
@@ -348,7 +349,7 @@ namespace ChargifyDotNetTests
         [DataTestMethod]
         [DataRow("xml")]
         [DataRow("json")]
-        [TestMethod, ExpectedException(typeof(ChargifyException))]
+        [TestMethod]
         public void Subscription_Does_PartialUpdate_Fail(string method)
         {
             var isJson = method == "json";
@@ -364,11 +365,9 @@ namespace ChargifyDotNetTests
             {
                 subscription = client.UpdateSubscriptionCreditCard(subscription.SubscriptionID, "1", DateTime.Now.AddMonths(1).Month, DateTime.Now.AddYears(1).Year, "123", subscription.PaymentProfile.BillingAddress, subscription.PaymentProfile.BillingCity, subscription.PaymentProfile.BillingState, subscription.PaymentProfile.BillingZip, subscription.PaymentProfile.BillingCountry);
             }
-
             string oldAddress = subscription.PaymentProfile.BillingAddress, oldAddress2 = subscription.PaymentProfile.BillingAddress2,
                 oldCity = subscription.PaymentProfile.BillingCity,
                 oldState = subscription.PaymentProfile.BillingState, oldZip = subscription.PaymentProfile.BillingZip;
-
             var newAttributes = new CreditCardAttributes()
             {
                 BillingAddress = GetNewRandomValue(oldAddress, Faker.Address.StreetAddress, false),
@@ -378,10 +377,12 @@ namespace ChargifyDotNetTests
                 BillingZip = GetNewRandomValue(oldZip, Faker.Address.ZipCode),
                 BillingCountry = "US"
             };
-
-            // Act
-            var result = client.UpdateSubscriptionCreditCard(subscription.SubscriptionID, newAttributes);
-
+            try
+            {
+                var _ = client.UpdateSubscriptionCreditCard(subscription.SubscriptionID, newAttributes);
+                Assert.Fail("Expected ChargifyException was not thrown");
+            }
+            catch (ChargifyException) { }
             SetJson(!isJson);
         }
 
@@ -413,7 +414,6 @@ namespace ChargifyDotNetTests
 
             // Assert
             Assert.IsNotNull(updatedSubscription);
-            //Assert.IsInstanceOfType(updatedSubscription, typeof(Subscription));
             Assert.AreEqual(newFirst, updatedSubscription.PaymentProfile.FirstName);
             Assert.AreEqual(newLast, updatedSubscription.PaymentProfile.LastName);
             Assert.AreEqual(subscription.PaymentProfile.ExpirationYear, updatedSubscription.PaymentProfile.ExpirationYear);
@@ -934,7 +934,6 @@ namespace ChargifyDotNetTests
             foreach (var component in usedComponents)
             {
                 Assert.IsTrue(componentsToUse.ContainsKey(component.Key));
-                //Assert.AreEqual(decimal.Parse(componentsToUse[component.Key]), component.Value.AllocatedQuantity);
             }
 
             // Cleanup
@@ -1061,18 +1060,15 @@ namespace ChargifyDotNetTests
         {
             var isJson = method == "json";
             SetJson(isJson);
-
-            AssertTheFollowingThrowsException(() =>
+            try
             {
-                Chargify.UpdateDelayedCancelForSubscription(GetRandomNegativeInt(), true,
-                    "No subscription exists by this number");
-            },
-                e =>
-                {
-                    var exception = (ChargifyException)e;
-                    Assert.AreEqual(exception.ErrorMessages.First(), "Subscription not found");
-                });
-
+                Chargify.UpdateDelayedCancelForSubscription(GetRandomNegativeInt(), true, "No subscription exists by this number");
+                Assert.Fail("Expected ChargifyException was not thrown");
+            }
+            catch (ChargifyException exception)
+            {
+                Assert.AreEqual("Subscription not found", exception.ErrorMessages.First().Message);
+            }
             SetJson(!isJson);
         }
 
@@ -1084,18 +1080,15 @@ namespace ChargifyDotNetTests
         {
             var isJson = method == "json";
             SetJson(isJson);
-
-            AssertTheFollowingThrowsException(() =>
+            try
             {
-                Chargify.UpdateDelayedCancelForSubscription(GetRandomNegativeInt(), false,
-                    "No subscription exists by this number");
-            },
-                e =>
-                {
-                    var exception = (ChargifyException)e;
-                    Assert.AreEqual(exception.ErrorMessages.First(), "Subscription not found");
-                });
-
+                Chargify.UpdateDelayedCancelForSubscription(GetRandomNegativeInt(), false, "No subscription exists by this number");
+                Assert.Fail("Expected ChargifyException was not thrown");
+            }
+            catch (ChargifyException exception)
+            {
+                Assert.AreEqual("Subscription not found", exception.ErrorMessages.First().Message);
+            }
             SetJson(!isJson);
         }
 

@@ -1,8 +1,9 @@
-﻿using System.Linq;
+using System.Linq;
 using ChargifyDotNetTests.Base;
 using ChargifyNET;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using ChargifyDotNet.Tests;
 
 namespace ChargifyDotNetTests
 {
@@ -60,20 +61,18 @@ namespace ChargifyDotNetTests
             // Assert
             if (subscription.BalanceInCents > 0)
             {
-                Assert.IsNotNull(balanceResult);
-                Assert.IsTrue(balanceResult == true);
+                Assert.AreEqual(true, balanceResult);
             }
             Assert.IsNotNull(result);
-            //Assert.IsInstanceOfType(result, typeof(Charge));
-            Assert.IsTrue(result.SubscriptionID == subscription.SubscriptionID);
-            Assert.IsTrue(result.ProductID == subscription.Product.ID);
-            Assert.IsTrue(result.Kind == "one_time");
-            Assert.IsTrue(result.ChargeType == "Charge");
-            Assert.IsTrue(result.TransactionType == "charge");
-            Assert.IsTrue(result.PaymentID != int.MinValue);
-            Assert.IsTrue(result.ID != int.MinValue);
-            Assert.IsTrue(result.Success == true);
-            Assert.IsTrue(retrievedSubscription.BalanceInCents == 0, "Expected $0, returned {0:C2}", retrievedSubscription.Balance);
+            Assert.AreEqual(true, result.SubscriptionID == subscription.SubscriptionID);
+            Assert.AreEqual(true, result.ProductID == subscription.Product.ID);
+            Assert.AreEqual(true, result.Kind == "one_time");
+            Assert.AreEqual(true, result.ChargeType == "Charge");
+            Assert.AreEqual(true, result.TransactionType == "charge");
+            Assert.AreEqual(true, result.PaymentID != int.MinValue);
+            Assert.AreEqual(true, result.ID != int.MinValue);
+            Assert.AreEqual(true, result.Success == true);
+            Assert.AreEqual(true, retrievedSubscription.BalanceInCents == 0);
 
             SetJson(!isJson);
         }
@@ -106,8 +105,7 @@ namespace ChargifyDotNetTests
             // Assert
             if (subscription.BalanceInCents > 0)
             {
-                Assert.IsNotNull(balanceResult);
-                Assert.IsTrue(balanceResult == true);
+                Assert.AreEqual(true, balanceResult);
             }
             Assert.IsNotNull(adjustmentResult);
             //Assert.IsInstanceOfType(adjustmentResult, typeof(Adjustment));
@@ -154,8 +152,7 @@ namespace ChargifyDotNetTests
             // Assert
             if (subscription.BalanceInCents > 0)
             {
-                Assert.IsNotNull(balanceResult);
-                Assert.IsTrue(balanceResult == true);
+                Assert.AreEqual(true, balanceResult);
             }
             Assert.IsNotNull(result);
             //Assert.IsInstanceOfType(result, typeof(Charge));
@@ -168,8 +165,8 @@ namespace ChargifyDotNetTests
             Assert.IsTrue(result.PaymentID.HasValue == false);
             Assert.IsTrue(result.ID != int.MinValue);
             Assert.IsTrue(result.Success == true);
-            Assert.IsTrue(result.EndingBalance == amountToCharge, "Expected {0:C2}, received {1:C2}", amountToCharge, result.EndingBalance);
-            Assert.IsTrue(retrievedSubscription.Balance == amountToCharge, "Expected {0:C2}, balance is {1:C2}", amountToCharge, retrievedSubscription.Balance);
+            Assert.IsTrue(result.EndingBalance == amountToCharge);
+            Assert.IsTrue(retrievedSubscription.Balance == amountToCharge);
 
             SetJson(!isJson);
         }

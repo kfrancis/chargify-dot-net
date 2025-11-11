@@ -137,7 +137,7 @@ namespace ChargifyNET
                     case MetadataKey:
                         if (dataNode.FirstChild != null)
                         {
-                            _metadata = new List<IMetadata>();
+                            _metadata = [];
                             // There's no constructor that takes in an XmlNode, so parse it here.
                             foreach (XmlNode metadataNode in dataNode.ChildNodes)
                             {
@@ -195,7 +195,7 @@ namespace ChargifyNET
                         _perPage = obj.GetJSONContentAsInt(key);
                         break;
                     case MetadataKey:
-                        _metadata = new List<IMetadata>();
+                        _metadata = [];
                         var viewObj = obj[key] as JsonArray;
                         if (viewObj?.Items != null && viewObj.Length > 0)
                         {
@@ -300,7 +300,7 @@ namespace ChargifyNET
             }
         }
 
-        private List<IMetadata> _metadata = new();
+        private List<IMetadata> _metadata = [];
 
         #endregion
     }

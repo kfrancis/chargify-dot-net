@@ -1,4 +1,5 @@
-﻿using ChargifyDotNetTests.Base;
+using ChargifyDotNet.Tests;
+using ChargifyDotNetTests.Base;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ChargifyDotNetTests

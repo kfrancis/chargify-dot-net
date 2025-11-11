@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using ChargifyDotNetTests.Base;
 using ChargifyNET;
 using System.Diagnostics;
+using ChargifyDotNet.Tests;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ChargifyDotNetTests

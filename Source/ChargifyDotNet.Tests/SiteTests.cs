@@ -2,6 +2,7 @@ using System;
 using ChargifyDotNetTests.Base;
 using ChargifyNET;
 using System.Linq;
+using ChargifyDotNet.Tests;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ChargifyDotNetTests

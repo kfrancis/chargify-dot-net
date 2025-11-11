@@ -1,4 +1,4 @@
-﻿using ChargifyDotNet;
+using ChargifyDotNet;
 using System;
 using System.Collections.Generic;
 
@@ -21,7 +21,7 @@ namespace ChargifyNET.Json
             get
             {
                 if (key == null)
-                    throw new NullReferenceException("key");
+                    throw new NullReferenceException(nameof(key));
 
                 if (ContainsKey(key) == false)
                     throw new JsonException("Key does not exists: " + key);
@@ -57,7 +57,7 @@ namespace ChargifyNET.Json
             value = null;
 
             if (key == null)
-                throw new NullReferenceException("key");
+                throw new NullReferenceException(nameof(key));
 
             if (ContainsKey(key) == false)
                 return false;
@@ -75,7 +75,7 @@ namespace ChargifyNET.Json
         public bool ContainsKey(string key)
         {
             if (key == null)
-                throw new NullReferenceException("key");
+                throw new NullReferenceException(nameof(key));
 
             return _value.ContainsKey(key);
         }
@@ -83,7 +83,7 @@ namespace ChargifyNET.Json
         void Add(string key, JsonValue value)
         {
             if (key == null)
-                throw new NullReferenceException("key");
+                throw new NullReferenceException(nameof(key));
 
             if (ContainsKey(key))
                 throw new JsonException(string.Format("Key '{0}' already exists in JsonObject", key));
