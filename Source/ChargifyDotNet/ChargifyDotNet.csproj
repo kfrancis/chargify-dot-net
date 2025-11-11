@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.0;net8.0</TargetFrameworks>
@@ -57,11 +57,15 @@
 
 	<ItemGroup>
 		<EmbeddedResource Include="Data\ISO_3166-1_list_en.xml" />
+    <PackageReference Include="DotNet.ReproducibleBuilds" Version="1.2.39">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
 		<PackageReference Include="MinVer" Version="6.0.0">
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.*" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -85,9 +89,6 @@
 		<Reference Include="System.Security" />
 		<Reference Include="System.Xml" />
 		<Reference Include="System.Configuration" />
-	</ItemGroup>
-	<ItemGroup>
-	  <PackageReference Update="DotNet.ReproducibleBuilds" Version="1.2.39" />
 	</ItemGroup>
 	<PropertyGroup Condition=" '$(TargetFramework)' == 'net45'">
 		<DefineConstants>NET45;NETFULL</DefineConstants>
