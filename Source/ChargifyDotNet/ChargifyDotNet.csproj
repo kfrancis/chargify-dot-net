@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.0;net45;net40</TargetFrameworks>
+		<TargetFrameworks>netstandard2.0;net45;net40;net8.0</TargetFrameworks>
 		<PackageId>chargify</PackageId>
 		<PackageProjectUrl>https://github.com/kfrancis/chargify-dot-net</PackageProjectUrl>
 		<Authors>KFrancis, DBall</Authors>
@@ -13,9 +13,6 @@
 
 	<ItemGroup>
 		<EmbeddedResource Include="Data\ISO_3166-1_list_en.xml" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<PackageReference Include="Nerdbank.GitVersioning" Version="3.4.244">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
