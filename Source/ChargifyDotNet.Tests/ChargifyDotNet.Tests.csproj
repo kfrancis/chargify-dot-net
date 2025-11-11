@@ -10,11 +10,6 @@
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.0.0" />
 	</ItemGroup>
 
-	<ItemGroup Condition=" '$(TargetFramework)' == 'net45' or '$(TargetFramework)' == 'net48'">
-		<PackageReference Include="MSTest.TestAdapter" Version="1.1.17" />
-		<PackageReference Include="MSTest.TestFramework" Version="1.1.17" />
-	</ItemGroup>
-
 	<ItemGroup>
 		<PackageReference Include="Bogus" Version="33.1.1" />
 		<PackageReference Include="Bogus.Tools.Analyzer" Version="33.1.1">
