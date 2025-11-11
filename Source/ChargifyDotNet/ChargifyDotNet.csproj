@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.0;net8.0</TargetFrameworks>
@@ -19,7 +19,8 @@
     <IsPackable>true</IsPackable>
 
     <!-- Build Configuration -->
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <!-- Disable automatic pack on build; CI will build then pack explicitly -->
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
@@ -97,13 +98,15 @@
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
 		<DebugType>full</DebugType>
 		<DebugSymbols>true</DebugSymbols>
-		<DocumentationFile>C:\Users\kfrancis\Documents\GitHub\chargify-dot-net\Source\ChargifyDotNet\ChargifyDotNet.xml</DocumentationFile>
+		<!-- Use relative path for documentation file -->
+		<DocumentationFile>$(MSBuildProjectDirectory)/ChargifyDotNet.xml</DocumentationFile>
 		<NoWarn>1701;1702;1591</NoWarn>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.0|AnyCPU'">
 		<DebugType>embedded</DebugType>
 		<DebugSymbols>true</DebugSymbols>
-		<DocumentationFile>C:\Users\kfrancis\Documents\GitHub\chargify-dot-net\Source\ChargifyDotNet\ChargifyDotNet.xml</DocumentationFile>
+		<!-- Use relative path for documentation file -->
+		<DocumentationFile>$(MSBuildProjectDirectory)/ChargifyDotNet.xml</DocumentationFile>
 	</PropertyGroup>
 
 	<Target Name="IncludeDocFile" BeforeTargets="PrepareForPublish">

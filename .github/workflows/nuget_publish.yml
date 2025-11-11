@@ -43,16 +43,27 @@ jobs:
         with:
           fetch-depth: 0
           show-progress: false
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v5
         with:
           global-json-file: 'global.json'
-      - run: dotnet pack Source/ChargifyDotNet/ChargifyDotNet.csproj --configuration Release --output ${{ env.NuGetDirectory }} -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg -p:MinVerTag=$(git describe --tags)
+
+      - name: Restore
+        run: dotnet restore Source/ChargifyDotNet/ChargifyDotNet.csproj
+
+      - name: Build (Release)
+        run: dotnet build Source/ChargifyDotNet/ChargifyDotNet.csproj --configuration Release --no-restore
+
+      - name: Pack (Release)
+        run: dotnet pack Source/ChargifyDotNet/ChargifyDotNet.csproj --configuration Release --no-build --output ${{ env.NuGetDirectory }} -p:MinVerTag=$(git describe --tags)
+
       - name: Prepare Artifacts
         run: |
           mkdir -p ${{ env.NuGetDirectory }}/artifacts
           cp ${{ env.NuGetDirectory }}/*.nupkg ${{ env.NuGetDirectory }}/artifacts
           cp ${{ env.NuGetDirectory }}/*.snupkg ${{ env.NuGetDirectory }}/artifacts
+
       - uses: actions/upload-artifact@v4
         with:
           name: nuget
@@ -73,10 +84,12 @@ jobs:
         with:
           fetch-depth: 0
           show-progress: false
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v5
         with:
           global-json-file: 'global.json'
+
       - name: Run tests
         run: dotnet test Source/ChargifyDotNet.Tests/ChargifyDotNet.Tests.csproj --configuration Release --filter 'FullyQualifiedName!~TestBase'
 
@@ -91,14 +104,17 @@ jobs:
         with:
           name: nuget
           path: ${{ env.NuGetDirectory }}
+
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v5
+
       # Get a short-lived NuGet API key
       - name: NuGet login (OIDC → temp API key)
         uses: NuGet/login@v1
         id: login
         with:
           user: ${{ secrets.NUGET_USER }}
+
       - name: Publish NuGet package
         run: |
           foreach($file in (Get-ChildItem "${{ env.NuGetDirectory }}" -Recurse -Include *.nupkg)) {
