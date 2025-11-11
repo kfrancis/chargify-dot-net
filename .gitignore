@@ -197,3 +197,4 @@ FakesAssemblies/
 .nuget/NuGet.exe
 *.bat
 /Bogus.Premium.LicenseKey
+Source/ChargifyDotNet.Tests/appsettings.Development.json
