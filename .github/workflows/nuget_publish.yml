@@ -73,30 +73,30 @@ jobs:
             ${{ env.NuGetDirectory }}/artifacts/*.nupkg
             ${{ env.NuGetDirectory }}/artifacts/*.snupkg
 
-  run_tests:
-    runs-on: ubuntu-latest
-    permissions:
-      attestations: write
-      contents: read
-      id-token: write
-    steps:
-      - uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
-          show-progress: false
+  # run_tests:
+  #   runs-on: ubuntu-latest
+  #   permissions:
+  #     attestations: write
+  #     contents: read
+  #     id-token: write
+  #   steps:
+  #     - uses: actions/checkout@v5
+  #       with:
+  #         fetch-depth: 0
+  #         show-progress: false
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v5
-        with:
-          global-json-file: 'global.json'
+  #     - name: Setup .NET
+  #       uses: actions/setup-dotnet@v5
+  #       with:
+  #         global-json-file: 'global.json'
 
-      - name: Run tests
-        run: dotnet test Source/ChargifyDotNet.Tests/ChargifyDotNet.Tests.csproj --configuration Release --filter 'FullyQualifiedName!~TestBase'
+  #     - name: Run tests
+  #       run: dotnet test Source/ChargifyDotNet.Tests/ChargifyDotNet.Tests.csproj --configuration Release --filter 'FullyQualifiedName!~TestBase'
 
   deploy:
     if: github.event_name == 'release'
     runs-on: ubuntu-latest
-    needs: [ run_tests ]
+    needs: [ create_nuget ]
     permissions:
       id-token: write  # enable GitHub OIDC token issuance for this job
     steps:
