@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace ChargifyNET.Json
 {
@@ -43,7 +43,7 @@ namespace ChargifyNET.Json
         public static void ValidateJsonField(JsonObject jsonObject, string fieldName, Type fieldType)
         {
             if (jsonObject == null)
-                throw new NullReferenceException("jsonObject");
+                throw new NullReferenceException(nameof(jsonObject));
 
             if (jsonObject.ContainsKey(fieldName) == false)
                 throw new JsonException(string.Format("Could not find key: '{0}' in JSON object", fieldName));

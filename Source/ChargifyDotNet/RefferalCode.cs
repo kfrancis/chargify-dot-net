@@ -67,7 +67,7 @@ namespace ChargifyNET
             // get the XML into an XML document
             XmlDocument Doc = new();
             Doc.LoadXml(ReferralCodeXML);
-            if (Doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", "ReferralCodeXML");
+            if (Doc.ChildNodes.Count == 0) throw new ArgumentException("XML not valid", nameof(ReferralCodeXML));
             // loop through the child nodes of this node
             foreach (XmlNode elementNode in Doc.ChildNodes)
             {
@@ -78,7 +78,7 @@ namespace ChargifyNET
                 }
             }
             // if we get here, then no info was found
-            throw new ArgumentException("XML does not contain coupon information", "ReferralCodeXML");
+            throw new ArgumentException("XML does not contain coupon information", nameof(ReferralCodeXML));
         }
 
         /// <summary>

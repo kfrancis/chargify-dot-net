@@ -1,4 +1,4 @@
-﻿
+
 #region License, Terms and Conditions
 //
 // MigrationPreview.cs
@@ -159,7 +159,7 @@ namespace ChargifyNET
         #region IMigrationPreview Members
 
         /// <summary>
-        /// 
+        /// Get the prorated adjustment, in cents
         /// </summary>
         public int ProratedAdjustmentInCents
         {

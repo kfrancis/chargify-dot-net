@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace ChargifyNET.Json
 {
@@ -27,7 +27,7 @@ namespace ChargifyNET.Json
 
         private JsonArray()
         {
-            _items = new List<JsonValue>();
+            _items = [];
         }
 
         private void Add(JsonValue jsonValue)
