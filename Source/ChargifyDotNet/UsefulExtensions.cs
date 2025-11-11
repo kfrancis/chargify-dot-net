@@ -56,7 +56,7 @@ namespace ChargifyNET
         {
             if (length < 0)
             {
-                throw new ArgumentOutOfRangeException("length", length,
+                throw new ArgumentOutOfRangeException(nameof(length), length,
                                                         "The length must be a non-negative number.");
             }
 
@@ -300,10 +300,22 @@ namespace ChargifyNET
         {
             var unencryptedText = sharedKey + text;
             var unencryptedData = Encoding.UTF8.GetBytes(unencryptedText);
-            MD5CryptoServiceProvider md5 = new();
+
+#if NET8_0_OR_GREATER
+            // .NET 8+ - Use the static HashData method
+            var hash = MD5.HashData(unencryptedData);
+            var hexaHash = Convert.ToHexString(hash).ToLowerInvariant();
+#elif NET5_0_OR_GREATER
+            // .NET 5-7 - Use MD5.Create() with Convert.ToHexString()
+            using var md5 = MD5.Create();
             var hash = md5.ComputeHash(unencryptedData);
-            var hexaHash = string.Empty;
-            foreach (var b in hash) { hexaHash += $"{b:x2}"; }
+            var hexaHash = Convert.ToHexString(hash).ToLowerInvariant();
+#else
+            // .NET Framework and .NET Core < 5.0 - Use MD5.Create() with manual hex conversion
+            using var md5 = MD5.Create();
+            var hash = md5.ComputeHash(unencryptedData);
+            var hexaHash = BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+#endif
 
             // I'm not sure if it could be longer, so just compare the same number as characters.
             return signature == hexaHash.Substring(0, signature.Length);
@@ -355,10 +367,18 @@ namespace ChargifyNET
         {
             // Method used as listed here: http://support.chargify.com/faqs/technical/generating-hosted-page-urls
             var data = Encoding.UTF8.GetBytes(text);
-            SHA1CryptoServiceProvider cryptoTransformSHA1 = new();
-            var hash = cryptoTransformSHA1.ComputeHash(data);
-            var hexaHash = "";
-            foreach (var b in hash) { hexaHash += string.Format("{0:x2}", b); }
+
+#if NET8_0_OR_GREATER
+            // .NET 8+ - Use the static HashData method
+            var hash = SHA1.HashData(data);
+            var hexaHash = Convert.ToHexString(hash).ToLowerInvariant();
+#else
+            // .NET Framework 4.0/4.5 and .NET Standard 2.0 - Use SHA1.Create()
+            using var sha1 = SHA1.Create();
+            var hash = sha1.ComputeHash(data);
+            var hexaHash = BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+#endif
+
             // Get only the first 10 characters of the SHA-1 hex digest
             return hexaHash.Substring(0, 10);
         }
@@ -1772,7 +1792,7 @@ namespace ChargifyNET
                     var classType = a.GetType("Microsoft.WindowsAzure.ServiceRuntime.RoleEnvironment");
                     var mi = classType.GetMethod("GetConfigurationSettingValue");
                     // This is the same as calling RoleEnvironment.GetConfigurationSettingValue(settingName)
-                    result = (string)mi.Invoke(null, new object[] { settingName });
+                    result = (string)mi.Invoke(null, [settingName]);
                 }
             }
             catch
@@ -1795,9 +1815,9 @@ namespace ChargifyNET
         {
             if (serverResponse.IsXml())
             {
-                Type[] argTypes = { typeof(string) };
+                Type[] argTypes = [typeof(string)];
                 var cInfo = typeof(T).GetConstructor(argTypes);
-                if (cInfo != null) return (T)cInfo.Invoke(new object[] { serverResponse });
+                if (cInfo != null) return (T)cInfo.Invoke([serverResponse]);
             }
             else if (serverResponse.IsJSON())
             {
@@ -1807,15 +1827,15 @@ namespace ChargifyNET
                 {
                     if (obj.ContainsKey(key) && obj.Keys.Count == 1)
                     {
-                        Type[] argTypes = { typeof(JsonObject) };
+                        Type[] argTypes = [typeof(JsonObject)];
                         var cInfo = typeof(T).GetConstructor(argTypes);
-                        if (cInfo != null) return (T)cInfo.Invoke(new object[] { obj[key] as JsonObject });
+                        if (cInfo != null) return (T)cInfo.Invoke([obj[key] as JsonObject]);
                     }
                     else
                     {
-                        Type[] argTypes = { typeof(JsonObject) };
+                        Type[] argTypes = [typeof(JsonObject)];
                         var cInfo = typeof(T).GetConstructor(argTypes);
-                        if (cInfo != null) return (T)cInfo.Invoke(new object[] { obj });
+                        if (cInfo != null) return (T)cInfo.Invoke([obj]);
                     }
                 }
                 else
@@ -1945,11 +1965,11 @@ namespace ChargifyNET
         public static decimal CalculateSubscriptionRevenue(this ChargifyConnect chargify, ISubscription subscription)
         {
             decimal retValue = 0;
-            List<TransactionType> refundKinds = new()
-            {
+            List<TransactionType> refundKinds =
+            [
                 TransactionType.Payment,
                 TransactionType.Refund
-            };
+            ];
             var transactions = chargify.GetTransactionsForSubscription(subscription.SubscriptionID, refundKinds);
             if ((transactions != null) && (transactions.Count > 0))
             {

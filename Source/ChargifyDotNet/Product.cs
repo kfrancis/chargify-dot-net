@@ -633,7 +633,7 @@ namespace ChargifyNET
         /// List of public signup page URLs and the associated ID
         /// </summary>
         public List<IPublicSignupPage> PublicSignupPages { get { return _publicSignupPages; } }
-        private List<IPublicSignupPage> _publicSignupPages = new();
+        private List<IPublicSignupPage> _publicSignupPages = [];
 
         /// <summary>
         /// The product version number

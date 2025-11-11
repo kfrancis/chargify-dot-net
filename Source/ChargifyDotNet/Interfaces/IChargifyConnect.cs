@@ -348,6 +348,7 @@ namespace ChargifyNET
         /// <param name="OverrideDetails"></param>
         /// <returns>The details returned by Chargify</returns>
         bool SetSubscriptionOverride(int SubscriptionID, ISubscriptionOverride OverrideDetails);
+
         /// <summary>
         /// This API endpoint allows you to set certain subscription fields that are usually managed for you automatically. Some of the fields can be set via the normal Subscriptions Update API, but others can only be set using this endpoint.
         /// </summary>
@@ -357,7 +358,8 @@ namespace ChargifyNET
         /// <param name="CancellationMessage"></param>
         /// <param name="ExpiresAt"></param>
         /// <returns></returns>
-        bool SetSubscriptionOverride(int SubscriptionID, DateTime? ActivatedAt = null, DateTime? CanceledAt = null, string CancellationMessage = null, DateTime? ExpiresAt = null);
+        bool SetSubscriptionOverride(int SubscriptionID, DateTime? ActivatedAt = null, DateTime? CanceledAt = null,
+            string? CancellationMessage = null, DateTime? ExpiresAt = null);
         #endregion
 
         #region Payment Profiles
@@ -478,8 +480,9 @@ namespace ChargifyNET
         /// <param name="NoteID">The id of the ntoe</param>
         /// <returns>True if successful, false otherwise.</returns>
         bool DeleteNote(int SubscriptionID, int NoteID);
+
         /// <summary>
-        /// 
+        /// Update note
         /// </summary>
         /// <param name="SubscriptionID">The related subscription id</param>
         /// <param name="UpdatedNote">The updated note information</param>
@@ -1386,7 +1389,7 @@ namespace ChargifyNET
         /// Get a reference to the last Http Response from the chargify server. This is set after every call to
         /// a Chargify Connect method
         /// </summary>
-        HttpWebResponse LastResponse { get; }
+        HttpWebResponse? LastResponse { get; }
 
         /// <summary>
         /// Get or set the password

@@ -1,6 +1,8 @@
-﻿using System;
+using System;
 using ChargifyDotNetTests.Base;
 using System.Linq;
+using ChargifyDotNet.Tests;
+using ChargifyNET;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ChargifyDotNetTests
@@ -8,7 +10,7 @@ namespace ChargifyDotNetTests
     [TestClass]
     public class PaymentTests : ChargifyTestBase
     {
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -18,7 +20,7 @@ namespace ChargifyDotNetTests
             SetJson(isJson);
 
             // Arrange
-            var subscription = Chargify.GetSubscriptionList().FirstOrDefault(s => s.Value.State == ChargifyNET.SubscriptionState.Active).Value;
+            var subscription = Chargify.GetSubscriptionList(SubscriptionState.Active).FirstOrDefault(s => s.Value.State == ChargifyNET.SubscriptionState.Active).Value;
             var amount = 1234; //$12.34
             var memo = Guid.NewGuid().ToString();
             var prePaymentBalance = subscription.BalanceInCents;

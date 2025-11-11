@@ -119,14 +119,14 @@ namespace ChargifyNET
                         _number = obj.GetJSONContentAsString(key);
                         break;
                     case ChargesKey:
-                        _charges = new List<ICharge>();
+                        _charges = [];
                         var chargesArray = obj[key] as JsonArray;
                         if (chargesArray != null)
                         {
                             foreach (var jsonValue in chargesArray.Items)
                             {
                                 var charge = (JsonObject)jsonValue;
-                                _charges.Add(charge.GetJSONContentAsCharge("charge"));
+                                _charges.Add(charge.GetJSONContentAsCharge(nameof(charge)));
                             }
                         }
                         // Sanity check, should be equal.
@@ -182,7 +182,7 @@ namespace ChargifyNET
                         _number = dataNode.GetNodeContentAsString();
                         break;
                     case ChargesKey:
-                        _charges = new List<ICharge>();
+                        _charges = [];
                         foreach (XmlNode childNode in dataNode.ChildNodes)
                         {
                             switch (childNode.Name)
@@ -275,13 +275,13 @@ namespace ChargifyNET
         /// A list of charges applied to this invoice
         /// </summary>
         public List<ICharge> Charges { get { return _charges; } }
-        private List<ICharge> _charges = new();
+        private List<ICharge> _charges = [];
 
         /// <summary>
         /// A list of the financial transactions that modify the amount due
         /// </summary>
         public List<IInvoicePaymentAndCredit> PaymentsAndCredits { get { return _paymentsAndCredits; } }
-        private readonly List<IInvoicePaymentAndCredit> _paymentsAndCredits = new();
+        private readonly List<IInvoicePaymentAndCredit> _paymentsAndCredits = [];
         #endregion
     }
 }

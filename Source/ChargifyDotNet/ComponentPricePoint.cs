@@ -1,4 +1,4 @@
-﻿#region License, Terms and Conditions
+#region License, Terms and Conditions
 
 //
 // ComponentPricePoint.cs
@@ -64,9 +64,9 @@ namespace ChargifyDotNet
         public ComponentPricePoint()
         {
             _pricingScheme = PricingSchemeType.Unknown;
-            _prices = new List<ComponentPrice>();
+            _prices = [];
             _overagePricingScheme = PricingSchemeType.Unknown;
-            _overagePricingPrices = new List<ComponentPrice>();
+            _overagePricingPrices = [];
         }
 
         public ComponentPricePoint(string componentPricePointXml)
@@ -213,7 +213,7 @@ namespace ChargifyDotNet
                         _pricingScheme = dataNode.GetNodeContentAsPricingSchemeType();
                         break;
                     case "overage_pricing":
-                        _overagePricingPrices = new List<ComponentPrice>();
+                        _overagePricingPrices = [];
                         foreach (XmlNode childNode in dataNode.ChildNodes)
                         {
                             switch (childNode.Name)

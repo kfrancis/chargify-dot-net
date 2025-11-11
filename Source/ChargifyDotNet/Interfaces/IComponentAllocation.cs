@@ -46,7 +46,7 @@ namespace ChargifyNET
     public enum ComponentUpgradeProrationScheme
     {
         /// <summary>
-        /// A charge is added for the prorated amount due, but the card is not charged until the subscription’s next renewal
+        /// A charge is added for the prorated amount due, but the card is not charged until the subscriptionâ€™s next renewal
         /// </summary>
         [XmlEnum("prorate-delay-capture")]
         Prorate_Delay_Capture,
@@ -66,7 +66,7 @@ namespace ChargifyNET
         [XmlEnum("full-price-attempt-capture")]
         Full_Price_Attempt_Capture,
         /// <summary>
-        /// A charge is added for the full price of the component change, but the card is not charged until the subscription’s next renewal.
+        /// A charge is added for the full price of the component change, but the card is not charged until the subscriptionâ€™s next renewal.
         /// </summary>
         [XmlEnum("full-price-delay-capture")]
         Full_Price_Delay_Capture,
@@ -131,7 +131,7 @@ namespace ChargifyNET
         /// <summary>
         /// The time that the allocation was recorded, in ISO 8601 format and UTC timezone, i.e. 2012-11-20T22:00:37Z
         /// </summary>
-        DateTime TimeStamp { get; }
+        DateTime TimeStamp { get; set; }
         /// <summary>
         /// The scheme used if the proration was an upgrade. This is only present when the allocation was created mid-period.
         /// </summary>

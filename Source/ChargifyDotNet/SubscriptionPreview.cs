@@ -1,4 +1,4 @@
-﻿
+
 #region License, Terms and Conditions
 //
 // SubscriptionPreview.cs
@@ -96,7 +96,7 @@ namespace ChargifyNET
         }
 
         /// <summary>
-        /// 
+        /// The subscription preview result
         /// </summary>
         [JsonProperty("subscription_preview")]
         public SubscriptionPreviewResult SubscriptionPreviewResult { get; set; }

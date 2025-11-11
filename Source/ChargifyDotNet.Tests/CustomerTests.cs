@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using ChargifyDotNet.Tests;
 using ChargifyDotNetTests.Base;
 using ChargifyNET;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -13,7 +14,7 @@ namespace ChargifyDotNetTests
         private const string StringWithNonUnicodeCharacters = "ÄäËëÏïÖöÜüŸß";
         private const string StringWithAmpersand = "Foo&Bar";
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -37,7 +38,7 @@ namespace ChargifyDotNetTests
             catch (ChargifyException chEx)
             {
                 Assert.IsNotNull(chEx.ErrorMessages);
-                Assert.AreEqual(2, chEx.ErrorMessages.Count);
+                Assert.HasCount(2, chEx.ErrorMessages);
                 Assert.IsTrue(chEx.ErrorMessages.Any(e => e.Message == "Last name: cannot be blank."));
                 Assert.IsTrue(chEx.ErrorMessages.Any(e => e.Message == "Email address: cannot be blank."));
             }
@@ -45,7 +46,7 @@ namespace ChargifyDotNetTests
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -79,18 +80,18 @@ namespace ChargifyDotNetTests
             // Assert
             Assert.IsNotNull(createdCustomer);
             //Assert.IsInstanceOfType(createdCustomer, typeof(Customer));
-            Assert.IsTrue(createdCustomer.SystemID == customer.SystemID);
-            Assert.IsTrue(createdCustomer.FirstName == customer.FirstName);
-            Assert.IsTrue(createdCustomer.LastName == customer.LastName);
-            Assert.IsTrue(createdCustomer.Organization == customer.Organization);
-            Assert.IsTrue(createdCustomer.Email == customer.Email);
-            Assert.IsTrue(createdCustomer.Phone == customer.Phone);
-            Assert.IsTrue(createdCustomer.ShippingAddress == customer.ShippingAddress);
-            Assert.IsTrue(createdCustomer.ShippingAddress2 == customer.ShippingAddress2);
-            Assert.IsTrue(createdCustomer.ShippingCity == customer.ShippingCity);
-            Assert.IsTrue(createdCustomer.ShippingState == customer.ShippingState);
-            Assert.IsTrue(createdCustomer.ShippingZip == customer.ShippingZip);
-            Assert.IsTrue(createdCustomer.ShippingCountry == customer.ShippingCountry);
+            Assert.AreEqual(customer.SystemID, createdCustomer.SystemID);
+            Assert.AreEqual(customer.FirstName, createdCustomer.FirstName);
+            Assert.AreEqual(customer.LastName, createdCustomer.LastName);
+            Assert.AreEqual(customer.Organization, createdCustomer.Organization);
+            Assert.AreEqual(customer.Email, createdCustomer.Email);
+            Assert.AreEqual(customer.Phone, createdCustomer.Phone);
+            Assert.AreEqual(customer.ShippingAddress, createdCustomer.ShippingAddress);
+            Assert.AreEqual(customer.ShippingAddress2, createdCustomer.ShippingAddress2);
+            Assert.AreEqual(customer.ShippingCity, createdCustomer.ShippingCity);
+            Assert.AreEqual(customer.ShippingState, createdCustomer.ShippingState);
+            Assert.AreEqual(customer.ShippingZip, createdCustomer.ShippingZip);
+            Assert.AreEqual(customer.ShippingCountry, createdCustomer.ShippingCountry);
             Assert.IsTrue(createdCustomer.TaxExempt);
 
             Chargify.DeleteCustomer(createdCustomer.ChargifyID);
@@ -98,7 +99,7 @@ namespace ChargifyDotNetTests
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -139,7 +140,7 @@ namespace ChargifyDotNetTests
             catch (ChargifyException chEx)
             {
                 Assert.IsNotNull(chEx.ErrorMessages);
-                Assert.AreEqual(1, chEx.ErrorMessages.Count);
+                Assert.HasCount(1, chEx.ErrorMessages);
                 Assert.IsTrue(chEx.ErrorMessages.Any(e => e.Message.Contains("Billing Portal")), $"Found '{string.Join(", ", chEx.ErrorMessages.Select(x => x.Message))}'");
                 //todo: Need to run test to find out the exact error message
             }
@@ -149,7 +150,7 @@ namespace ChargifyDotNetTests
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -192,7 +193,7 @@ namespace ChargifyDotNetTests
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -233,7 +234,7 @@ namespace ChargifyDotNetTests
             catch (ChargifyException chEx)
             {
                 Assert.IsNotNull(chEx.ErrorMessages);
-                Assert.AreEqual(1, chEx.ErrorMessages.Count);
+                Assert.HasCount(1, chEx.ErrorMessages);
                 Assert.IsTrue(chEx.ErrorMessages.Any(e => e.Message.Contains("Billing Portal")));
                 //todo: Need to run test to find out the exact error message
             }
@@ -243,7 +244,7 @@ namespace ChargifyDotNetTests
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -286,7 +287,7 @@ namespace ChargifyDotNetTests
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -319,12 +320,12 @@ namespace ChargifyDotNetTests
             // Assert
             Assert.IsNotNull(createdCustomer);
             //Assert.IsInstanceOfType(createdCustomer, typeof(Customer));
-            Assert.IsTrue(createdCustomer.Organization == customer.Organization);
+            Assert.AreEqual(customer.Organization, createdCustomer.Organization);
 
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -357,12 +358,12 @@ namespace ChargifyDotNetTests
             // Assert
             Assert.IsNotNull(createdCustomer);
             //Assert.IsInstanceOfType(createdCustomer, typeof(Customer));
-            Assert.IsTrue(createdCustomer.Organization == customer.Organization);
+            Assert.AreEqual(customer.Organization, createdCustomer.Organization);
 
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -395,12 +396,12 @@ namespace ChargifyDotNetTests
             // Assert
             Assert.IsNotNull(createdCustomer);
             //Assert.IsInstanceOfType(createdCustomer, typeof(Customer));
-            Assert.IsTrue(createdCustomer.FirstName == customer.FirstName);
+            Assert.AreEqual(customer.FirstName, createdCustomer.FirstName);
 
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -433,12 +434,12 @@ namespace ChargifyDotNetTests
             // Assert
             Assert.IsNotNull(createdCustomer);
             //Assert.IsInstanceOfType(createdCustomer, typeof(Customer));
-            Assert.IsTrue(createdCustomer.FirstName == customer.FirstName);
+            Assert.AreEqual(customer.FirstName, createdCustomer.FirstName);
 
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -471,12 +472,12 @@ namespace ChargifyDotNetTests
             // Assert
             Assert.IsNotNull(createdCustomer);
             //Assert.IsInstanceOfType(createdCustomer, typeof(Customer));
-            Assert.IsTrue(createdCustomer.FirstName == customer.FirstName);
+            Assert.AreEqual(customer.FirstName, createdCustomer.FirstName);
 
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -509,12 +510,12 @@ namespace ChargifyDotNetTests
             // Assert
             Assert.IsNotNull(createdCustomer);
             //Assert.IsInstanceOfType(createdCustomer, typeof(Customer));
-            Assert.IsTrue(createdCustomer.FirstName == customer.FirstName);
+            Assert.AreEqual(customer.FirstName, createdCustomer.FirstName);
 
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -547,12 +548,12 @@ namespace ChargifyDotNetTests
             // Assert
             Assert.IsNotNull(createdCustomer);
             //Assert.IsInstanceOfType(createdCustomer, typeof(Customer));
-            Assert.IsTrue(createdCustomer.FirstName == customer.FirstName);
+            Assert.AreEqual(customer.FirstName, createdCustomer.FirstName);
 
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -566,9 +567,9 @@ namespace ChargifyDotNetTests
             var referenceValue = customers.FirstOrDefault(systemID => !string.IsNullOrWhiteSpace(systemID));
             var customer = Chargify.LoadCustomer(referenceValue);
             Assert.IsNotNull(customer);
-            Assert.IsTrue(string.IsNullOrWhiteSpace(customer.FirstName) == false);
-            Assert.IsTrue(string.IsNullOrWhiteSpace(customer.LastName) == false);
-            Assert.IsTrue(string.IsNullOrWhiteSpace(customer.SystemID) == false);
+            Assert.AreEqual(false, string.IsNullOrWhiteSpace(customer.FirstName));
+            Assert.AreEqual(false, string.IsNullOrWhiteSpace(customer.LastName));
+            Assert.AreEqual(false, string.IsNullOrWhiteSpace(customer.SystemID));
             Assert.AreEqual(referenceValue, customer.SystemID);
 
             var customer1 = Chargify.LoadCustomer(customer.ChargifyID);
@@ -583,7 +584,7 @@ namespace ChargifyDotNetTests
         /// <summary>
         /// Get the list of customers
         /// </summary>
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -599,7 +600,7 @@ namespace ChargifyDotNetTests
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
@@ -622,7 +623,7 @@ namespace ChargifyDotNetTests
             SetJson(!isJson);
         }
 
-        [DataTestMethod]
+        
         [DataRow("xml")]
         [DataRow("json")]
         [TestMethod]
