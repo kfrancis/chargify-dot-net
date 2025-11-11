@@ -1,4 +1,4 @@
-﻿
+
 #region License, Terms and Conditions
 //
 // IComponentInfo.cs
@@ -53,6 +53,10 @@ namespace ChargifyNET
         /// On/Off Component
         /// </summary>
         On_Off_Component,
+        /// <summary>
+        /// Pre Paid UsageComponent
+        /// </summary>
+        Prepaid_Usage_Component,
         /// <summary>
         /// Unknown Transaction Type
         /// </summary>
