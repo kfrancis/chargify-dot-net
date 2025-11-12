@@ -1,5 +1,5 @@
 using System;
-using ChargifyNET;
+using ChargifyDotNet;
 using ChargifyDotNetTests.Base;
 using System.Linq;
 using ChargifyDotNet.Tests;

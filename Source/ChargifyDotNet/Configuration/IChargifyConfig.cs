@@ -29,7 +29,7 @@
 
 #endregion
 
-namespace ChargifyNET.Configuration
+namespace ChargifyDotNet.Configuration
 {
     /// <summary>
     ///     Abstraction for retrieving Chargify account configuration across full .NET Framework and .NET (Core) targets.

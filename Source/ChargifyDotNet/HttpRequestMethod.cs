@@ -29,7 +29,7 @@
 
 using System.Xml.Serialization;
 
-namespace ChargifyNET
+namespace ChargifyDotNet
 {
     /// <summary>
     /// The type of REST request

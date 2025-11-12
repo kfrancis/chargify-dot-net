@@ -1,13 +1,13 @@
-﻿#if NETFULL
+#if NETFULL
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using ChargifyNET.Data;
+using ChargifyDotNet.Data;
 
 // ReSharper disable once CheckNamespace
-namespace ChargifyNET.Controls
+namespace ChargifyDotNet.Controls
 {
     /// <summary>
     /// Custom control

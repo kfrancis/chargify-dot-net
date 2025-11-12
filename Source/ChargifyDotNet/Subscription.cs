@@ -1,4 +1,4 @@
-﻿
+
 #region License, Terms and Conditions
 //
 // Subscription.cs
@@ -32,9 +32,9 @@ using System;
 using System.Diagnostics;
 using System.Text;
 using System.Xml;
-using ChargifyNET.Json;
+using ChargifyDotNet.Json;
 
-namespace ChargifyNET
+namespace ChargifyDotNet
 {
     #region Imports
 

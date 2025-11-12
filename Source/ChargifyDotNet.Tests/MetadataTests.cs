@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using ChargifyDotNetTests.Base;
-using ChargifyNET;
+using ChargifyDotNet;
 using System.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 using ChargifyDotNet.Tests;
-using ChargifyNET;
+using ChargifyDotNet;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shouldly;
 

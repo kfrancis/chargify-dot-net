@@ -1,6 +1,6 @@
 using ChargifyDotNetTests.Base;
 using System.Linq;
-using ChargifyNET;
+using ChargifyDotNet;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using ChargifyDotNet;

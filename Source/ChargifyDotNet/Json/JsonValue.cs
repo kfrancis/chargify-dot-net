@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 
-namespace ChargifyNET.Json
+namespace ChargifyDotNet.Json
 {
     /// <summary>
     /// Object representing JSON value

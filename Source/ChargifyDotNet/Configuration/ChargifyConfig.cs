@@ -11,7 +11,7 @@ using System.Linq;
 using Microsoft.Extensions.Configuration;
 #endif
 
-namespace ChargifyNET.Configuration
+namespace ChargifyDotNet.Configuration
 {
 #if NET8_0_OR_GREATER
     /// <summary>

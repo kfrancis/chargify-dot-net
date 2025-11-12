@@ -1,4 +1,4 @@
-﻿
+
 #region License, Terms and Conditions
 //
 // ICreditCardAttributes.cs
@@ -29,7 +29,7 @@
 #endregion
 
 // ReSharper disable once CheckNamespace
-namespace ChargifyNET
+namespace ChargifyDotNet
 {
     /// <summary>
     /// Interface representing credit card attributes

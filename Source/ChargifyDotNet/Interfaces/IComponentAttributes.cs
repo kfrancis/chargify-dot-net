@@ -1,4 +1,4 @@
-﻿#region License, Terms and Conditions
+#region License, Terms and Conditions
 
 //
 // IComponentAttributes.cs
@@ -33,7 +33,7 @@
 using ChargifyDotNet;
 using System.Collections.Generic;
 
-namespace ChargifyNET
+namespace ChargifyDotNet
 {
     /// <summary>
     /// Specfic class when getting information about a component as set to a specific subscription

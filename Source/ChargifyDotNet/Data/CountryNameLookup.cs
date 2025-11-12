@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
@@ -6,7 +6,7 @@ using System.Reflection;
 using System.IO;
 using System.Xml.Linq;
 
-namespace ChargifyNET.Data
+namespace ChargifyDotNet.Data
 {
     /// <summary>
     /// Since Chargify suggests using ISO 3166-1 Alpha 2 for the country codes, provide some data to users.

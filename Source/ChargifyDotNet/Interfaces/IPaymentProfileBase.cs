@@ -1,4 +1,4 @@
-﻿
+
 #region License, Terms and Conditions
 //
 // IPaymentProfileBase.cs
@@ -29,7 +29,7 @@
 #endregion
 
 // ReSharper disable once CheckNamespace
-namespace ChargifyNET
+namespace ChargifyDotNet
 {
     /// <summary>
     /// Base class for the credit card types

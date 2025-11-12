@@ -28,10 +28,10 @@
 //
 #endregion
 
-namespace ChargifyNET
+namespace ChargifyDotNet
 {
     #region Imports
-    using ChargifyNET.Json;
+    using ChargifyDotNet.Json;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Converters;
     using System;

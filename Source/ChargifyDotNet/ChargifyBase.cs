@@ -1,4 +1,4 @@
-﻿
+
 #region License, Terms and Conditions
 //
 // ChargifyBase.cs
@@ -32,7 +32,7 @@
 using System;
 [assembly: CLSCompliant(true)]
 
-namespace ChargifyNET
+namespace ChargifyDotNet
 {
     #region Imports
     using System.Web;

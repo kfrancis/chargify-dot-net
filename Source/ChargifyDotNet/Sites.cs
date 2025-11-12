@@ -1,4 +1,4 @@
-﻿namespace ChargifyNET
+namespace ChargifyDotNet
 {
     /// <summary>
     /// The type of cleanup being performed

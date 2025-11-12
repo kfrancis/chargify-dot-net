@@ -1,6 +1,6 @@
 using System;
 using System.Linq;
-using ChargifyNET;
+using ChargifyDotNet;
 using ChargifyDotNetTests.Base;
 using Bogus;
 using ChargifyDotNet.Tests;

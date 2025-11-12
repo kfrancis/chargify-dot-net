@@ -1,6 +1,6 @@
 
 // ReSharper disable once CheckNamespace
-namespace ChargifyNET
+namespace ChargifyDotNet
 {
     /// <summary>
     /// TODO

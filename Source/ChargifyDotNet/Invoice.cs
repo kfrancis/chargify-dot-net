@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Xml;
-using ChargifyNET.Json;
+using ChargifyDotNet.Json;
 
-namespace ChargifyNET
+namespace ChargifyDotNet
 {
     /// <summary>
     /// Invoice Billing allows you to bill your customers manually by sending them an invoice each month. Subscriptions with invoice billing enabled will not be charged automatically.

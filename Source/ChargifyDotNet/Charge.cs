@@ -1,4 +1,4 @@
-﻿
+
 #region License, Terms and Conditions
 //
 // Charge.cs
@@ -28,7 +28,7 @@
 //
 #endregion
 
-namespace ChargifyNET
+namespace ChargifyDotNet
 {
     #region Imports
     using System;

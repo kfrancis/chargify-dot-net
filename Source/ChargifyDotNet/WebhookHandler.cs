@@ -27,7 +27,7 @@
 //
 #endregion
 
-namespace ChargifyNET
+namespace ChargifyDotNet
 {
 #if NETFULL
     #region Imports

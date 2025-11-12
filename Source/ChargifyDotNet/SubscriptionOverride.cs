@@ -1,4 +1,4 @@
-﻿
+
 #region License, Terms and Conditions
 //
 // SubscriptionOverride.cs
@@ -30,7 +30,7 @@
 
 
 
-namespace ChargifyNET
+namespace ChargifyDotNet
 {
     #region Imports
     using System;

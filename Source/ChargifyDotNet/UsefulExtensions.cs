@@ -1,4 +1,4 @@
-namespace ChargifyNET
+namespace ChargifyDotNet
 {
     #region Imports
 

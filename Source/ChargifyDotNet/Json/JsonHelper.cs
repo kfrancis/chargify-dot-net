@@ -1,6 +1,6 @@
 using System;
 
-namespace ChargifyNET.Json
+namespace ChargifyDotNet.Json
 {
     /// <summary>
     /// Methods useful for parsing and getting types

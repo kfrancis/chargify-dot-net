@@ -1,4 +1,4 @@
-﻿
+
 #region License, Terms and Conditions
 //
 // ChargifyAccountElementCollection.cs
@@ -28,7 +28,7 @@
 //
 #endregion
 
-namespace ChargifyNET.Configuration
+namespace ChargifyDotNet.Configuration
 {
 #if NETFULL
     #region Imports 

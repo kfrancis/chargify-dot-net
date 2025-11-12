@@ -4,7 +4,7 @@ using System.IO;
 using System.Net;
 using Bogus;
 using ChargifyDotNet.Tests.Base; // settings class
-using ChargifyNET;
+using ChargifyDotNet;
 using Microsoft.Extensions.Configuration; // added
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;

@@ -33,7 +33,7 @@ using System.Linq;
 using ChargifyDotNet.RequestDTOs;
 using Newtonsoft.Json;
 
-namespace ChargifyNET
+namespace ChargifyDotNet
 {
     #region Imports
 
@@ -48,7 +48,7 @@ namespace ChargifyNET
     using System.Xml;
     using System.Xml.Linq;
     using ChargifyDotNet;
-    using ChargifyNET.Configuration;
+    using ChargifyDotNet.Configuration;
     using Json;
 
     #endregion

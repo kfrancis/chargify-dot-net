@@ -1,5 +1,5 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using ChargifyNET;
+using ChargifyDotNet;
 using System;
 
 namespace ChargifyDotNet.Tests

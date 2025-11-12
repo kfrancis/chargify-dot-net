@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using ChargifyNET;
+using ChargifyDotNet;
 using Newtonsoft.Json;
 
 namespace ChargifyDotNet.RequestDTOs

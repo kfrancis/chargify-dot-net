@@ -1,5 +1,5 @@
-using ChargifyNET;
-using ChargifyNET.Configuration;
+using ChargifyDotNet;
+using ChargifyDotNet.Configuration;
 using System;
 using System.Linq;
 

@@ -22,7 +22,7 @@ namespace ChargifyDotNetTests
 
             // Assert
             Assert.IsNotNull(stats);
-            //Assert.IsInstanceOfType(stats, typeof(ChargifyNET.SiteStatistics));
+            //Assert.IsInstanceOfType(stats, typeof(ChargifyDotNet.SiteStatistics));
             Assert.AreEqual(allSubscriptions.Count, stats.TotalSubscriptions);
 
             SetJson(!isJson);

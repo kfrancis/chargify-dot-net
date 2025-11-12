@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Xml;
-using ChargifyNET.Json;
+using ChargifyDotNet.Json;
 
-namespace ChargifyNET
+namespace ChargifyDotNet
 {
     /// <summary>
     /// Coupon usage

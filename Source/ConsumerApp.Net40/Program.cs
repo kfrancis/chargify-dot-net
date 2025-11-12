@@ -1,4 +1,4 @@
-﻿using ChargifyNET;
+using ChargifyDotNet;
 using System;
 using System.Collections.Generic;
 using System.Linq;

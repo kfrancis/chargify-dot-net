@@ -2,7 +2,7 @@ using System;
 using ChargifyDotNetTests.Base;
 using System.Linq;
 using ChargifyDotNet.Tests;
-using ChargifyNET;
+using ChargifyDotNet;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ChargifyDotNetTests
@@ -20,7 +20,7 @@ namespace ChargifyDotNetTests
             SetJson(isJson);
 
             // Arrange
-            var subscription = Chargify.GetSubscriptionList(SubscriptionState.Active).FirstOrDefault(s => s.Value.State == ChargifyNET.SubscriptionState.Active).Value;
+            var subscription = Chargify.GetSubscriptionList(SubscriptionState.Active).FirstOrDefault(s => s.Value.State == ChargifyDotNet.SubscriptionState.Active).Value;
             var amount = 1234; //$12.34
             var memo = Guid.NewGuid().ToString();
             var prePaymentBalance = subscription.BalanceInCents;

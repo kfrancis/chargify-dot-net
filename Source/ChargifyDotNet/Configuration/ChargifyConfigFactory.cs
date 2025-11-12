@@ -10,7 +10,7 @@ using System.Configuration;
 using Microsoft.Extensions.Configuration;
 #endif
 
-namespace ChargifyNET.Configuration
+namespace ChargifyDotNet.Configuration
 {
     /// <summary>
     /// Factory to obtain an IChargifyConfig across different target frameworks.

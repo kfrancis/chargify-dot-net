@@ -1,6 +1,6 @@
-﻿using System.Globalization;
+using System.Globalization;
 
-namespace ChargifyNET.Json
+namespace ChargifyDotNet.Json
 {
     /// <summary>
     /// Object representing a JsonNumber

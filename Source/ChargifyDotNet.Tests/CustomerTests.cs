@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ChargifyDotNet.Tests;
 using ChargifyDotNetTests.Base;
-using ChargifyNET;
+using ChargifyDotNet;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ChargifyDotNetTests

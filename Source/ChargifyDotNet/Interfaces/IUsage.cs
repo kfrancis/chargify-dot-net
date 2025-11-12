@@ -1,4 +1,4 @@
-﻿
+
 #region License, Terms and Conditions
 //
 // IUsage.cs
@@ -29,7 +29,7 @@
 #endregion
 
 // ReSharper disable once CheckNamespace
-namespace ChargifyNET
+namespace ChargifyDotNet
 {
     #region Imports
     using System;

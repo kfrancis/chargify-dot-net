@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text;
 using System.Xml;
 using System.Collections;
@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System.Globalization;
 
-namespace ChargifyNET.Json
+namespace ChargifyDotNet.Json
 {
     /// <summary>
     /// Class used to convert an XmlDocument into JSON to send back to Chargify

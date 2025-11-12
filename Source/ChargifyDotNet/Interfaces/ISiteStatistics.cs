@@ -1,4 +1,4 @@
-﻿#region License, Terms and Conditions
+#region License, Terms and Conditions
 //
 // ISiteStatistics.cs
 //
@@ -28,7 +28,7 @@
 #endregion
 
 // ReSharper disable once CheckNamespace
-namespace ChargifyNET
+namespace ChargifyDotNet
 {
     /// <summary>
     /// The stats object for a site

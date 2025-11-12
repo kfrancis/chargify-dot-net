@@ -30,9 +30,9 @@
 using System;
 using System.Collections.Generic;
 using System.Xml;
-using ChargifyNET.Json;
+using ChargifyDotNet.Json;
 
-namespace ChargifyNET
+namespace ChargifyDotNet
 {
     #region Imports
 

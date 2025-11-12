@@ -1,4 +1,4 @@
-﻿#region License, Terms and Conditions
+#region License, Terms and Conditions
 //
 // ICoupon.cs
 //
@@ -27,7 +27,7 @@
 //
 #endregion
 
-namespace ChargifyNET
+namespace ChargifyDotNet
 {
     #region Imports
     using System;

@@ -27,9 +27,9 @@
 
 using System;
 using System.Xml;
-using ChargifyNET.Json;
+using ChargifyDotNet.Json;
 
-namespace ChargifyNET
+namespace ChargifyDotNet
 {
     /// <summary>
     ///     Specific class when getting or setting information specfic to a components allocation history

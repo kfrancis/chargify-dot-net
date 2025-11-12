@@ -1,4 +1,4 @@
-namespace ChargifyNET
+namespace ChargifyDotNet
 {
     /// <summary>
     /// The model object for every ID-based object in Chargify

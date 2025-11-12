@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace ChargifyNET.Json
+namespace ChargifyDotNet.Json
 {
     /// <summary>
     /// Object representing a JsonArray

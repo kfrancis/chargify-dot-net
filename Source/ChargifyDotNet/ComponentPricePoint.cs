@@ -32,8 +32,8 @@
 namespace ChargifyDotNet
 {
     #region Imports
-    using ChargifyNET;
-    using ChargifyNET.Json;
+    using ChargifyDotNet;
+    using ChargifyDotNet.Json;
     using Newtonsoft.Json;
     using System;
     using System.Collections.Generic;

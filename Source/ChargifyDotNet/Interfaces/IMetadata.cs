@@ -31,7 +31,7 @@
 // ReSharper disable once CheckNamespace
 using Newtonsoft.Json;
 
-namespace ChargifyNET
+namespace ChargifyDotNet
 {
     /// <summary>
     /// Chargify Metadata is used to add your own meaningful values to subscription or customer records.

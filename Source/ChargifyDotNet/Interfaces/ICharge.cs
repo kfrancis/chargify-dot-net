@@ -1,4 +1,4 @@
-﻿
+
 #region License, Terms and Conditions
 //
 // ICharge.cs
@@ -29,7 +29,7 @@
 #endregion
 
 // ReSharper disable once CheckNamespace
-namespace ChargifyNET
+namespace ChargifyDotNet
 {
     using Newtonsoft.Json;
     #region Imports
