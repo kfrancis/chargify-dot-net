@@ -1420,13 +1420,13 @@ namespace ChargifyNET
         /// Caller can plug in a delegate for logging raw Chargify requests.
         /// Method, URL, and Data are the parameters.
         /// </summary>
-        Action<HttpRequestMethod, string, string> LogRequest { get; set; }
+        Action<HttpRequestMethod, string, string>? LogRequest { get; set; }
 
         /// <summary>
         /// Caller can plug in a delegate for logging raw Chargify responses (including errors)
         /// Http Status, URL, and response body are the parameters.
         /// </summary>
-        Action<HttpStatusCode, string, string> LogResponse { get; set; }
+        Action<HttpStatusCode, string, string>? LogResponse { get; set; }
         #endregion
 
         #region Statements

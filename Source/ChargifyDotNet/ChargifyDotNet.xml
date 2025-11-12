@@ -329,8 +329,18 @@
         </member>
         <member name="M:ChargifyNET.ChargifyConnect.#ctor">
             <summary>
-            Constructor
+            Initializes a new instance of the ChargifyConnect class.
             </summary>
+        </member>
+        <member name="M:ChargifyNET.ChargifyConnect.#ctor(ChargifyNET.Configuration.IChargifyAccountConfig)">
+            <summary>
+            Initializes a new instance of the ChargifyConnect class using the specified account configuration.
+            </summary>
+            <remarks>This constructor simplifies initialization by allowing all required connection
+            settings to be provided through a single configuration object. The values from the configuration are used to
+            set up the connection to the Chargify service.</remarks>
+            <param name="config">An object that provides the site, API key, API password, and shared key required to connect to the Chargify
+            API. Cannot be null.</param>
         </member>
         <member name="M:ChargifyNET.ChargifyConnect.#ctor(System.String,System.String,System.String)">
             <summary>
@@ -2799,6 +2809,73 @@
         <member name="P:ChargifyNET.PriceBracketInfo.UnitPrice">
             <summary>
             The unit price for the component
+            </summary>
+        </member>
+        <member name="T:ChargifyNET.Configuration.ChargifyConfigFactory">
+            <summary>
+            Factory to obtain an IChargifyConfig across different target frameworks.
+            </summary>
+        </member>
+        <member name="T:ChargifyNET.Configuration.IChargifyConfig">
+            <summary>
+                Abstraction for retrieving Chargify account configuration across full .NET Framework and .NET (Core) targets.
+            </summary>
+        </member>
+        <member name="P:ChargifyNET.Configuration.IChargifyConfig.DefaultAccount">
+            <summary>
+                Returns configured default account name
+            </summary>
+        </member>
+        <member name="M:ChargifyNET.Configuration.IChargifyConfig.GetDefaultOrFirst">
+            <summary>
+                Retrieve the default (or first) account configuration.
+            </summary>
+        </member>
+        <member name="M:ChargifyNET.Configuration.IChargifyConfig.GetSharedKeyForDefaultOrFirstSite">
+            <summary>
+                Retrieve the shared key for the default (or first) account.
+            </summary>
+        </member>
+        <member name="P:ChargifyNET.Configuration.IChargifyConfig.UseJSON">
+            <summary>
+                Returns whether JSON should be used.
+            </summary>
+        </member>
+        <member name="T:ChargifyNET.Configuration.IChargifyAccountConfig">
+            <summary>
+                Cross-framework abstraction of a single account element.
+            </summary>
+        </member>
+        <member name="P:ChargifyNET.Configuration.IChargifyAccountConfig.Name">
+            <summary>
+            Gets the name associated with the current instance.
+            </summary>
+        </member>
+        <member name="P:ChargifyNET.Configuration.IChargifyAccountConfig.Site">
+            <summary>
+            Gets the site URL for the Chargify account. 
+            </summary>
+        </member>
+        <member name="P:ChargifyNET.Configuration.IChargifyAccountConfig.ApiKey">
+            <summary>
+            Gets the API key used to authenticate requests to the service.
+            </summary>
+        </member>
+        <member name="P:ChargifyNET.Configuration.IChargifyAccountConfig.ApiPassword">
+            <summary>
+            Gets the API password used for authenticating requests to the external service.
+            </summary>
+            <remarks>The API password should be kept secure and not exposed in client applications or
+            logs. Access to this property may be restricted depending on the application's security model.</remarks>
+        </member>
+        <member name="P:ChargifyNET.Configuration.IChargifyAccountConfig.SharedKey">
+            <summary>
+            Gets the shared secret key used for authentication or encryption.
+            </summary>
+        </member>
+        <member name="P:ChargifyNET.Configuration.IChargifyAccountConfig.CvvRequired">
+            <summary>
+               Returns whether CVV is required.
             </summary>
         </member>
         <member name="T:ChargifyNET.Coupon">

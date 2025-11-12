@@ -48,6 +48,7 @@ namespace ChargifyNET
     using System.Xml;
     using System.Xml.Linq;
     using ChargifyDotNet;
+    using ChargifyNET.Configuration;
     using Json;
 
     #endregion
@@ -69,10 +70,23 @@ namespace ChargifyNET
         private int _timeout = 180000;
 
         /// <summary>
-        /// Constructor
+        /// Initializes a new instance of the ChargifyConnect class.
         /// </summary>
         public ChargifyConnect()
         { }
+
+        /// <summary>
+        /// Initializes a new instance of the ChargifyConnect class using the specified account configuration.
+        /// </summary>
+        /// <remarks>This constructor simplifies initialization by allowing all required connection
+        /// settings to be provided through a single configuration object. The values from the configuration are used to
+        /// set up the connection to the Chargify service.</remarks>
+        /// <param name="config">An object that provides the site, API key, API password, and shared key required to connect to the Chargify
+        /// API. Cannot be null.</param>
+        public ChargifyConnect(IChargifyAccountConfig config)
+            : this(config.Site, config.ApiKey, config.ApiPassword, config.SharedKey)
+        {
+        }
 
         /// <summary>
         /// Constructor
@@ -110,7 +124,7 @@ namespace ChargifyNET
                                                string.Format("Chargify.NET Client v" +
                                                              System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
 
-        private static string s_userAgent;
+        private static string? s_userAgent;
 
         /// <summary>
         /// Get or set the API key
@@ -200,12 +214,12 @@ namespace ChargifyNET
         /// <summary>
         /// Caller can plug in a delegate for logging raw Chargify requests
         /// </summary>
-        public Action<HttpRequestMethod, string, string> LogRequest { get; set; }
+        public Action<HttpRequestMethod, string, string>? LogRequest { get; set; }
 
         /// <summary>
         /// Caller can plug in a delegate for logging raw Chargify responses
         /// </summary>
-        public Action<HttpStatusCode, string, string> LogResponse { get; set; }
+        public Action<HttpStatusCode, string, string>? LogResponse { get; set; }
 
         /// <summary>
         /// Get a reference to the last Http Response from the chargify server. This is set after every call to

@@ -38,15 +38,15 @@ namespace ChargifyNET.Configuration
     /// <summary>
     /// The collection of Chargify Account elements in web.config
     /// </summary>
-    [ConfigurationCollection(typeof(ChargifyAccountElement))]
+    [ConfigurationCollection(typeof(ChargifyAccountConfig))]
     public class ChargifyAccountElementCollection : ConfigurationElementCollection
     {
         /// <summary>
-        /// Create a new configuration element of type ChargifyAccountElement
+        /// Create a new configuration element of type ChargifyAccountConfig
         /// </summary>        
         protected override ConfigurationElement CreateNewElement()
         {
-            return new ChargifyAccountElement();
+            return new ChargifyAccountConfig();
         }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace ChargifyNET.Configuration
         /// <returns></returns>
         protected override object GetElementKey(ConfigurationElement element)
         {
-            return ((ChargifyAccountElement)element).Name;
+            return ((ChargifyAccountConfig)element).Name;
         }
 
         /// <summary>
@@ -64,11 +64,11 @@ namespace ChargifyNET.Configuration
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
-        public ChargifyAccountElement this[int index]
+        public ChargifyAccountConfig this[int index]
         {
             get
             {
-                return (ChargifyAccountElement)BaseGet(index);
+                return (ChargifyAccountConfig)BaseGet(index);
             }
             set
             {

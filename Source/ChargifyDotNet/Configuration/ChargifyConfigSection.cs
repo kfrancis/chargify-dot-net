@@ -1,7 +1,6 @@
-﻿
 #region License, Terms and Conditions
 //
-// ChargifyAccountRetrieverSection.cs
+// ChargifyConfigSection.cs
 //
 // Authors: Kori Francis <twitter.com/djbyter>, David Ball
 // Copyright (C) 2010 Clinical Support Systems, Inc. All rights reserved.
@@ -31,24 +30,18 @@
 namespace ChargifyNET.Configuration
 {
 #if NETFULL
-    #region Imports
     using System.Configuration;
-    #endregion
 
     /// <summary>
     /// Class that deals with getting the account elements in web.config
     /// </summary>
-    public class ChargifyAccountRetrieverSection : ConfigurationSection
+    public class ChargifyConfigSection : ConfigurationSection, IChargifyConfig
     {
         /// <summary>
         /// The name of the default account, to be used in GetDefaultOrFirst() method.
         /// </summary>
         [ConfigurationProperty("defaultAccount")]
-        public string DefaultAccount
-        {
-            get { return (string)base["defaultAccount"]; }
-            set { base["defaultAccount"] = value; }
-        }
+        public string DefaultAccount { get { return (string)base["defaultAccount"]; } set { base["defaultAccount"] = value; } }
 
         /// <summary>
         /// Should Chargify.NET use JSON or XML. UseJSON = false by default (ie XML by default)
@@ -68,21 +61,17 @@ namespace ChargifyNET.Configuration
         /// The collection of Chargify Account elements
         /// </summary>
         [ConfigurationProperty("accounts", IsDefaultCollection = true)]
-        public ChargifyAccountElementCollection Accounts
-        {
-            get { return (ChargifyAccountElementCollection)this["accounts"]; }
-            set { this["accounts"] = value; }
-        }
+        public ChargifyAccountElementCollection Accounts { get { return (ChargifyAccountElementCollection)this["accounts"]; } set { this["accounts"] = value; } }
 
         /// <summary>
         /// Method that gets the default (as specified via the DefaultAccount property) or the first
         /// </summary>
-        public ChargifyAccountElement GetDefaultOrFirst()
+        public ChargifyAccountConfig GetDefaultOrFirst()
         {
-            ChargifyAccountElement result = null;
+            ChargifyAccountConfig result = null;
             if (!string.IsNullOrEmpty(DefaultAccount))
             {
-                foreach (ChargifyAccountElement element in Accounts)
+                foreach (ChargifyAccountConfig element in Accounts)
                 {
                     if (element.Name == DefaultAccount)
                     {
@@ -104,16 +93,18 @@ namespace ChargifyNET.Configuration
             return result;
         }
 
+        IChargifyAccountConfig IChargifyConfig.GetDefaultOrFirst() { return GetDefaultOrFirst(); }
+
         /// <summary>
         /// Method for getting the shared key for the default site
         /// </summary>
         /// <returns>The shared key for the default site, if applicable</returns>
         public string GetSharedKeyForDefaultOrFirstSite()
         {
-            ChargifyAccountElement result = null;
+            ChargifyAccountConfig result = null;
             if (!string.IsNullOrEmpty(DefaultAccount))
             {
-                foreach (ChargifyAccountElement element in Accounts)
+                foreach (ChargifyAccountConfig element in Accounts)
                 {
                     if (element.Name == DefaultAccount)
                     {

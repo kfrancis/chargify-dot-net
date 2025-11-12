@@ -1,7 +1,6 @@
-﻿
 #region License, Terms and Conditions
 //
-// ChargifyAccountElement.cs
+// ChargifyAccountConfig.cs
 //
 // Authors: Kori Francis <twitter.com/djbyter>, David Ball
 // Copyright (C) 2010 Clinical Support Systems, Inc. All rights reserved.
@@ -38,7 +37,7 @@ namespace ChargifyNET.Configuration
     /// <summary>
     /// The object that holds information about a Chargify account, including name, site, apikey and password
     /// </summary>
-    public class ChargifyAccountElement : ConfigurationElement
+    public class ChargifyAccountConfig : ConfigurationElement, IChargifyAccountConfig
     {
         /// <summary>
         /// The "Name" of the site, used when setting the Default
