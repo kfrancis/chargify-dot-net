@@ -127,6 +127,10 @@ namespace ChargifyDotNet
         /// </summary>
         Paused,
         /// <summary>
+        /// The 'awaiting_signup' subscription state
+        /// </summary>
+        Awaiting_Signup,
+        /// <summary>
         /// The 'unknown' subscription state, only internal to this wrapper
         /// </summary>
         Unknown = -1
