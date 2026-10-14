@@ -3,7 +3,6 @@ using System.Linq;
 using ChargifyDotNet;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using ChargifyDotNet;
 using Shouldly;
 using Bogus;
 using System.Collections.Generic;

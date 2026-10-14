@@ -654,7 +654,7 @@ namespace ChargifyDotNetTests
             Assert.IsNotNull(createdSubscription);
             var deletedSubscription = Chargify.DeleteSubscription(createdSubscription.SubscriptionID,
                 "Delete for test Subscription_Can_Reactivate_With_Trial");
-            Assert.IsNotNull(deletedSubscription);
+            Assert.IsTrue(deletedSubscription);
             var foundSubscription = Chargify.Find<Subscription>(createdSubscription.SubscriptionID);
             Assert.AreEqual(SubscriptionState.Canceled,
                 foundSubscription.State, "Expected cancelled subscription on a trial product");
@@ -693,7 +693,7 @@ namespace ChargifyDotNetTests
             Assert.IsNotNull(createdSubscription);
             var deletedSubscription = Chargify.DeleteSubscription(createdSubscription.SubscriptionID,
                 "Delete for test Subscription_Can_Reactivate_With_Trial");
-            Assert.IsNotNull(deletedSubscription);
+            Assert.IsTrue(deletedSubscription);
             var foundSubscription = Chargify.Find<Subscription>(createdSubscription.SubscriptionID);
             Assert.AreEqual(SubscriptionState.Canceled,
                 foundSubscription.State, "Expected cancelled subscription on a trial product");

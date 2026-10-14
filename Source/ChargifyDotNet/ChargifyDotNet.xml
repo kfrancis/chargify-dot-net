@@ -2470,6 +2470,18 @@
             </summary>
             <param name="message">The message of this exception</param>
         </member>
+        <member name="M:ChargifyDotNet.ChargifyNetException.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:ChargifyDotNet.ChargifyNetException.#ctor(System.String,System.Exception)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="message">The message of this exception</param>
+            <param name="innerException">The exception that caused this exception</param>
+        </member>
         <member name="T:ChargifyDotNet.ChargifyException">
             <summary>
             Exception thrown by the chargify system when a request fails
@@ -8743,6 +8755,18 @@
             </summary>
             <param name="message">The message to display</param>
         </member>
+        <member name="M:ChargifyDotNet.Json.JsonException.#ctor">
+            <summary>
+            JsonException constructor
+            </summary>
+        </member>
+        <member name="M:ChargifyDotNet.Json.JsonException.#ctor(System.String,System.Exception)">
+            <summary>
+            JsonException constructor
+            </summary>
+            <param name="message">The message to display</param>
+            <param name="innerException">The exception that caused this exception</param>
+        </member>
         <member name="T:ChargifyDotNet.Json.JsonParseException">
             <summary>
             Exception for dealing with Json parsing
@@ -8753,6 +8777,18 @@
             JsonParseException Constructor
             </summary>
             <param name="message">The message to display</param>
+        </member>
+        <member name="M:ChargifyDotNet.Json.JsonParseException.#ctor">
+            <summary>
+            JsonParseException constructor
+            </summary>
+        </member>
+        <member name="M:ChargifyDotNet.Json.JsonParseException.#ctor(System.String,System.Exception)">
+            <summary>
+            JsonParseException constructor
+            </summary>
+            <param name="message">The message to display</param>
+            <param name="innerException">The exception that caused this exception</param>
         </member>
         <member name="M:ChargifyDotNet.Json.JsonParseException.#ctor(System.String,System.Int32)">
             <summary>

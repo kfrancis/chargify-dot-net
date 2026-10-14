@@ -244,6 +244,22 @@ namespace ChargifyDotNet
         public ChargifyNetException(string message) : base(message)
         {
         }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public ChargifyNetException()
+        {
+        }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="message">The message of this exception</param>
+        /// <param name="innerException">The exception that caused this exception</param>
+        public ChargifyNetException(string message, Exception innerException) : base(message, innerException)
+        {
+        }
     }
 
     /// <summary>
@@ -251,6 +267,8 @@ namespace ChargifyDotNet
     /// </summary>
     [DebuggerDisplay("Status Description: {StatusDescription}, Status Code: {StatusCode}, Error Messages: {ErrorMessages.Count}")]
     [Serializable]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "RCS1194:Implement exception constructors",
+        Justification = "Every ChargifyException carries an HTTP status code; message-only constructors would leave StatusCode meaningless.")]
     public class ChargifyException : Exception
     {
         /// <summary>

@@ -484,7 +484,7 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="chargifyId">The chargify ID of the customer</param>
         /// <returns>The customer with the specified chargify ID</returns>
-        public ICustomer LoadCustomer(long chargifyId)
+        public ICustomer? LoadCustomer(long chargifyId)
         {
             try
             {
@@ -507,7 +507,7 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="systemId">The system ID of the customer</param>
         /// <returns>The customer with the specified chargify ID</returns>
-        public ICustomer LoadCustomer(string systemId)
+        public ICustomer? LoadCustomer(string systemId)
         {
             try
             {
@@ -990,7 +990,7 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="handle">The Chargify ID or handle of the product</param>
         /// <returns>The product with the specified chargify ID</returns>
-        public IProduct LoadProduct(string handle)
+        public IProduct? LoadProduct(string handle)
         {
             return LoadProduct(handle, true);
         }
@@ -1001,7 +1001,7 @@ namespace ChargifyDotNet
         /// <param name="productId">The Chargify ID or handle of the product</param>
         /// <param name="isHandle">If true, then the ProductID represents the handle, if false the ProductID represents the Chargify ID</param>
         /// <returns>The product with the specified chargify ID</returns>
-        public IProduct LoadProduct(string productId, bool isHandle)
+        public IProduct? LoadProduct(string productId, bool isHandle)
         {
             try
             {
@@ -1190,7 +1190,7 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="handle">The Chargify ID or handle of the product</param>
         /// <returns>The product family with the specified chargify ID</returns>
-        public IProductFamily LoadProductFamily(string handle)
+        public IProductFamily? LoadProductFamily(string handle)
         {
             return LoadProductFamily(handle, true);
         }
@@ -1200,7 +1200,7 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="id">The Chargify ID of the product</param>
         /// <returns>The product family with the specified chargify ID</returns>
-        public IProductFamily LoadProductFamily(int id)
+        public IProductFamily? LoadProductFamily(int id)
         {
             return LoadProductFamily(id.ToString(), false);
         }
@@ -1211,7 +1211,7 @@ namespace ChargifyDotNet
         /// <param name="productFamilyIdentifier">The Chargify identifier (ID or handle) of the product family</param>
         /// <param name="isHandle">If true, then the ProductID represents the handle, if false the ProductFamilyID represents the Chargify ID</param>
         /// <returns>The product family with the specified chargify ID</returns>
-        private IProductFamily LoadProductFamily(string productFamilyIdentifier, bool isHandle)
+        private IProductFamily? LoadProductFamily(string productFamilyIdentifier, bool isHandle)
         {
             try
             {
@@ -1316,7 +1316,7 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="subscriptionId">The ID of the subscription to reactivate</param>
         /// <returns>The newly reactivated subscription, or nothing.</returns>
-        public ISubscription ReactivateSubscription(int subscriptionId)
+        public ISubscription? ReactivateSubscription(int subscriptionId)
         {
             try
             {
@@ -1337,7 +1337,7 @@ namespace ChargifyDotNet
         /// <param name="subscriptionId">The ID of the subscription to reactivate</param>
         /// <param name="includeTrial">If true, the reactivated subscription will include a trial if one is available.</param>
         /// <returns>The newly reactivated subscription, or nothing.</returns>
-        public ISubscription ReactivateSubscription(int subscriptionId, bool includeTrial)
+        public ISubscription? ReactivateSubscription(int subscriptionId, bool includeTrial)
         {
             return ReactivateSubscription(subscriptionId, includeTrial, null, null);
         }
@@ -1352,7 +1352,7 @@ namespace ChargifyDotNet
         /// <param name="preserveBalance">If true, the existing subscription balance will NOT be cleared/reset before adding the additional reactivation charges.</param>
         /// <param name="couponCode">The coupon code to be applied during reactivation.</param>
         /// <returns>The newly reactivated subscription, or nothing.</returns>
-        public ISubscription ReactivateSubscription(int subscriptionId, bool includeTrial, bool? preserveBalance, string? couponCode)
+        public ISubscription? ReactivateSubscription(int subscriptionId, bool includeTrial, bool? preserveBalance, string? couponCode)
         {
             try
             {
@@ -1463,7 +1463,7 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="subscriptionId">The ID of the subscription</param>
         /// <returns>The subscription with the specified ID</returns>
-        public ISubscription LoadSubscription(int subscriptionId)
+        public ISubscription? LoadSubscription(int subscriptionId)
         {
             try
             {
@@ -1615,7 +1615,7 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="chargifyId">The ChargifyID of the customer</param>
         /// <returns>A list of subscriptions</returns>
-        public IDictionary<int, ISubscription> GetSubscriptionListForCustomer(long chargifyId)
+        public IDictionary<int, ISubscription>? GetSubscriptionListForCustomer(long chargifyId)
         {
             try
             {
@@ -2199,7 +2199,7 @@ namespace ChargifyDotNet
         {
             if (creditCardAttributes == null) throw new ArgumentNullException(nameof(creditCardAttributes));
             if (customerAttributes == null) throw new ArgumentNullException(nameof(customerAttributes));
-            if (nextBillingAt == null || nextBillingAt == DateTime.MinValue) throw new ArgumentNullException(nameof(nextBillingAt));
+            if (nextBillingAt == DateTime.MinValue) throw new ArgumentNullException(nameof(nextBillingAt));
 
             return CreateSubscription(productHandle, customerAttributes.SystemID, customerAttributes.FirstName,
                                       customerAttributes.LastName, customerAttributes.Email, customerAttributes.Phone, customerAttributes.Organization,
@@ -2990,7 +2990,7 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="subscription">The subscription to update</param>
         /// <returns>The updated subscriptionn, null otherwise.</returns>
-        public ISubscription UpdateSubscription(ISubscription subscription)
+        public ISubscription? UpdateSubscription(ISubscription subscription)
         {
             return UpdateSubscription(subscription.SubscriptionID, subscription.Product.Handle, subscription.Customer.SystemID, subscription.Customer.FirstName,
                 subscription.Customer.LastName, subscription.Customer.Email, subscription.Customer.Phone, subscription.Customer.Organization, subscription.PaymentProfile.FullNumber, subscription.PaymentProfile.ExpirationMonth,
@@ -3227,7 +3227,7 @@ namespace ChargifyDotNet
         /// <param name="billingZip">The billing zip code or postal code (optional - set to null if not required)</param>
         /// <param name="billingCountry">The billing country (optional - set to null if not required)</param>
         /// <returns>The xml describing the new subsscription</returns>
-        private ISubscription UpdateSubscription(int subscriptionId, string productHandle, string systemId, string firstName, string lastName, string emailAddress, string phone,
+        private ISubscription? UpdateSubscription(int subscriptionId, string productHandle, string systemId, string firstName, string lastName, string emailAddress, string phone,
                                                  string organization, string fullNumber, int? expirationMonth, int? expirationYear,
                                                  string cvv, string billingAddress, string billingCity, string billingState, string billingZip,
                                                  string billingCountry)
@@ -3332,7 +3332,7 @@ namespace ChargifyDotNet
         /// <param name="cancelAtEndOfPeriod">True if the subscription should cancel at the end of the current period</param>
         /// <param name="cancellationMessage">The reason for cancelling the subscription</param>
         /// <returns>Subscription if successful, null otherwise.</returns>
-        public ISubscription UpdateDelayedCancelForSubscription(int subscriptionId, bool cancelAtEndOfPeriod, string cancellationMessage)
+        public ISubscription? UpdateDelayedCancelForSubscription(int subscriptionId, bool cancelAtEndOfPeriod, string cancellationMessage)
         {
             if (subscriptionId == int.MinValue) throw new ArgumentNullException(nameof(subscriptionId));
 
@@ -3709,7 +3709,7 @@ namespace ChargifyDotNet
         /// <param name="productFamilyId">The ID of the product family that the coupon belongs to</param>
         /// <param name="couponId">The ID of the coupon</param>
         /// <returns>The object if found, null otherwise.</returns>
-        public ICoupon LoadCoupon(int productFamilyId, int couponId)
+        public ICoupon? LoadCoupon(int productFamilyId, int couponId)
         {
             try
             {
@@ -3735,7 +3735,7 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="productFamilyID">The ID of the product family that the coupon belongs to</param>
         /// <returns>A dictionary of objects if found, empty collection otherwise.</returns>
-        public IDictionary<int, ICoupon> GetAllCoupons(int productFamilyID)
+        public IDictionary<int, ICoupon>? GetAllCoupons(int productFamilyID)
         {
             var coupons = new Dictionary<int, ICoupon>();
 
@@ -3804,7 +3804,7 @@ namespace ChargifyDotNet
                 // Throw if anything but not found, since not found is telling us that it's working correctly
                 // but that there just isn't a coupon with that ID.
                 if (cex.StatusCode == HttpStatusCode.NotFound) return null;
-                throw cex;
+                throw;
             }
 
             return coupons;
@@ -4008,7 +4008,7 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="couponId">The ID of the coupon</param>
         /// <returns>The object if found, null otherwise.</returns>
-        public IDictionary<int, ICouponUsage> GetCouponUsage(int couponId)
+        public IDictionary<int, ICouponUsage>? GetCouponUsage(int couponId)
         {
             var coupons = new Dictionary<int, ICouponUsage>();
 
@@ -4077,7 +4077,7 @@ namespace ChargifyDotNet
         /// <param name="productFamilyId">The ID of the product family the coupon belongs to</param>
         /// <param name="couponCode">The code used to represent the coupon</param>
         /// <returns>The object if found, otherwise null.</returns>
-        public ICoupon FindCoupon(int productFamilyId, string couponCode)
+        public ICoupon? FindCoupon(int productFamilyId, string couponCode)
         {
             try
             {
@@ -4920,7 +4920,7 @@ namespace ChargifyDotNet
         /// <param name="setEnabled">True if wanting to turn the component "on", false otherwise.</param>
         /// <returns>IComponentAttributes object if successful, null otherwise.</returns>
         [Obsolete("Use CreateComponentAllocation() Instead")]
-        public IComponentAttributes SetComponent(int subscriptionId, int componentId, bool setEnabled)
+        public IComponentAttributes? SetComponent(int subscriptionId, int componentId, bool setEnabled)
         {
             try
             {
@@ -4953,7 +4953,7 @@ namespace ChargifyDotNet
         /// <param name="componentId">The componentID to scope this request</param>
         /// <param name="page">Pass an integer in the page parameter via the query string to access subsequent pages of 50 transactions</param>
         /// <returns>A dictionary of allocation objects keyed by ComponentID, or null.</returns>
-        public IDictionary<int, List<IComponentAllocation>> GetAllocationListForSubscriptionComponent(int subscriptionId, int componentId, int? page = 0)
+        public IDictionary<int, List<IComponentAllocation>>? GetAllocationListForSubscriptionComponent(int subscriptionId, int componentId, int? page = 0)
         {
             // make sure data is valid
             if (subscriptionId == int.MinValue) throw new ArgumentNullException(nameof(subscriptionId));
@@ -5037,7 +5037,7 @@ namespace ChargifyDotNet
         /// <param name="componentId"></param>
         /// <param name="allocation"></param>
         /// <returns></returns>
-        public IComponentAllocation CreateComponentAllocation(int subscriptionId, int componentId, ComponentAllocation allocation)
+        public IComponentAllocation? CreateComponentAllocation(int subscriptionId, int componentId, ComponentAllocation allocation)
         {
             if (allocation == null) throw new ArgumentNullException(nameof(allocation));
             return CreateComponentAllocation(subscriptionId, componentId, allocation.Quantity, allocation.Memo, allocation.UpgradeScheme, allocation.DowngradeScheme);
@@ -5050,7 +5050,7 @@ namespace ChargifyDotNet
         /// <param name="componentId">The ID of the component to apply this quantity allocation to</param>
         /// <param name="quantity">The allocated quantity to which to set the line-items allocated quantity. This should always be an integer. For On/Off components, use 1 for on and 0 for off.</param>
         /// <returns></returns>
-        public IComponentAllocation CreateComponentAllocation(int subscriptionId, int componentId, int quantity)
+        public IComponentAllocation? CreateComponentAllocation(int subscriptionId, int componentId, int quantity)
         {
             return CreateComponentAllocation(subscriptionId, componentId, quantity, string.Empty, ComponentUpgradeProrationScheme.Unknown, ComponentDowngradeProrationScheme.Unknown);
         }
@@ -5063,7 +5063,7 @@ namespace ChargifyDotNet
         /// <param name="quantity">The allocated quantity to which to set the line-items allocated quantity. This should always be an integer. For On/Off components, use 1 for on and 0 for off.</param>
         /// <param name="memo">(optional) A memo to record along with the allocation</param>
         /// <returns></returns>
-        public IComponentAllocation CreateComponentAllocation(int subscriptionId, int componentId, int quantity, string memo)
+        public IComponentAllocation? CreateComponentAllocation(int subscriptionId, int componentId, int quantity, string memo)
         {
             return CreateComponentAllocation(subscriptionId, componentId, quantity, memo, ComponentUpgradeProrationScheme.Unknown, ComponentDowngradeProrationScheme.Unknown);
         }
@@ -5078,7 +5078,7 @@ namespace ChargifyDotNet
         /// <param name="upgradeScheme">(optional) The scheme used if the proration is an upgrade. Defaults to the site setting if one is not provided.</param>
         /// <param name="downgradeScheme">(optional) The scheme used if the proration is a downgrade. Defaults to the site setting if one is not provided.</param>
         /// <returns>The component allocation object, null otherwise.</returns>
-        public IComponentAllocation CreateComponentAllocation(int subscriptionId, int componentId, int quantity, string memo, ComponentUpgradeProrationScheme upgradeScheme, ComponentDowngradeProrationScheme downgradeScheme)
+        public IComponentAllocation? CreateComponentAllocation(int subscriptionId, int componentId, int quantity, string memo, ComponentUpgradeProrationScheme upgradeScheme, ComponentDowngradeProrationScheme downgradeScheme)
         {
             try
             {
@@ -5527,7 +5527,7 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="id">The ID of the transaction</param>
         /// <returns>The transaction with the specified ID</returns>
-        public ITransaction LoadTransaction(int id)
+        public ITransaction? LoadTransaction(int id)
         {
             try
             {
@@ -5598,7 +5598,7 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="statementId">The ID of the statement to retrieve</param>
         /// <returns>The statement if found, null otherwise.</returns>
-        public IStatement LoadStatement(int statementId)
+        public IStatement? LoadStatement(int statementId)
         {
             try
             {
@@ -5621,7 +5621,7 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="statementId">The ID of the statement to retrieve the byte[] for</param>
         /// <returns>A byte[] of the PDF data, to be sent to the user in a download</returns>
-        public byte[] LoadStatementPDF(int statementId)
+        public byte[]? LoadStatementPDF(int statementId)
         {
             try
             {
@@ -5929,7 +5929,7 @@ namespace ChargifyDotNet
         /// <summary>
         /// From http://docs.chargify.com/api-billing-portal
         /// </summary>
-        public IBillingManagementInfo GetManagementLink(long chargifyId)
+        public IBillingManagementInfo? GetManagementLink(long chargifyId)
         {
             try
             {
@@ -6200,7 +6200,7 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="id">The ID of the payment profile</param>
         /// <returns>The payment profile, null if not found.</returns>
-        public IPaymentProfileView LoadPaymentProfile(int id)
+        public IPaymentProfileView? LoadPaymentProfile(int id)
         {
             try
             {
@@ -6225,7 +6225,7 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="paymentProfile">The payment profile object</param>
         /// <returns>The updated payment profile if successful, null or exception otherwise.</returns>
-        public IPaymentProfileView UpdatePaymentProfile(PaymentProfileView paymentProfile)
+        public IPaymentProfileView? UpdatePaymentProfile(PaymentProfileView paymentProfile)
         {
             try
             {
@@ -6407,7 +6407,7 @@ namespace ChargifyDotNet
         /// <param name="subscriptionId">The id of the subscription</param>
         /// <param name="noteId">The id of the note to retrieve</param>
         /// <returns></returns>
-        public INote LoadNote(int subscriptionId, int noteId)
+        public INote? LoadNote(int subscriptionId, int noteId)
         {
             try
             {
@@ -6509,7 +6509,7 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="referralCode">Referral code</param>
         /// <returns>The object if found, null otherwise.</returns>
-        public IReferralCode ValidateReferralCode(string referralCode)
+        public IReferralCode? ValidateReferralCode(string referralCode)
         {
             try
             {
@@ -6522,7 +6522,7 @@ namespace ChargifyDotNet
                 // Throw if anything but not found, since not found is telling us that it's working correctly
                 // but that there just isn't a referral code with that code.
                 if (cex.StatusCode == HttpStatusCode.NotFound) return null;
-                throw cex;
+                throw;
             }
         }
 
@@ -6837,7 +6837,7 @@ namespace ChargifyDotNet
                 {
                     errorContent = response.Content?.ReadAsStringAsync().GetAwaiter().GetResult();
                 }
-                catch (Exception)
+                catch (Exception ex) when (ex is HttpRequestException or IOException or ObjectDisposedException or InvalidOperationException)
                 {
                     // Body could not be read; still surface the status code.
                 }
