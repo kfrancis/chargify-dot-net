@@ -44,6 +44,7 @@ namespace ChargifyDotNet.Tests
             ex.ErrorMessages.Select(e => e.Message).ShouldBe(new[] { "Memo: cannot be blank.", "Amount: must be greater than 0." });
             ex.ResponseBody.ShouldBe(body);
             ex.ToString().ShouldContain("Memo: cannot be blank.");
+            ex.Message.ShouldContain("Errors: Memo: cannot be blank.; Amount: must be greater than 0.");
             ex.ToString().ShouldContain("Response Body: ");
             ((int?)client.LastStatusCode).ShouldBe(422);
             client.LastResponseBody.ShouldBe(body);

@@ -439,6 +439,19 @@ namespace ChargifyDotNet
         public List<ChargifyError> ErrorMessages { get; }
 
         /// <summary>
+        /// The exception message, followed by any error messages Chargify returned so that
+        /// test runners and loggers that only print <see cref="Exception.Message"/> show the reason.
+        /// </summary>
+        public override string Message
+        {
+            get
+            {
+                if (ErrorMessages == null || ErrorMessages.Count == 0) return base.Message;
+                return $"{base.Message} Errors: {string.Join("; ", ErrorMessages.Select(e => e.Message).ToArray())}";
+            }
+        }
+
+        /// <summary>
         /// Pretty output for this exception
         /// </summary>
         /// <returns>Request, response and errors</returns>
