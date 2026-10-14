@@ -359,6 +359,47 @@
             <param name="password">Your Chargify api password</param>
             <param name="sharedKey">Your Chargify hosted page shared key</param>
         </member>
+        <member name="M:ChargifyDotNet.ChargifyConnect.#ctor(System.String,System.String,System.String,System.String,System.Net.Http.HttpClient)">
+            <summary>
+            Constructor that sends all requests through the supplied <see cref="T:System.Net.Http.HttpClient"/>.
+            </summary>
+            <remarks>
+            The client is not disposed or modified by this instance (authentication, accept and user-agent headers are set
+            per request). <see cref="P:ChargifyDotNet.ChargifyConnect.ProtocolType"/> is not applied. The client's own Timeout still applies in addition
+            to <see cref="P:ChargifyDotNet.ChargifyConnect.Timeout"/>.
+            </remarks>
+            <param name="url">The Chargify URL</param>
+            <param name="apiKey">Your Chargify api key</param>
+            <param name="password">Your Chargify api password</param>
+            <param name="sharedKey">Your Chargify hosted page shared key (optional)</param>
+            <param name="httpClient">The HttpClient to use for every request</param>
+        </member>
+        <member name="M:ChargifyDotNet.ChargifyConnect.#ctor(System.String,System.String,System.String,System.String,System.Net.Http.HttpMessageHandler)">
+            <summary>
+            Constructor that sends all requests through the supplied <see cref="T:System.Net.Http.HttpMessageHandler"/>
+            (e.g. a mock handler in unit tests, or a handler from IHttpClientFactory).
+            </summary>
+            <remarks>The handler is not disposed by this instance. <see cref="P:ChargifyDotNet.ChargifyConnect.ProtocolType"/> is not applied.</remarks>
+            <param name="url">The Chargify URL</param>
+            <param name="apiKey">Your Chargify api key</param>
+            <param name="password">Your Chargify api password</param>
+            <param name="sharedKey">Your Chargify hosted page shared key (optional)</param>
+            <param name="handler">The handler to use for every request</param>
+        </member>
+        <member name="M:ChargifyDotNet.ChargifyConnect.#ctor(ChargifyDotNet.Configuration.IChargifyAccountConfig,System.Net.Http.HttpClient)">
+            <summary>
+            Initializes a new instance using the specified account configuration and <see cref="T:System.Net.Http.HttpClient"/>.
+            </summary>
+            <param name="config">The account configuration</param>
+            <param name="httpClient">The HttpClient to use for every request</param>
+        </member>
+        <member name="M:ChargifyDotNet.ChargifyConnect.#ctor(ChargifyDotNet.Configuration.IChargifyAccountConfig,System.Net.Http.HttpMessageHandler)">
+            <summary>
+            Initializes a new instance using the specified account configuration and <see cref="T:System.Net.Http.HttpMessageHandler"/>.
+            </summary>
+            <param name="config">The account configuration</param>
+            <param name="handler">The handler to use for every request</param>
+        </member>
         <member name="P:ChargifyDotNet.ChargifyConnect.apiKey">
             <summary>
             Get or set the API key
@@ -394,6 +435,7 @@
             Allows you to specify the specific SecurityProtocolType. If not set, then
             the default is used.
             </summary>
+            <remarks>Ignored when an <see cref="T:System.Net.Http.HttpClient"/> or <see cref="T:System.Net.Http.HttpMessageHandler"/> was supplied to the constructor.</remarks>
         </member>
         <member name="P:ChargifyDotNet.ChargifyConnect.Timeout">
             <summary>
@@ -417,8 +459,28 @@
         </member>
         <member name="P:ChargifyDotNet.ChargifyConnect.LastResponse">
             <summary>
-            Get a reference to the last Http Response from the chargify server. This is set after every call to
-            a Chargify Connect method
+            Always null. Since the move to HttpClient there is no HttpWebResponse to expose.
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.ChargifyConnect.LastStatusCode">
+            <summary>
+            The HTTP status code of the last request made by this instance, or null if no response was received.
+            Set on every request, successful or not.
+            </summary>
+            <remarks>Not meaningful when the same instance is used concurrently from multiple threads.</remarks>
+        </member>
+        <member name="P:ChargifyDotNet.ChargifyConnect.LastResponseBody">
+            <summary>
+            The raw response body of the last request made by this instance, or null if no response was received
+            (or the response was binary, e.g. a PDF). Set on every request, successful or not.
+            </summary>
+            <remarks>Not meaningful when the same instance is used concurrently from multiple threads.</remarks>
+        </member>
+        <member name="P:ChargifyDotNet.ChargifyConnect.ValidateSubscriptionBeforeCharge">
+            <summary>
+            When true (the default), <see cref="M:ChargifyDotNet.ChargifyConnect.CreateCharge(System.Int32,System.Decimal,System.String,System.Boolean,System.Boolean)"/> loads the subscription
+            before posting the charge and throws <see cref="T:System.ArgumentException"/> if it does not exist.
+            Set to false to skip that extra GET; Chargify will then return a 404 for an unknown subscription.
             </summary>
         </member>
         <member name="M:ChargifyDotNet.ChargifyConnect.GetMetafields``1">
@@ -1633,6 +1695,16 @@
             <param name="useNegativeBalance">(Optional) Should the subscription balance be taken into consideration? Default = true</param>
             <param name="delayCharge">(Optional) Should the charge be billed during the next assessment? Default = false</param>
             <returns>The charge details</returns>
+            <remarks>
+            <para>
+            The <c>use_negative_balance</c> value sent to Chargify is the inverse of <paramref name="useNegativeBalance"/>:
+            passing <c>false</c> (the default) sends <c>1</c> and passing <c>true</c> sends <c>0</c>.
+            This is a long-standing quirk that existing callers depend on, so it is preserved in 1.x.
+            </para>
+            <para>
+            Unless <see cref="P:ChargifyDotNet.ChargifyConnect.ValidateSubscriptionBeforeCharge"/> is false, the subscription is loaded first (an extra GET).
+            </para>
+            </remarks>
         </member>
         <member name="M:ChargifyDotNet.ChargifyConnect.CreateCredit(System.Int32,ChargifyDotNet.ICredit)">
             <summary>
@@ -2263,6 +2335,12 @@
             <param name="postData"></param>
             <returns></returns>
         </member>
+        <member name="M:ChargifyDotNet.ChargifyConnect.SendRequest(System.Uri,System.String,ChargifyDotNet.HttpRequestMethod,System.Net.Http.HttpContent,System.String,System.String,System.Int32)">
+            <summary>
+            Sends a request on the shared HttpClient. Returns the response on success (caller disposes it);
+            on a non-success status, reads the body once and throws a <see cref="T:ChargifyDotNet.ChargifyException"/> carrying it.
+            </summary>
+        </member>
         <member name="M:ChargifyDotNet.ChargifyConnect.DoRequest(System.String,ChargifyDotNet.HttpRequestMethod,System.String)">
             <summary>
             Make a request to Chargify
@@ -2333,6 +2411,12 @@
             The message from Chargify
             </summary>
         </member>
+        <member name="P:ChargifyDotNet.ChargifyError.Field">
+            <summary>
+            The field the error relates to, when Chargify returned field-keyed errors
+            (e.g. <c>{"errors":{"amount":["must be greater than 0"]}}</c>). Null otherwise.
+            </summary>
+        </member>
         <member name="M:ChargifyDotNet.ChargifyError.#ctor">
             <summary>
             Constructor
@@ -2355,6 +2439,18 @@
             Constructor
             </summary>
             <param name="errorStr">The JsonString obj that contains the error message</param>
+        </member>
+        <member name="M:ChargifyDotNet.ChargifyError.ParseErrorsFromContent(System.String)">
+            <summary>
+            Parses the error messages out of a Chargify error response body.
+            </summary>
+            <remarks>
+            Supports <c>&lt;errors&gt;&lt;error&gt;msg&lt;/error&gt;&lt;/errors&gt;</c>,
+            <c>{"errors":["msg"]}</c> and <c>{"errors":{"field":["msg"]}}</c>.
+            Unknown or unparseable content yields an empty list; this method never throws.
+            </remarks>
+            <param name="content">The raw response body</param>
+            <returns>The list of errors, possibly empty</returns>
         </member>
         <member name="M:ChargifyDotNet.ChargifyError.ParseChargifyErrors(System.Net.HttpWebResponse)">
             <summary>
@@ -2426,6 +2522,41 @@
             <param name="innerException">The original exception that caused this exception</param>
             <param name="postData">The data posted that could have potentially caused the exception.</param>
         </member>
+        <member name="M:ChargifyDotNet.ChargifyException.#ctor(System.Net.Http.HttpResponseMessage,System.String,System.Exception,System.String)">
+            <summary>
+            Constructor for HttpClient usage where the response body has already been read.
+            </summary>
+            <param name="response">The HTTP response message (status, reason and headers are taken from it; its content is not read)</param>
+            <param name="responseBody">The already-read response body</param>
+            <param name="innerException">The original exception that caused this exception</param>
+            <param name="postData">The data posted that could have potentially caused the exception.</param>
+        </member>
+        <member name="F:ChargifyDotNet.ChargifyException.MaxResponseBodyLength">
+            <summary>
+            The maximum number of characters of the response body kept on <see cref="P:ChargifyDotNet.ChargifyException.ResponseBody"/>.
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.ChargifyException.ResponseBody">
+            <summary>
+            The raw response body returned by Chargify (card numbers masked, truncated to
+            <see cref="F:ChargifyDotNet.ChargifyException.MaxResponseBodyLength"/> characters). Null if no response was received.
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.ChargifyException.ResponseHeaders">
+            <summary>
+            The response headers returned with the failed response (Set-Cookie excluded). Empty if no response was received.
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.ChargifyException.RateLimitHeaders">
+            <summary>
+            Any <c>X-RateLimit-*</c> headers returned with the failed response. Empty if none.
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.ChargifyException.RetryAfter">
+            <summary>
+            The value of the <c>Retry-After</c> header (typically sent with 429 or 503), if present.
+            </summary>
+        </member>
         <member name="P:ChargifyDotNet.ChargifyException.StatusDescription">
             <summary>
             Get the status description
@@ -2444,6 +2575,12 @@
         <member name="P:ChargifyDotNet.ChargifyException.ErrorMessages">
             <summary>
             List of ChargifyErrors returned from Chargify.
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.ChargifyException.Message">
+            <summary>
+            The exception message, followed by any error messages Chargify returned so that
+            test runners and loggers that only print <see cref="P:System.Exception.Message"/> show the reason.
             </summary>
         </member>
         <member name="M:ChargifyDotNet.ChargifyException.ToString">
@@ -4564,6 +4701,11 @@
             <param name="delayCharge">(Optional) Should the charge be billed during the next assessment? Default = false</param>
             <param name="useNegativeBalance">(Optional) Should the subscription balance be taken into consideration? Default = false</param>
             <returns>The charge details</returns>
+            <remarks>
+            The <c>use_negative_balance</c> value sent to Chargify is the inverse of <paramref name="useNegativeBalance"/>:
+            passing <c>false</c> (the default) sends <c>1</c> and passing <c>true</c> sends <c>0</c>.
+            This is a long-standing quirk that existing callers depend on, so it is preserved in 1.x.
+            </remarks>
         </member>
         <member name="M:ChargifyDotNet.IChargifyConnect.CreateCoupon(ChargifyDotNet.ICoupon,System.Int32)">
             <summary>
@@ -5460,8 +5602,7 @@
         </member>
         <member name="P:ChargifyDotNet.IChargifyConnect.LastResponse">
             <summary>
-            Get a reference to the last Http Response from the chargify server. This is set after every call to
-            a Chargify Connect method
+            Always null. Since the move to HttpClient there is no HttpWebResponse to expose.
             </summary>
         </member>
         <member name="P:ChargifyDotNet.IChargifyConnect.Password">
@@ -7620,6 +7761,11 @@
         <member name="F:ChargifyDotNet.SubscriptionState.Paused">
             <summary>
             The 'paused' subscription state
+            </summary>
+        </member>
+        <member name="F:ChargifyDotNet.SubscriptionState.Awaiting_Signup">
+            <summary>
+            The 'awaiting_signup' subscription state
             </summary>
         </member>
         <member name="F:ChargifyDotNet.SubscriptionState.Unknown">
@@ -10284,6 +10430,17 @@
             </summary>
             <param name="other">The other details to compare</param>
             <returns></returns>
+        </member>
+        <member name="T:ChargifyDotNet.SensitiveDataMasker">
+            <summary>
+            Masks card data in request/response payloads before they are stored on exceptions or handed to log callbacks.
+            </summary>
+        </member>
+        <member name="M:ChargifyDotNet.SensitiveDataMasker.Mask(System.String)">
+            <summary>
+            Masks every <c>full_number</c> (all but the last 4 characters) and <c>cvv</c> (all characters)
+            value found in an XML or JSON payload. Returns the input unchanged if there is nothing to mask.
+            </summary>
         </member>
         <member name="T:ChargifyDotNet.SiteCleanupScope">
             <summary>
