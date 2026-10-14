@@ -2577,6 +2577,12 @@
             List of ChargifyErrors returned from Chargify.
             </summary>
         </member>
+        <member name="P:ChargifyDotNet.ChargifyException.Message">
+            <summary>
+            The exception message, followed by any error messages Chargify returned so that
+            test runners and loggers that only print <see cref="P:System.Exception.Message"/> show the reason.
+            </summary>
+        </member>
         <member name="M:ChargifyDotNet.ChargifyException.ToString">
             <summary>
             Pretty output for this exception
