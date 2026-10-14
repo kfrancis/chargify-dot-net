@@ -25,12 +25,6 @@ namespace ChargifyDotNet.Tests
             return Hex(hmac.ComputeHash(Encoding.UTF8.GetBytes(text)));
         }
 
-        private static string HmacAscii(string text, string key)
-        {
-            using var hmac = new HMACSHA256(Encoding.ASCII.GetBytes(key));
-            return Hex(hmac.ComputeHash(Encoding.ASCII.GetBytes(text)));
-        }
-
         private static string Md5(string text, string key)
         {
             using var md5 = MD5.Create();
@@ -135,10 +129,52 @@ namespace ChargifyDotNet.Tests
         [TestMethod]
         public void Stream_ValidSignature_EitherCase_ReturnsTrue()
         {
-            var signature = HmacAscii(Body, SharedKey);
+            var signature = HmacUtf8(Body, SharedKey);
 
             StreamOf(Body).IsWebhookRequestValid(SharedKey, signature).ShouldBeTrue();
             StreamOf(Body).IsWebhookRequestValid(SharedKey, signature.ToUpperInvariant()).ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void Stream_NonAsciiBody_Verifies()
+        {
+            const string body = "payload[customer][first_name]=Zoë&payload[customer][last_name]=Ångström-Müller&payload[customer][organization]=Café Señor 日本";
+
+            StreamOf(body).IsWebhookRequestValid(SharedKey, HmacUtf8(body, SharedKey)).ShouldBeTrue();
+            UsefulExtensions.CalculateHMAC256Signature(body, SharedKey).ShouldBe(HmacUtf8(body, SharedKey));
+        }
+
+        [TestMethod]
+        public void Stream_NonAsciiBody_SignatureOverAsciiMangledBody_IsRejected()
+        {
+            // The old implementation hashed the body as ASCII ("Zo?"), so it would only accept this wrong signature.
+            const string body = "payload[customer][first_name]=Zoë";
+
+            StreamOf(body).IsWebhookRequestValid(SharedKey, HmacUtf8("payload[customer][first_name]=Zo?", SharedKey)).ShouldBeFalse();
+        }
+
+        [TestMethod]
+        public void Stream_HashesRawBytes_NotDecodedText()
+        {
+            // A body that is not valid UTF-8 (Latin-1 "é") must still be verified against its exact bytes.
+            var bytes = new byte[] { (byte)'n', (byte)'a', (byte)'m', (byte)'e', (byte)'=', 0xE9 };
+            using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(SharedKey));
+            var signature = Hex(hmac.ComputeHash(bytes));
+
+            new MemoryStream(bytes).IsWebhookRequestValid(SharedKey, signature).ShouldBeTrue();
+        }
+
+        [TestMethod]
+        public void Stream_IsLeftOpenAndRewound()
+        {
+            var stream = StreamOf(Body);
+            stream.Position = 5; // already partially read by the host
+
+            stream.IsWebhookRequestValid(SharedKey, HmacUtf8(Body, SharedKey)).ShouldBeTrue();
+
+            stream.CanRead.ShouldBeTrue();
+            stream.Position.ShouldBe(0);
+            new StreamReader(stream).ReadToEnd().ShouldBe(Body);
         }
 
         [TestMethod]
@@ -146,7 +182,7 @@ namespace ChargifyDotNet.Tests
         {
             var signature = UsefulExtensions.CalculateHMAC256Signature(Body, SharedKey);
 
-            signature.ShouldBe(HmacAscii(Body, SharedKey));
+            signature.ShouldBe(HmacUtf8(Body, SharedKey));
             StreamOf(Body).IsWebhookRequestValid(SharedKey, signature).ShouldBeTrue();
         }
 
@@ -162,8 +198,8 @@ namespace ChargifyDotNet.Tests
         [TestMethod]
         public void Stream_WrongSignatureOrEmptyBody_ReturnsFalse()
         {
-            StreamOf(Body).IsWebhookRequestValid(SharedKey, FlipLastChar(HmacAscii(Body, SharedKey))).ShouldBeFalse();
-            StreamOf(string.Empty).IsWebhookRequestValid(SharedKey, HmacAscii(string.Empty, SharedKey)).ShouldBeFalse();
+            StreamOf(Body).IsWebhookRequestValid(SharedKey, FlipLastChar(HmacUtf8(Body, SharedKey))).ShouldBeFalse();
+            StreamOf(string.Empty).IsWebhookRequestValid(SharedKey, HmacUtf8(string.Empty, SharedKey)).ShouldBeFalse();
         }
 
         // --- FixedTimeEqualsHex ---

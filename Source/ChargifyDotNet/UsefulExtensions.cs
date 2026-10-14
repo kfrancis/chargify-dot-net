@@ -239,39 +239,42 @@ namespace ChargifyDotNet
         /// <summary>
         /// Determine if the webhook request is valid by calculating the expected signature and comparing it
         /// </summary>
-        /// <param name="requestStream">The request stream</param>
+        /// <param name="requestStream">The request stream. It is read from the start (when seekable) and left open,
+        /// positioned at the start, so the caller can still read the body.</param>
         /// <param name="sharedKey">The site shared key from Chargify</param>
         /// <param name="givenSignature">The signature returned along side the webhook for verification (hex, either case)</param>
         /// <returns>True if verified, false otherwise (including a missing or malformed signature).</returns>
         public static bool IsWebhookRequestValid(this Stream requestStream, string sharedKey, string? givenSignature = null)
         {
-            string possibleData;
-            using (StreamReader sr = new(requestStream))
+            // Chargify signs the raw request body, so hash the bytes as received rather than decoding and
+            // re-encoding them (which mangled non-ASCII characters such as accented names).
+            if (requestStream.CanSeek) requestStream.Position = 0;
+            byte[] body;
+            using (var buffer = new MemoryStream())
             {
-                requestStream.Position = 0;
-                possibleData = sr.ReadToEnd();
+                requestStream.CopyTo(buffer);
+                body = buffer.ToArray();
             }
+            if (requestStream.CanSeek) requestStream.Position = 0;
 
-            if (string.IsNullOrEmpty(possibleData)) return false;
+            if (body.Length == 0) return false;
 
-            // Same encoding as CalculateHMAC256Signature, so results match that method.
-            ASCIIEncoding encoding = new();
-            var expected = ComputeHmacSha256(encoding.GetBytes(sharedKey), encoding.GetBytes(possibleData));
+            var expected = ComputeHmacSha256(Encoding.UTF8.GetBytes(sharedKey), body);
             return FixedTimeEqualsHex(expected, givenSignature);
         }
 
         /// <summary>
-        /// Method to calculate the expected HMAC-SHA256 signture of a body of text using the site's sharedKey
+        /// Method to calculate the expected HMAC-SHA256 signature of a body of text using the site's sharedKey.
+        /// The text and key are UTF-8 encoded (identical to the previous ASCII encoding for ASCII-only input).
         /// </summary>
         /// <param name="text">The text to run through the hashing algorithm</param>
         /// <param name="secret">The secret used to seed the hash</param>
         /// <returns>The hex hash of the passed in text</returns>
         public static string CalculateHMAC256Signature(string text, string secret)
         {
-            ASCIIEncoding encoding = new();
-            var keyByte = encoding.GetBytes(secret);
+            var keyByte = Encoding.UTF8.GetBytes(secret);
 
-            var messageBytes = encoding.GetBytes(text);
+            var messageBytes = Encoding.UTF8.GetBytes(text);
             var hashMessage = ComputeHmacSha256(keyByte, messageBytes);
             var hexaHash = string.Empty;
             foreach (var b in hashMessage) { hexaHash += string.Format("{0:x2}", b); }
