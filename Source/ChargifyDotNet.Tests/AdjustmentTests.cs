@@ -40,11 +40,12 @@ namespace ChargifyDotNetTests
             {
                 result = Chargify.CreateAdjustment(subscription.SubscriptionID, amount, memo);
             }
-            ISubscription postAdjustmentSubscription;
+            ISubscription? postAdjustmentSubscription;
             using (Step("Reload subscription"))
             {
                 postAdjustmentSubscription = Chargify.LoadSubscription(subscription.SubscriptionID);
             }
+            Assert.IsNotNull(postAdjustmentSubscription);
 
             // Assert
             using (Step("Assertions"))
@@ -91,11 +92,12 @@ namespace ChargifyDotNetTests
             {
                 result = Chargify.CreateAdjustment(subscription.SubscriptionID, amount, memo);
             }
-            ISubscription postAdjustmentSubscription;
+            ISubscription? postAdjustmentSubscription;
             using (Step("Reload subscription"))
             {
                 postAdjustmentSubscription = Chargify.LoadSubscription(subscription.SubscriptionID);
             }
+            Assert.IsNotNull(postAdjustmentSubscription);
 
             // Assert
             using (Step("Assertions"))

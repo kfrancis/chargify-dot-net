@@ -962,7 +962,7 @@ namespace ChargifyDotNet
         /// <param name="accountingCode">The accounting code used for this product</param>
         /// <param name="description">The product description</param>
         /// <returns>The created product</returns>
-        public IProduct CreateProduct(int productFamilyId, string name, string handle, int priceInCents, int interval, IntervalUnit intervalUnit, string accountingCode, string description)
+        public IProduct CreateProduct(int productFamilyId, string name, string handle, int priceInCents, int interval, IntervalUnit intervalUnit, string? accountingCode, string? description)
         {
             // make sure data is valid
             if (string.IsNullOrEmpty(name)) throw new ArgumentNullException(nameof(name));
@@ -977,7 +977,7 @@ namespace ChargifyDotNet
                 productXml.AppendFormat("<interval_unit>{0}</interval_unit>", intervalUnitName.ToLowerInvariant());
             if (!string.IsNullOrEmpty(handle)) productXml.AppendFormat("<handle>{0}</handle>", handle);
             if (!string.IsNullOrEmpty(accountingCode)) productXml.AppendFormat("<accounting_code>{0}</accounting_code>", accountingCode);
-            if (!string.IsNullOrEmpty(description)) productXml.AppendFormat("<description>{0}</description>", PCLWebUtility.WebUtility.HtmlEncode(description));
+            if (description is { Length: > 0 }) productXml.AppendFormat("<description>{0}</description>", PCLWebUtility.WebUtility.HtmlEncode(description));
             productXml.Append("</product>");
             // now make the request
             var response = DoRequest(string.Format("product_families/{0}/products.{1}", productFamilyId, GetMethodExtension()), HttpRequestMethod.Post, productXml.ToString());

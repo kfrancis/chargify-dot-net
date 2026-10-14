@@ -25,6 +25,7 @@ namespace ChargifyDotNetTests
 
             // Act
             var result = Chargify.LoadStatementPDF(statementIDs.FirstOrDefault());
+            Assert.IsNotNull(result, "Statement PDF not found");
 
             var tempPath = Path.GetTempPath();
             var filePath = string.Format(@"{0}{1}.pdf", tempPath, statementIDs.FirstOrDefault());

@@ -702,7 +702,7 @@ namespace ChargifyDotNet
         /// Equals operator for two subscriptions
         /// </summary>
         /// <returns>True if the subscriptions are equal</returns>
-        public static bool operator ==(Subscription a, Subscription b)
+        public static bool operator ==(Subscription? a, Subscription? b)
         {
             // If both are null, or both are same instance, return true.
             if (ReferenceEquals(a, b)) { return true; }
@@ -717,7 +717,7 @@ namespace ChargifyDotNet
         /// Equals operator for two subscriptions
         /// </summary>
         /// <returns>True if the subscriptions are equal</returns>
-        public static bool operator ==(Subscription a, ISubscription b)
+        public static bool operator ==(Subscription? a, ISubscription? b)
         {
             // If both are null, or both are same instance, return true.
             if (ReferenceEquals(a, b)) { return true; }
@@ -732,7 +732,7 @@ namespace ChargifyDotNet
         /// Equals operator for two subscriptions
         /// </summary>
         /// <returns>True if the subscriptions are equal</returns>
-        public static bool operator ==(ISubscription a, Subscription b)
+        public static bool operator ==(ISubscription? a, Subscription? b)
         {
             // If both are null, or both are same instance, return true.
             if (ReferenceEquals(a, b)) { return true; }
@@ -747,7 +747,7 @@ namespace ChargifyDotNet
         /// Not Equals operator for two subscriptions
         /// </summary>
         /// <returns>True if the subscriptions are not equal</returns>
-        public static bool operator !=(Subscription a, Subscription b)
+        public static bool operator !=(Subscription? a, Subscription? b)
         {
             return !(a == b);
         }
@@ -756,7 +756,7 @@ namespace ChargifyDotNet
         /// Not Equals operator for two subscriptions
         /// </summary>
         /// <returns>True if the subscriptions are not equal</returns>
-        public static bool operator !=(Subscription a, ISubscription b)
+        public static bool operator !=(Subscription? a, ISubscription? b)
         {
             return !(a == b);
         }
@@ -765,7 +765,7 @@ namespace ChargifyDotNet
         /// Not Equals operator for two subscriptions
         /// </summary>
         /// <returns>True if the subscriptions are not equal</returns>
-        public static bool operator !=(ISubscription a, Subscription b)
+        public static bool operator !=(ISubscription? a, Subscription? b)
         {
             return !(a == b);
         }

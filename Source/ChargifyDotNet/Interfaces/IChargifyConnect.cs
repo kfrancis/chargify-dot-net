@@ -431,7 +431,7 @@ namespace ChargifyDotNet
         /// <param name="AccountingCode">The accounting code used for this product</param>
         /// <param name="Description">The product description</param>
         /// <returns>The created product</returns>
-        IProduct CreateProduct(int ProductFamilyID, string Name, string Handle, int PriceInCents, int Interval, IntervalUnit IntervalUnit, string AccountingCode, string Description);
+        IProduct CreateProduct(int ProductFamilyID, string Name, string Handle, int PriceInCents, int Interval, IntervalUnit IntervalUnit, string? AccountingCode, string? Description);
         #endregion
 
         #region Renewal Preview

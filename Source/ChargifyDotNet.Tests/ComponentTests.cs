@@ -39,9 +39,11 @@ namespace ChargifyDotNetTests
             Assert.IsNotNull(components);
             //Assert.IsInstanceOfType(components, typeof(List<IComponentInfo>));
             Assert.IsTrue(components.Where(c => c.Prices.Any()).Any());
-            Assert.AreNotEqual(int.MinValue, components.FirstOrDefault(c => c.Prices is { Count: > 0 }).Prices.First().StartingQuantity);
-            Assert.AreNotEqual(int.MinValue, components.FirstOrDefault(c => c.Prices is { Count: > 0 }).Prices.First().EndingQuantity);
-            Assert.AreNotEqual(int.MinValue, components.FirstOrDefault(c => c.Prices is { Count: > 0 }).Prices.First().UnitPrice);
+            var pricedComponent = components.FirstOrDefault(c => c.Prices is { Count: > 0 });
+            Assert.IsNotNull(pricedComponent);
+            Assert.AreNotEqual(int.MinValue, pricedComponent.Prices.First().StartingQuantity);
+            Assert.AreNotEqual(int.MinValue, pricedComponent.Prices.First().EndingQuantity);
+            Assert.AreNotEqual(int.MinValue, pricedComponent.Prices.First().UnitPrice);
 
             SetJson(!isJson);
         }
@@ -297,6 +299,7 @@ namespace ChargifyDotNetTests
 
             var defaultPricePoint = pricePoints.FirstOrDefault(x => x.Default == true);
             var firstNonDefaultPricePoint = pricePoints.FirstOrDefault(x => x.Default != true);
+            if (defaultPricePoint is null || firstNonDefaultPricePoint is null) Assert.Inconclusive("Need a default and a non-default price point.");
 
             var result = Chargify.SetPricePointDefault(defaultPricePoint.ComponentId, firstNonDefaultPricePoint.Id);
 
@@ -355,6 +358,7 @@ namespace ChargifyDotNetTests
             var subscriptionComponent = Chargify.GetComponentInfoForSubscription(subscription.SubscriptionID, 1526150);
 
             var pricePoints = Chargify.GetPricePoints(subscriptionComponent.ComponentID)?.Values.ToList();
+            if (pricePoints is null) Assert.Inconclusive("No price points found.");
 
             var defaultPricePoint = pricePoints.FirstOrDefault(x => !x.IsArchived);
             if (defaultPricePoint == null) Assert.Inconclusive("No unarchived price points to unarchive.");
@@ -407,6 +411,7 @@ namespace ChargifyDotNetTests
             var subscriptionComponent = Chargify.GetComponentInfoForSubscription(subscription.SubscriptionID, 1526150);
 
             var pricePoints = Chargify.GetPricePoints(subscriptionComponent.ComponentID)?.Values.ToList();
+            if (pricePoints is null) Assert.Inconclusive("No price points found.");
 
             var defaultPricePoint = pricePoints.FirstOrDefault(x => x.IsArchived);
             if (defaultPricePoint == null) Assert.Inconclusive("No archived price points to unarchive.");
@@ -435,10 +440,12 @@ namespace ChargifyDotNetTests
             var subscriptionComponent = Chargify.GetComponentInfoForSubscription(subscription.SubscriptionID, 1526150);
 
             var pricePoints = Chargify.GetPricePoints(subscriptionComponent.ComponentID)?.Values.ToList();
+            if (pricePoints is null) Assert.Inconclusive("No price points found.");
             var firstPricePoint = pricePoints.FirstOrDefault();
             if (firstPricePoint == null) Assert.Inconclusive();
 
             var firstPrice = firstPricePoint.Prices.FirstOrDefault();
+            if (firstPrice is null) Assert.Inconclusive("Price point has no prices.");
             firstPrice.UnitPrice += 1;
 
             //Chargify.UpdatePriceInPricePoint(subscriptionComponent.ComponentID, firstPrice);

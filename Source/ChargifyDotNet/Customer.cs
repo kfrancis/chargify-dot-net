@@ -301,7 +301,7 @@ namespace ChargifyDotNet
         /// Equals operator for two customers
         /// </summary>
         /// <returns>True if the Customers are equal</returns>
-        public static bool operator ==(Customer a, Customer b)
+        public static bool operator ==(Customer? a, Customer? b)
         {
             // If both are null or both are the same instance, return true.
             if (ReferenceEquals(a, b)) return true;
@@ -333,7 +333,7 @@ namespace ChargifyDotNet
         /// Equals operator for two customers
         /// </summary>
         /// <returns>True if the Customers are equal</returns>
-        public static bool operator ==(Customer a, ICustomer b)
+        public static bool operator ==(Customer? a, ICustomer? b)
         {
             // If both are null or both are the same instance, return true.
             if (ReferenceEquals(a, b)) return true;
@@ -365,7 +365,7 @@ namespace ChargifyDotNet
         /// Equals operator for two customers
         /// </summary>
         /// <returns>True if the Customers are equal</returns>
-        public static bool operator ==(ICustomer a, Customer b)
+        public static bool operator ==(ICustomer? a, Customer? b)
         {
             // If both are null or both are the same instance, return true.
             if (ReferenceEquals(a, b)) return true;
@@ -397,7 +397,7 @@ namespace ChargifyDotNet
         /// Not Equals operator for two customers
         /// </summary>
         /// <returns>True if the Customers are not equal</returns>
-        public static bool operator !=(Customer a, Customer b)
+        public static bool operator !=(Customer? a, Customer? b)
         {
             return !(a == b);
         }
@@ -406,7 +406,7 @@ namespace ChargifyDotNet
         /// Not Equals operator for two customers
         /// </summary>
         /// <returns>True if the Customers are not equal</returns>
-        public static bool operator !=(Customer a, ICustomer b)
+        public static bool operator !=(Customer? a, ICustomer? b)
         {
             return !(a == b);
         }
@@ -415,7 +415,7 @@ namespace ChargifyDotNet
         /// Not Equals operator for two customers
         /// </summary>
         /// <returns>True if the Customers are not equal</returns>
-        public static bool operator !=(ICustomer a, Customer b)
+        public static bool operator !=(ICustomer? a, Customer? b)
         {
             return !(a == b);
         }

@@ -669,7 +669,7 @@ namespace ChargifyDotNet
         /// Equals operator for two products
         /// </summary>
         /// <returns>True if the products are equal</returns>
-        public static bool operator ==(Product a, Product b)
+        public static bool operator ==(Product? a, Product? b)
         {
             // If both are null, or both are same instance, return true.
             if (ReferenceEquals(a, b)) { return true; }
@@ -684,7 +684,7 @@ namespace ChargifyDotNet
         /// Unequal operator for two products
         /// </summary>
         /// <returns>True if the products are unequal</returns>
-        public static bool operator !=(Product a, Product b)
+        public static bool operator !=(Product? a, Product? b)
         {
             return !(a == b);
         }
@@ -693,7 +693,7 @@ namespace ChargifyDotNet
         /// Equals operator for two products
         /// </summary>
         /// <returns>True if the products are equal</returns>
-        public static bool operator ==(Product a, IProduct b)
+        public static bool operator ==(Product? a, IProduct? b)
         {
             // If both are null, or both are same instance, return true.
             if (ReferenceEquals(a, b)) { return true; }
@@ -708,7 +708,7 @@ namespace ChargifyDotNet
         /// Unequals operator for two products
         /// </summary>
         /// <returns>True if the products are unequal</returns>
-        public static bool operator !=(Product a, IProduct b)
+        public static bool operator !=(Product? a, IProduct? b)
         {
             return !(a == b);
         }
@@ -717,7 +717,7 @@ namespace ChargifyDotNet
         /// Equals operator for two products
         /// </summary>
         /// <returns>True if the products are equal</returns>
-        public static bool operator ==(IProduct a, Product b)
+        public static bool operator ==(IProduct? a, Product? b)
         {
             // If both are null, or both are same instance, return true.
             if (ReferenceEquals(a, b)) { return true; }
@@ -732,7 +732,7 @@ namespace ChargifyDotNet
         /// Unequal operator for two products
         /// </summary>
         /// <returns>True if the products are unequal</returns>
-        public static bool operator !=(IProduct a, Product b)
+        public static bool operator !=(IProduct? a, Product? b)
         {
             return !(a == b);
         }

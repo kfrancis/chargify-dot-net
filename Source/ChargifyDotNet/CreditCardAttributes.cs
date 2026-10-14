@@ -102,7 +102,7 @@ namespace ChargifyDotNet
         /// Equals operator for two credit card attributes
         /// </summary>
         /// <returns>True if the credit card attributes are equal</returns>
-        public static bool operator ==(CreditCardAttributes a, CreditCardAttributes b)
+        public static bool operator ==(CreditCardAttributes? a, CreditCardAttributes? b)
         {
             // If both are null, or both are same instance, return true.
             if (ReferenceEquals(a, b)) { return true; }
@@ -125,7 +125,7 @@ namespace ChargifyDotNet
         /// Unequal operator for two credit card attributes
         /// </summary>
         /// <returns>True if the credit card attributes are unequal</returns>
-        public static bool operator !=(CreditCardAttributes a, CreditCardAttributes b)
+        public static bool operator !=(CreditCardAttributes? a, CreditCardAttributes? b)
         {
             return !(a == b);
         }
@@ -134,7 +134,7 @@ namespace ChargifyDotNet
         /// Equals operator for two credit card attributes
         /// </summary>
         /// <returns>True if the credit card attributes are equal</returns>
-        public static bool operator ==(ICreditCardAttributes a, CreditCardAttributes b)
+        public static bool operator ==(ICreditCardAttributes? a, CreditCardAttributes? b)
         {
             // If both are null, or both are same instance, return true.
             if (ReferenceEquals(a, b)) { return true; }
@@ -157,7 +157,7 @@ namespace ChargifyDotNet
         /// Unequal operator for two credit card attributes
         /// </summary>
         /// <returns>True if the credit card attributes are unequal</returns>
-        public static bool operator !=(ICreditCardAttributes a, CreditCardAttributes b)
+        public static bool operator !=(ICreditCardAttributes? a, CreditCardAttributes? b)
         {
             return !(a == b);
         }
@@ -166,7 +166,7 @@ namespace ChargifyDotNet
         /// Equals operator for two credit card attributes
         /// </summary>
         /// <returns>True if the credit card attributes are equal</returns>
-        public static bool operator ==(CreditCardAttributes a, ICreditCardAttributes b)
+        public static bool operator ==(CreditCardAttributes? a, ICreditCardAttributes? b)
         {
             // If both are null, or both are same instance, return true.
             if (ReferenceEquals(a, b)) { return true; }
@@ -189,7 +189,7 @@ namespace ChargifyDotNet
         /// Unequal operator for two credit card attributes
         /// </summary>
         /// <returns>True if the credit card attributes are unequal</returns>
-        public static bool operator !=(CreditCardAttributes a, ICreditCardAttributes b)
+        public static bool operator !=(CreditCardAttributes? a, ICreditCardAttributes? b)
         {
             return !(a == b);
         }

@@ -18,7 +18,7 @@ namespace ChargifyDotNetTests
             if (productFamilyList.Count == 0)
             {
                 var newProductFamilyId = Guid.NewGuid().ToString();
-                var newProductFamily = Chargify.CreateProductFamily(new ProductFamily(newProductFamilyId, newProductFamilyId, null, null));
+                var newProductFamily = Chargify.CreateProductFamily(new ProductFamily(newProductFamilyId, newProductFamilyId, string.Empty, string.Empty));
                 familyId = newProductFamily.ID;
             }
             else
@@ -45,7 +45,7 @@ namespace ChargifyDotNetTests
             var customerId = long.MinValue;
             var customerList = Chargify.GetCustomerList();
             var referenceID = Guid.NewGuid().ToString();
-            Customer customer = null;
+            Customer? customer = null;
             if (customerList.Count == 0)
             {
                 var newCustomer = new Customer()
@@ -65,11 +65,13 @@ namespace ChargifyDotNetTests
                 };
 
                 customer = Chargify.CreateCustomer(newCustomer) as Customer;
+                Assert.IsNotNull(customer);
                 customerId = customer.ChargifyID;
             }
             else
             {
                 customer = customerList.FirstOrDefault().Value as Customer;
+                Assert.IsNotNull(customer);
                 customerId = customer.ChargifyID;
             }
 

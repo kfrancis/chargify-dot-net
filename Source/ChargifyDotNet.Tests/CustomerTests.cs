@@ -565,6 +565,7 @@ namespace ChargifyDotNetTests
             var customers = Chargify.GetCustomerList().Keys;
             // Load test customer via reference value (ASP.NET Membership ID)
             var referenceValue = customers.FirstOrDefault(systemID => !string.IsNullOrWhiteSpace(systemID));
+            Assert.IsNotNull(referenceValue, "No customer with a reference value found");
             var customer = Chargify.LoadCustomer(referenceValue);
             Assert.IsNotNull(customer);
             Assert.AreEqual(false, string.IsNullOrWhiteSpace(customer.FirstName));
@@ -612,7 +613,9 @@ namespace ChargifyDotNetTests
             // Arrange
             var customers = Chargify.GetCustomerList().Keys;
             var referenceValue = customers.FirstOrDefault(systemID => !string.IsNullOrWhiteSpace(systemID));
+            Assert.IsNotNull(referenceValue, "No customer with a reference value found");
             var customer = Chargify.LoadCustomer(referenceValue);
+            Assert.IsNotNull(customer, "Customer not found");
 
             // Act
             var updatedCustomer = Chargify.UpdateCustomer(customer);
@@ -636,6 +639,7 @@ namespace ChargifyDotNetTests
             var customers = Chargify.GetCustomerList().Keys;
             // Load test customer via reference value (ASP.NET Membership ID)
             var referenceValue = customers.FirstOrDefault(systemID => !string.IsNullOrWhiteSpace(systemID));
+            Assert.IsNotNull(referenceValue, "No customer with a reference value found");
             var customer = Chargify.LoadCustomer(referenceValue);
             Assert.IsNotNull(customer);
 

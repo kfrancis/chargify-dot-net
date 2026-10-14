@@ -68,7 +68,7 @@ namespace ChargifyDotNetTests
             Assert.AreEqual("basic", basicProduct.Handle);
             Assert.IsNotNull(basicProduct.PublicSignupPages);
             Assert.IsNotEmpty(basicProduct.PublicSignupPages);
-            Assert.IsFalse(string.IsNullOrWhiteSpace(basicProduct.PublicSignupPages.FirstOrDefault().URL));
+            Assert.IsFalse(string.IsNullOrWhiteSpace(basicProduct.PublicSignupPages.First().URL));
         }
 
         [TestMethod]
@@ -90,6 +90,7 @@ namespace ChargifyDotNetTests
         {
             // Arrange
             var productFamily = Chargify.GetProductFamilyList().Values.FirstOrDefault();
+            Assert.IsNotNull(productFamily, "No product family found");
 
             // Act
             try
@@ -112,7 +113,9 @@ namespace ChargifyDotNetTests
         {
             // Arrange
             var product = Chargify.GetProductList().Values.FirstOrDefault();
+            Assert.IsNotNull(product, "No product found");
             var loadedProduct = Chargify.LoadProduct(product.Handle);
+            Assert.IsNotNull(loadedProduct, "Product not found");
 
             loadedProduct.PriceInCents = RandomProvider.GetThreadRandom().Next(100, 1000);
 
