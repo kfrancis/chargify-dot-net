@@ -116,6 +116,69 @@ namespace ChargifyDotNet
             SharedKey = sharedKey;
         }
 
+        /// <summary>
+        /// Constructor that sends all requests through the supplied <see cref="HttpClient"/>.
+        /// </summary>
+        /// <remarks>
+        /// The client is not disposed or modified by this instance (authentication, accept and user-agent headers are set
+        /// per request). <see cref="ProtocolType"/> is not applied. The client's own Timeout still applies in addition
+        /// to <see cref="Timeout"/>.
+        /// </remarks>
+        /// <param name="url">The Chargify URL</param>
+        /// <param name="apiKey">Your Chargify api key</param>
+        /// <param name="password">Your Chargify api password</param>
+        /// <param name="sharedKey">Your Chargify hosted page shared key (optional)</param>
+        /// <param name="httpClient">The HttpClient to use for every request</param>
+        public ChargifyConnect(string url, string apiKey, string password, string? sharedKey, HttpClient httpClient)
+        {
+            URL = url;
+            this.apiKey = apiKey;
+            Password = password;
+            SharedKey = sharedKey;
+            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+            _httpClientInjected = true;
+        }
+
+        /// <summary>
+        /// Constructor that sends all requests through the supplied <see cref="HttpMessageHandler"/>
+        /// (e.g. a mock handler in unit tests, or a handler from IHttpClientFactory).
+        /// </summary>
+        /// <remarks>The handler is not disposed by this instance. <see cref="ProtocolType"/> is not applied.</remarks>
+        /// <param name="url">The Chargify URL</param>
+        /// <param name="apiKey">Your Chargify api key</param>
+        /// <param name="password">Your Chargify api password</param>
+        /// <param name="sharedKey">Your Chargify hosted page shared key (optional)</param>
+        /// <param name="handler">The handler to use for every request</param>
+        public ChargifyConnect(string url, string apiKey, string password, string? sharedKey, HttpMessageHandler handler)
+        {
+            URL = url;
+            this.apiKey = apiKey;
+            Password = password;
+            SharedKey = sharedKey;
+            _injectedHandler = handler ?? throw new ArgumentNullException(nameof(handler));
+            _httpClientInjected = true;
+        }
+
+        /// <summary>
+        /// Initializes a new instance using the specified account configuration and <see cref="HttpClient"/>.
+        /// </summary>
+        /// <param name="config">The account configuration</param>
+        /// <param name="httpClient">The HttpClient to use for every request</param>
+        public ChargifyConnect(IChargifyAccountConfig config, HttpClient httpClient)
+            : this(config.Site, config.ApiKey, config.ApiPassword, config.SharedKey, httpClient)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance using the specified account configuration and <see cref="HttpMessageHandler"/>.
+        /// </summary>
+        /// <param name="config">The account configuration</param>
+        /// <param name="handler">The handler to use for every request</param>
+        public ChargifyConnect(IChargifyAccountConfig config, HttpMessageHandler handler)
+            : this(config.Site, config.ApiKey, config.ApiPassword, config.SharedKey, handler)
+        {
+        }
+
         #endregion
 
         #region Properties
@@ -163,18 +226,23 @@ namespace ChargifyDotNet
         /// Allows you to specify the specific SecurityProtocolType. If not set, then
         /// the default is used.
         /// </summary>
+        /// <remarks>Ignored when an <see cref="HttpClient"/> or <see cref="HttpMessageHandler"/> was supplied to the constructor.</remarks>
         public SecurityProtocolType? ProtocolType
         {
             get { return _protocolType; }
             set
             {
-                if (value.HasValue)
+                if (_protocolType == value) return;
+                _protocolType = value;
+
+                // The owned HttpClient's handler bakes in the protocol, so rebuild it on next use.
+                // The old client is not disposed because requests may still be in flight on it.
+                if (!_httpClientInjected)
                 {
-                    _protocolType = value;
-                }
-                else
-                {
-                    _protocolType = null;
+                    lock (_httpClientLock)
+                    {
+                        _httpClient = null;
+                    }
                 }
             }
         }
@@ -222,18 +290,46 @@ namespace ChargifyDotNet
         public Action<HttpStatusCode, string, string>? LogResponse { get; set; }
 
         /// <summary>
-        /// Get a reference to the last Http Response from the chargify server. This is set after every call to
-        /// a Chargify Connect method
+        /// Always null. Since the move to HttpClient there is no HttpWebResponse to expose.
         /// </summary>
+        [Obsolete("Always null since the move to HttpClient. Use LastStatusCode and LastResponseBody instead.")]
         public HttpWebResponse? LastResponse
         {
             get
             {
-                return _lastResponse;
+                return null;
             }
         }
 
-        private HttpWebResponse? _lastResponse;
+        /// <summary>
+        /// The HTTP status code of the last request made by this instance, or null if no response was received.
+        /// Set on every request, successful or not.
+        /// </summary>
+        /// <remarks>Not meaningful when the same instance is used concurrently from multiple threads.</remarks>
+        public HttpStatusCode? LastStatusCode => _lastStatusCode;
+
+        private HttpStatusCode? _lastStatusCode;
+
+        /// <summary>
+        /// The raw response body of the last request made by this instance, or null if no response was received
+        /// (or the response was binary, e.g. a PDF). Set on every request, successful or not.
+        /// </summary>
+        /// <remarks>Not meaningful when the same instance is used concurrently from multiple threads.</remarks>
+        public string? LastResponseBody => _lastResponseBody;
+
+        private string? _lastResponseBody;
+
+        /// <summary>
+        /// When true (the default), <see cref="CreateCharge(int, decimal, string, bool, bool)"/> loads the subscription
+        /// before posting the charge and throws <see cref="ArgumentException"/> if it does not exist.
+        /// Set to false to skip that extra GET; Chargify will then return a 404 for an unknown subscription.
+        /// </summary>
+        public bool ValidateSubscriptionBeforeCharge { get; set; } = true;
+
+        private readonly object _httpClientLock = new();
+        private HttpClient? _httpClient;
+        private readonly HttpMessageHandler? _injectedHandler;
+        private readonly bool _httpClientInjected;
 
         #endregion
 
@@ -4183,13 +4279,23 @@ namespace ChargifyDotNet
         /// <param name="useNegativeBalance">(Optional) Should the subscription balance be taken into consideration? Default = true</param>
         /// <param name="delayCharge">(Optional) Should the charge be billed during the next assessment? Default = false</param>
         /// <returns>The charge details</returns>
+        /// <remarks>
+        /// <para>
+        /// The <c>use_negative_balance</c> value sent to Chargify is the inverse of <paramref name="useNegativeBalance"/>:
+        /// passing <c>false</c> (the default) sends <c>1</c> and passing <c>true</c> sends <c>0</c>.
+        /// This is a long-standing quirk that existing callers depend on, so it is preserved in 1.x.
+        /// </para>
+        /// <para>
+        /// Unless <see cref="ValidateSubscriptionBeforeCharge"/> is false, the subscription is loaded first (an extra GET).
+        /// </para>
+        /// </remarks>
         public ICharge CreateCharge(int subscriptionId, decimal amount, string memo, bool useNegativeBalance = false, bool delayCharge = false)
         {
             // make sure data is valid
             if (amount < 0) throw new ArgumentNullException(nameof(amount)); // Chargify will throw a 422 if a negative number is in this field.
             if (string.IsNullOrEmpty(memo)) throw new ArgumentNullException(nameof(memo));
             // make sure that the SubscriptionID is unique
-            if (LoadSubscription(subscriptionId) == null) throw new ArgumentException("Not an SubscriptionID", nameof(subscriptionId));
+            if (ValidateSubscriptionBeforeCharge && LoadSubscription(subscriptionId) == null) throw new ArgumentException("Not an SubscriptionID", nameof(subscriptionId));
             // create XML for creation of a charge
             StringBuilder chargeXml = new(GetXmlStringIfApplicable());
             chargeXml.Append("<charge>");
@@ -6561,22 +6667,6 @@ namespace ChargifyDotNet
             };
             var address = uriBuilder.Uri;
 
-            using var httpClient = CreateHttpClient();
-
-            // Set timeout
-            httpClient.Timeout = TimeSpan.FromMilliseconds(180000);
-
-            // Set basic authentication
-            var credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes(apiKey + ":" + Password));
-            httpClient.DefaultRequestHeaders.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", credentials);
-
-            // Set user agent
-            if (!string.IsNullOrEmpty(UserAgent))
-            {
-                httpClient.DefaultRequestHeaders.UserAgent.TryParseAdd(UserAgent);
-            }
-
             // Prepare request content and content type
             HttpContent? content = null;
             var dataToPost = postData;
@@ -6599,10 +6689,6 @@ namespace ChargifyDotNet
                 acceptType = "application/pdf";
             }
 
-            // Set accept header
-            httpClient.DefaultRequestHeaders.Accept.Add(
-                new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue(acceptType));
-
             if (requestMethod == HttpRequestMethod.Post || requestMethod == HttpRequestMethod.Put || requestMethod == HttpRequestMethod.Delete)
             {
                 if (!string.IsNullOrEmpty(postData))
@@ -6618,89 +6704,47 @@ namespace ChargifyDotNet
                 }
             }
 
-            try
+            LogRequest?.Invoke(requestMethod, addressString, dataToPost);
+
+            // File requests have always used a fixed 3 minute timeout rather than Timeout.
+            using var response = SendRequest(address, addressString, requestMethod, content, acceptType, postData, 180000);
+            var retValue = response.Content.ReadAsByteArrayAsync().GetAwaiter().GetResult();
+            SetLastResponse(response.StatusCode, null);
+
+            LogResponse?.Invoke(response.StatusCode, addressString, string.Empty);
+
+            return retValue;
+        }
+
+        internal HttpClient GetHttpClient()
+        {
+            var client = System.Threading.Volatile.Read(ref _httpClient);
+            if (client != null) return client;
+
+            lock (_httpClientLock)
             {
-                LogRequest?.Invoke(requestMethod, addressString, dataToPost);
-
-                using var response = SendHttpRequest(httpClient, address, requestMethod, content);
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    throw new HttpRequestException($"Request failed with status code: {response.StatusCode}");
-                }
-
-                var retValue = response.Content.ReadAsByteArrayAsync().GetAwaiter().GetResult();
-
-                // Create a compatible response object for _lastResponse
-                _lastResponse = CreateCompatibleWebResponse(response);
-
-                LogResponse?.Invoke(response.StatusCode, addressString, string.Empty);
-
-                return retValue;
-            }
-            catch (HttpRequestException hex)
-            {
-                Exception? newException = null;
-
-                var sanitizedPostData = postData;
-                if (!string.IsNullOrEmpty(sanitizedPostData))
-                {
-                    if (sanitizedPostData.Contains("<full_number>"))
-                    {
-                        var xdoc = XDocument.Parse(sanitizedPostData);
-                        var fullNumberElement = xdoc.Element("subscription")?.Element("credit_card_attributes")?.Element("full_number");
-                        if (fullNumberElement != null)
-                        {
-                            fullNumberElement.Value = fullNumberElement.Value.Mask('X', 4);
-                            sanitizedPostData = xdoc.ToString();
-                        }
-                    }
-                }
-
-                // Extract status code from HttpRequestException if possible
-                var statusCode = ExtractStatusCodeFromException(hex);
-                newException = new ChargifyException(statusCode, hex.Message, hex, sanitizedPostData);
-                _lastResponse = null;
-
-                LogResponse?.Invoke(statusCode, addressString, newException.ToString());
-
-                if (newException != null)
-                {
-                    throw newException;
-                }
-                else
-                {
-                    throw;
-                }
-            }
-            finally
-            {
-                content?.Dispose();
+                _httpClient ??= CreateHttpClient();
+                return _httpClient;
             }
         }
 
         private HttpClient CreateHttpClient()
         {
-#if NET8_0_OR_GREATER
-            var handler = new HttpClientHandler();
+            if (_injectedHandler != null)
+            {
+                // The caller owns the handler; ProtocolType is not applied to it.
+                return new HttpClient(_injectedHandler, disposeHandler: false) { Timeout = System.Threading.Timeout.InfiniteTimeSpan };
+            }
 
+            var handler = new HttpClientHandler();
+#if NET8_0_OR_GREATER
             if (_protocolType != null)
             {
                 handler.SslProtocols = ConvertSecurityProtocolToSslProtocols(_protocolType.Value);
             }
-
-            return new HttpClient(handler);
-#else
-            var handler = new HttpClientHandler();
-
-            if (_protocolType != null)
-            {
-                // For netstandard2.0, we need to set this on ServicePointManager still
-                ServicePointManager.SecurityProtocol = _protocolType.Value;
-            }
-
-            return new HttpClient(handler);
 #endif
+            // Per-request timeouts are applied with a CancellationToken so Timeout can change after the first request.
+            return new HttpClient(handler) { Timeout = System.Threading.Timeout.InfiniteTimeSpan };
         }
 
 #if NET8_0_OR_GREATER
@@ -6717,38 +6761,110 @@ namespace ChargifyDotNet
         }
 #endif
 
-        private static HttpResponseMessage SendHttpRequest(HttpClient httpClient, Uri address, HttpRequestMethod requestMethod, HttpContent content)
+        private static HttpMethod ToHttpMethod(HttpRequestMethod requestMethod)
         {
             return requestMethod switch
             {
-                HttpRequestMethod.Get => httpClient.GetAsync(address).GetAwaiter().GetResult(),
-                HttpRequestMethod.Post => httpClient.PostAsync(address, content).GetAwaiter().GetResult(),
-                HttpRequestMethod.Put => httpClient.PutAsync(address, content).GetAwaiter().GetResult(),
-                HttpRequestMethod.Delete when content != null =>
-                    httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Delete, address) { Content = content }).GetAwaiter().GetResult(),
-                HttpRequestMethod.Delete => httpClient.DeleteAsync(address).GetAwaiter().GetResult(),
+                HttpRequestMethod.Get => HttpMethod.Get,
+                HttpRequestMethod.Post => HttpMethod.Post,
+                HttpRequestMethod.Put => HttpMethod.Put,
+                HttpRequestMethod.Delete => HttpMethod.Delete,
                 _ => throw new ArgumentException($"Unsupported request method: {requestMethod}")
             };
         }
 
-        private static HttpWebResponse CreateCompatibleWebResponse(HttpResponseMessage response)
+        private void SetLastResponse(HttpStatusCode? statusCode, string? body)
         {
-            // Since we can't create HttpWebResponse directly, we'll need to return null
-            // or create a wrapper class that implements the interface your code expects
-            // This depends on how _lastResponse is used elsewhere in your code
-            return null;
+            _lastStatusCode = statusCode;
+            _lastResponseBody = body;
+        }
+
+        /// <summary>
+        /// Sends a request on the shared HttpClient. Returns the response on success (caller disposes it);
+        /// on a non-success status, reads the body once and throws a <see cref="ChargifyException"/> carrying it.
+        /// </summary>
+        private HttpResponseMessage SendRequest(Uri address, string logAddress, HttpRequestMethod requestMethod, HttpContent? content,
+            string? acceptType, string? postData, int timeoutMilliseconds)
+        {
+            SetLastResponse(null, null);
+
+            using var request = new HttpRequestMessage(ToHttpMethod(requestMethod), address) { Content = content };
+            var credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes(apiKey + ":" + Password));
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", credentials);
+            if (!string.IsNullOrEmpty(UserAgent))
+            {
+                request.Headers.UserAgent.TryParseAdd(UserAgent);
+            }
+            if (acceptType != null)
+            {
+                request.Headers.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue(acceptType));
+            }
+
+#if !NET8_0_OR_GREATER
+            if (_protocolType != null)
+            {
+                // For netstandard2.0/net452, we need to set this on ServicePointManager still
+                ServicePointManager.SecurityProtocol = _protocolType.Value;
+            }
+#endif
+
+            HttpResponseMessage response;
+            using (var cts = new System.Threading.CancellationTokenSource(timeoutMilliseconds))
+            {
+                try
+                {
+                    response = GetHttpClient().SendAsync(request, cts.Token).GetAwaiter().GetResult();
+                }
+                catch (HttpRequestException hex)
+                {
+                    // No HTTP response was received (DNS, TLS, connection reset, ...).
+                    var statusCode = ExtractStatusCodeFromException(hex);
+                    var newException = new ChargifyException(statusCode, hex.Message, hex, SanitizePostData(postData));
+                    LogResponse?.Invoke(statusCode, logAddress, newException.ToString());
+                    throw newException;
+                }
+            }
+
+            if (response.IsSuccessStatusCode)
+            {
+                return response;
+            }
+
+            using (response)
+            {
+                string? errorContent = null;
+                try
+                {
+                    errorContent = response.Content?.ReadAsStringAsync().GetAwaiter().GetResult();
+                }
+                catch (Exception)
+                {
+                    // Body could not be read; still surface the status code.
+                }
+
+                SetLastResponse(response.StatusCode, errorContent);
+
+                var newException = new ChargifyException(response, errorContent,
+                    new HttpRequestException($"Request failed with status code: {response.StatusCode}"),
+                    SanitizePostData(postData));
+
+                LogResponse?.Invoke(response.StatusCode, logAddress, SensitiveDataMasker.Mask(errorContent) ?? string.Empty);
+
+                throw newException;
+            }
         }
 
         private static HttpStatusCode ExtractStatusCodeFromException(HttpRequestException hex)
         {
-            // Try to extract status code from exception message or use a default
-            // HttpRequestException in .NET 5+ has Data property that might contain status code
-            if (hex.Data.Contains("StatusCode"))
+#if NET8_0_OR_GREATER
+            if (hex.StatusCode.HasValue)
             {
-                if (hex.Data?.Contains("StatusCode") == true && Enum.TryParse<HttpStatusCode>(hex.Data["StatusCode"]!.ToString(), out var statusCode))
-                {
-                    return statusCode;
-                }
+                return hex.StatusCode.Value;
+            }
+#endif
+            if (hex.Data?.Contains("StatusCode") == true && Enum.TryParse<HttpStatusCode>(hex.Data["StatusCode"]!.ToString(), out var statusCode))
+            {
+                return statusCode;
             }
 
             // Default to BadRequest if we can't determine the actual status code
@@ -6779,22 +6895,6 @@ namespace ChargifyDotNet
             };
             var address = uriBuilder.Uri;
 
-            using var httpClient = CreateHttpClient();
-
-            // Set timeout
-            httpClient.Timeout = TimeSpan.FromMilliseconds(_timeout);
-
-            // Set basic authentication
-            var credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes(apiKey + ":" + Password));
-            httpClient.DefaultRequestHeaders.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", credentials);
-
-            // Set user agent
-            if (!string.IsNullOrEmpty(UserAgent))
-            {
-                httpClient.DefaultRequestHeaders.UserAgent.TryParseAdd(UserAgent);
-            }
-
             // Prepare request content and content type
             HttpContent? content = null;
             var dataToPost = postData;
@@ -6810,10 +6910,6 @@ namespace ChargifyDotNet
                 contentType = "application/json";
                 acceptType = "application/json";
             }
-
-            // Set accept header
-            httpClient.DefaultRequestHeaders.Accept.Add(
-                new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue(acceptType));
 
             if (requestMethod == HttpRequestMethod.Post || requestMethod == HttpRequestMethod.Put || requestMethod == HttpRequestMethod.Delete)
             {
@@ -6835,87 +6931,20 @@ namespace ChargifyDotNet
                 }
             }
 
-            try
-            {
-                LogRequest?.Invoke(requestMethod, addressString, dataToPost);
+            LogRequest?.Invoke(requestMethod, addressString, dataToPost);
 
-                using var response = SendHttpRequest(httpClient, address, requestMethod, content);
+            using var response = SendRequest(address, addressString, requestMethod, content, acceptType, postData, _timeout);
+            var retValue = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+            SetLastResponse(response.StatusCode, retValue);
 
-                if (!response.IsSuccessStatusCode)
-                {
-                    var errorContent = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-                    var sanitizedPostData = SanitizePostData(postData);
+            LogResponse?.Invoke(response.StatusCode, addressString, retValue);
 
-                    var newException = new ChargifyException(response,
-                        new HttpRequestException($"Request failed with status code: {response.StatusCode}"),
-                        sanitizedPostData);
-
-                    _lastResponse = CreateCompatibleWebResponse(response);
-                    LogResponse?.Invoke(response.StatusCode, addressString, newException.ToString());
-
-                    throw newException;
-                }
-
-                var retValue = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-
-                // Create a compatible response object for _lastResponse
-                _lastResponse = CreateCompatibleWebResponse(response);
-
-                LogResponse?.Invoke(response.StatusCode, addressString, retValue);
-
-                return retValue;
-            }
-            catch (HttpRequestException hex)
-            {
-                Exception? newException = null;
-                var sanitizedPostData = SanitizePostData(postData);
-
-                // Extract status code from HttpRequestException if possible
-                var statusCode = ExtractStatusCodeFromException(hex);
-                var statusDescription = hex.Message;
-
-                newException = new ChargifyException(statusCode, statusDescription, hex, sanitizedPostData);
-                _lastResponse = null;
-
-                LogResponse?.Invoke(statusCode, addressString, newException.ToString());
-
-                if (newException != null)
-                {
-                    throw newException;
-                }
-                else
-                {
-                    throw;
-                }
-            }
-            catch (ChargifyException)
-            {
-                // Re-throw ChargifyExceptions as-is
-                throw;
-            }
-            finally
-            {
-                content?.Dispose();
-            }
+            return retValue;
         }
 
         private static string? SanitizePostData(string? postData)
         {
-            var sanitizedPostData = postData;
-            if (sanitizedPostData != null && !string.IsNullOrEmpty(sanitizedPostData))
-            {
-                if (sanitizedPostData.Contains("<full_number>"))
-                {
-                    var xdoc = XDocument.Parse(sanitizedPostData);
-                    var fullNumberElement = xdoc.Element("subscription")?.Element("credit_card_attributes")?.Element("full_number");
-                    if (fullNumberElement != null)
-                    {
-                        fullNumberElement.Value = fullNumberElement.Value.Mask('X', 4);
-                        sanitizedPostData = xdoc.ToString();
-                    }
-                }
-            }
-            return sanitizedPostData;
+            return SensitiveDataMasker.Mask(postData);
         }
 
         private string DoNewRequest(string methodString, StringBuilder queryString)
@@ -6964,27 +6993,11 @@ namespace ChargifyDotNet
             ChargifyConnect.Require(nameof(apiKey), apiKey);
             ChargifyConnect.Require(nameof(Password), Password);
 
-            using var httpClient = CreateHttpClient();
-
-            // Set timeout
-            httpClient.Timeout = TimeSpan.FromMilliseconds(_timeout);
-
-            // Set basic authentication
-            var credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes(apiKey + ":" + Password));
-            httpClient.DefaultRequestHeaders.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", credentials);
-
-            // Set user agent
-            if (!string.IsNullOrEmpty(UserAgent))
-            {
-                httpClient.DefaultRequestHeaders.UserAgent.TryParseAdd(UserAgent);
-            }
-
             // Prepare request content and content type
             HttpContent? content = null;
             string? postData = null;
             string? contentType = null;
-            string? acceptType;
+            string? acceptType = null;
 
             if (body != null)
             {
@@ -7014,10 +7027,6 @@ namespace ChargifyDotNet
                     contentType = "application/json";
                     acceptType = "application/json";
                 }
-
-                // Set accept header
-                httpClient.DefaultRequestHeaders.Accept.Add(
-                    new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue(acceptType));
             }
 
             if (requestMethod == HttpRequestMethod.Post || requestMethod == HttpRequestMethod.Put || requestMethod == HttpRequestMethod.Delete)
@@ -7033,68 +7042,15 @@ namespace ChargifyDotNet
                 }
             }
 
-            try
-            {
-                LogRequest?.Invoke(requestMethod, uri.AbsolutePath, postData);
+            LogRequest?.Invoke(requestMethod, uri.AbsolutePath, postData);
 
-                using var response = SendHttpRequest(httpClient, uri, requestMethod, content);
+            using var response = SendRequest(uri, uri.AbsolutePath, requestMethod, content, acceptType, postData, _timeout);
+            var retValue = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+            SetLastResponse(response.StatusCode, retValue);
 
-                if (!response.IsSuccessStatusCode)
-                {
-                    var errorContent = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-                    var sanitizedPostData = SanitizePostData(postData);
+            LogResponse?.Invoke(response.StatusCode, uri.AbsolutePath, retValue);
 
-                    var newException = new ChargifyException(response,
-                        new HttpRequestException($"Request failed with status code: {response.StatusCode}"),
-                        sanitizedPostData);
-
-                    _lastResponse = CreateCompatibleWebResponse(response);
-                    LogResponse?.Invoke(response.StatusCode, uri.AbsoluteUri, newException.ToString());
-
-                    throw newException;
-                }
-
-                var retValue = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-
-                // Create a compatible response object for _lastResponse
-                _lastResponse = CreateCompatibleWebResponse(response);
-
-                LogResponse?.Invoke(response.StatusCode, uri.AbsolutePath, retValue);
-
-                return retValue;
-            }
-            catch (HttpRequestException hex)
-            {
-                Exception? newException = null;
-                var sanitizedPostData = SanitizePostData(postData);
-
-                // Extract status code from HttpRequestException if possible
-                var statusCode = ExtractStatusCodeFromException(hex);
-                var statusDescription = hex.Message;
-
-                newException = new ChargifyException(statusCode, statusDescription, hex, sanitizedPostData);
-                _lastResponse = null;
-
-                LogResponse?.Invoke(statusCode, uri.AbsoluteUri, newException.ToString());
-
-                if (newException != null)
-                {
-                    throw newException;
-                }
-                else
-                {
-                    throw;
-                }
-            }
-            catch (ChargifyException)
-            {
-                // Re-throw ChargifyExceptions as-is
-                throw;
-            }
-            finally
-            {
-                content?.Dispose();
-            }
+            return retValue;
         }
 
         #endregion

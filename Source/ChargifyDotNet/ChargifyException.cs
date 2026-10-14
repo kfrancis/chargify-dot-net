@@ -54,6 +54,12 @@ namespace ChargifyDotNet
         /// </summary>
         public string Message { get; private set; }
 
+        /// <summary>
+        /// The field the error relates to, when Chargify returned field-keyed errors
+        /// (e.g. <c>{"errors":{"amount":["must be greater than 0"]}}</c>). Null otherwise.
+        /// </summary>
+        public string? Field { get; private set; }
+
         #region Constructors
         /// <summary>
         /// Constructor
@@ -114,13 +120,91 @@ namespace ChargifyDotNet
             return errors;
         }
 
-        private static List<ChargifyError> ParseErrorsFromContent(string content)
+        /// <summary>
+        /// Parses the error messages out of a Chargify error response body.
+        /// </summary>
+        /// <remarks>
+        /// Supports <c>&lt;errors&gt;&lt;error&gt;msg&lt;/error&gt;&lt;/errors&gt;</c>,
+        /// <c>{"errors":["msg"]}</c> and <c>{"errors":{"field":["msg"]}}</c>.
+        /// Unknown or unparseable content yields an empty list; this method never throws.
+        /// </remarks>
+        /// <param name="content">The raw response body</param>
+        /// <returns>The list of errors, possibly empty</returns>
+        internal static List<ChargifyError> ParseErrorsFromContent(string? content)
         {
-            // Move your existing parsing logic here so it can be shared
-            // between the HttpWebResponse and HttpResponseMessage versions
             var errors = new List<ChargifyError>();
-            // ... your parsing logic
+            if (content == null || string.IsNullOrWhiteSpace(content)) return errors;
+
+            try
+            {
+                var trimmed = content.Trim();
+                if (trimmed.StartsWith("<", StringComparison.Ordinal))
+                {
+                    ParseXmlErrors(trimmed, errors);
+                }
+                else if (trimmed.StartsWith("{", StringComparison.Ordinal) || trimmed.StartsWith("[", StringComparison.Ordinal))
+                {
+                    ParseJsonErrors(trimmed, errors);
+                }
+            }
+            catch
+            {
+                // Never throw from error parsing; the raw body is still available on the exception.
+                errors.Clear();
+            }
+
             return errors;
+        }
+
+        private static void ParseXmlErrors(string content, List<ChargifyError> errors)
+        {
+            var xdoc = XDocument.Parse(content);
+            var errorElements = xdoc.Descendants("error").ToList();
+            if (errorElements.Count == 0)
+            {
+                // e.g. <errors>Some message</errors>
+                errorElements = xdoc.Descendants("errors").Where(e => !e.HasElements).ToList();
+            }
+
+            foreach (var element in errorElements)
+            {
+                AddError(errors, element.Value, null);
+            }
+        }
+
+        private static void ParseJsonErrors(string content, List<ChargifyError> errors)
+        {
+            var token = Newtonsoft.Json.Linq.JToken.Parse(content);
+            var errorsToken = token is Newtonsoft.Json.Linq.JObject obj ? obj["errors"] : token;
+            AddJsonErrors(errors, errorsToken, null);
+        }
+
+        private static void AddJsonErrors(List<ChargifyError> errors, Newtonsoft.Json.Linq.JToken? token, string? field)
+        {
+            switch (token)
+            {
+                case null:
+                    return;
+                case Newtonsoft.Json.Linq.JArray array:
+                    foreach (var item in array) AddJsonErrors(errors, item, field);
+                    return;
+                case Newtonsoft.Json.Linq.JObject obj:
+                    foreach (var property in obj.Properties()) AddJsonErrors(errors, property.Value, property.Name);
+                    return;
+                case Newtonsoft.Json.Linq.JValue value when value.Type != Newtonsoft.Json.Linq.JTokenType.Null:
+                    AddError(errors, Convert.ToString(value.Value, System.Globalization.CultureInfo.InvariantCulture), field);
+                    return;
+            }
+        }
+
+        private static void AddError(List<ChargifyError> errors, string? message, string? field)
+        {
+            if (message == null || string.IsNullOrWhiteSpace(message)) return;
+            var fullMessage = string.IsNullOrEmpty(field) || string.Equals(field, "base", StringComparison.OrdinalIgnoreCase)
+                ? message
+                : $"{field}: {message}";
+            if (errors.Any(e => e.Message == fullMessage)) return;
+            errors.Add(new ChargifyError(fullMessage) { Field = field });
         }
 
         /// <summary>
@@ -143,61 +227,7 @@ namespace ChargifyDotNet
             }
 
             using StreamReader reader = new(responseStream);
-            var errorResponse = reader.ReadToEnd();
-
-            // Response is frequently " " ...
-            if (string.IsNullOrEmpty(errorResponse.Trim())) return errors;
-
-            if (errorResponse.IsXml())
-            {
-                // New way - Linq-y
-                var xdoc = XDocument.Parse(errorResponse);
-                if (xdoc.Descendants("error").Any())
-                {
-                    var results = from e in xdoc.Descendants("error")
-                        select new ChargifyError
-                        {
-                            Message = e.Value
-                        };
-                    errors = results.ToList();
-                }
-                else
-                {
-                    var results = from e in xdoc.Descendants(nameof(errors))
-                        select new ChargifyError
-                        {
-                            Message = e.Value
-                        };
-                    errors = results.ToList();
-                }
-            }
-            else if (errorResponse.IsJSON())
-            {
-                // slightly different json response from the usual
-                var position = 0;
-                var obj = JsonObject.Parse(errorResponse, ref position);
-                if (!obj.ContainsKey(nameof(errors)) || obj[nameof(errors)] is not JsonArray { Length: > 0 } array)
-                {
-                    return errors;
-                }
-
-                for (var i = 0; i <= array.Length - 1; i++)
-                {
-                    if ((JsonString)array.Items[i] == null ||
-                        string.IsNullOrEmpty(((JsonString)array.Items[i]).Value))
-                    {
-                        continue;
-                    }
-
-                    var errorStr = array.Items[i] as JsonString;
-                    ChargifyError anError = new(errorStr);
-                    if (!errors.Contains(anError))
-                    {
-                        errors.Add(anError);
-                    }
-                }
-            }
-            return errors;
+            return ParseErrorsFromContent(reader.ReadToEnd());
         }
     }
 
@@ -248,7 +278,7 @@ namespace ChargifyDotNet
         {
             StatusDescription = errorResponse.StatusDescription;
             StatusCode = errorResponse.StatusCode;
-            LastDataPosted = postData;
+            LastDataPosted = SensitiveDataMasker.Mask(postData);
             // if there are any errors, parse them for user consumption
             ErrorMessages = ChargifyError.ParseChargifyErrors(errorResponse);
         }
@@ -279,7 +309,7 @@ namespace ChargifyDotNet
         {
             StatusDescription = statusDescription;
             StatusCode = statusCode;
-            LastDataPosted = postData;
+            LastDataPosted = SensitiveDataMasker.Mask(postData);
             ErrorMessages = new List<ChargifyError>();
         }
 
@@ -308,10 +338,85 @@ namespace ChargifyDotNet
         {
             StatusDescription = response.ReasonPhrase ?? response.StatusCode.ToString();
             StatusCode = response.StatusCode;
-            LastDataPosted = postData;
+            LastDataPosted = SensitiveDataMasker.Mask(postData);
             // Parse errors from response content if available
             ErrorMessages = ChargifyError.ParseChargifyErrors(response);
         }
+
+        /// <summary>
+        /// Constructor for HttpClient usage where the response body has already been read.
+        /// </summary>
+        /// <param name="response">The HTTP response message (status, reason and headers are taken from it; its content is not read)</param>
+        /// <param name="responseBody">The already-read response body</param>
+        /// <param name="innerException">The original exception that caused this exception</param>
+        /// <param name="postData">The data posted that could have potentially caused the exception.</param>
+        public ChargifyException(HttpResponseMessage response, string? responseBody, Exception innerException, string? postData) :
+            base($"The server returned '{response.ReasonPhrase}' with the status code {response.StatusCode} ({response.StatusCode:d}) to the last request.", innerException)
+        {
+            StatusDescription = response.ReasonPhrase ?? response.StatusCode.ToString();
+            StatusCode = response.StatusCode;
+            LastDataPosted = SensitiveDataMasker.Mask(postData);
+            ResponseBody = Truncate(SensitiveDataMasker.Mask(responseBody));
+            ErrorMessages = ChargifyError.ParseErrorsFromContent(responseBody);
+
+            var headers = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            var rateLimit = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            IEnumerable<KeyValuePair<string, IEnumerable<string>>> allHeaders = response.Headers;
+            if (response.Content != null) allHeaders = allHeaders.Concat(response.Content.Headers);
+            foreach (var header in allHeaders)
+            {
+                // Never keep cookies around on an exception that is likely to be logged.
+                if (string.Equals(header.Key, "Set-Cookie", StringComparison.OrdinalIgnoreCase)) continue;
+                var value = string.Join(", ", header.Value);
+                headers[header.Key] = value;
+                if (header.Key.StartsWith("X-RateLimit-", StringComparison.OrdinalIgnoreCase)) rateLimit[header.Key] = value;
+            }
+            ResponseHeaders = headers;
+            RateLimitHeaders = rateLimit;
+
+            var retryAfter = response.Headers.RetryAfter;
+            if (retryAfter?.Delta != null)
+            {
+                RetryAfter = retryAfter.Delta;
+            }
+            else if (retryAfter?.Date != null)
+            {
+                var delta = retryAfter.Date.Value - DateTimeOffset.UtcNow;
+                RetryAfter = delta < TimeSpan.Zero ? TimeSpan.Zero : delta;
+            }
+        }
+
+        /// <summary>
+        /// The maximum number of characters of the response body kept on <see cref="ResponseBody"/>.
+        /// </summary>
+        public const int MaxResponseBodyLength = 4096;
+
+        private static string? Truncate(string? value)
+        {
+            if (value == null || value.Length <= MaxResponseBodyLength) return value;
+            return value.Substring(0, MaxResponseBodyLength) + "...[truncated]";
+        }
+
+        /// <summary>
+        /// The raw response body returned by Chargify (card numbers masked, truncated to
+        /// <see cref="MaxResponseBodyLength"/> characters). Null if no response was received.
+        /// </summary>
+        public string? ResponseBody { get; }
+
+        /// <summary>
+        /// The response headers returned with the failed response (Set-Cookie excluded). Empty if no response was received.
+        /// </summary>
+        public IReadOnlyDictionary<string, string> ResponseHeaders { get; } = new Dictionary<string, string>();
+
+        /// <summary>
+        /// Any <c>X-RateLimit-*</c> headers returned with the failed response. Empty if none.
+        /// </summary>
+        public IReadOnlyDictionary<string, string> RateLimitHeaders { get; } = new Dictionary<string, string>();
+
+        /// <summary>
+        /// The value of the <c>Retry-After</c> header (typically sent with 429 or 503), if present.
+        /// </summary>
+        public TimeSpan? RetryAfter { get; }
 
         /// <summary>
         /// Get the status description
@@ -339,23 +444,14 @@ namespace ChargifyDotNet
         /// <returns>Request, response and errors</returns>
         public override string ToString()
         {
-            var sanitizedPostData = LastDataPosted;
-            if (!string.IsNullOrEmpty(sanitizedPostData) && sanitizedPostData.Contains("<full_number>"))
-            {
-                var xdoc = XDocument.Parse(sanitizedPostData);
-                var fullNumberElement = xdoc.Element("subscription")?.Element("credit_card_attributes")?.Element("full_number");
-                if (fullNumberElement != null)
-                {
-                    fullNumberElement.Value = fullNumberElement.Value.Mask('X', 4);
-                    sanitizedPostData = xdoc.ToString();
-                }
-            }
+            var sanitizedPostData = SensitiveDataMasker.Mask(LastDataPosted);
 
-            // Used for the LogResponse Action
             var retVal = string.Empty;
             retVal += $"Request: {sanitizedPostData}\n";
             retVal += $"Response: {StatusCode} {StatusDescription}\n";
             retVal += $"Errors: {string.Join(", ", ErrorMessages.Select(e => e.Message).ToArray())}\n";
+            if (RetryAfter.HasValue) retVal += $"Retry-After: {RetryAfter.Value}\n";
+            if (ResponseBody != null) retVal += $"Response Body: {SensitiveDataMasker.Mask(ResponseBody)}\n";
             return retVal;
         }
     }

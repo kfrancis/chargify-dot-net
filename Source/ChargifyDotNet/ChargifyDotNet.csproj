@@ -69,6 +69,10 @@
 		<Compile Update="WebhookHandler.cs" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<InternalsVisibleTo Include="ChargifyDotNet.Tests" />
+	</ItemGroup>
+
 	<PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0'">
 		<DefineConstants>NETCORE;NETSTANDARD;NETSTANDARD2_0</DefineConstants>
 	</PropertyGroup>

@@ -550,6 +550,11 @@ namespace ChargifyDotNet
         /// <param name="delayCharge">(Optional) Should the charge be billed during the next assessment? Default = false</param>
         /// <param name="useNegativeBalance">(Optional) Should the subscription balance be taken into consideration? Default = false</param>
         /// <returns>The charge details</returns>
+        /// <remarks>
+        /// The <c>use_negative_balance</c> value sent to Chargify is the inverse of <paramref name="useNegativeBalance"/>:
+        /// passing <c>false</c> (the default) sends <c>1</c> and passing <c>true</c> sends <c>0</c>.
+        /// This is a long-standing quirk that existing callers depend on, so it is preserved in 1.x.
+        /// </remarks>
         ICharge CreateCharge(int SubscriptionID, decimal amount, string memo, bool useNegativeBalance = false, bool delayCharge = false);
         #endregion
 
@@ -1386,9 +1391,9 @@ namespace ChargifyDotNet
         bool HasConnected { get; }
 
         /// <summary>
-        /// Get a reference to the last Http Response from the chargify server. This is set after every call to
-        /// a Chargify Connect method
+        /// Always null. Since the move to HttpClient there is no HttpWebResponse to expose.
         /// </summary>
+        [Obsolete("Always null since the move to HttpClient. Use ChargifyConnect.LastStatusCode and ChargifyConnect.LastResponseBody instead.")]
         HttpWebResponse? LastResponse { get; }
 
         /// <summary>
