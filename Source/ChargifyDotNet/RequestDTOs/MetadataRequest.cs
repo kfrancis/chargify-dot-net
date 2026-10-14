@@ -10,9 +10,9 @@ namespace ChargifyDotNet.RequestDTOs
     internal class MetadataRequest
     {
         [JsonProperty("value")]
-        public string Value { get; set; }
+        public string Value { get; set; } = null!;
         [JsonProperty("name")]
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         #region XmlBuilders
 

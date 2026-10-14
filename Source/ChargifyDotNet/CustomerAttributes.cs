@@ -277,7 +277,7 @@ namespace ChargifyDotNet
         /// Get or set the customer's first name
         /// </summary>
         [XmlElement("first_name")]
-        public string FirstName { get; set; }
+        public string FirstName { get; set; } = null!;
         /// <summary>
         /// Ignore, used for determining if the value should be serialized
         /// </summary>
@@ -290,7 +290,7 @@ namespace ChargifyDotNet
         /// Get or set the customer's last name
         /// </summary>
         [XmlElement("last_name")]
-        public string LastName { get; set; }
+        public string LastName { get; set; } = null!;
         /// <summary>
         /// Ignore, used for determining if the value should be serialized
         /// </summary>
@@ -303,7 +303,7 @@ namespace ChargifyDotNet
         /// Get or set the customer's email address
         /// </summary>
         [XmlElement("email")]
-        public string Email { get; set; }
+        public string Email { get; set; } = null!;
         /// <summary>
         /// Ignore, used for determining if the value should be serialized
         /// </summary>
@@ -316,7 +316,7 @@ namespace ChargifyDotNet
         /// The customer's phone number
         /// </summary>
         [XmlElement("phone")]
-        public string Phone { get; set; }
+        public string Phone { get; set; } = null!;
         /// <summary>
         /// Ignore, used for determining if the value should be serialized
         /// </summary>
@@ -329,7 +329,7 @@ namespace ChargifyDotNet
         /// Get or set the customer's organization
         /// </summary>
         [XmlElement("organization")]
-        public string Organization { get; set; }
+        public string Organization { get; set; } = null!;
         /// <summary>
         /// Ignore, used for determining if the value should be serialized
         /// </summary>
@@ -342,7 +342,7 @@ namespace ChargifyDotNet
         /// The customers vat number
         /// </summary>
         [XmlIgnore]
-        public string VatNumber { get; set; }
+        public string VatNumber { get; set; } = null!;
         /// <summary>
         /// Ignore, used for determining if the value should be serialized
         /// </summary>
@@ -355,7 +355,7 @@ namespace ChargifyDotNet
         /// The customers shipping address
         /// </summary>
         [XmlElement("address")]
-        public string ShippingAddress { get; set; }
+        public string ShippingAddress { get; set; } = null!;
         /// <summary>
         /// Ignore, used for determining if the value should be serialized
         /// </summary>
@@ -368,7 +368,7 @@ namespace ChargifyDotNet
         /// The customers shipping address 2
         /// </summary>
         [XmlElement("address_2")]
-        public string ShippingAddress2 { get; set; }
+        public string ShippingAddress2 { get; set; } = null!;
         /// <summary>
         /// Ignore, used for determining if the value should be serialized
         /// </summary>
@@ -381,7 +381,7 @@ namespace ChargifyDotNet
         /// The customers shipping city
         /// </summary>
         [XmlElement("city")]
-        public string ShippingCity { get; set; }
+        public string ShippingCity { get; set; } = null!;
         /// <summary>
         /// Ignore, used for determining if the value should be serialized
         /// </summary>
@@ -394,7 +394,7 @@ namespace ChargifyDotNet
         /// The customers shipping zip/postal code
         /// </summary>
         [XmlElement("zip")]
-        public string ShippingZip { get; set; }
+        public string ShippingZip { get; set; } = null!;
         /// <summary>
         /// Ignore, used for determining if the value should be serialized
         /// </summary>
@@ -407,7 +407,7 @@ namespace ChargifyDotNet
         /// The customers shipping state
         /// </summary>
         [XmlElement("state")]
-        public string ShippingState { get; set; }
+        public string ShippingState { get; set; } = null!;
         /// <summary>
         /// Ignore, used for determining if the value should be serialized
         /// </summary>
@@ -420,7 +420,7 @@ namespace ChargifyDotNet
         /// The customers shipping country
         /// </summary>
         [XmlElement("country")]
-        public string ShippingCountry { get; set; }
+        public string ShippingCountry { get; set; } = null!;
         /// <summary>
         /// Ignore, used for determining if the value should be serialized
         /// </summary>
@@ -470,7 +470,7 @@ namespace ChargifyDotNet
         /// Get or set the customer's cc emails
         /// </summary>
         [XmlElement("cc_emails")]
-        public string CCEmails { get; set; }
+        public string CCEmails { get; set; } = null!;
         /// <summary>
         /// Ignore, used for determining if the value should be serialized
         /// </summary>
@@ -500,8 +500,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="other">The other instance</param>
         /// <returns>The result of the comparison</returns>
-        public int CompareTo(ICustomerAttributes other)
+        public int CompareTo(ICustomerAttributes? other)
         {
+            if (other is null) return 1;
             return string.Compare(FullName, other.FullName, StringComparison.InvariantCultureIgnoreCase);
         }
 
@@ -514,8 +515,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="other">The other instance</param>
         /// <returns>The result of the comparison</returns>
-        public int CompareTo(CustomerAttributes other)
+        public int CompareTo(CustomerAttributes? other)
         {
+            if (other is null) return 1;
             return string.Compare(FullName, other.FullName, StringComparison.InvariantCultureIgnoreCase);
         }
 

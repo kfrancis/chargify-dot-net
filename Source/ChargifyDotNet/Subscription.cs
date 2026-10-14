@@ -561,7 +561,7 @@ namespace ChargifyDotNet
                 return _product;
             }
         }
-        private IProduct _product;
+        private IProduct _product = null!;
 
         /// <summary>
         /// Get the credit card information for this subscription
@@ -573,7 +573,7 @@ namespace ChargifyDotNet
                 return _paymentProfile;
             }
         }
-        private IPaymentProfileView _paymentProfile;
+        private IPaymentProfileView _paymentProfile = null!;
 
         /// <summary>
         /// Get the customer information for this subscription
@@ -585,7 +585,7 @@ namespace ChargifyDotNet
                 return _customer;
             }
         }
-        private ICustomer _customer;
+        private ICustomer _customer = null!;
 
         /// <summary>
         /// Is this subscription going to automatically cancel at the end of the current period?
@@ -786,7 +786,7 @@ namespace ChargifyDotNet
         /// Equals
         /// </summary>
         /// <param name="obj"></param>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj == null) return false;
 
@@ -824,8 +824,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="other">The other instance</param>
         /// <returns>The result of the comparison</returns>
-        public int CompareTo(ISubscription other)
+        public int CompareTo(ISubscription? other)
         {
+            if (other is null) return 1;
             return SubscriptionID.CompareTo(other.SubscriptionID);
         }
 
@@ -838,8 +839,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="other">The other instance</param>
         /// <returns>The result of the comparison</returns>
-        public int CompareTo(Subscription other)
+        public int CompareTo(Subscription? other)
         {
+            if (other is null) return 1;
             return SubscriptionID.CompareTo(other.SubscriptionID);
         }
 

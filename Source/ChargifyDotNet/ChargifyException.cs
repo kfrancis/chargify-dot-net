@@ -52,7 +52,7 @@ namespace ChargifyDotNet
         /// <summary>
         /// The message from Chargify
         /// </summary>
-        public string Message { get; private set; }
+        public string Message { get; private set; } = string.Empty;
 
         /// <summary>
         /// The field the error relates to, when Chargify returned field-keyed errors
@@ -81,7 +81,7 @@ namespace ChargifyDotNet
         /// <param name="errorNode">The XML node that contains the error message</param>
         internal ChargifyError(XmlNode errorNode)
         {
-            Message = errorNode.Value;
+            Message = errorNode.Value ?? string.Empty;
         }
 
         /// <summary>

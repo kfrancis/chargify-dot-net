@@ -313,7 +313,7 @@ namespace ChargifyDotNet
         /// The kind of transaction
         /// </summary>
         [XmlElement(KindKey), JsonProperty(KindKey)]
-        public string Kind { get; set; }
+        public string Kind { get; set; } = null!;
 
         /// <summary>
         /// The amount of the transaction in cents
@@ -331,7 +331,7 @@ namespace ChargifyDotNet
         /// The memo of the transaction
         /// </summary>
         [XmlElement(MemoKey), JsonProperty(MemoKey)]
-        public string Memo { get; set; }
+        public string Memo { get; set; } = null!;
 
         /// <summary>
         /// The discount amount in cents
@@ -358,13 +358,13 @@ namespace ChargifyDotNet
         { get { return Convert.ToDecimal(TaxableAmountInCents) / 100; } }
 
         [XmlElement(ProductHandleKey), JsonProperty(ProductHandleKey)]
-        public string ProductHandle { get; set; }
+        public string ProductHandle { get; set; } = null!;
 
         [XmlElement(ProductIdKey), JsonProperty(ProductIdKey)]
         public long ProductId { get; set; }
 
         [XmlElement(ProductNameKey), JsonProperty(ProductNameKey)]
-        public string ProductName { get; set; }
+        public string ProductName { get; set; } = null!;
 
         #endregion
     }

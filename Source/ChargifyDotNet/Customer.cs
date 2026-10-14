@@ -436,7 +436,7 @@ namespace ChargifyDotNet
         /// Equals
         /// </summary>
         /// <param name="obj"></param>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             // If both are null or both are the same instance, return true.
             if (ReferenceEquals(this, obj)) return true;
@@ -482,8 +482,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="other">The other instance</param>
         /// <returns>The result of the comparison</returns>
-        public int CompareTo(ICustomer other)
+        public int CompareTo(ICustomer? other)
         {
+            if (other is null) return 1;
             return string.Compare(FullName, other.FullName, StringComparison.InvariantCultureIgnoreCase);
         }
 
@@ -496,8 +497,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="other">The other instance</param>
         /// <returns>The result of the comparison</returns>
-        public int CompareTo(Customer other)
+        public int CompareTo(Customer? other)
         {
+            if (other is null) return 1;
             return string.Compare(FullName, other.FullName, StringComparison.InvariantCultureIgnoreCase);
         }
 

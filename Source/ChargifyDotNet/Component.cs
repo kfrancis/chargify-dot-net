@@ -177,8 +177,9 @@ namespace ChargifyDotNet
         /// <summary>
         /// Compare this IComponent to another
         /// </summary>
-        public int CompareTo(IComponent other)
+        public int CompareTo(IComponent? other)
         {
+            if (other is null) return 1;
             return string.Compare(ID, other.ID, StringComparison.InvariantCultureIgnoreCase);
         }
 
@@ -189,8 +190,9 @@ namespace ChargifyDotNet
         /// <summary>
         /// Compare this Component to another
         /// </summary>
-        public int CompareTo(Component other)
+        public int CompareTo(Component? other)
         {
+            if (other is null) return 1;
             return string.Compare(ID, other.ID, StringComparison.InvariantCultureIgnoreCase);
         }
 

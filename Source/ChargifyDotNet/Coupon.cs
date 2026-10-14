@@ -426,8 +426,9 @@ namespace ChargifyDotNet
         /// <summary>
         /// Method for comparing one coupon to another
         /// </summary>
-        public int CompareTo(ICoupon other)
+        public int CompareTo(ICoupon? other)
         {
+            if (other is null) return 1;
             return AmountInCents.CompareTo(other.AmountInCents);
         }
 
@@ -438,8 +439,9 @@ namespace ChargifyDotNet
         /// <summary>
         /// Method for comparing one coupon to another
         /// </summary>
-        public int CompareTo(Coupon other)
+        public int CompareTo(Coupon? other)
         {
+            if (other is null) return 1;
             return AmountInCents.CompareTo(other.AmountInCents);
         }
         #endregion

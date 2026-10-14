@@ -373,8 +373,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="other">The other instance</param>
         /// <returns>The result of the comparison</returns>
-        public int CompareTo(ITransaction other)
+        public int CompareTo(ITransaction? other)
         {
+            if (other is null) return 1;
             return ID.CompareTo(other.ID);
         }
 
@@ -387,8 +388,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="other">The other instance</param>
         /// <returns>The result of the comparison</returns>
-        public int CompareTo(Transaction other)
+        public int CompareTo(Transaction? other)
         {
+            if (other is null) return 1;
             return ID.CompareTo(other.ID);
         }
 

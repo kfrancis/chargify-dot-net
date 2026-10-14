@@ -85,7 +85,7 @@ namespace ChargifyDotNet
         /// Get or set the CVV number on the credit card
         /// </summary>
         [XmlElement("cvv")]
-        public string CVV { get; set; }
+        public string CVV { get; set; } = null!;
         /// <summary>
         /// Ignore, used for determining if the value should be serialized
         /// </summary>
@@ -221,7 +221,7 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="obj">the object to compare</param>
         /// <returns>true if they are equal</returns>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj == null) return false;
 

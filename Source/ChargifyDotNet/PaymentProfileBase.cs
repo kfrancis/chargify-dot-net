@@ -151,7 +151,7 @@ namespace ChargifyDotNet
         /// Get or set the billing address of the credit card
         /// </summary>
         [XmlElement("billing_address")]
-        public string BillingAddress { get; set; }
+        public string BillingAddress { get; set; } = null!;
         /// <summary>
         /// Ignore, used for determining if the value should be serialized
         /// </summary>
@@ -164,7 +164,7 @@ namespace ChargifyDotNet
         /// Get or set the billing address 2 of the credit card
         /// </summary>
         [XmlElement("billing_address_2")]
-        public string BillingAddress2 { get; set; }
+        public string BillingAddress2 { get; set; } = null!;
         /// <summary>
         /// Ignore, used for determining if the value should be serialized
         /// </summary>
@@ -177,7 +177,7 @@ namespace ChargifyDotNet
         /// Get or set the billing city of the credit card
         /// </summary>
         [XmlElement("billing_city")]
-        public string BillingCity { get; set; }
+        public string BillingCity { get; set; } = null!;
         /// <summary>
         /// Ignore, used for determining if the value should be serialized
         /// </summary>
@@ -190,7 +190,7 @@ namespace ChargifyDotNet
         /// Get or set the billing state or province of the credit card
         /// </summary>
         [XmlElement("billing_state")]
-        public string BillingState { get; set; }
+        public string BillingState { get; set; } = null!;
         /// <summary>
         /// Ignore, used for determining if the value should be serialized
         /// </summary>
@@ -203,7 +203,7 @@ namespace ChargifyDotNet
         /// Get or set the billing zip code or postal code of the credit card
         /// </summary>
         [XmlElement("billing_zip")]
-        public string BillingZip { get; set; }
+        public string BillingZip { get; set; } = null!;
         /// <summary>
         /// Ignore, used for determining if the value should be serialized
         /// </summary>
@@ -216,7 +216,7 @@ namespace ChargifyDotNet
         /// Get or set the billing country of the credit card
         /// </summary>
         [XmlElement("billing_country")]
-        public string BillingCountry { get; set; }
+        public string BillingCountry { get; set; } = null!;
         /// <summary>
         /// Ignore, used for determining if the value should be serialized
         /// </summary>

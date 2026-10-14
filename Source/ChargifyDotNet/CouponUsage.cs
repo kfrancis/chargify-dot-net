@@ -190,8 +190,9 @@ namespace ChargifyDotNet
         /// <summary>
         /// Method for comparing one coupon usage to another
         /// </summary>
-        public int CompareTo(ICouponUsage other)
+        public int CompareTo(ICouponUsage? other)
         {
+            if (other is null) return 1;
             return Revenue.CompareTo(other.Revenue);
         }
 
@@ -202,8 +203,9 @@ namespace ChargifyDotNet
         /// <summary>
         /// Method for comparing one coupon usage to another
         /// </summary>
-        public int CompareTo(CouponUsage other)
+        public int CompareTo(CouponUsage? other)
         {
+            if (other is null) return 1;
             return Revenue.CompareTo(other.Revenue);
         }
         #endregion

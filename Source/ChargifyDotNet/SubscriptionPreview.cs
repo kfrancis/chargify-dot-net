@@ -99,23 +99,23 @@ namespace ChargifyDotNet
         /// The subscription preview result
         /// </summary>
         [JsonProperty("subscription_preview")]
-        public SubscriptionPreviewResult SubscriptionPreviewResult { get; set; }
+        public SubscriptionPreviewResult SubscriptionPreviewResult { get; set; } = null!;
     }
 
     [XmlRoot("subscription_preview")]
     public class SubscriptionPreviewResult : ISubscriptionPreviewResult
     {
         [JsonProperty("current_billing_manifest"), XmlElement("current_billing_manifest")]
-        public SubscriptionPreviewBillingManifest CurrentBillingManifest { get; set; }
+        public SubscriptionPreviewBillingManifest CurrentBillingManifest { get; set; } = null!;
 
         [JsonProperty("next_billing_manifest"), XmlElement("next_billing_manifest")]
-        public SubscriptionPreviewBillingManifest NextBillingManifest { get; set; }
+        public SubscriptionPreviewBillingManifest NextBillingManifest { get; set; } = null!;
     }
 
     public class SubscriptionPreviewBillingManifest : ISubscriptionPreviewBillingManifest
     {
         [JsonProperty("line_items"), XmlArray("line_items"), XmlArrayItem("line_item")]
-        public List<SubscriptionPreviewLineItem> LineItems { get; set; }
+        public List<SubscriptionPreviewLineItem> LineItems { get; set; } = null!;
 
         [JsonProperty("total_in_cents"), XmlElement("total_in_cents")]
         public long TotalInCents { get; set; }
@@ -148,7 +148,7 @@ namespace ChargifyDotNet
         public DateTime EndDate { get; set; }
 
         [JsonProperty("period_type"), XmlElement("period_type")]
-        public string PeriodType { get; set; }
+        public string PeriodType { get; set; } = null!;
 
         [JsonProperty("existing_balance_in_cents"), XmlElement("existing_balance_in_cents")]
         public long ExistingBalanceInCents { get; set; }
@@ -160,10 +160,10 @@ namespace ChargifyDotNet
     public class SubscriptionPreviewLineItem : ISubscriptionPreviewLineItem
     {
         [JsonProperty("transaction_type"), XmlElement("transaction_type")]
-        public string TransactionType { get; set; }
+        public string TransactionType { get; set; } = null!;
 
         [JsonProperty("kind"), XmlElement("kind")]
-        public string Kind { get; set; }
+        public string Kind { get; set; } = null!;
 
         [JsonProperty("amount_in_cents"), XmlElement("amount_in_cents")]
         public long AmountInCents { get; set; }
@@ -172,7 +172,7 @@ namespace ChargifyDotNet
         public decimal Amount => Convert.ToDecimal(AmountInCents) / 100;
 
         [JsonProperty("memo"), XmlElement("memo")]
-        public string Memo { get; set; }
+        public string Memo { get; set; } = null!;
 
         [JsonProperty("discount_amount_in_cents"), XmlElement("discount_amount_in_cents")]
         public long DiscountAmountInCents { get; set; }

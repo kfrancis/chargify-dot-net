@@ -45,21 +45,21 @@ namespace ChargifyDotNet
     {
         private long _id;
         private bool? _default;
-        private string _name;
-        private string _type;
+        private string _name = null!;
+        private string _type = null!;
         private PricingSchemeType _pricingScheme;
         private long _componentId;
-        private string _handle;
+        private string _handle = null!;
         private DateTime? _archivedAt;
         private DateTime _createdAt;
         private DateTime _updatedAt;
-        private List<ComponentPrice> _prices;
+        private List<ComponentPrice> _prices = null!;
         private bool? _renewPrepaidAllocation;
         private bool? _rolloverPrepaidRemainder;
         private int _expirationInterval;
         private IntervalUnit _expirationIntervalUnit;
         private PricingSchemeType _overagePricingScheme;
-        private List<ComponentPrice> _overagePricingPrices;
+        private List<ComponentPrice> _overagePricingPrices = null!;
 
         public ComponentPricePoint()
         {
@@ -254,8 +254,9 @@ namespace ChargifyDotNet
         /// <summary>
         /// Compare this ComponentAttributes to another
         /// </summary>
-        public int CompareTo(ComponentPricePoint other)
+        public int CompareTo(ComponentPricePoint? other)
         {
+            if (other is null) return 1;
             return Id.CompareTo(other.Id);
         }
 
@@ -308,7 +309,7 @@ namespace ChargifyDotNet
         private long _endingQuantity;
         private decimal _unitPrice;
         private long _pricePointId;
-        private string _formattedUnitPrice;
+        private string _formattedUnitPrice = null!;
         private long _segmentId;
 
         public ComponentPrice()

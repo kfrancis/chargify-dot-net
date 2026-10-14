@@ -391,7 +391,7 @@ namespace ChargifyDotNet
                 return _productFamily;
             }
         }
-        private IProductFamily _productFamily;
+        private IProductFamily _productFamily = null!;
 
         /// <summary>
         /// Get the accounting code for this product
@@ -753,7 +753,7 @@ namespace ChargifyDotNet
         /// Equals
         /// </summary>
         /// <param name="obj"></param>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj == null) return false;
 
@@ -782,8 +782,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="other">The other instance</param>
         /// <returns>The result of the comparison</returns>
-        public int CompareTo(IProductFamily other)
+        public int CompareTo(IProductFamily? other)
         {
+            if (other is null) return 1;
             return string.Compare(Name, other.Name, StringComparison.InvariantCultureIgnoreCase);
         }
 
@@ -796,8 +797,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="other">The other instance</param>
         /// <returns>The result of the comparison</returns>
-        public int CompareTo(Product other)
+        public int CompareTo(Product? other)
         {
+            if (other is null) return 1;
             return string.Compare(Name, other.Name, StringComparison.InvariantCultureIgnoreCase);
         }
 

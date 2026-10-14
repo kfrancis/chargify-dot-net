@@ -271,7 +271,7 @@ namespace ChargifyDotNet
         /// Equals
         /// </summary>
         /// <param name="obj"></param>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj == null) return false;
 
@@ -300,8 +300,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="other">The other instance</param>
         /// <returns>The result of the comparison</returns>
-        public int CompareTo(IProductFamily other)
+        public int CompareTo(IProductFamily? other)
         {
+            if (other is null) return 1;
             return string.Compare(Handle, other.Handle, StringComparison.InvariantCultureIgnoreCase);
         }
 
@@ -314,8 +315,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="other">The other instance</param>
         /// <returns>The result of the comparison</returns>
-        public int CompareTo(ProductFamily other)
+        public int CompareTo(ProductFamily? other)
         {
+            if (other is null) return 1;
             return string.Compare(Handle, other.Handle, StringComparison.InvariantCultureIgnoreCase);
         }
 

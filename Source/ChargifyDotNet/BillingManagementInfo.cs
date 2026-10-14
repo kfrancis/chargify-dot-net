@@ -212,8 +212,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>
-        public int CompareTo(BillingManagementInfo other)
+        public int CompareTo(BillingManagementInfo? other)
         {
+            if (other is null) return 1;
             // compare
             return string.Compare(URL, other.URL, StringComparison.InvariantCultureIgnoreCase);
         }
@@ -223,8 +224,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>
-        public int CompareTo(IBillingManagementInfo other)
+        public int CompareTo(IBillingManagementInfo? other)
         {
+            if (other is null) return 1;
             return string.Compare(URL, other.URL, StringComparison.CurrentCultureIgnoreCase);
         }
         #endregion

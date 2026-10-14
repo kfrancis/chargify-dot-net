@@ -64,33 +64,33 @@ namespace ChargifyDotNet
         public long DataCount { get; set; }
 
         [JsonProperty("enum")]
-        public object Enum { get; set; }
+        public object Enum { get; set; } = null!;
 
         [JsonProperty("input_type")]
-        public string InputType { get; set; }
+        public string InputType { get; set; } = null!;
 
         [JsonProperty("name")]
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         [JsonProperty("scope")]
-        public MetafieldScope Scope { get; set; }
+        public MetafieldScope Scope { get; set; } = null!;
     }
 
     public class MetafieldScope : ChargifyBase, IMetafieldScope
     {
         [JsonProperty("csv")]
-        public string Csv { get; set; }
+        public string Csv { get; set; } = null!;
 
         [JsonProperty("hosted")]
-        public List<object> Hosted { get; set; }
+        public List<object> Hosted { get; set; } = null!;
 
         [JsonProperty("invoices")]
-        public string Invoices { get; set; }
+        public string Invoices { get; set; } = null!;
 
         [JsonProperty("portal")]
-        public string Portal { get; set; }
+        public string Portal { get; set; } = null!;
 
         [JsonProperty("statements")]
-        public string Statements { get; set; }
+        public string Statements { get; set; } = null!;
     }
 }

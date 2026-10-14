@@ -297,8 +297,9 @@ namespace ChargifyDotNet
         /// <summary>
         /// Compare this ComponentAttributes to another
         /// </summary>
-        public int CompareTo(ComponentAttributes other)
+        public int CompareTo(ComponentAttributes? other)
         {
+            if (other is null) return 1;
             return ComponentID.CompareTo(other.ComponentID);
         }
 
@@ -309,8 +310,9 @@ namespace ChargifyDotNet
         /// <summary>
         /// Compare this IComponentAttributes to another
         /// </summary>
-        public int CompareTo(IComponentAttributes other)
+        public int CompareTo(IComponentAttributes? other)
         {
+            if (other is null) return 1;
             return ComponentID.CompareTo(other.ComponentID);
         }
 

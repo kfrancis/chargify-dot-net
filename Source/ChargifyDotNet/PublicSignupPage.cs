@@ -191,8 +191,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="other">The object to compare to</param>
         /// <returns></returns>
-        public int CompareTo(IPublicSignupPage other)
+        public int CompareTo(IPublicSignupPage? other)
         {
+            if (other is null) return 1;
             return ID.CompareTo(other.ID);
         }
         #endregion
@@ -203,8 +204,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="other">The object to compare to</param>
         /// <returns></returns>
-        public int CompareTo(PublicSignupPage other)
+        public int CompareTo(PublicSignupPage? other)
         {
+            if (other is null) return 1;
             return ID.CompareTo(other.ID);
         }
         #endregion

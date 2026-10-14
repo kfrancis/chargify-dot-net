@@ -192,17 +192,17 @@ namespace ChargifyDotNet
         /// <summary>
         /// Get or set the API key
         /// </summary>
-        public string apiKey { get; set; }
+        public string apiKey { get; set; } = null!;
 
         /// <summary>
         /// Get or set the password
         /// </summary>
-        public string Password { get; set; }
+        public string Password { get; set; } = null!;
 
         /// <summary>
         /// Get or set the URL for chargify
         /// </summary>
-        public string URL { get; set; }
+        public string URL { get; set; } = null!;
 
         /// <summary>
         /// SharedKey used for url generation

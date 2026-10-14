@@ -402,8 +402,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="other">The object to compare to.</param>
         /// <returns>The CompareTo value based on comparing IDs</returns>
-        public int CompareTo(IComponentInfo other)
+        public int CompareTo(IComponentInfo? other)
         {
+            if (other is null) return 1;
             return ID.CompareTo(other.ID);
         }
 
@@ -416,8 +417,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="other">The object to compare to.</param>
         /// <returns>The CompareTo value based on comparing IDs</returns>
-        public int CompareTo(ComponentInfo other)
+        public int CompareTo(ComponentInfo? other)
         {
+            if (other is null) return 1;
             return ID.CompareTo(other.ID);
         }
 

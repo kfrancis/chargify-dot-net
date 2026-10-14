@@ -194,8 +194,9 @@ namespace ChargifyDotNet
         /// <summary>
         /// Compare this credit to another
         /// </summary>
-        public int CompareTo(ICredit other)
+        public int CompareTo(ICredit? other)
         {
+            if (other is null) return 1;
             return AmountInCents.CompareTo(other.AmountInCents);
         }
 
@@ -206,8 +207,9 @@ namespace ChargifyDotNet
         /// <summary>
         /// Compare this credit to another
         /// </summary>
-        public int CompareTo(Credit other)
+        public int CompareTo(Credit? other)
         {
+            if (other is null) return 1;
             return AmountInCents.CompareTo(other.AmountInCents);
         }
 

@@ -252,8 +252,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="other">The other IPaymentProfileAttributes to compare with</param>
         /// <returns>The result of the comparison</returns>
-        public int CompareTo(IPaymentProfileAttributes other)
+        public int CompareTo(IPaymentProfileAttributes? other)
         {
+            if (other is null) return 1;
             return string.Compare(VaultToken, other.VaultToken, StringComparison.InvariantCultureIgnoreCase);
         }
 
@@ -266,8 +267,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="other">The other PaymentProfileAttributes to compare with</param>
         /// <returns>The result of the comparison</returns>
-        public int CompareTo(PaymentProfileAttributes other)
+        public int CompareTo(PaymentProfileAttributes? other)
         {
+            if (other is null) return 1;
             return string.Compare(VaultToken, other.VaultToken, StringComparison.InvariantCultureIgnoreCase);
         }
 

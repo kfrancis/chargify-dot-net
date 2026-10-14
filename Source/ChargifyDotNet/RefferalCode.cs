@@ -213,8 +213,9 @@ namespace ChargifyDotNet
         /// <summary>
         /// Method for comparing one coupon to another
         /// </summary>
-        public int CompareTo(IReferralCode other)
+        public int CompareTo(IReferralCode? other)
         {
+            if (other is null) return 1;
             return this.Code.CompareTo(other.Code);
         }
 
@@ -225,8 +226,9 @@ namespace ChargifyDotNet
         /// <summary>
         /// Method for comparing one coupon to another
         /// </summary>
-        public int CompareTo(ReferralCode other)
+        public int CompareTo(ReferralCode? other)
         {
+            if (other is null) return 1;
             return this.Code.CompareTo(other.Code);
         }
         #endregion

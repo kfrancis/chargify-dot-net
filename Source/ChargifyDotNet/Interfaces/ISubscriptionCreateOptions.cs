@@ -257,7 +257,7 @@ namespace ChargifyDotNet
         /// The day that processing is performed
         /// </summary>
         [XmlElement("snap_day")]
-        public string SnapDay { get; set; }
+        public string SnapDay { get; set; } = null!;
         /// <summary>
         /// Ignore, used to determine if the field should be serialized
         /// </summary>
@@ -278,7 +278,7 @@ namespace ChargifyDotNet
         /// The list of components to set when creating the subscription
         /// </summary>
         [XmlArray("components")]
-        public List<ComponentDetails> Components { get; set; }
+        public List<ComponentDetails> Components { get; set; } = null!;
         /// <summary>
         /// Ignore, used to determine if the field should be serialized
         /// </summary>
@@ -292,7 +292,7 @@ namespace ChargifyDotNet
         /// should be done on. Cannot be used when also specifying NextBillingAt.
         /// </summary>
         [XmlElement("calendar_billing")]
-        public CalendarBillingAttributes CalendarBilling { get; set; }
+        public CalendarBillingAttributes CalendarBilling { get; set; } = null!;
         /// <summary>
         /// Ignore, used to determine if the field should be serialized
         /// </summary>
@@ -305,7 +305,7 @@ namespace ChargifyDotNet
         /// The ACH agreements terms
         /// </summary>
         [XmlElement("agreement_terms")]
-        public string AgreementTerms { get; set; }
+        public string AgreementTerms { get; set; } = null!;
         /// <summary>
         /// Ignore, used to determine if the field should be serialized
         /// </summary>
@@ -319,7 +319,7 @@ namespace ChargifyDotNet
         /// DELETE method) to make a note about the reason for cancellation.
         /// </summary>
         [XmlElement("cancellation_message")]
-        public string CancellationMessage { get; set; }
+        public string CancellationMessage { get; set; } = null!;
         /// <summary>
         /// Ignore, used to determine if the field should be serialized
         /// </summary>
@@ -332,7 +332,7 @@ namespace ChargifyDotNet
         /// (Optional) The coupon code of the coupon to apply
         /// </summary>
         [XmlElement("coupon_code")]
-        public string CouponCode { get; set; }
+        public string CouponCode { get; set; } = null!;
         /// <summary>
         /// Ignore, used to determine if the field should be serialized
         /// </summary>
@@ -345,7 +345,7 @@ namespace ChargifyDotNet
         /// (Optional) The coupon codes of the coupons to apply
         /// </summary>
         [XmlElement("coupon_codes")]
-        public string[] CouponCodes { get; set; }
+        public string[] CouponCodes { get; set; } = null!;
         /// <summary>
         /// Ignore, used to determine if the field should be serialized
         /// </summary>
@@ -358,7 +358,7 @@ namespace ChargifyDotNet
         /// Details about the new customer
         /// </summary>
         [XmlElement("customer_attributes")]
-        public CustomerAttributes CustomerAttributes { get; set; }
+        public CustomerAttributes CustomerAttributes { get; set; } = null!;
 
         /// <summary>
         /// The ID of an existing customer within Chargify. Required, 
@@ -380,7 +380,7 @@ namespace ChargifyDotNet
         /// customer_attributes is given.
         /// </summary>
         [XmlElement("customer_reference")]
-        public string CustomerReference { get; set; }
+        public string CustomerReference { get; set; } = null!;
         /// <summary>
         /// Ignore, used to determine if the field should be serialized
         /// </summary>
@@ -436,13 +436,13 @@ namespace ChargifyDotNet
         /// Details of the payment profile to use with this new subscription
         /// </summary>
         [XmlElement("payment_profile_attributes")]
-        public PaymentProfileAttributes PaymentProfileAttributes { get; set; }
+        public PaymentProfileAttributes PaymentProfileAttributes { get; set; } = null!;
 
         /// <summary>
         /// Details of the credit card to use with this new subscription
         /// </summary>
         [XmlElement("credit_card_attributes")]
-        public CreditCardAttributes CreditCardAttributes { get; set; }
+        public CreditCardAttributes CreditCardAttributes { get; set; } = null!;
 
         /// <summary>
         /// The Payment Profile ID of an existing card or bank account, which belongs 
@@ -478,7 +478,7 @@ namespace ChargifyDotNet
         /// Required, unless a product_id is given instead.
         /// </summary>
         [XmlElement("product_handle")]
-        public string ProductHandle { get; set; }
+        public string ProductHandle { get; set; } = null!;
         /// <summary>
         /// Ignore, used to determine if the field should be serialized
         /// </summary>
@@ -507,7 +507,7 @@ namespace ChargifyDotNet
         /// If supplied, must be valid, or else subscription creation will fail.
         /// </summary>
         [XmlElement("ref")]
-        public string ReferralCode { get; set; }
+        public string ReferralCode { get; set; } = null!;
         /// <summary>
         /// Ignore, used to determine if the field should be serialized
         /// </summary>
@@ -524,7 +524,7 @@ namespace ChargifyDotNet
         /// not in the customer attributes (if specified).
         /// </summary>
         [XmlElement("vat_number")]
-        public string VatNumber { get; set; }
+        public string VatNumber { get; set; } = null!;
         /// <summary>
         /// Ignore, used to determine if the field should be serialized
         /// </summary>

@@ -12,31 +12,31 @@ namespace ChargifyDotNet.RequestDTOs
     internal class CustomerRequest
     {
         [JsonProperty("first_name", NullValueHandling = NullValueHandling.Ignore)]
-        public string FirstName { get; set; }
+        public string FirstName { get; set; } = null!;
         [JsonProperty("last_name", NullValueHandling = NullValueHandling.Ignore)]
-        public string LastName { get; set; }
+        public string LastName { get; set; } = null!;
         [JsonProperty("email", NullValueHandling = NullValueHandling.Ignore)]
-        public string Email { get; set; }
+        public string Email { get; set; } = null!;
         [JsonProperty("phone", NullValueHandling = NullValueHandling.Ignore)]
-        public string Phone { get; set; }
+        public string Phone { get; set; } = null!;
         [JsonProperty("organization", NullValueHandling = NullValueHandling.Ignore)]
-        public string Organization { get; set; }
+        public string Organization { get; set; } = null!;
         [JsonProperty("reference", NullValueHandling = NullValueHandling.Ignore)]
-        public string SystemID { get; set; }
+        public string SystemID { get; set; } = null!;
         [JsonProperty("cc_emails", NullValueHandling = NullValueHandling.Ignore)]
-        public string CCEmails { get; set; }
+        public string CCEmails { get; set; } = null!;
         [JsonProperty("address", NullValueHandling = NullValueHandling.Ignore)]
-        public string ShippingAddress { get; set; }
+        public string ShippingAddress { get; set; } = null!;
         [JsonProperty("address_2", NullValueHandling = NullValueHandling.Ignore)]
-        public string ShippingAddress2 { get; set; }
+        public string ShippingAddress2 { get; set; } = null!;
         [JsonProperty("city", NullValueHandling = NullValueHandling.Ignore)]
-        public string ShippingCity { get; set; }
+        public string ShippingCity { get; set; } = null!;
         [JsonProperty("zip", NullValueHandling = NullValueHandling.Ignore)]
-        public string ShippingZip { get; set; }
+        public string ShippingZip { get; set; } = null!;
         [JsonProperty("state", NullValueHandling = NullValueHandling.Ignore)]
-        public string ShippingState { get; set; }
+        public string ShippingState { get; set; } = null!;
         [JsonProperty("country", NullValueHandling = NullValueHandling.Ignore)]
-        public string ShippingCountry { get; set; }
+        public string ShippingCountry { get; set; } = null!;
         [JsonProperty("tax_exempt", NullValueHandling = NullValueHandling.Ignore)]
         public bool TaxExempt { get; set; }
 

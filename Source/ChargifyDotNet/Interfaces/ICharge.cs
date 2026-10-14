@@ -114,7 +114,7 @@ namespace ChargifyDotNet
         /// The charge memo/description
         /// </summary>
         [XmlElement("memo"), JsonProperty("memo")]
-        public string Memo { get; set; }
+        public string Memo { get; set; } = null!;
 
         /// <summary>
         /// Ignore, used to determine if the field should be serialized
