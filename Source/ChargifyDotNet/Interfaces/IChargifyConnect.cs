@@ -491,6 +491,11 @@ namespace ChargifyDotNet
         #endregion
 
         #region Referral Codes
+        /// <summary>
+        /// Check whether a referral code is valid.
+        /// </summary>
+        /// <param name="ReferralCode">The referral code</param>
+        /// <returns>The referral code if found, null otherwise.</returns>
         IReferralCode? ValidateReferralCode(string ReferralCode);
         #endregion
 

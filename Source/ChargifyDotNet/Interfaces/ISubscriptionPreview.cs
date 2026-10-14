@@ -67,37 +67,85 @@ namespace ChargifyDotNet
     /// </summary>
     public interface ISubscriptionPreviewBillingManifest
     {
+        /// <summary>
+        /// The line items
+        /// </summary>
         List<SubscriptionPreviewLineItem> LineItems { get; set; }
 
+        /// <summary>
+        /// The total, in cents
+        /// </summary>
         long TotalInCents { get; set; }
 
+        /// <summary>
+        /// The total discount, in cents
+        /// </summary>
         long TotalDiscountInCents { get; set; }
 
+        /// <summary>
+        /// The total tax, in cents
+        /// </summary>
         long TotalTaxInCents { get; set; }
 
+        /// <summary>
+        /// The subtotal before discounts and tax, in cents
+        /// </summary>
         long SubtotalInCents { get; set; }
 
+        /// <summary>
+        /// The start of the billing period
+        /// </summary>
         DateTime StartDate { get; set; }
 
+        /// <summary>
+        /// The end of the billing period
+        /// </summary>
         DateTime EndDate { get; set; }
 
+        /// <summary>
+        /// The billing period type (e.g. "recurring", "prorated")
+        /// </summary>
         string PeriodType { get; set; }
 
+        /// <summary>
+        /// The subscription balance carried into this period, in cents
+        /// </summary>
         long ExistingBalanceInCents { get; set; }
     }
 
+    /// <summary>
+    /// A line item in a subscription preview billing manifest
+    /// </summary>
     public interface ISubscriptionPreviewLineItem
     {
+        /// <summary>
+        /// The transaction type (e.g. "charge", "credit", "adjustment")
+        /// </summary>
         string TransactionType { get; set; }
 
+        /// <summary>
+        /// The kind of line item (e.g. "baseline", "component", "trial")
+        /// </summary>
         string Kind { get; set; }
 
+        /// <summary>
+        /// The amount, in cents
+        /// </summary>
         long AmountInCents { get; set; }
 
+        /// <summary>
+        /// The line item description
+        /// </summary>
         string Memo { get; set; }
 
+        /// <summary>
+        /// The discount applied, in cents
+        /// </summary>
         long DiscountAmountInCents { get; set; }
 
+        /// <summary>
+        /// The taxable amount, in cents
+        /// </summary>
         long TaxableAmountInCents { get; set; }
     }
 }

@@ -42,6 +42,9 @@ namespace ChargifyDotNet
     using System.Xml.Serialization;
     #endregion
 
+    /// <summary>
+    /// A preview of what a new subscription would be billed now and at its next renewal
+    /// </summary>
     public class SubscriptionPreview : ChargifyBase, ISubscriptionPreview
     {
         /// <summary>
@@ -68,6 +71,10 @@ namespace ChargifyDotNet
             throw new ArgumentException("XML does not contain expected nodes", nameof(xml));
         }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="json">JSON containing a subscription_preview object</param>
         public SubscriptionPreview(JsonObject json)
         {
             if (json == null) throw new ArgumentNullException(nameof(json));
@@ -102,87 +109,171 @@ namespace ChargifyDotNet
         public SubscriptionPreviewResult SubscriptionPreviewResult { get; set; } = null!;
     }
 
+    /// <summary>
+    /// The billing manifests of a subscription preview
+    /// </summary>
     [XmlRoot("subscription_preview")]
     public class SubscriptionPreviewResult : ISubscriptionPreviewResult
     {
+        /// <summary>
+        /// What would be billed when the subscription is created
+        /// </summary>
         [JsonProperty("current_billing_manifest"), XmlElement("current_billing_manifest")]
         public SubscriptionPreviewBillingManifest CurrentBillingManifest { get; set; } = null!;
 
+        /// <summary>
+        /// What would be billed at the next renewal
+        /// </summary>
         [JsonProperty("next_billing_manifest"), XmlElement("next_billing_manifest")]
         public SubscriptionPreviewBillingManifest NextBillingManifest { get; set; } = null!;
     }
 
+    /// <summary>
+    /// A subscription preview billing manifest
+    /// </summary>
     public class SubscriptionPreviewBillingManifest : ISubscriptionPreviewBillingManifest
     {
+        /// <summary>
+        /// The line items
+        /// </summary>
         [JsonProperty("line_items"), XmlArray("line_items"), XmlArrayItem("line_item")]
         public List<SubscriptionPreviewLineItem> LineItems { get; set; } = null!;
 
+        /// <summary>
+        /// The total, in cents
+        /// </summary>
         [JsonProperty("total_in_cents"), XmlElement("total_in_cents")]
         public long TotalInCents { get; set; }
 
+        /// <summary>
+        /// The total
+        /// </summary>
         [XmlIgnore]
         public decimal Total => Convert.ToDecimal(TotalInCents) / 100;
 
+        /// <summary>
+        /// The total discount, in cents
+        /// </summary>
         [JsonProperty("total_discount_in_cents"), XmlElement("total_discount_in_cents")]
         public long TotalDiscountInCents { get; set; }
 
+        /// <summary>
+        /// The total discount
+        /// </summary>
         [XmlIgnore]
         public decimal TotalDiscount => Convert.ToDecimal(TotalDiscountInCents) / 100;
 
+        /// <summary>
+        /// The total tax, in cents
+        /// </summary>
         [JsonProperty("total_tax_in_cents"), XmlElement("total_tax_in_cents")]
         public long TotalTaxInCents { get; set; }
 
+        /// <summary>
+        /// The total tax
+        /// </summary>
         [XmlIgnore]
         public decimal TotalTax => Convert.ToDecimal(TotalTaxInCents) / 100;
 
+        /// <summary>
+        /// The subtotal before discounts and tax, in cents
+        /// </summary>
         [JsonProperty("subtotal_in_cents"), XmlElement("subtotal_in_cents")]
         public long SubtotalInCents { get; set; }
 
+        /// <summary>
+        /// The subtotal before discounts and tax
+        /// </summary>
         [XmlIgnore]
         public decimal Subtotal => Convert.ToDecimal(SubtotalInCents) / 100;
 
+        /// <summary>
+        /// The start of the billing period
+        /// </summary>
         [JsonProperty("start_date"), XmlElement("start_date")]
         public DateTime StartDate { get; set; }
 
+        /// <summary>
+        /// The end of the billing period
+        /// </summary>
         [JsonProperty("end_date"), XmlElement("end_date")]
         public DateTime EndDate { get; set; }
 
+        /// <summary>
+        /// The billing period type (e.g. "recurring", "prorated")
+        /// </summary>
         [JsonProperty("period_type"), XmlElement("period_type")]
         public string PeriodType { get; set; } = null!;
 
+        /// <summary>
+        /// The subscription balance carried into this period, in cents
+        /// </summary>
         [JsonProperty("existing_balance_in_cents"), XmlElement("existing_balance_in_cents")]
         public long ExistingBalanceInCents { get; set; }
 
+        /// <summary>
+        /// The subscription balance carried into this period
+        /// </summary>
         [XmlIgnore]
         public decimal ExistingBalance => Convert.ToDecimal(ExistingBalanceInCents) / 100;
     }
 
+    /// <summary>
+    /// A line item in a subscription preview billing manifest
+    /// </summary>
     public class SubscriptionPreviewLineItem : ISubscriptionPreviewLineItem
     {
+        /// <summary>
+        /// The transaction type (e.g. "charge", "credit", "adjustment")
+        /// </summary>
         [JsonProperty("transaction_type"), XmlElement("transaction_type")]
         public string TransactionType { get; set; } = null!;
 
+        /// <summary>
+        /// The kind of line item (e.g. "baseline", "component", "trial")
+        /// </summary>
         [JsonProperty("kind"), XmlElement("kind")]
         public string Kind { get; set; } = null!;
 
+        /// <summary>
+        /// The amount, in cents
+        /// </summary>
         [JsonProperty("amount_in_cents"), XmlElement("amount_in_cents")]
         public long AmountInCents { get; set; }
 
+        /// <summary>
+        /// The amount
+        /// </summary>
         [XmlIgnore]
         public decimal Amount => Convert.ToDecimal(AmountInCents) / 100;
 
+        /// <summary>
+        /// The line item description
+        /// </summary>
         [JsonProperty("memo"), XmlElement("memo")]
         public string Memo { get; set; } = null!;
 
+        /// <summary>
+        /// The discount applied, in cents
+        /// </summary>
         [JsonProperty("discount_amount_in_cents"), XmlElement("discount_amount_in_cents")]
         public long DiscountAmountInCents { get; set; }
 
+        /// <summary>
+        /// The discount applied
+        /// </summary>
         [XmlIgnore]
         public decimal DiscountAmount => Convert.ToDecimal(DiscountAmountInCents) / 100;
 
+        /// <summary>
+        /// The taxable amount, in cents
+        /// </summary>
         [JsonProperty("taxable_amount_in_cents"), XmlElement("taxable_amount_in_cents")]
         public long TaxableAmountInCents { get; set; }
 
+        /// <summary>
+        /// The taxable amount
+        /// </summary>
         [XmlIgnore]
         public decimal TaxableAmount => Convert.ToDecimal(TaxableAmountInCents) / 100;
     }

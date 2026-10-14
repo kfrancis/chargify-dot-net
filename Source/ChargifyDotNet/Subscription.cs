@@ -348,6 +348,9 @@ namespace ChargifyDotNet
 
         #region ISubscription Members
 
+        /// <summary>
+        /// The referral code the subscription was created with, if any
+        /// </summary>
         public string ReferralCode
         {
             get

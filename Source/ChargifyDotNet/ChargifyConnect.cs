@@ -4357,11 +4357,21 @@ namespace ChargifyDotNet
 
         #region Components
 
+        /// <summary>
+        /// Bulk-create price points for a component. Not implemented.
+        /// </summary>
+        /// <exception cref="NotImplementedException">Always.</exception>
         public List<ComponentPricePoint> GetPricePoints(int componentID, List<ComponentPricePoint> bulkPricePoints)
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Make a price point the default for its component.
+        /// </summary>
+        /// <param name="componentID">The component ID</param>
+        /// <param name="pricePointId">The price point ID</param>
+        /// <returns>True if Chargify accepted the change, false if it returned an error.</returns>
         public bool SetPricePointDefault(long componentID, long pricePointId)
         {
             //components/{component_id}/price_points/{price_point_id}/default.json
@@ -4383,6 +4393,13 @@ namespace ChargifyDotNet
             }
         }
 
+        /// <summary>
+        /// Archive a component price point.
+        /// </summary>
+        /// <param name="componentID">The component ID</param>
+        /// <param name="pricePointId">The price point ID</param>
+        /// <returns>The archived price point.</returns>
+        /// <exception cref="InvalidOperationException">Chargify returned 404.</exception>
         public ComponentPricePoint ArchivePricePoint(int componentID, long pricePointId)
         {
             try
@@ -4406,6 +4423,13 @@ namespace ChargifyDotNet
             }
         }
 
+        /// <summary>
+        /// Unarchive a component price point.
+        /// </summary>
+        /// <param name="componentID">The component ID</param>
+        /// <param name="pricePointId">The price point ID</param>
+        /// <returns>The unarchived price point.</returns>
+        /// <exception cref="InvalidOperationException">Chargify returned 404.</exception>
         public ComponentPricePoint UnarchivePricePoint(int componentID, long pricePointId)
         {
             try
@@ -4429,11 +4453,20 @@ namespace ChargifyDotNet
             }
         }
 
+        /// <summary>
+        /// Update a component price point. Not implemented.
+        /// </summary>
+        /// <exception cref="NotImplementedException">Always.</exception>
         public ComponentPricePoint UpdatePricePoint(int componentID, ComponentPricePoint updatedPricePoint)
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Get the price points for a component.
+        /// </summary>
+        /// <param name="componentId">The component ID</param>
+        /// <returns>The price points, keyed by price point ID.</returns>
         public IDictionary<long, ComponentPricePoint> GetPricePoints(int componentId)
         {
             // make sure data is valid
@@ -4513,6 +4546,12 @@ namespace ChargifyDotNet
             return retValue;
         }
 
+        /// <summary>
+        /// Create a price point for a component.
+        /// </summary>
+        /// <param name="componentID">The component ID</param>
+        /// <param name="newPricePoint">The price point to create</param>
+        /// <returns>The created price point.</returns>
         public ComponentPricePoint CreatePricePoint(int componentID, ComponentPricePoint newPricePoint)
         {
             // create XML for creation of an adjustment

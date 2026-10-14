@@ -838,6 +838,11 @@ namespace ChargifyDotNet
             return result;
         }
 
+        /// <summary>
+        /// Get the content of an XmlNode as a component price point
+        /// </summary>
+        /// <param name="node">The price_point node</param>
+        /// <returns>The price point, or null if the node is empty.</returns>
         public static ComponentPricePoint? GetNodeContentAsComponentPricePoint(this XmlNode node)
         {
             ComponentPricePoint? result = null;
@@ -1090,6 +1095,11 @@ namespace ChargifyDotNet
             return result;
         }
 
+        /// <summary>
+        /// Get the content of an XmlNode as a component price tier
+        /// </summary>
+        /// <param name="node">The price node</param>
+        /// <returns>The price tier, or null if the node is empty.</returns>
         public static ComponentPrice? GetNodeContentAsComponentPrice(this XmlNode node)
         {
             ComponentPrice? result = null;
@@ -1122,6 +1132,12 @@ namespace ChargifyDotNet
             return result;
         }
 
+        /// <summary>
+        /// Get the keyed array of a JsonObject as component price points
+        /// </summary>
+        /// <param name="obj">The object containing the array</param>
+        /// <param name="key">The key of the array</param>
+        /// <returns>The price points; empty if the key is missing.</returns>
         public static List<ComponentPricePoint> GetJSONContentAsPricePoints(this JsonObject obj, string key)
         {
             var pricePoints = new List<ComponentPricePoint>();
@@ -1142,6 +1158,12 @@ namespace ChargifyDotNet
             return pricePoints;
         }
 
+        /// <summary>
+        /// Get the keyed array of a JsonObject as component price tiers
+        /// </summary>
+        /// <param name="obj">The object containing the array</param>
+        /// <param name="key">The key of the array</param>
+        /// <returns>The price tiers; empty if the key is missing.</returns>
         public static List<ComponentPrice> GetJSONContentAsPrices(this JsonObject obj, string key)
         {
             var prices = new List<ComponentPrice>();
@@ -1177,6 +1199,11 @@ namespace ChargifyDotNet
             return result;
         }
 
+        /// <summary>
+        /// Get the child nodes of an XmlNode as component price points
+        /// </summary>
+        /// <param name="node">The price_points node</param>
+        /// <returns>The price points.</returns>
         public static List<ComponentPricePoint> GetNodeContentAsPricePoints(this XmlNode node)
         {
             var pricePoints = new List<ComponentPricePoint>();
@@ -1199,6 +1226,11 @@ namespace ChargifyDotNet
             return pricePoints;
         }
 
+        /// <summary>
+        /// Get the child nodes of an XmlNode as component price tiers
+        /// </summary>
+        /// <param name="node">The prices node</param>
+        /// <returns>The price tiers.</returns>
         public static List<ComponentPrice> GetNodeContentAsComponentPrices(this XmlNode node)
         {
             var prices = new List<ComponentPrice>();

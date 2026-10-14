@@ -94,6 +94,9 @@ namespace ChargifyDotNet
             set { _customerVaultToken = value; }
         }
         private string _customerVaultToken = string.Empty;
+        /// <summary>
+        /// Used by XmlSerializer: only serialize CustomerVaultToken when it has a value.
+        /// </summary>
         public bool ShouldSerializeCustomerVaultToken()
         {
             return !string.IsNullOrEmpty(CustomerVaultToken);
@@ -120,6 +123,9 @@ namespace ChargifyDotNet
         }
         private int _expirationYear = int.MinValue;
 
+        /// <summary>
+        /// Used by XmlSerializer: only serialize ExpirationYear when it has a value.
+        /// </summary>
         public bool ShouldSerializeExpirationYear()
         {
             return ExpirationYear >= 0;
@@ -134,6 +140,9 @@ namespace ChargifyDotNet
             set { _expirationMonth = value; }
         }
         private int _expirationMonth = int.MinValue;
+        /// <summary>
+        /// Used by XmlSerializer: only serialize ExpirationMonth when it has a value.
+        /// </summary>
         public bool ShouldSerializeExpirationMonth()
         {
             return ExpirationMonth >= 0;
@@ -149,6 +158,9 @@ namespace ChargifyDotNet
             set { _cardType = value; }
         }
         private CardType _cardType = CardType.Unknown;
+        /// <summary>
+        /// Used by XmlSerializer: only serialize CardType when it has a value.
+        /// </summary>
         public bool ShouldSerializeCardType()
         {
             return CardType != CardType.Unknown;
@@ -164,6 +176,9 @@ namespace ChargifyDotNet
             set { _lastFour = value; }
         }
         private string _lastFour = string.Empty;
+        /// <summary>
+        /// Used by XmlSerializer: only serialize LastFour when it has a value.
+        /// </summary>
         public bool ShouldSerializeLastFour()
         {
             return !string.IsNullOrEmpty(LastFour);
@@ -178,6 +193,9 @@ namespace ChargifyDotNet
             set { _bankName = value; }
         }
         private string _bankName = string.Empty;
+        /// <summary>
+        /// Used by XmlSerializer: only serialize BankName when it has a value.
+        /// </summary>
         public bool ShouldSerializeBankName()
         {
             return !string.IsNullOrEmpty(BankName);
@@ -193,6 +211,9 @@ namespace ChargifyDotNet
         }
         private string _bankRoutingNumber = string.Empty;
 
+        /// <summary>
+        /// Used by XmlSerializer: only serialize BankRoutingNumber when it has a value.
+        /// </summary>
         public bool ShouldSerializeBankRoutingNumber()
         {
             return !string.IsNullOrEmpty(BankRoutingNumber);
@@ -208,6 +229,9 @@ namespace ChargifyDotNet
         }
         private string _bankAccountNumber = string.Empty;
 
+        /// <summary>
+        /// Used by XmlSerializer: only serialize BankAccountNumber when it has a value.
+        /// </summary>
         public bool ShouldSerializeBankAccountNumber()
         {
             return !string.IsNullOrEmpty(BankAccountNumber);
@@ -223,6 +247,9 @@ namespace ChargifyDotNet
         }
         private BankAccountType _bankAccountType = BankAccountType.Unknown;
 
+        /// <summary>
+        /// Used by XmlSerializer: only serialize BankAccountType when it has a value.
+        /// </summary>
         public bool ShouldSerializeBankAccountType()
         {
             return BankAccountType != BankAccountType.Unknown;
@@ -238,6 +265,9 @@ namespace ChargifyDotNet
         }
         private BankAccountHolderType _bankAccountHolderType = BankAccountHolderType.Unknown;
 
+        /// <summary>
+        /// Used by XmlSerializer: only serialize BankAccountHolderType when it has a value.
+        /// </summary>
         public bool ShouldSerializeBankAccountHolderType()
         {
             return BankAccountHolderType != BankAccountHolderType.Unknown;

@@ -41,6 +41,9 @@ namespace ChargifyDotNet
     using System.Xml;
     #endregion
 
+    /// <summary>
+    /// A price point for a component: the pricing scheme and price tiers used to bill it.
+    /// </summary>
     public class ComponentPricePoint : ChargifyBase, IComparable<ComponentPricePoint>
     {
         private long _id;
@@ -61,6 +64,9 @@ namespace ChargifyDotNet
         private PricingSchemeType _overagePricingScheme;
         private List<ComponentPrice> _overagePricingPrices = null!;
 
+        /// <summary>
+        /// Constructor. Pricing schemes default to Unknown and price lists are empty.
+        /// </summary>
         public ComponentPricePoint()
         {
             _pricingScheme = PricingSchemeType.Unknown;
@@ -69,6 +75,10 @@ namespace ChargifyDotNet
             _overagePricingPrices = [];
         }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="componentPricePointXml">XML containing a price_point element</param>
         public ComponentPricePoint(string componentPricePointXml)
         {
             // get the XML into an XML document
@@ -263,27 +273,66 @@ namespace ChargifyDotNet
 
         #endregion
 
+        /// <summary>
+        /// The price point ID
+        /// </summary>
         public long Id { get => _id; set => _id = value; }
 
+        /// <summary>
+        /// Whether this is the component's default price point
+        /// </summary>
         public bool? Default { get => _default; set => _default = value; }
 
+        /// <summary>
+        /// Prepaid components: whether the allocation renews each period
+        /// </summary>
         public bool? RenewPrepaidAllocation { get => _renewPrepaidAllocation; set => _renewPrepaidAllocation = value; }
+        /// <summary>
+        /// Prepaid components: whether unused quantity rolls over to the next period
+        /// </summary>
         public bool? RolloverPrepaidRemainder { get => _rolloverPrepaidRemainder; set => _rolloverPrepaidRemainder = value; }
 
+        /// <summary>
+        /// The price point name
+        /// </summary>
         public string Name { get => _name; set => _name = value; }
 
+        /// <summary>
+        /// The price point type (e.g. "default", "catalog", "custom")
+        /// </summary>
         public string Type { get => _type; set => _type = value; }
 
+        /// <summary>
+        /// The pricing scheme
+        /// </summary>
         public PricingSchemeType PricingScheme { get => _pricingScheme; set => _pricingScheme = value; }
 
+        /// <summary>
+        /// The ID of the component this price point belongs to
+        /// </summary>
         public long ComponentId { get => _componentId; set => _componentId = value; }
 
+        /// <summary>
+        /// The price point handle
+        /// </summary>
         public string Handle { get => _handle; set => _handle = value; }
+        /// <summary>
+        /// Prepaid components: how many expiration interval units the rollover lasts
+        /// </summary>
         public int ExpirationInterval { get => _expirationInterval; set => _expirationInterval = value; }
+        /// <summary>
+        /// Prepaid components: the unit of the expiration interval
+        /// </summary>
         public IntervalUnit ExpirationIntervalUnit { get => _expirationIntervalUnit; set => _expirationIntervalUnit = value; }
 
+        /// <summary>
+        /// When the price point was archived, or null if it is active
+        /// </summary>
         public DateTime? ArchivedAt { get => _archivedAt; set => _archivedAt = value; }
 
+        /// <summary>
+        /// True if the price point has been archived
+        /// </summary>
         public bool IsArchived
         {
             get
@@ -292,15 +341,33 @@ namespace ChargifyDotNet
             }
         }
 
+        /// <summary>
+        /// When the price point was created
+        /// </summary>
         public DateTime CreatedAt { get => _createdAt; set => _createdAt = value; }
 
+        /// <summary>
+        /// When the price point was last updated
+        /// </summary>
         public DateTime UpdatedAt { get => _updatedAt; set => _updatedAt = value; }
 
+        /// <summary>
+        /// The price tiers
+        /// </summary>
         public IList<ComponentPrice> Prices { get => _prices; set => _prices = (List<ComponentPrice>)value; }
+        /// <summary>
+        /// Prepaid components: the pricing scheme for usage above the allocation
+        /// </summary>
         public PricingSchemeType OveragePricingScheme { get => _overagePricingScheme; set => _overagePricingScheme = value; }
+        /// <summary>
+        /// Prepaid components: the price tiers for usage above the allocation
+        /// </summary>
         public IList<ComponentPrice> OveragePricingPrices { get => _overagePricingPrices; set => _overagePricingPrices = (List<ComponentPrice>)value; }
     }
 
+    /// <summary>
+    /// A price tier within a component price point
+    /// </summary>
     [JsonArray]
     public class ComponentPrice
     {
@@ -313,6 +380,9 @@ namespace ChargifyDotNet
         private string _formattedUnitPrice = null!;
         private long _segmentId;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public ComponentPrice()
         {
 
@@ -417,20 +487,44 @@ namespace ChargifyDotNet
             }
         }
 
+        /// <summary>
+        /// The price tier ID
+        /// </summary>
         public long Id { get => _id; set => _id = value; }
 
+        /// <summary>
+        /// The ID of the component this tier belongs to
+        /// </summary>
         public long ComponentId { get => _componentId; set => _componentId = value; }
 
+        /// <summary>
+        /// The first quantity this tier applies to
+        /// </summary>
         public long StartingQuantity { get => _startingQuantity; set => _startingQuantity = value; }
 
+        /// <summary>
+        /// The last quantity this tier applies to (0 or unset for an open-ended tier)
+        /// </summary>
         public long EndingQuantity { get => _endingQuantity; set => _endingQuantity = value; }
 
+        /// <summary>
+        /// The price per unit in this tier
+        /// </summary>
         public decimal UnitPrice { get => _unitPrice; set => _unitPrice = value; }
 
+        /// <summary>
+        /// The ID of the price point this tier belongs to
+        /// </summary>
         public long PricePointId { get => _pricePointId; set => _pricePointId = value; }
 
+        /// <summary>
+        /// The unit price formatted by Chargify for display
+        /// </summary>
         public string FormattedUnitPrice { get => _formattedUnitPrice; set => _formattedUnitPrice = value; }
 
+        /// <summary>
+        /// The ID of the event-based billing segment this tier belongs to, if any
+        /// </summary>
         public long SegmentId { get => _segmentId; set => _segmentId = value; }
     }
 }

@@ -159,6 +159,10 @@ namespace ChargifyDotNet
         public RenewalLineItem()
         { }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="xml">XML containing a line item</param>
         public RenewalLineItem(string xml)
             : base()
         {
@@ -357,12 +361,21 @@ namespace ChargifyDotNet
         public decimal TaxableAmount
         { get { return Convert.ToDecimal(TaxableAmountInCents) / 100; } }
 
+        /// <summary>
+        /// The handle of the product the line item is for
+        /// </summary>
         [XmlElement(ProductHandleKey), JsonProperty(ProductHandleKey)]
         public string ProductHandle { get; set; } = null!;
 
+        /// <summary>
+        /// The ID of the product the line item is for
+        /// </summary>
         [XmlElement(ProductIdKey), JsonProperty(ProductIdKey)]
         public long ProductId { get; set; }
 
+        /// <summary>
+        /// The name of the product the line item is for
+        /// </summary>
         [XmlElement(ProductNameKey), JsonProperty(ProductNameKey)]
         public string ProductName { get; set; } = null!;
 

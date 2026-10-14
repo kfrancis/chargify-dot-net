@@ -94,6 +94,11 @@ namespace ChargifyDotNet
         }
 
         #endregion
+        /// <summary>
+        /// Parse the errors in a failed response's body. Reads the response content.
+        /// </summary>
+        /// <param name="response">The failed response</param>
+        /// <returns>The errors, or an empty list if the body has none or cannot be parsed.</returns>
         public static List<ChargifyError> ParseChargifyErrors(HttpResponseMessage response)
         {
             var errors = new List<ChargifyError>();
