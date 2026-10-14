@@ -558,10 +558,10 @@ namespace ChargifyDotNet
         {
             get
             {
-                return _product;
+                return _product!; // may be null if absent from the response; non-null in the 1.x contract
             }
         }
-        private IProduct _product = null!;
+        private IProduct? _product;
 
         /// <summary>
         /// Get the credit card information for this subscription
@@ -570,10 +570,10 @@ namespace ChargifyDotNet
         {
             get
             {
-                return _paymentProfile;
+                return _paymentProfile!; // may be null if absent from the response; non-null in the 1.x contract
             }
         }
-        private IPaymentProfileView _paymentProfile = null!;
+        private IPaymentProfileView? _paymentProfile;
 
         /// <summary>
         /// Get the customer information for this subscription
@@ -582,10 +582,10 @@ namespace ChargifyDotNet
         {
             get
             {
-                return _customer;
+                return _customer!; // may be null if absent from the response; non-null in the 1.x contract
             }
         }
-        private ICustomer _customer = null!;
+        private ICustomer? _customer;
 
         /// <summary>
         /// Is this subscription going to automatically cancel at the end of the current period?
@@ -792,7 +792,7 @@ namespace ChargifyDotNet
 
             if (obj is ISubscription)
             {
-                return (SubscriptionID == (obj as ISubscription).SubscriptionID);
+                return (SubscriptionID == ((ISubscription)obj).SubscriptionID);
             }
             return ReferenceEquals(this, obj);
         }

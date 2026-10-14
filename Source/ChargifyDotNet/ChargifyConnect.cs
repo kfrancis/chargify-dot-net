@@ -282,7 +282,7 @@ namespace ChargifyDotNet
         /// <summary>
         /// Caller can plug in a delegate for logging raw Chargify requests
         /// </summary>
-        public Action<HttpRequestMethod, string, string>? LogRequest { get; set; }
+        public Action<HttpRequestMethod, string, string?>? LogRequest { get; set; }
 
         /// <summary>
         /// Caller can plug in a delegate for logging raw Chargify responses
@@ -388,7 +388,7 @@ namespace ChargifyDotNet
             if (UseJSON)
             {
                 var metadatumResult = JsonConvert.DeserializeObject<IList<Metadata>>(response);
-                retVal = metadatumResult.Cast<IMetadata>().ToList();
+                retVal = metadatumResult?.Cast<IMetadata>().ToList() ?? new List<IMetadata>();
             }
             else
             {
@@ -743,7 +743,7 @@ namespace ChargifyDotNet
                 {
                     if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("customer"))
                     {
-                        var customerObj = (array.Items[i] as JsonObject)["customer"] as JsonObject;
+                        var customerObj = GetArrayItemObject(array, i, "customer");
                         var loadedCustomer = new Customer(customerObj);
                         var key = keyByChargifyId ? loadedCustomer.ChargifyID.ToString() : loadedCustomer.SystemID;
                         if (!retValue.ContainsKey(key))
@@ -1075,7 +1075,7 @@ namespace ChargifyDotNet
                 {
                     if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("product"))
                     {
-                        var productObj = (array.Items[i] as JsonObject)["product"] as JsonObject;
+                        var productObj = GetArrayItemObject(array, i, "product");
                         IProduct loadedProduct = new Product(productObj);
                         if (!retValue.ContainsKey(loadedProduct.ID))
                         {
@@ -1168,7 +1168,7 @@ namespace ChargifyDotNet
                 {
                     if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("product_family"))
                     {
-                        var productFamilyObj = (array.Items[i] as JsonObject)["product_family"] as JsonObject;
+                        var productFamilyObj = GetArrayItemObject(array, i, "product_family");
                         IProductFamily loadedProductFamily = new ProductFamily(productFamilyObj);
                         if (!retValue.ContainsKey(loadedProductFamily.ID))
                         {
@@ -1275,7 +1275,7 @@ namespace ChargifyDotNet
 
         static string Slug(string? s)
         {
-            if (string.IsNullOrWhiteSpace(s)) return string.Empty;
+            if (s is null || string.IsNullOrWhiteSpace(s)) return string.Empty;
             var sb = new StringBuilder();
             foreach (var c in s.Normalize(NormalizationForm.FormD))
                 if (CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark) sb.Append(c);
@@ -1662,7 +1662,7 @@ namespace ChargifyDotNet
                     {
                         if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("subscription"))
                         {
-                            var subscriptionObj = (array.Items[i] as JsonObject)["subscription"] as JsonObject;
+                            var subscriptionObj = GetArrayItemObject(array, i, "subscription");
                             ISubscription loadedSubscription = new Subscription(subscriptionObj);
                             if (!retValue.ContainsKey(loadedSubscription.SubscriptionID))
                             {
@@ -3604,7 +3604,7 @@ namespace ChargifyDotNet
                 var overrideXml = new StringBuilder(GetXmlStringIfApplicable());
                 overrideXml.Append("<subscription>");
                 if (activatedAt.HasValue) { overrideXml.AppendFormat("<activated_at>{0}</activated_at>", activatedAt.Value.ToString("o")); }
-                if (!string.IsNullOrEmpty(cancellationMessage)) { overrideXml.AppendFormat("<cancellation_message>{0}</cancellation_message>", PCLWebUtility.WebUtility.HtmlEncode(cancellationMessage)); }
+                if (cancellationMessage is { Length: > 0 }) { overrideXml.AppendFormat("<cancellation_message>{0}</cancellation_message>", PCLWebUtility.WebUtility.HtmlEncode(cancellationMessage)); }
                 if (canceledAt.HasValue) { overrideXml.AppendFormat("<canceled_at>{0}</canceled_at>", canceledAt.Value.ToString("o")); }
                 if (expiresAt.HasValue) { overrideXml.AppendFormat("<expires_at>{0}</expires_at>", expiresAt.Value.ToString("o")); }
                 overrideXml.Append("</subscription>");
@@ -3783,9 +3783,9 @@ namespace ChargifyDotNet
                     var array = JsonArray.Parse(response, ref position);
                     for (var i = 0; i <= array.Length - 1; i++)
                     {
-                        if ((array.Items[i] as JsonObject).ContainsKey("coupon"))
+                        if (array.Items[i] is JsonObject couponItem && couponItem.ContainsKey("coupon"))
                         {
-                            var couponObj = (array.Items[i] as JsonObject)["coupon"] as JsonObject;
+                            var couponObj = GetArrayItemObject(array, i, "coupon");
                             ICoupon loadedCooupon = new Coupon(couponObj);
                             if (!coupons.ContainsKey(loadedCooupon.ID))
                             {
@@ -4476,13 +4476,12 @@ namespace ChargifyDotNet
                 var jObj = JsonObject.Parse(response);
 
                 // should be expecting an array
-                var array = jObj["price_points"] as JsonArray;
+                var array = jObj["price_points"] as JsonArray ?? throw new JsonException("Expected 'price_points' to be a JSON array");
                 for (var i = 0; i <= array.Length - 1; i++)
                 {
                     if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("prices"))
                     {
-                        var componentObj = array.Items[i] as JsonObject;
-                        var loadedComponent = new ComponentPricePoint(componentObj);
+                        var loadedComponent = new ComponentPricePoint(jsonObject);
                         if (!retValue.ContainsKey(loadedComponent.Id))
                         {
                             retValue.Add(loadedComponent.Id, loadedComponent);
@@ -4535,8 +4534,8 @@ namespace ChargifyDotNet
                     pricePointXml.AppendFormat("<pricing_scheme>{0}</pricing_scheme>", pricingSchemeName.ToLowerInvariant());
             }
 
-            if (newPricePoint.RenewPrepaidAllocation.HasValue) pricePointXml.AppendFormat("<renew_prepaid_allocation>{0}</renew_prepaid_allocation>", newPricePoint.RenewPrepaidAllocation.ToString().ToLowerInvariant());
-            if (newPricePoint.RolloverPrepaidRemainder.HasValue) pricePointXml.AppendFormat("<rollover_prepaid_remainder>{0}</rollover_prepaid_remainder>", newPricePoint.RolloverPrepaidRemainder.ToString().ToLowerInvariant());
+            if (newPricePoint.RenewPrepaidAllocation.HasValue) pricePointXml.AppendFormat("<renew_prepaid_allocation>{0}</renew_prepaid_allocation>", newPricePoint.RenewPrepaidAllocation.Value.ToString().ToLowerInvariant());
+            if (newPricePoint.RolloverPrepaidRemainder.HasValue) pricePointXml.AppendFormat("<rollover_prepaid_remainder>{0}</rollover_prepaid_remainder>", newPricePoint.RolloverPrepaidRemainder.Value.ToString().ToLowerInvariant());
             if (newPricePoint.ArchivedAt.HasValue) pricePointXml.AppendFormat("<archived_at>{0}</archived_at>", newPricePoint.ArchivedAt);
             if (newPricePoint.ExpirationInterval > 0 && newPricePoint.RolloverPrepaidRemainder.HasValue)
             {
@@ -4720,7 +4719,7 @@ namespace ChargifyDotNet
                 {
                     if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("component"))
                     {
-                        var componentObj = (array.Items[i] as JsonObject)["component"] as JsonObject;
+                        var componentObj = GetArrayItemObject(array, i, "component");
                         IComponentAttributes loadedComponent = new ComponentAttributes(componentObj);
                         if (!retValue.ContainsKey(loadedComponent.ComponentID))
                         {
@@ -4790,7 +4789,7 @@ namespace ChargifyDotNet
                 {
                     if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("component"))
                     {
-                        var componentObj = (array.Items[i] as JsonObject)["component"] as JsonObject;
+                        var componentObj = GetArrayItemObject(array, i, "component");
                         IComponentInfo loadedComponent = new ComponentInfo(componentObj);
                         if (!retValue.ContainsKey(loadedComponent.ID))
                         {
@@ -4869,7 +4868,7 @@ namespace ChargifyDotNet
                 {
                     if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("component"))
                     {
-                        var componentObj = (array.Items[i] as JsonObject)["component"] as JsonObject;
+                        var componentObj = GetArrayItemObject(array, i, "component");
                         IComponent loadedComponent = new Component(componentObj);
                         if (!retValue.ContainsKey(loadedComponent.ID))
                         {
@@ -5009,7 +5008,7 @@ namespace ChargifyDotNet
                     {
                         if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey(ComponentAllocation.AllocationRootKey))
                         {
-                            var componentObj = (array.Items[i] as JsonObject)[ComponentAllocation.AllocationRootKey] as JsonObject;
+                            var componentObj = GetArrayItemObject(array, i, ComponentAllocation.AllocationRootKey);
                             IComponentAllocation loadedComponentAllocation = new ComponentAllocation(componentObj);
                             childComponentAllocations.Add(loadedComponentAllocation);
                         }
@@ -5308,7 +5307,7 @@ namespace ChargifyDotNet
                 {
                     if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("transaction"))
                     {
-                        var transactionObj = (array.Items[i] as JsonObject)["transaction"] as JsonObject;
+                        var transactionObj = GetArrayItemObject(array, i, "transaction");
                         ITransaction loadedTransaction = new Transaction(transactionObj);
                         if (!retValue.ContainsKey(loadedTransaction.ID))
                         {
@@ -5505,7 +5504,7 @@ namespace ChargifyDotNet
                 {
                     if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("transaction"))
                     {
-                        var transactionObj = (array.Items[i] as JsonObject)["transaction"] as JsonObject;
+                        var transactionObj = GetArrayItemObject(array, i, "transaction");
                         ITransaction loadedTransaction = new Transaction(transactionObj);
                         if (!retValue.ContainsKey(loadedTransaction.ID))
                         {
@@ -5795,7 +5794,7 @@ namespace ChargifyDotNet
                 {
                     if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("statement"))
                     {
-                        var statementObj = (array.Items[i] as JsonObject)["statement"] as JsonObject;
+                        var statementObj = GetArrayItemObject(array, i, "statement");
                         IStatement loadedStatement = new Statement(statementObj);
                         if (!retValue.ContainsKey(loadedStatement.ID))
                         {
@@ -6384,7 +6383,7 @@ namespace ChargifyDotNet
                 {
                     if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("note"))
                     {
-                        var componentObj = (array.Items[i] as JsonObject)["note"] as JsonObject;
+                        var componentObj = GetArrayItemObject(array, i, "note");
                         INote loadedComponent = new Note(componentObj);
                         if (!retValue.ContainsKey(loadedComponent.ID))
                         {
@@ -6537,7 +6536,7 @@ namespace ChargifyDotNet
                 return json;
 
             var xmlNode = JsonConvert.DeserializeXmlNode(json);
-            return xmlNode.InnerXml;
+            return xmlNode?.InnerXml ?? string.Empty;
         }
 
         private static Dictionary<int, T> GetListedJsonResponse<T>(string key, string response)
@@ -6552,8 +6551,9 @@ namespace ChargifyDotNet
             {
                 if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey(key))
                 {
-                    var jsonObj = (array.Items[i] as JsonObject)[key] as JsonObject;
-                    var value = (T)Activator.CreateInstance(typeof(T), jsonObj);
+                    var jsonObj = jsonObject[key] as JsonObject;
+                    // Activator.CreateInstance only returns null for Nullable<T>; T is a class here.
+                    var value = (T)Activator.CreateInstance(typeof(T), jsonObj)!;
                     if (!retValue.ContainsKey(value.ID))
                     {
                         retValue.Add(value.ID, value);
@@ -6587,7 +6587,7 @@ namespace ChargifyDotNet
                     {
                         if (childNode.Name == key)
                         {
-                            var value = (T)Activator.CreateInstance(typeof(T), childNode);
+                            var value = (T)Activator.CreateInstance(typeof(T), childNode)!;
                             if (!retValue.ContainsKey(value.ID))
                             {
                                 retValue.Add(value.ID, value);
@@ -6913,7 +6913,7 @@ namespace ChargifyDotNet
 
             if (requestMethod == HttpRequestMethod.Post || requestMethod == HttpRequestMethod.Put || requestMethod == HttpRequestMethod.Delete)
             {
-                if (!string.IsNullOrEmpty(postData))
+                if (postData is { Length: > 0 })
                 {
                     if (UseJSON)
                     {
@@ -6927,7 +6927,7 @@ namespace ChargifyDotNet
                         dataToPost = XmlToJsonConverter.XmlToJson(doc);
                     }
 
-                    content = new StringContent(dataToPost, Encoding.UTF8, contentType);
+                    content = new StringContent(dataToPost ?? postData, Encoding.UTF8, contentType);
                 }
             }
 
@@ -6940,6 +6940,15 @@ namespace ChargifyDotNet
             LogResponse?.Invoke(response.StatusCode, addressString, retValue);
 
             return retValue;
+        }
+
+        /// <summary>
+        /// Returns <c>array[index][key]</c> as a JsonObject, throwing a JsonException when the response is not shaped as expected.
+        /// </summary>
+        private static JsonObject GetArrayItemObject(JsonArray array, int index, string key)
+        {
+            if (array.Items[index] is not JsonObject item) throw new JsonException($"Expected a JSON object at index {index}");
+            return item[key] as JsonObject ?? throw new JsonException($"Expected '{key}' at index {index} to be a JSON object");
         }
 
         private static string? SanitizePostData(string? postData)
@@ -7011,7 +7020,7 @@ namespace ChargifyDotNet
                     {
                         var dataAsJson = JsonConvert.SerializeObject(body);
                         var dataAsJObject = JsonConvert.DeserializeXmlNode(dataAsJson);
-                        postData = GetXmlStringIfApplicable() + dataAsJObject.InnerXml;
+                        postData = GetXmlStringIfApplicable() + dataAsJObject?.InnerXml;
                     }
 
                     contentType = "text/xml";

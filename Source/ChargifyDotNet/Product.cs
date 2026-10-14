@@ -388,10 +388,10 @@ namespace ChargifyDotNet
         {
             get
             {
-                return _productFamily;
+                return _productFamily!; // may be null if absent from the response; non-null in the 1.x contract
             }
         }
-        private IProductFamily _productFamily = null!;
+        private IProductFamily? _productFamily;
 
         /// <summary>
         /// Get the accounting code for this product

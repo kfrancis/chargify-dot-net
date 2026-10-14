@@ -151,12 +151,12 @@ namespace ChargifyDotNet
                         _pricingScheme = obj.GetJSONContentAsPricingSchemeType(key);
                         break;
                     case "overage_pricing":
-                        var overrage = obj[key] as JsonObject;
+                        if (obj[key] is not JsonObject overrage) break;
                         _overagePricingScheme = overrage.GetJSONContentAsPricingSchemeType("pricing_scheme");
                         _overagePricingPrices = overrage.GetJSONContentAsPrices("prices");
                         var overrageArray = overrage["prices"] as JsonArray;
                         // Sanity check, should be equal.
-                        if (overrage["prices"] != null && (overrage["prices"] as JsonArray).Length != _overagePricingPrices.Count)
+                        if (overrageArray != null && overrageArray.Length != _overagePricingPrices.Count)
                         {
                             throw new JsonParseException(string.Format("Unable to parse charges ({0} != {1})", overrageArray.Length, _overagePricingPrices.Count));
                         }
@@ -222,7 +222,8 @@ namespace ChargifyDotNet
                                     _overagePricingScheme = childNode.GetNodeContentAsPricingSchemeType();
                                     break;
                                 case "price":
-                                    _overagePricingPrices.Add(childNode.GetNodeContentAsComponentPrice());
+                                    var item = childNode.GetNodeContentAsComponentPrice();
+                                    if (item is not null) _overagePricingPrices.Add(item);
                                     break;
                             }
                         }

@@ -9,14 +9,14 @@ namespace ChargifyDotNet.Json
     /// </summary>
     public sealed class JsonObject : JsonValue
     {
-        readonly Dictionary<string, JsonValue> _value;
+        readonly Dictionary<string, JsonValue?> _value;
 
         /// <summary>
         /// Enumerator into this object
         /// </summary>
         /// <param name="key">The string key to evaluate</param>
-        /// <returns>The JsonValue at key</returns>
-        public JsonValue this[string key]
+        /// <returns>The JsonValue at key (null for a JSON <c>null</c>)</returns>
+        public JsonValue? this[string key]
         {
             get
             {
@@ -43,7 +43,7 @@ namespace ChargifyDotNet.Json
 
         JsonObject()
         {
-            _value = new Dictionary<string, JsonValue>();
+            _value = new Dictionary<string, JsonValue?>();
         }
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace ChargifyDotNet.Json
         /// <param name="key">The proposed key</param>
         /// <param name="value">The value to retrieve it to</param>
         /// <returns>True if successful, false otherwise.</returns>
-        public bool TryGetValue(string key, out JsonValue value)
+        public bool TryGetValue(string key, out JsonValue? value)
         {
             value = null;
 
@@ -80,7 +80,7 @@ namespace ChargifyDotNet.Json
             return _value.ContainsKey(key);
         }
 
-        void Add(string key, JsonValue value)
+        void Add(string key, JsonValue? value)
         {
             if (key == null)
                 throw new NullReferenceException(nameof(key));
@@ -96,7 +96,8 @@ namespace ChargifyDotNet.Json
         /// </summary>
         /// <param name="str">The string to parse</param>
         /// <returns>JsonObject if applicable, null otherwise. JsonParseException if not properly formatted.</returns>
-        public static JsonObject Parse(string str)
+        [return: System.Diagnostics.CodeAnalysis.NotNullIfNotNull(nameof(str))]
+        public static JsonObject? Parse(string? str)
         {
             if (str == null)
                 return null;
@@ -105,10 +106,11 @@ namespace ChargifyDotNet.Json
                 throw new JsonParseException("Json string does not terminates with '}': " + str);
 
             var startPos = 0;
-            return Parse(str, ref startPos);
+            // str ends with '}', so it is never empty and Parse(str, ref) returns an object or throws.
+            return Parse(str, ref startPos)!;
         }
 
-        internal static JsonObject Parse(string str, ref int position)
+        internal static JsonObject? Parse(string str, ref int position)
         {
             EatSpaces(str, ref position);
 

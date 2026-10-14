@@ -160,8 +160,7 @@ namespace ChargifyDotNet
                         {
                             foreach (var jsonValue in pricesArray.Items)
                             {
-                                var priceObj = (JsonObject)jsonValue;
-                                if (priceObj == null) continue;
+                                if (jsonValue is not JsonObject priceObj) continue;
                                 var bracketInfo = new PriceBracketInfo();
 
                                 foreach (var bracketKey in priceObj.Keys)

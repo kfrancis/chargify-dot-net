@@ -103,7 +103,7 @@ namespace ChargifyDotNet
         {
             if (couponObject == null) throw new ArgumentNullException("referralCodeObject");
             if (couponObject.Keys.Count <= 0) throw new ArgumentException("Not a vaild coupon object", "referralCodeObject");
-            this.LoadFromJSON(couponObject["referral_code"] as JsonObject);
+            this.LoadFromJSON(couponObject["referral_code"] as JsonObject ?? throw new ArgumentException("Missing 'referral_code' object", "referralCodeObject"));
         }
 
         /// <summary>

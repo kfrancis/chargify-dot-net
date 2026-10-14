@@ -2350,6 +2350,11 @@
             <param name="postData">The data included as part of a POST, PUT or DELETE request</param>
             <returns>The xml response to the request</returns>
         </member>
+        <member name="M:ChargifyDotNet.ChargifyConnect.GetArrayItemObject(ChargifyDotNet.Json.JsonArray,System.Int32,System.String)">
+            <summary>
+            Returns <c>array[index][key]</c> as a JsonObject, throwing a JsonException when the response is not shaped as expected.
+            </summary>
+        </member>
         <member name="M:ChargifyDotNet.ChargifyConnect.DoNewRequest(System.String,ChargifyDotNet.HttpRequestMethod,System.Object)">
             <summary>
             Make a request to Chargify
@@ -8876,7 +8881,7 @@
             Enumerator into this object
             </summary>
             <param name="key">The string key to evaluate</param>
-            <returns>The JsonValue at key</returns>
+            <returns>The JsonValue at key (null for a JSON <c>null</c>)</returns>
         </member>
         <member name="P:ChargifyDotNet.Json.JsonObject.Keys">
             <summary>

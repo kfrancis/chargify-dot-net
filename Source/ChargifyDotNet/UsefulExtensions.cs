@@ -243,7 +243,7 @@ namespace ChargifyDotNet
         /// <param name="sharedKey">The site shared key from Chargify</param>
         /// <param name="givenSignature">The signature returned along side the webhook for verification</param>
         /// <returns>True if verified, false otherwise.</returns>
-        public static bool IsWebhookRequestValid(this Stream requestStream, string sharedKey, string givenSignature = null)
+        public static bool IsWebhookRequestValid(this Stream requestStream, string sharedKey, string? givenSignature = null)
         {
             var retVal = true;
             string possibleData;
@@ -474,9 +474,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="value">The value to convert.</param>
         /// <returns>The guid object of value.</returns>
-        public static Guid ConvertToGuid(this string value)
+        public static Guid ConvertToGuid(this string? value)
         {
-            return string.IsNullOrEmpty(value) ? Guid.Empty : (s_guidRegex.IsMatch(value) ? new Guid(value) : Guid.Empty);
+            return value is null || value.Length == 0 ? Guid.Empty : (s_guidRegex.IsMatch(value) ? new Guid(value) : Guid.Empty);
         }
 
         /// <summary>
@@ -883,7 +883,7 @@ namespace ChargifyDotNet
             {
                 foreach (var jsonValue in renewalLineItemsArray.Items)
                 {
-                    var renewalLineItem = (JsonObject)jsonValue;
+                    if (jsonValue is not JsonObject renewalLineItem) continue;
                     renewalLineItems.Add(new RenewalLineItem(renewalLineItem));
                 }
             }
@@ -908,7 +908,8 @@ namespace ChargifyDotNet
                 switch (childNode.Name)
                 {
                     case "line_item":
-                        lineItems.Add(childNode.GetNodeContentAsRenewalLineItem());
+                        var item = childNode.GetNodeContentAsRenewalLineItem();
+                        if (item is not null) lineItems.Add(item);
                         break;
                 }
             }
@@ -934,7 +935,8 @@ namespace ChargifyDotNet
                 switch (childNode.Name)
                 {
                     case "public_signup_page":
-                        publicSignupPages.Add(childNode.GetNodeContentAsPublicSignupPage());
+                        var item = childNode.GetNodeContentAsPublicSignupPage();
+                        if (item is not null) publicSignupPages.Add(item);
                         break;
                 }
             }
@@ -961,7 +963,7 @@ namespace ChargifyDotNet
             {
                 foreach (var jsonValue in publicSignupPagesArray.Items)
                 {
-                    var publicSignupPage = (JsonObject)jsonValue;
+                    if (jsonValue is not JsonObject publicSignupPage) continue;
                     publicSignupPages.Add(new PublicSignupPage(publicSignupPage));
                 }
             }
@@ -1128,7 +1130,7 @@ namespace ChargifyDotNet
             {
                 foreach (var jsonValue in pricePointsArray.Items)
                 {
-                    var pricePoint = (JsonObject)jsonValue;
+                    if (jsonValue is not JsonObject pricePoint) continue;
                     pricePoints.Add(new ComponentPricePoint(pricePoint));
                 }
             }
@@ -1148,7 +1150,7 @@ namespace ChargifyDotNet
             {
                 foreach (var jsonValue in pricesArray.Items)
                 {
-                    var price = (JsonObject)jsonValue;
+                    if (jsonValue is not JsonObject price) continue;
                     prices.Add(new ComponentPrice(price));
                 }
             }
@@ -1183,7 +1185,8 @@ namespace ChargifyDotNet
                 switch (childNode.Name)
                 {
                     case "price_point":
-                        pricePoints.Add(childNode.GetNodeContentAsComponentPricePoint());
+                        var item = childNode.GetNodeContentAsComponentPricePoint();
+                        if (item is not null) pricePoints.Add(item);
                         break;
                 }
             }
@@ -1204,7 +1207,8 @@ namespace ChargifyDotNet
                 switch (childNode.Name)
                 {
                     case "price":
-                        prices.Add(childNode.GetNodeContentAsComponentPrice());
+                        var item = childNode.GetNodeContentAsComponentPrice();
+                        if (item is not null) prices.Add(item);
                         break;
                 }
             }
@@ -1469,9 +1473,8 @@ namespace ChargifyDotNet
         public static TransactionType GetNodeContentAsTransactionType(this XmlNode node)
         {
             var result = TransactionType.Unknown;
-            if (node.FirstChild != null)
+            if (node.FirstChild?.Value is { } nodeText)
             {
-                var nodeText = node.FirstChild.Value;
                 result = (TransactionType)Enum.Parse(typeof(TransactionType), nodeText, true);
             }
             return result;
@@ -1503,9 +1506,9 @@ namespace ChargifyDotNet
         public static SubscriptionState GetNodeContentAsSubscriptionState(this XmlNode node)
         {
             var result = SubscriptionState.Unknown;
-            if (node.FirstChild != null)
+            if (node.FirstChild?.Value is { } nodeText)
             {
-                result = (SubscriptionState)Enum.Parse(typeof(SubscriptionState), node.FirstChild.Value, true);
+                result = (SubscriptionState)Enum.Parse(typeof(SubscriptionState), nodeText, true);
             }
             return result;
         }
@@ -1520,9 +1523,9 @@ namespace ChargifyDotNet
             T result = default;
             if (node.FirstChild != null)
             {
-                if (CheckEnumIsDefined<T>(node.FirstChild.Value))
+                if (node.FirstChild.Value is { } nodeText && CheckEnumIsDefined<T>(nodeText))
                 {
-                    result = (T)Enum.Parse(typeof(T), node.FirstChild.Value, true);
+                    result = (T)Enum.Parse(typeof(T), nodeText, true);
                 }
             }
             return result;
@@ -1742,7 +1745,7 @@ namespace ChargifyDotNet
         /// <typeparam name="T">The type of enum</typeparam>
         /// <param name="value">The string value</param>
         /// <returns>True if defined, false otherwise</returns>
-        public static bool CheckEnumIsDefined<T>(this string value)
+        public static bool CheckEnumIsDefined<T>(this string? value)
         {
             return Enum.GetNames(typeof(T)).Any(x => string.Equals(x, value, StringComparison.CurrentCultureIgnoreCase));
         }

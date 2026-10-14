@@ -238,7 +238,7 @@ namespace ChargifyDotNet
                         {
                             foreach (var jsonValue in transactionsArray.Items)
                             {
-                                var transaction = (JsonObject)jsonValue;
+                                if (jsonValue is not JsonObject transaction) continue;
                                 _transactions.Add(new Transaction(transaction));
                             }
                         }
@@ -358,7 +358,8 @@ namespace ChargifyDotNet
                             switch (childNode.Name)
                             {
                                 case "transaction":
-                                    _transactions.Add(childNode.GetNodeContentAsTransaction());
+                                    var item = childNode.GetNodeContentAsTransaction();
+                                    if (item is not null) _transactions.Add(item);
                                     break;
                             }
                         }
