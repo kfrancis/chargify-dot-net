@@ -241,11 +241,10 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="requestStream">The request stream</param>
         /// <param name="sharedKey">The site shared key from Chargify</param>
-        /// <param name="givenSignature">The signature returned along side the webhook for verification</param>
-        /// <returns>True if verified, false otherwise.</returns>
+        /// <param name="givenSignature">The signature returned along side the webhook for verification (hex, either case)</param>
+        /// <returns>True if verified, false otherwise (including a missing or malformed signature).</returns>
         public static bool IsWebhookRequestValid(this Stream requestStream, string sharedKey, string? givenSignature = null)
         {
-            var retVal = true;
             string possibleData;
             using (StreamReader sr = new(requestStream))
             {
@@ -253,20 +252,12 @@ namespace ChargifyDotNet
                 possibleData = sr.ReadToEnd();
             }
 
-            if (!string.IsNullOrEmpty(possibleData))
-            {
-                var calculatedSignature = CalculateHMAC256Signature(possibleData, sharedKey);
-                if (calculatedSignature != givenSignature)
-                {
-                    retVal = false;
-                }
-            }
-            else
-            {
-                retVal = false;
-            }
+            if (string.IsNullOrEmpty(possibleData)) return false;
 
-            return retVal;
+            // Same encoding as CalculateHMAC256Signature, so results match that method.
+            ASCIIEncoding encoding = new();
+            var expected = ComputeHmacSha256(encoding.GetBytes(sharedKey), encoding.GetBytes(possibleData));
+            return FixedTimeEqualsHex(expected, givenSignature);
         }
 
         /// <summary>
@@ -280,9 +271,8 @@ namespace ChargifyDotNet
             ASCIIEncoding encoding = new();
             var keyByte = encoding.GetBytes(secret);
 
-            HMACSHA256 hmacsha256 = new(keyByte);
             var messageBytes = encoding.GetBytes(text);
-            var hashMessage = hmacsha256.ComputeHash(messageBytes);
+            var hashMessage = ComputeHmacSha256(keyByte, messageBytes);
             var hexaHash = string.Empty;
             foreach (var b in hashMessage) { hexaHash += string.Format("{0:x2}", b); }
 
@@ -295,30 +285,26 @@ namespace ChargifyDotNet
         /// <param name="text">The body of the webhook message</param>
         /// <param name="signature">The signature in the header of the message</param>
         /// <param name="sharedKey">The site shared key (used to validate)</param>
-        /// <returns>True if the signature matches the calculated value, false otherwise.</returns>
+        /// <returns>True if the signature matches the calculated value, false otherwise (including a missing,
+        /// malformed or truncated signature).</returns>
         public static bool IsChargifyWebhookContentValid(this string text, string signature, string sharedKey)
         {
             var unencryptedText = sharedKey + text;
             var unencryptedData = Encoding.UTF8.GetBytes(unencryptedText);
 
 #if NET8_0_OR_GREATER
-            // .NET 8+ - Use the static HashData method
             var hash = MD5.HashData(unencryptedData);
-            var hexaHash = Convert.ToHexString(hash).ToLowerInvariant();
-#elif NET5_0_OR_GREATER
-            // .NET 5-7 - Use MD5.Create() with Convert.ToHexString()
-            using var md5 = MD5.Create();
-            var hash = md5.ComputeHash(unencryptedData);
-            var hexaHash = Convert.ToHexString(hash).ToLowerInvariant();
 #else
-            // .NET Framework and .NET Core < 5.0 - Use MD5.Create() with manual hex conversion
-            using var md5 = MD5.Create();
-            var hash = md5.ComputeHash(unencryptedData);
-            var hexaHash = BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+            byte[] hash;
+            using (var md5 = MD5.Create())
+            {
+                hash = md5.ComputeHash(unencryptedData);
+            }
 #endif
 
-            // I'm not sure if it could be longer, so just compare the same number as characters.
-            return signature == hexaHash.Substring(0, signature.Length);
+            // The full 32-character digest is required. Previously only a prefix of the signature's own
+            // length was compared, so an empty signature verified any body.
+            return FixedTimeEqualsHex(hash, signature);
         }
 
         /// <summary>
@@ -327,15 +313,56 @@ namespace ChargifyDotNet
         /// <param name="text">The body of the webhook message</param>
         /// <param name="signature">The signature in the header of the message</param>
         /// <param name="sharedKey">The site shared key (used to validate)</param>
-        /// <returns>True if the signature matches the calculated value, false otherwise.</returns>
+        /// <returns>True if the signature matches the calculated value, false otherwise (including a missing or
+        /// malformed signature).</returns>
         public static bool IsChargifyWebhookContentValidHMAC(string text, string signature, string sharedKey)
         {
-            var uncryptedData = Encoding.UTF8.GetBytes(text);
+            var hash = ComputeHmacSha256(Encoding.UTF8.GetBytes(sharedKey), Encoding.UTF8.GetBytes(text));
+            return FixedTimeEqualsHex(hash, signature);
+        }
 
-            HMACSHA256 hmac = new(Encoding.UTF8.GetBytes(sharedKey));
-            var hash = hmac.ComputeHash(uncryptedData);
+        private static byte[] ComputeHmacSha256(byte[] key, byte[] data)
+        {
+            using var hmac = new HMACSHA256(key);
+            return hmac.ComputeHash(data);
+        }
 
-            return string.Equals(BitConverter.ToString(hash).Replace("-", ""), signature, StringComparison.OrdinalIgnoreCase);
+        /// <summary>
+        /// Compares a computed digest with a hex signature (either case) in time that does not depend on where
+        /// they differ. A null, malformed or wrong-length signature returns false.
+        /// </summary>
+        internal static bool FixedTimeEqualsHex(byte[] expected, string? givenHex)
+        {
+            if (givenHex is null || givenHex.Length != expected.Length * 2) return false;
+
+            var given = new byte[expected.Length];
+            for (var i = 0; i < given.Length; i++)
+            {
+                var hi = HexValue(givenHex[2 * i]);
+                var lo = HexValue(givenHex[(2 * i) + 1]);
+                if (hi < 0 || lo < 0) return false;
+                given[i] = (byte)((hi << 4) | lo);
+            }
+
+#if NETCOREAPP2_1_OR_GREATER
+            return CryptographicOperations.FixedTimeEquals(expected, given);
+#else
+            // CryptographicOperations is not available on net452 / netstandard2.0.
+            var diff = 0;
+            for (var i = 0; i < expected.Length; i++)
+            {
+                diff |= expected[i] ^ given[i];
+            }
+            return diff == 0;
+#endif
+        }
+
+        private static int HexValue(char c)
+        {
+            if (c >= '0' && c <= '9') return c - '0';
+            if (c >= 'a' && c <= 'f') return c - 'a' + 10;
+            if (c >= 'A' && c <= 'F') return c - 'A' + 10;
+            return -1;
         }
 
         /// <summary>
@@ -349,7 +376,7 @@ namespace ChargifyDotNet
             ASCIIEncoding encoding = new();
             var keyByte = encoding.GetBytes(api_secret);
 
-            HMACSHA1 hmacsha1 = new(keyByte);
+            using HMACSHA1 hmacsha1 = new(keyByte);
             var messageBytes = encoding.GetBytes(text);
             var hashMessage = hmacsha1.ComputeHash(messageBytes);
             var hexaHash = "";

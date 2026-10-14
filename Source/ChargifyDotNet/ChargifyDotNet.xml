@@ -12115,8 +12115,8 @@
             </summary>
             <param name="requestStream">The request stream</param>
             <param name="sharedKey">The site shared key from Chargify</param>
-            <param name="givenSignature">The signature returned along side the webhook for verification</param>
-            <returns>True if verified, false otherwise.</returns>
+            <param name="givenSignature">The signature returned along side the webhook for verification (hex, either case)</param>
+            <returns>True if verified, false otherwise (including a missing or malformed signature).</returns>
         </member>
         <member name="M:ChargifyDotNet.UsefulExtensions.CalculateHMAC256Signature(System.String,System.String)">
             <summary>
@@ -12133,7 +12133,8 @@
             <param name="text">The body of the webhook message</param>
             <param name="signature">The signature in the header of the message</param>
             <param name="sharedKey">The site shared key (used to validate)</param>
-            <returns>True if the signature matches the calculated value, false otherwise.</returns>
+            <returns>True if the signature matches the calculated value, false otherwise (including a missing,
+            malformed or truncated signature).</returns>
         </member>
         <member name="M:ChargifyDotNet.UsefulExtensions.IsChargifyWebhookContentValidHMAC(System.String,System.String,System.String)">
             <summary>
@@ -12142,7 +12143,14 @@
             <param name="text">The body of the webhook message</param>
             <param name="signature">The signature in the header of the message</param>
             <param name="sharedKey">The site shared key (used to validate)</param>
-            <returns>True if the signature matches the calculated value, false otherwise.</returns>
+            <returns>True if the signature matches the calculated value, false otherwise (including a missing or
+            malformed signature).</returns>
+        </member>
+        <member name="M:ChargifyDotNet.UsefulExtensions.FixedTimeEqualsHex(System.Byte[],System.String)">
+            <summary>
+            Compares a computed digest with a hex signature (either case) in time that does not depend on where
+            they differ. A null, malformed or wrong-length signature returns false.
+            </summary>
         </member>
         <member name="M:ChargifyDotNet.UsefulExtensions.GetChargifyDirectSignature(System.String,System.String)">
             <summary>
