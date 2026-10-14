@@ -13,7 +13,7 @@ namespace ChargifyDotNetTests.Base
 
         public static Random GetThreadRandom()
         {
-            return randomWrapper.Value;
+            return randomWrapper.Value!; // the ThreadLocal factory never returns null
         }
     }
 }

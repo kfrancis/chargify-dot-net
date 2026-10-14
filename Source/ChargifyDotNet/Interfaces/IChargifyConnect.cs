@@ -114,7 +114,7 @@ namespace ChargifyDotNet
         /// <param name="ComponentID">The ID of the component (on/off only) to modify</param>
         /// <param name="SetEnabled">True if wanting to turn the component "on", false otherwise.</param>
         /// <returns>IComponentAttributes object if successful, null otherwise.</returns>
-        IComponentAttributes SetComponent(int SubscriptionID, int ComponentID, bool SetEnabled);
+        IComponentAttributes? SetComponent(int SubscriptionID, int ComponentID, bool SetEnabled);
         /// <summary>
         /// Method for getting a list of component usages for a specific subscription
         /// </summary>
@@ -162,7 +162,7 @@ namespace ChargifyDotNet
         /// <param name="ComponentID">The componentID to scope this request</param>
         /// <param name="Page">Pass an integer in the page parameter via the query string to access subsequent pages of 50 transactions</param>
         /// <returns>A dictionary of allocation objects keyed by ComponentID, or null.</returns>
-        IDictionary<int, List<IComponentAllocation>> GetAllocationListForSubscriptionComponent(int SubscriptionID, int ComponentID, int? Page = 0);
+        IDictionary<int, List<IComponentAllocation>>? GetAllocationListForSubscriptionComponent(int SubscriptionID, int ComponentID, int? Page = 0);
         /// <summary>
         /// Creates a new Allocation, setting the current allocated quantity for the component and recording a memo.
         /// </summary>
@@ -170,7 +170,7 @@ namespace ChargifyDotNet
         /// <param name="ComponentID"></param>
         /// <param name="Allocation"></param>
         /// <returns></returns>
-        IComponentAllocation CreateComponentAllocation(int SubscriptionID, int ComponentID, ComponentAllocation Allocation);
+        IComponentAllocation? CreateComponentAllocation(int SubscriptionID, int ComponentID, ComponentAllocation Allocation);
 
         /// <summary>
         /// Creates a new Allocation, setting the current allocated quantity for the component and recording a memo.
@@ -179,7 +179,7 @@ namespace ChargifyDotNet
         /// <param name="ComponentID">The ID of the component to apply this quantity allocation to</param>
         /// <param name="Quantity">The allocated quantity to which to set the line-items allocated quantity. This should always be an integer. For On/Off components, use 1 for on and 0 for off.</param>
         /// <returns></returns>
-        IComponentAllocation CreateComponentAllocation(int SubscriptionID, int ComponentID, int Quantity);
+        IComponentAllocation? CreateComponentAllocation(int SubscriptionID, int ComponentID, int Quantity);
 
         /// <summary>
         /// Creates a new Allocation, setting the current allocated quantity for the component and recording a memo.
@@ -189,7 +189,7 @@ namespace ChargifyDotNet
         /// <param name="Quantity">The allocated quantity to which to set the line-items allocated quantity. This should always be an integer. For On/Off components, use 1 for on and 0 for off.</param>
         /// <param name="Memo">(optional) A memo to record along with the allocation</param>
         /// <returns></returns>
-        IComponentAllocation CreateComponentAllocation(int SubscriptionID, int ComponentID, int Quantity, string Memo);
+        IComponentAllocation? CreateComponentAllocation(int SubscriptionID, int ComponentID, int Quantity, string Memo);
 
         /// <summary>
         /// Creates a new Allocation, setting the current allocated quantity for the component and recording a memo.
@@ -201,7 +201,7 @@ namespace ChargifyDotNet
         /// <param name="UpgradeScheme">(optional) The scheme used if the proration is an upgrade. Defaults to the site setting if one is not provided.</param>
         /// <param name="DowngradeScheme">(optional) The scheme used if the proration is a downgrade. Defaults to the site setting if one is not provided.</param>
         /// <returns>The component allocation object, null otherwise.</returns>
-        IComponentAllocation CreateComponentAllocation(int SubscriptionID, int ComponentID, int Quantity, string Memo, ComponentUpgradeProrationScheme UpgradeScheme, ComponentDowngradeProrationScheme DowngradeScheme);
+        IComponentAllocation? CreateComponentAllocation(int SubscriptionID, int ComponentID, int Quantity, string Memo, ComponentUpgradeProrationScheme UpgradeScheme, ComponentDowngradeProrationScheme DowngradeScheme);
         #endregion
 
         #region Coupons
@@ -218,14 +218,14 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="ProductFamilyID">The ID of the product family that the coupon belongs to</param>
         /// <returns>A dictionary of objects if found, empty collection otherwise.</returns>
-        IDictionary<int, ICoupon> GetAllCoupons(int ProductFamilyID);
+        IDictionary<int, ICoupon>? GetAllCoupons(int ProductFamilyID);
 
         /// <summary>
         /// Method for retrieving information about a coupon usage using the ID of that coupon.
         /// </summary>
         /// <param name="CouponID">The ID of the coupon</param>
         /// <returns>The object if found, null otherwise.</returns>
-        IDictionary<int, ICouponUsage> GetCouponUsage(int CouponID);
+        IDictionary<int, ICouponUsage>? GetCouponUsage(int CouponID);
 
         /// <summary>
         /// Method to remove a coupon to a subscription using the API
@@ -242,7 +242,7 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="chargifyId">The ID of the customer (not reference)</param>
         /// <returns>The billing portal management link and additional information</returns>
-        IBillingManagementInfo GetManagementLink(long chargifyId);
+        IBillingManagementInfo? GetManagementLink(long chargifyId);
         #endregion
 
         #region Invoices
@@ -368,13 +368,13 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="ID">The ID of the payment profile</param>
         /// <returns>The payment profile, null if not found.</returns>
-        IPaymentProfileView LoadPaymentProfile(int ID);
+        IPaymentProfileView? LoadPaymentProfile(int ID);
         /// <summary>
         /// Updates a payment profile
         /// </summary>
         /// <param name="PaymentProfile">The payment profile object</param>
         /// <returns>The updated payment profile if successful, null or exception otherwise.</returns>
-        IPaymentProfileView UpdatePaymentProfile(PaymentProfileView PaymentProfile);
+        IPaymentProfileView? UpdatePaymentProfile(PaymentProfileView PaymentProfile);
         #endregion
 
         #region Product
@@ -396,14 +396,14 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="Handle">The Chargify ID or handle of the product</param>
         /// <returns>The product with the specified chargify ID</returns>
-        IProduct LoadProduct(string Handle);
+        IProduct? LoadProduct(string Handle);
         /// <summary>
         /// Load the requested product from chargify
         /// </summary>
         /// <param name="ProductID">The Chargify ID or handle of the product</param>
         /// <param name="IsHandle">If true, then the ProductID represents the handle, if false the ProductID represents the Chargify ID</param>
         /// <returns>The product with the specified chargify ID</returns>
-        IProduct LoadProduct(string ProductID, bool IsHandle);
+        IProduct? LoadProduct(string ProductID, bool IsHandle);
 
         /// <summary>
         /// Get a list of products
@@ -431,7 +431,7 @@ namespace ChargifyDotNet
         /// <param name="AccountingCode">The accounting code used for this product</param>
         /// <param name="Description">The product description</param>
         /// <returns>The created product</returns>
-        IProduct CreateProduct(int ProductFamilyID, string Name, string Handle, int PriceInCents, int Interval, IntervalUnit IntervalUnit, string AccountingCode, string Description);
+        IProduct CreateProduct(int ProductFamilyID, string Name, string Handle, int PriceInCents, int Interval, IntervalUnit IntervalUnit, string? AccountingCode, string? Description);
         #endregion
 
         #region Renewal Preview
@@ -471,7 +471,7 @@ namespace ChargifyDotNet
         /// <param name="SubscriptionID">The related subscription id</param>
         /// <param name="NoteID">The id of the ntoe</param>
         /// <returns></returns>
-        INote LoadNote(int SubscriptionID, int NoteID);
+        INote? LoadNote(int SubscriptionID, int NoteID);
 
         /// <summary>
         /// Delete a note
@@ -491,7 +491,12 @@ namespace ChargifyDotNet
         #endregion
 
         #region Referral Codes
-        IReferralCode ValidateReferralCode(string ReferralCode);
+        /// <summary>
+        /// Check whether a referral code is valid.
+        /// </summary>
+        /// <param name="ReferralCode">The referral code</param>
+        /// <returns>The referral code if found, null otherwise.</returns>
+        IReferralCode? ValidateReferralCode(string ReferralCode);
         #endregion
 
         #region Usage
@@ -523,13 +528,13 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="Handle">The Chargify ID or handle of the product</param>
         /// <returns>The product family with the specified chargify ID</returns>
-        IProductFamily LoadProductFamily(string Handle);
+        IProductFamily? LoadProductFamily(string Handle);
         /// <summary>
         /// Load the requested product family from chargify by its handle
         /// </summary>
         /// <param name="ID">The Chargify ID of the product</param>
         /// <returns>The product family with the specified chargify ID</returns>
-        IProductFamily LoadProductFamily(int ID);
+        IProductFamily? LoadProductFamily(int ID);
         #endregion
 
         #region Charges
@@ -579,7 +584,7 @@ namespace ChargifyDotNet
         /// <param name="ProductFamilyID">The ID of the product family the coupon belongs to</param>
         /// <param name="CouponCode">The code used to represent the coupon</param>
         /// <returns>The object if found, otherwise null.</returns>
-        ICoupon FindCoupon(int ProductFamilyID, string CouponCode);
+        ICoupon? FindCoupon(int ProductFamilyID, string CouponCode);
 
         /// <summary>
         /// Method for retrieving information about a coupon using the ID of that coupon.
@@ -587,7 +592,7 @@ namespace ChargifyDotNet
         /// <param name="ProductFamilyID">The ID of the product family that the coupon belongs to</param>
         /// <param name="CouponID">The ID of the coupon</param>
         /// <returns>The object if found, null otherwise.</returns>
-        ICoupon LoadCoupon(int ProductFamilyID, int CouponID);
+        ICoupon? LoadCoupon(int ProductFamilyID, int CouponID);
         #endregion
 
         #region Credit
@@ -679,13 +684,13 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="ChargifyID">The chargify id of the customer</param>
         /// <returns>The requested customer, null otherwise</returns>
-        ICustomer LoadCustomer(long ChargifyID);
+        ICustomer? LoadCustomer(long ChargifyID);
         /// <summary>
         /// Load the requested customer from chargify
         /// </summary>
         /// <param name="SystemID">The system ID of the customer</param>
         /// <returns>The customer with the specified chargify ID</returns>
-        ICustomer LoadCustomer(string SystemID);
+        ICustomer? LoadCustomer(string SystemID);
         #endregion
 
         #region Subscriptions
@@ -755,7 +760,7 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="Subscription">The subscription to update</param>
         /// <returns>The updated subscriptionn, null otherwise.</returns>
-        ISubscription UpdateSubscription(ISubscription Subscription);
+        ISubscription? UpdateSubscription(ISubscription Subscription);
         /// <summary>
         /// Update the collection method of the subscription
         /// </summary>
@@ -770,7 +775,7 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="SubscriptionID">The ID of the subscription to reactivate</param>
         /// <returns>The newly reactivated subscription, or nothing.</returns>
-        ISubscription ReactivateSubscription(int SubscriptionID);
+        ISubscription? ReactivateSubscription(int SubscriptionID);
         /// <summary>
         /// Chargify offers the ability to reactivate a previously canceled subscription. For details
         /// on how reactivation works, and how to reactivate subscriptions through the Admin interface, see
@@ -779,7 +784,7 @@ namespace ChargifyDotNet
         /// <param name="SubscriptionID">The ID of the subscription to reactivate</param>
         /// <param name="includeTrial">If true, the reactivated subscription will include a trial if one is available.</param>
         /// <returns>The newly reactivated subscription, or nothing.</returns>
-        ISubscription ReactivateSubscription(int SubscriptionID, bool includeTrial);
+        ISubscription? ReactivateSubscription(int SubscriptionID, bool includeTrial);
         /// <summary>
         /// Chargify offers the ability to reactivate a previously canceled subscription. For details
         /// on how reactivation works, and how to reactivate subscriptions through the Admin interface, see
@@ -790,7 +795,7 @@ namespace ChargifyDotNet
         /// <param name="preserveBalance">If true, the existing subscription balance will NOT be cleared/reset before adding the additional reactivation charges.</param>
         /// <param name="couponCode">The coupon code to be applied during reactivation.</param>
         /// <returns>The newly reactivated subscription, or nothing.</returns>
-        ISubscription ReactivateSubscription(int SubscriptionID, bool includeTrial, bool? preserveBalance, string couponCode);
+        ISubscription? ReactivateSubscription(int SubscriptionID, bool includeTrial, bool? preserveBalance, string couponCode);
         /// <summary>
         /// Method for reseting a subscription balance to zero (removes outstanding balance). 
         /// Useful when reactivating subscriptions, and making sure not to charge the user
@@ -866,7 +871,7 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="SubscriptionID">The ID of the subscription</param>
         /// <returns>The subscription with the specified ID</returns>
-        ISubscription LoadSubscription(int SubscriptionID);
+        ISubscription? LoadSubscription(int SubscriptionID);
         /// <summary>
         /// Create a subscription
         /// </summary>
@@ -1153,7 +1158,7 @@ namespace ChargifyDotNet
         /// <param name="CancelAtEndOfPeriod">True if the subscription should cancel at the end of the current period</param>
         /// <param name="CancellationMessage">The reason for cancelling.</param>
         /// <returns>Subscription if successful, null otherwise.</returns>
-        ISubscription UpdateDelayedCancelForSubscription(int SubscriptionID, bool CancelAtEndOfPeriod, string CancellationMessage);
+        ISubscription? UpdateDelayedCancelForSubscription(int SubscriptionID, bool CancelAtEndOfPeriod, string CancellationMessage);
         /// <summary>
         /// Method to get the secure URL (with pretty id) for updating the payment details for a subscription.
         /// </summary>
@@ -1167,7 +1172,7 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="chargifyId">The ChargifyID of the customer</param>
         /// <returns>A list of subscriptions</returns>
-        IDictionary<int, ISubscription> GetSubscriptionListForCustomer(long chargifyId);
+        IDictionary<int, ISubscription>? GetSubscriptionListForCustomer(long chargifyId);
         /// <summary>
         /// Method to get the secure URL for updating the payment details for a subscription.
         /// </summary>
@@ -1207,7 +1212,7 @@ namespace ChargifyDotNet
         /// <param name="ID">The ID of the transaction</param>
         /// <returns>The transaction with the specified ID</returns>
         /// <remarks>Unfortunately, this resource isn't yet available.</remarks>
-        ITransaction LoadTransaction(int ID);
+        ITransaction? LoadTransaction(int ID);
         /// <summary>
         /// Method for getting a list of transactions
         /// </summary>
@@ -1404,7 +1409,7 @@ namespace ChargifyDotNet
         /// <summary>
         /// SharedKey used for url generation
         /// </summary>
-        string SharedKey { get; set; }
+        string? SharedKey { get; set; }
 
         /// <summary>
         /// Get or set the URL for chargify
@@ -1425,7 +1430,7 @@ namespace ChargifyDotNet
         /// Caller can plug in a delegate for logging raw Chargify requests.
         /// Method, URL, and Data are the parameters.
         /// </summary>
-        Action<HttpRequestMethod, string, string>? LogRequest { get; set; }
+        Action<HttpRequestMethod, string, string?>? LogRequest { get; set; }
 
         /// <summary>
         /// Caller can plug in a delegate for logging raw Chargify responses (including errors)
@@ -1440,13 +1445,13 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="StatementID">The ID of the statement to retrieve</param>
         /// <returns>The statement if found, null otherwise.</returns>
-        IStatement LoadStatement(int StatementID);
+        IStatement? LoadStatement(int StatementID);
         /// <summary>
         /// Individual PDF Statements can be retrieved by using the Accept/Content-Type header application/pdf or appending .pdf as the format portion of the URL:
         /// </summary>
         /// <param name="StatementID">The ID of the statement to retrieve the byte[] for</param>
         /// <returns>A byte[] of the PDF data, to be sent to the user in a download</returns>
-        byte[] LoadStatementPDF(int StatementID);
+        byte[]? LoadStatementPDF(int StatementID);
         /// <summary>
         /// Method for getting a list of statment ids for a specific subscription
         /// </summary>

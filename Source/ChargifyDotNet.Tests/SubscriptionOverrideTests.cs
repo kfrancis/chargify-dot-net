@@ -30,6 +30,7 @@ namespace ChargifyDotNetTests
             // Act
             var result = Chargify.SetSubscriptionOverride(subscription.SubscriptionID, activatedAt, canceledAt, cancellationMessage, expiresAt);
             var retrievedSubscription = Chargify.Find<Subscription>(subscription.SubscriptionID);
+            Assert.IsNotNull(retrievedSubscription, "Subscription not found");
 
             // Assert
             Assert.IsTrue(result);

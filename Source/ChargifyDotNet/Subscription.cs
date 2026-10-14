@@ -348,6 +348,9 @@ namespace ChargifyDotNet
 
         #region ISubscription Members
 
+        /// <summary>
+        /// The referral code the subscription was created with, if any
+        /// </summary>
         public string ReferralCode
         {
             get
@@ -558,10 +561,10 @@ namespace ChargifyDotNet
         {
             get
             {
-                return _product;
+                return _product!; // may be null if absent from the response; non-null in the 1.x contract
             }
         }
-        private IProduct _product;
+        private IProduct? _product;
 
         /// <summary>
         /// Get the credit card information for this subscription
@@ -570,10 +573,10 @@ namespace ChargifyDotNet
         {
             get
             {
-                return _paymentProfile;
+                return _paymentProfile!; // may be null if absent from the response; non-null in the 1.x contract
             }
         }
-        private IPaymentProfileView _paymentProfile;
+        private IPaymentProfileView? _paymentProfile;
 
         /// <summary>
         /// Get the customer information for this subscription
@@ -582,10 +585,10 @@ namespace ChargifyDotNet
         {
             get
             {
-                return _customer;
+                return _customer!; // may be null if absent from the response; non-null in the 1.x contract
             }
         }
-        private ICustomer _customer;
+        private ICustomer? _customer;
 
         /// <summary>
         /// Is this subscription going to automatically cancel at the end of the current period?
@@ -702,7 +705,7 @@ namespace ChargifyDotNet
         /// Equals operator for two subscriptions
         /// </summary>
         /// <returns>True if the subscriptions are equal</returns>
-        public static bool operator ==(Subscription a, Subscription b)
+        public static bool operator ==(Subscription? a, Subscription? b)
         {
             // If both are null, or both are same instance, return true.
             if (ReferenceEquals(a, b)) { return true; }
@@ -717,7 +720,7 @@ namespace ChargifyDotNet
         /// Equals operator for two subscriptions
         /// </summary>
         /// <returns>True if the subscriptions are equal</returns>
-        public static bool operator ==(Subscription a, ISubscription b)
+        public static bool operator ==(Subscription? a, ISubscription? b)
         {
             // If both are null, or both are same instance, return true.
             if (ReferenceEquals(a, b)) { return true; }
@@ -732,7 +735,7 @@ namespace ChargifyDotNet
         /// Equals operator for two subscriptions
         /// </summary>
         /// <returns>True if the subscriptions are equal</returns>
-        public static bool operator ==(ISubscription a, Subscription b)
+        public static bool operator ==(ISubscription? a, Subscription? b)
         {
             // If both are null, or both are same instance, return true.
             if (ReferenceEquals(a, b)) { return true; }
@@ -747,7 +750,7 @@ namespace ChargifyDotNet
         /// Not Equals operator for two subscriptions
         /// </summary>
         /// <returns>True if the subscriptions are not equal</returns>
-        public static bool operator !=(Subscription a, Subscription b)
+        public static bool operator !=(Subscription? a, Subscription? b)
         {
             return !(a == b);
         }
@@ -756,7 +759,7 @@ namespace ChargifyDotNet
         /// Not Equals operator for two subscriptions
         /// </summary>
         /// <returns>True if the subscriptions are not equal</returns>
-        public static bool operator !=(Subscription a, ISubscription b)
+        public static bool operator !=(Subscription? a, ISubscription? b)
         {
             return !(a == b);
         }
@@ -765,7 +768,7 @@ namespace ChargifyDotNet
         /// Not Equals operator for two subscriptions
         /// </summary>
         /// <returns>True if the subscriptions are not equal</returns>
-        public static bool operator !=(ISubscription a, Subscription b)
+        public static bool operator !=(ISubscription? a, Subscription? b)
         {
             return !(a == b);
         }
@@ -786,13 +789,13 @@ namespace ChargifyDotNet
         /// Equals
         /// </summary>
         /// <param name="obj"></param>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj == null) return false;
 
             if (obj is ISubscription)
             {
-                return (SubscriptionID == (obj as ISubscription).SubscriptionID);
+                return (SubscriptionID == ((ISubscription)obj).SubscriptionID);
             }
             return ReferenceEquals(this, obj);
         }
@@ -824,8 +827,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="other">The other instance</param>
         /// <returns>The result of the comparison</returns>
-        public int CompareTo(ISubscription other)
+        public int CompareTo(ISubscription? other)
         {
+            if (other is null) return 1;
             return SubscriptionID.CompareTo(other.SubscriptionID);
         }
 
@@ -838,8 +842,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="other">The other instance</param>
         /// <returns>The result of the comparison</returns>
-        public int CompareTo(Subscription other)
+        public int CompareTo(Subscription? other)
         {
+            if (other is null) return 1;
             return SubscriptionID.CompareTo(other.SubscriptionID);
         }
 

@@ -176,7 +176,8 @@ namespace ChargifyDotNet.Tests
             string retVal;
             do
             {
-                retVal = generateValue(generateArg);
+                // Bogus generators treat a null argument as "use the default format"
+                retVal = generateValue(generateArg!);
             }
             while (retVal == oldValue);
             return retVal;
@@ -206,12 +207,13 @@ namespace ChargifyDotNet.Tests
         /// <param name="generateValue">The method (that returns string) that will be used to generate the random value</param>
         /// <param name="generateArg">An argument to be passed to the generateValue function</param>
         /// <returns>A new random string value that isn't the same as the existing/old value</returns>
-        protected static string GetNewRandomValue(string oldValue, Func<string, string> generateValue, string generateArg = null)
+        protected static string GetNewRandomValue(string oldValue, Func<string, string> generateValue, string? generateArg = null)
         {
             string retVal;
             do
             {
-                retVal = generateValue(generateArg);
+                // Bogus generators treat a null argument as "use the default format"
+                retVal = generateValue(generateArg!);
             }
             while (retVal == oldValue);
             return retVal;
@@ -221,10 +223,7 @@ namespace ChargifyDotNet.Tests
 
         internal void SetJson(bool useJson)
         {
-            if (Chargify != null)
-            {
-                _chargify.UseJSON = useJson;
-            }
+            Chargify.UseJSON = useJson;
         }
 
         internal static int GetRandomNegativeInt()
@@ -240,7 +239,7 @@ namespace ChargifyDotNet.Tests
         /// langword="false"/>.</param>
         /// <param name="customFailureMessage">An optional custom message to include if the validation fails. If <see langword="null"/>, a default failure
         /// message is used.</param>
-        internal static void ValidateRun(Func<bool> validation, string customFailureMessage = null)
+        internal static void ValidateRun(Func<bool> validation, string? customFailureMessage = null)
         {//To prevent "multiple asserts" in a single test class this masks the
             //idea of having multiple asserts and allows us to verify all data is valid before running
             if (!validation())

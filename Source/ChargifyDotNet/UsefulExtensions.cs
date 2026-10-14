@@ -243,7 +243,7 @@ namespace ChargifyDotNet
         /// <param name="sharedKey">The site shared key from Chargify</param>
         /// <param name="givenSignature">The signature returned along side the webhook for verification</param>
         /// <returns>True if verified, false otherwise.</returns>
-        public static bool IsWebhookRequestValid(this Stream requestStream, string sharedKey, string givenSignature = null)
+        public static bool IsWebhookRequestValid(this Stream requestStream, string sharedKey, string? givenSignature = null)
         {
             var retVal = true;
             string possibleData;
@@ -335,7 +335,7 @@ namespace ChargifyDotNet
             HMACSHA256 hmac = new(Encoding.UTF8.GetBytes(sharedKey));
             var hash = hmac.ComputeHash(uncryptedData);
 
-            return BitConverter.ToString(hash).Replace("-", "").ToLower() == signature.ToLower();
+            return string.Equals(BitConverter.ToString(hash).Replace("-", ""), signature, StringComparison.OrdinalIgnoreCase);
         }
 
         /// <summary>
@@ -474,9 +474,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="value">The value to convert.</param>
         /// <returns>The guid object of value.</returns>
-        public static Guid ConvertToGuid(this string value)
+        public static Guid ConvertToGuid(this string? value)
         {
-            return string.IsNullOrEmpty(value) ? Guid.Empty : (s_guidRegex.IsMatch(value) ? new Guid(value) : Guid.Empty);
+            return value is null || value.Length == 0 ? Guid.Empty : (s_guidRegex.IsMatch(value) ? new Guid(value) : Guid.Empty);
         }
 
         /// <summary>
@@ -661,7 +661,7 @@ namespace ChargifyDotNet
             var result = string.Empty;
             if (node.FirstChild != null)
             {
-                result = node.FirstChild.Value;
+                result = node.FirstChild.Value ?? string.Empty;
             }
             return result;
         }
@@ -791,9 +791,9 @@ namespace ChargifyDotNet
         /// <param name="obj">The object whose value needs to be extracted</param>
         /// <param name="key">The key of the product family to retrieve</param>
         /// <returns>The product family value of the object as keyed</returns>
-        public static ProductFamily GetJSONContentAsProductFamily(this JsonObject obj, string key)
+        public static ProductFamily? GetJSONContentAsProductFamily(this JsonObject obj, string key)
         {
-            ProductFamily result = null;
+            ProductFamily? result = null;
             if (obj != null)
             {
                 if (obj.ContainsKey(key))
@@ -812,9 +812,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="node">The node whose value needs to be extracted</param>
         /// <returns>The product family value of the node</returns>
-        public static ProductFamily GetNodeContentAsProductFamily(this XmlNode node)
+        public static ProductFamily? GetNodeContentAsProductFamily(this XmlNode node)
         {
-            ProductFamily result = null;
+            ProductFamily? result = null;
             if (node.FirstChild != null)
             {
                 // create new product family object
@@ -828,9 +828,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="node">The xml node containing renewal line item data</param>
         /// <returns>The renewal line item object, or null</returns>
-        public static RenewalLineItem GetNodeContentAsRenewalLineItem(this XmlNode node)
+        public static RenewalLineItem? GetNodeContentAsRenewalLineItem(this XmlNode node)
         {
-            RenewalLineItem result = null;
+            RenewalLineItem? result = null;
             if (node.FirstChild != null)
             {
                 result = new RenewalLineItem(node);
@@ -838,9 +838,14 @@ namespace ChargifyDotNet
             return result;
         }
 
-        public static ComponentPricePoint GetNodeContentAsComponentPricePoint(this XmlNode node)
+        /// <summary>
+        /// Get the content of an XmlNode as a component price point
+        /// </summary>
+        /// <param name="node">The price_point node</param>
+        /// <returns>The price point, or null if the node is empty.</returns>
+        public static ComponentPricePoint? GetNodeContentAsComponentPricePoint(this XmlNode node)
         {
-            ComponentPricePoint result = null;
+            ComponentPricePoint? result = null;
             if (node.FirstChild != null)
             {
                 result = new ComponentPricePoint(node);
@@ -854,7 +859,7 @@ namespace ChargifyDotNet
         /// <typeparam name="T">The type to convert to</typeparam>
         /// <param name="node">The xml node to convert</param>
         /// <returns>The object if successful, null otherwise</returns>
-        public static T ConvertNode<T>(this XmlNode node) where T : class
+        public static T? ConvertNode<T>(this XmlNode node) where T : class
         {
             using MemoryStream stm = new();
             using StreamWriter stw = new(stm);
@@ -883,7 +888,7 @@ namespace ChargifyDotNet
             {
                 foreach (var jsonValue in renewalLineItemsArray.Items)
                 {
-                    var renewalLineItem = (JsonObject)jsonValue;
+                    if (jsonValue is not JsonObject renewalLineItem) continue;
                     renewalLineItems.Add(new RenewalLineItem(renewalLineItem));
                 }
             }
@@ -908,7 +913,8 @@ namespace ChargifyDotNet
                 switch (childNode.Name)
                 {
                     case "line_item":
-                        lineItems.Add(childNode.GetNodeContentAsRenewalLineItem());
+                        var item = childNode.GetNodeContentAsRenewalLineItem();
+                        if (item is not null) lineItems.Add(item);
                         break;
                 }
             }
@@ -934,7 +940,8 @@ namespace ChargifyDotNet
                 switch (childNode.Name)
                 {
                     case "public_signup_page":
-                        publicSignupPages.Add(childNode.GetNodeContentAsPublicSignupPage());
+                        var item = childNode.GetNodeContentAsPublicSignupPage();
+                        if (item is not null) publicSignupPages.Add(item);
                         break;
                 }
             }
@@ -961,7 +968,7 @@ namespace ChargifyDotNet
             {
                 foreach (var jsonValue in publicSignupPagesArray.Items)
                 {
-                    var publicSignupPage = (JsonObject)jsonValue;
+                    if (jsonValue is not JsonObject publicSignupPage) continue;
                     publicSignupPages.Add(new PublicSignupPage(publicSignupPage));
                 }
             }
@@ -979,9 +986,9 @@ namespace ChargifyDotNet
         /// <param name="obj">The JsonObject containing the Customer data</param>
         /// <param name="key">They key of the customer object</param>
         /// <returns>The customer object if possible, null otherwise.</returns>
-        public static Customer GetJSONContentAsCustomer(this JsonObject obj, string key)
+        public static Customer? GetJSONContentAsCustomer(this JsonObject obj, string key)
         {
-            Customer result = null;
+            Customer? result = null;
             if (obj != null)
             {
                 if (obj.ContainsKey(key))
@@ -1001,9 +1008,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="node">The node whose value needs to be extracted</param>
         /// <returns>The customer of the node</returns>
-        public static Customer GetNodeContentAsCustomer(this XmlNode node)
+        public static Customer? GetNodeContentAsCustomer(this XmlNode node)
         {
-            Customer result = null;
+            Customer? result = null;
             if (node.FirstChild != null)
             {
                 // create new Customer object
@@ -1018,9 +1025,9 @@ namespace ChargifyDotNet
         /// <param name="obj">The object to retrieve the PaymentProfileView value from</param>
         /// <param name="key">The key of the PaymentProfileView field in the JsonObject</param>
         /// <returns>The PaymentProfileView value, null otherwise.</returns>
-        public static PaymentProfileView GetJSONContentAsPaymentProfileView(this JsonObject obj, string key)
+        public static PaymentProfileView? GetJSONContentAsPaymentProfileView(this JsonObject obj, string key)
         {
-            PaymentProfileView result = null;
+            PaymentProfileView? result = null;
             if (obj != null)
             {
                 if (obj.ContainsKey(key))
@@ -1040,9 +1047,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="node">The node whose value needs to be extracted</param>
         /// <returns>The PaymentProfileView value of the node</returns>
-        public static PaymentProfileView GetNodeContentAsPaymentProfileView(this XmlNode node)
+        public static PaymentProfileView? GetNodeContentAsPaymentProfileView(this XmlNode node)
         {
-            PaymentProfileView result = null;
+            PaymentProfileView? result = null;
             if (node.FirstChild != null)
             {
                 result = new PaymentProfileView(node);
@@ -1056,9 +1063,9 @@ namespace ChargifyDotNet
         /// <param name="obj">The object to retrieve the Product value from</param>
         /// <param name="key">The key of the Product field in the JsonObject</param>
         /// <returns>The Product value, null otherwise.</returns>
-        public static Product GetJSONContentAsProduct(this JsonObject obj, string key)
+        public static Product? GetJSONContentAsProduct(this JsonObject obj, string key)
         {
-            Product result = null;
+            Product? result = null;
             if (obj != null)
             {
                 if (obj.ContainsKey(key))
@@ -1078,9 +1085,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="node">The node whose value needs to be extracted</param>
         /// <returns>The Product value of the node</returns>
-        public static Product GetNodeContentAsProduct(this XmlNode node)
+        public static Product? GetNodeContentAsProduct(this XmlNode node)
         {
-            Product result = null;
+            Product? result = null;
             if (node.FirstChild != null)
             {
                 result = new Product(node);
@@ -1088,9 +1095,14 @@ namespace ChargifyDotNet
             return result;
         }
 
-        public static ComponentPrice GetNodeContentAsComponentPrice(this XmlNode node)
+        /// <summary>
+        /// Get the content of an XmlNode as a component price tier
+        /// </summary>
+        /// <param name="node">The price node</param>
+        /// <returns>The price tier, or null if the node is empty.</returns>
+        public static ComponentPrice? GetNodeContentAsComponentPrice(this XmlNode node)
         {
-            ComponentPrice result = null;
+            ComponentPrice? result = null;
             if (node.FirstChild != null)
             {
                 result = new ComponentPrice(node);
@@ -1120,6 +1132,12 @@ namespace ChargifyDotNet
             return result;
         }
 
+        /// <summary>
+        /// Get the keyed array of a JsonObject as component price points
+        /// </summary>
+        /// <param name="obj">The object containing the array</param>
+        /// <param name="key">The key of the array</param>
+        /// <returns>The price points; empty if the key is missing.</returns>
         public static List<ComponentPricePoint> GetJSONContentAsPricePoints(this JsonObject obj, string key)
         {
             var pricePoints = new List<ComponentPricePoint>();
@@ -1128,7 +1146,7 @@ namespace ChargifyDotNet
             {
                 foreach (var jsonValue in pricePointsArray.Items)
                 {
-                    var pricePoint = (JsonObject)jsonValue;
+                    if (jsonValue is not JsonObject pricePoint) continue;
                     pricePoints.Add(new ComponentPricePoint(pricePoint));
                 }
             }
@@ -1140,6 +1158,12 @@ namespace ChargifyDotNet
             return pricePoints;
         }
 
+        /// <summary>
+        /// Get the keyed array of a JsonObject as component price tiers
+        /// </summary>
+        /// <param name="obj">The object containing the array</param>
+        /// <param name="key">The key of the array</param>
+        /// <returns>The price tiers; empty if the key is missing.</returns>
         public static List<ComponentPrice> GetJSONContentAsPrices(this JsonObject obj, string key)
         {
             var prices = new List<ComponentPrice>();
@@ -1148,7 +1172,7 @@ namespace ChargifyDotNet
             {
                 foreach (var jsonValue in pricesArray.Items)
                 {
-                    var price = (JsonObject)jsonValue;
+                    if (jsonValue is not JsonObject price) continue;
                     prices.Add(new ComponentPrice(price));
                 }
             }
@@ -1175,6 +1199,11 @@ namespace ChargifyDotNet
             return result;
         }
 
+        /// <summary>
+        /// Get the child nodes of an XmlNode as component price points
+        /// </summary>
+        /// <param name="node">The price_points node</param>
+        /// <returns>The price points.</returns>
         public static List<ComponentPricePoint> GetNodeContentAsPricePoints(this XmlNode node)
         {
             var pricePoints = new List<ComponentPricePoint>();
@@ -1183,7 +1212,8 @@ namespace ChargifyDotNet
                 switch (childNode.Name)
                 {
                     case "price_point":
-                        pricePoints.Add(childNode.GetNodeContentAsComponentPricePoint());
+                        var item = childNode.GetNodeContentAsComponentPricePoint();
+                        if (item is not null) pricePoints.Add(item);
                         break;
                 }
             }
@@ -1196,6 +1226,11 @@ namespace ChargifyDotNet
             return pricePoints;
         }
 
+        /// <summary>
+        /// Get the child nodes of an XmlNode as component price tiers
+        /// </summary>
+        /// <param name="node">The prices node</param>
+        /// <returns>The price tiers.</returns>
         public static List<ComponentPrice> GetNodeContentAsComponentPrices(this XmlNode node)
         {
             var prices = new List<ComponentPrice>();
@@ -1204,7 +1239,8 @@ namespace ChargifyDotNet
                 switch (childNode.Name)
                 {
                     case "price":
-                        prices.Add(childNode.GetNodeContentAsComponentPrice());
+                        var item = childNode.GetNodeContentAsComponentPrice();
+                        if (item is not null) prices.Add(item);
                         break;
                 }
             }
@@ -1469,9 +1505,8 @@ namespace ChargifyDotNet
         public static TransactionType GetNodeContentAsTransactionType(this XmlNode node)
         {
             var result = TransactionType.Unknown;
-            if (node.FirstChild != null)
+            if (node.FirstChild?.Value is { } nodeText)
             {
-                var nodeText = node.FirstChild.Value;
                 result = (TransactionType)Enum.Parse(typeof(TransactionType), nodeText, true);
             }
             return result;
@@ -1503,9 +1538,9 @@ namespace ChargifyDotNet
         public static SubscriptionState GetNodeContentAsSubscriptionState(this XmlNode node)
         {
             var result = SubscriptionState.Unknown;
-            if (node.FirstChild != null)
+            if (node.FirstChild?.Value is { } nodeText)
             {
-                result = (SubscriptionState)Enum.Parse(typeof(SubscriptionState), node.FirstChild.Value, true);
+                result = (SubscriptionState)Enum.Parse(typeof(SubscriptionState), nodeText, true);
             }
             return result;
         }
@@ -1520,9 +1555,9 @@ namespace ChargifyDotNet
             T result = default;
             if (node.FirstChild != null)
             {
-                if (CheckEnumIsDefined<T>(node.FirstChild.Value))
+                if (node.FirstChild.Value is { } nodeText && CheckEnumIsDefined<T>(nodeText))
                 {
-                    result = (T)Enum.Parse(typeof(T), node.FirstChild.Value, true);
+                    result = (T)Enum.Parse(typeof(T), nodeText, true);
                 }
             }
             return result;
@@ -1580,9 +1615,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="node">The node whose value need to be parsed</param>
         /// <returns>The Charge, null otherwise</returns>
-        public static Charge GetNodeContentAsCharge(this XmlNode node)
+        public static Charge? GetNodeContentAsCharge(this XmlNode node)
         {
-            Charge result = null;
+            Charge? result = null;
             if (node.FirstChild != null)
             {
                 result = new Charge(node);
@@ -1596,9 +1631,9 @@ namespace ChargifyDotNet
         /// <param name="obj">The object to retrieve the PublicSignupPage value from</param>
         /// <param name="key">The key of the PublicSignupPage field in the JsonObject</param>
         /// <returns>The PublicSignupPage value, null otherwise.</returns>
-        public static Charge GetJSONContentAsCharge(this JsonObject obj, string key)
+        public static Charge? GetJSONContentAsCharge(this JsonObject obj, string key)
         {
-            Charge result = null;
+            Charge? result = null;
             if (obj != null)
             {
                 if (obj.ContainsKey(key))
@@ -1618,9 +1653,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="node">The node whose value need to be parsed</param>
         /// <returns>The PublicSignupPage, null otherwise</returns>
-        public static PublicSignupPage GetNodeContentAsPublicSignupPage(this XmlNode node)
+        public static PublicSignupPage? GetNodeContentAsPublicSignupPage(this XmlNode node)
         {
-            PublicSignupPage result = null;
+            PublicSignupPage? result = null;
             if (node.FirstChild != null)
             {
                 result = new PublicSignupPage(node);
@@ -1634,9 +1669,9 @@ namespace ChargifyDotNet
         /// <param name="obj">The object to retrieve the PublicSignupPage value from</param>
         /// <param name="key">The key of the PublicSignupPage field in the JsonObject</param>
         /// <returns>The PublicSignupPage value, null otherwise.</returns>
-        public static PublicSignupPage GetJSONContentAsPublicSignupPage(this JsonObject obj, string key)
+        public static PublicSignupPage? GetJSONContentAsPublicSignupPage(this JsonObject obj, string key)
         {
-            PublicSignupPage result = null;
+            PublicSignupPage? result = null;
             if (obj != null)
             {
                 if (obj.ContainsKey(key))
@@ -1656,9 +1691,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="node">The node whose value needs to be extracted</param>
         /// <returns>The Transaction value of the node</returns>
-        public static Transaction GetNodeContentAsTransaction(this XmlNode node)
+        public static Transaction? GetNodeContentAsTransaction(this XmlNode node)
         {
-            Transaction result = null;
+            Transaction? result = null;
             if (node.FirstChild != null)
             {
                 result = new Transaction(node);
@@ -1672,9 +1707,9 @@ namespace ChargifyDotNet
         /// <param name="obj">The object to retrieve the Transaction value from</param>
         /// <param name="key">The key of the Transaction field in the JsonObject</param>
         /// <returns>The Transaction value, null otherwise.</returns>
-        public static Transaction GetJSONContentAsTransaction(this JsonObject obj, string key)
+        public static Transaction? GetJSONContentAsTransaction(this JsonObject obj, string key)
         {
-            Transaction result = null;
+            Transaction? result = null;
             if (obj != null)
             {
                 if (obj.ContainsKey(key))
@@ -1742,7 +1777,7 @@ namespace ChargifyDotNet
         /// <typeparam name="T">The type of enum</typeparam>
         /// <param name="value">The string value</param>
         /// <returns>True if defined, false otherwise</returns>
-        public static bool CheckEnumIsDefined<T>(this string value)
+        public static bool CheckEnumIsDefined<T>(this string? value)
         {
             return Enum.GetNames(typeof(T)).Any(x => string.Equals(x, value, StringComparison.CurrentCultureIgnoreCase));
         }
@@ -1763,9 +1798,9 @@ namespace ChargifyDotNet
                 if (a != null)
                 {
                     var classType = a.GetType("Microsoft.WindowsAzure.ServiceRuntime.RoleEnvironment");
-                    var pi = classType.GetProperty("IsAvailable");
+                    var pi = classType?.GetProperty("IsAvailable");
                     // This is the same as calling RoleEnvironment.IsAvailable, but without requiring it be referenced.
-                    result = (bool)pi.GetValue(null, null); // This should get the result of IsAvailable
+                    result = pi?.GetValue(null, null) is true; // This should get the result of IsAvailable
                 }
             }
             catch
@@ -1790,9 +1825,9 @@ namespace ChargifyDotNet
                 if (a != null)
                 {
                     var classType = a.GetType("Microsoft.WindowsAzure.ServiceRuntime.RoleEnvironment");
-                    var mi = classType.GetMethod("GetConfigurationSettingValue");
+                    var mi = classType?.GetMethod("GetConfigurationSettingValue");
                     // This is the same as calling RoleEnvironment.GetConfigurationSettingValue(settingName)
-                    result = (string)mi.Invoke(null, [settingName]);
+                    result = mi?.Invoke(null, [settingName]) as string ?? string.Empty;
                 }
             }
             catch
@@ -1843,8 +1878,9 @@ namespace ChargifyDotNet
                     throw new ArgumentException("No JSON key specified");
                 }
             }
-            // The object isn't of a known variety
-            return null;
+            // The object isn't of a known variety. Only reachable for a 2xx body that is neither XML nor JSON;
+            // the 1.x contract (and ~100 ChargifyConnect methods) treat the result as non-null, so keep it.
+            return null!;
         }
 
         /// <summary>
@@ -1854,27 +1890,27 @@ namespace ChargifyDotNet
         /// <param name="chargify">The ChargifyConnect object</param>
         /// <param name="objectToBeSaved">The object of type T that is to be saved/updated</param>
         /// <returns>The updated object if applicable, null otherwise.</returns>
-        public static T Save<T>(this ChargifyConnect chargify, T objectToBeSaved)
+        public static T? Save<T>(this ChargifyConnect chargify, T objectToBeSaved)
             where T : ChargifyBase
         {
-            T result = null;
+            T? result = null;
             // Since there are different signatures for the various Update methods
             // we need to do this on a case per case basis. Can't use reflection here. :(
             switch (typeof(T).Name.ToLowerInvariant())
             {
                 case "customer":
                     if (!typeof(ICustomer).IsAssignableFrom(typeof(T))) throw new ArgumentException();
-                    result = (T)chargify.UpdateCustomer(objectToBeSaved as ICustomer);
+                    result = (T)chargify.UpdateCustomer((ICustomer)objectToBeSaved);
                     break;
 
                 case "subscription":
                     if (!typeof(ISubscription).IsAssignableFrom(typeof(T))) throw new ArgumentException();
-                    result = (T)chargify.UpdateSubscription(objectToBeSaved as ISubscription);
+                    result = (T?)chargify.UpdateSubscription((ISubscription)objectToBeSaved);
                     break;
 
                 case "coupon":
                     if (!typeof(ICoupon).IsAssignableFrom(typeof(T))) throw new ArgumentException();
-                    result = (T)chargify.UpdateCoupon(objectToBeSaved as ICoupon);
+                    result = (T)chargify.UpdateCoupon((ICoupon)objectToBeSaved);
                     break;
             }
             return result;
@@ -1888,69 +1924,69 @@ namespace ChargifyDotNet
         /// <param name="id">The ID (or Handle if Product) to find</param>
         /// <param name="parentId">The ID of the parent, optional</param>
         /// <returns>The found object if applicable, null otherwise.</returns>
-        public static T Find<T>(this ChargifyConnect chargify, object id, int? parentId = null)
+        public static T? Find<T>(this ChargifyConnect chargify, object id, int? parentId = null)
             where T : ChargifyBase
         {
-            T result = null;
+            T? result = null;
             // Since there are different signatures for the various Load methods
             // we need to do this on a case per case basis. Can't use reflection here. :(
             switch (typeof(T).Name.ToLowerInvariant())
             {
                 case "customer":
                     if (!typeof(ICustomer).IsAssignableFrom(typeof(T))) throw new ArgumentException();
-                    ICustomer customer = null;
+                    ICustomer? customer = null;
                     // load the object depending on what the ID can be interpreted as,
                     // in this case it's either the ChargifyID (int) or the SystemID (string)
-                    if (id is string) customer = chargify.LoadCustomer(id as string);
+                    if (id is string systemId) customer = chargify.LoadCustomer(systemId);
                     else if (id is int customerId) customer = chargify.LoadCustomer(customerId);
-                    result = (T)customer;
+                    result = (T?)customer;
                     break;
 
                 case "subscription":
                     if (!typeof(ISubscription).IsAssignableFrom(typeof(T))) throw new ArgumentException();
-                    ISubscription subscription = null;
+                    ISubscription? subscription = null;
                     // load the object depending on what the ID can be interpreted as,
                     // in this case it's only SubscriptionID (int)
                     if (id is int subscriptionId) subscription = chargify.LoadSubscription(subscriptionId);
-                    result = (T)subscription;
+                    result = (T?)subscription;
                     break;
 
                 case "product":
                     if (!typeof(IProduct).IsAssignableFrom(typeof(T))) throw new ArgumentException();
-                    IProduct product = null;
+                    IProduct? product = null;
                     // load the object depending on what the ID can be interpreted as,
                     // in this case it's either the ProductID (int) or the ProductHandle (string)
-                    if (id is string) product = chargify.LoadProduct(id as string, true);
+                    if (id is string handle) product = chargify.LoadProduct(handle, true);
                     else if (id is int productId) product = chargify.LoadProduct(productId.ToString(), false);
-                    result = (T)product;
+                    result = (T?)product;
                     break;
 
                 case "statement":
                     if (!typeof(IStatement).IsAssignableFrom(typeof(T))) throw new ArgumentException();
-                    IStatement statement = null;
+                    IStatement? statement = null;
                     if (id is int statementId) statement = chargify.LoadStatement(statementId);
-                    result = (T)statement;
+                    result = (T?)statement;
                     break;
 
                 case "transaction":
                     if (!typeof(ITransaction).IsAssignableFrom(typeof(T))) throw new ArgumentException();
-                    ITransaction transaction = null;
+                    ITransaction? transaction = null;
                     if (id is int transactionId) transaction = chargify.LoadTransaction(transactionId);
-                    result = (T)transaction;
+                    result = (T?)transaction;
                     break;
 
                 case "coupon":
                     if (!typeof(ICoupon).IsAssignableFrom(typeof(T))) throw new ArgumentException();
-                    ICoupon coupon = null;
+                    ICoupon? coupon = null;
                     if (id is int couponId && parentId.HasValue && parentId.Value > 0) coupon = chargify.LoadCoupon(parentId.Value, couponId);
-                    result = (T)coupon;
+                    result = (T?)coupon;
                     break;
 
                 case "productfamily":
                     if (!typeof(IProductFamily).IsAssignableFrom(typeof(T))) throw new ArgumentException();
-                    IProductFamily productFamily = null;
+                    IProductFamily? productFamily = null;
                     if (id is int familyId) productFamily = chargify.LoadProductFamily(familyId);
-                    result = (T)productFamily;
+                    result = (T?)productFamily;
                     break;
             }
             return result;

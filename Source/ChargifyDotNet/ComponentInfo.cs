@@ -160,8 +160,7 @@ namespace ChargifyDotNet
                         {
                             foreach (var jsonValue in pricesArray.Items)
                             {
-                                var priceObj = (JsonObject)jsonValue;
-                                if (priceObj == null) continue;
+                                if (jsonValue is not JsonObject priceObj) continue;
                                 var bracketInfo = new PriceBracketInfo();
 
                                 foreach (var bracketKey in priceObj.Keys)
@@ -402,8 +401,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="other">The object to compare to.</param>
         /// <returns>The CompareTo value based on comparing IDs</returns>
-        public int CompareTo(IComponentInfo other)
+        public int CompareTo(IComponentInfo? other)
         {
+            if (other is null) return 1;
             return ID.CompareTo(other.ID);
         }
 
@@ -416,8 +416,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="other">The object to compare to.</param>
         /// <returns>The CompareTo value based on comparing IDs</returns>
-        public int CompareTo(ComponentInfo other)
+        public int CompareTo(ComponentInfo? other)
         {
+            if (other is null) return 1;
             return ID.CompareTo(other.ID);
         }
 

@@ -328,8 +328,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="other">The other instance</param>
         /// <returns>The result of the comparison</returns>
-        public int CompareTo(ICharge other)
+        public int CompareTo(ICharge? other)
         {
+            if (other is null) return 1;
             return AmountInCents.CompareTo(other.AmountInCents);
         }
 
@@ -342,8 +343,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="other">The other instance</param>
         /// <returns>The result of the comparison</returns>
-        public int CompareTo(Charge other)
+        public int CompareTo(Charge? other)
         {
+            if (other is null) return 1;
             return AmountInCents.CompareTo(other.AmountInCents);
         }
 

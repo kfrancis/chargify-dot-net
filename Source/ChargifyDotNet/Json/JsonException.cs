@@ -15,6 +15,23 @@ namespace ChargifyDotNet.Json
             : base(message)
         {
         }
+
+        /// <summary>
+        /// JsonException constructor
+        /// </summary>
+        public JsonException()
+        {
+        }
+
+        /// <summary>
+        /// JsonException constructor
+        /// </summary>
+        /// <param name="message">The message to display</param>
+        /// <param name="innerException">The exception that caused this exception</param>
+        public JsonException(string message, Exception innerException)
+            : base(message, innerException)
+        {
+        }
     }
 
     /// <summary>
@@ -28,6 +45,23 @@ namespace ChargifyDotNet.Json
         /// <param name="message">The message to display</param>
         public JsonParseException(string message)
             : base(message)
+        {
+        }
+
+        /// <summary>
+        /// JsonParseException constructor
+        /// </summary>
+        public JsonParseException()
+        {
+        }
+
+        /// <summary>
+        /// JsonParseException constructor
+        /// </summary>
+        /// <param name="message">The message to display</param>
+        /// <param name="innerException">The exception that caused this exception</param>
+        public JsonParseException(string message, Exception innerException)
+            : base(message, innerException)
         {
         }
 

@@ -238,7 +238,7 @@ namespace ChargifyDotNet
                         {
                             foreach (var jsonValue in transactionsArray.Items)
                             {
-                                var transaction = (JsonObject)jsonValue;
+                                if (jsonValue is not JsonObject transaction) continue;
                                 _transactions.Add(new Transaction(transaction));
                             }
                         }
@@ -358,7 +358,8 @@ namespace ChargifyDotNet
                             switch (childNode.Name)
                             {
                                 case "transaction":
-                                    _transactions.Add(childNode.GetNodeContentAsTransaction());
+                                    var item = childNode.GetNodeContentAsTransaction();
+                                    if (item is not null) _transactions.Add(item);
                                     break;
                             }
                         }
@@ -450,7 +451,7 @@ namespace ChargifyDotNet
         {
             get { return _futurePayments; }
         }
-        private object _futurePayments;
+        private object _futurePayments = null!;
 
         /// <summary>
         /// The subscription's balance at the time the statement was opened (in cents)
@@ -637,7 +638,7 @@ namespace ChargifyDotNet
         {
             get { return _events; }
         }
-        private object _events;
+        private object _events = null!;
 
         /// <summary>
         /// The creation date for this statement
@@ -666,8 +667,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="other">The other IStatement object to compare against.</param>
         /// <returns>The result of the comparison</returns>
-        public int CompareTo(IStatement other)
+        public int CompareTo(IStatement? other)
         {
+            if (other is null) return 1;
             return ID.CompareTo(other.ID);
         }
 
@@ -680,8 +682,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="other">The other Statement object to compare against.</param>
         /// <returns>The result of the comparison</returns>
-        public int CompareTo(Statement other)
+        public int CompareTo(Statement? other)
         {
+            if (other is null) return 1;
             return ID.CompareTo(other.ID);
         }
 

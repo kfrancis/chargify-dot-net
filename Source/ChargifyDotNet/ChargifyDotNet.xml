@@ -1723,6 +1723,59 @@
             <param name="memo">A note regarding the reason for the credit</param>
             <returns>The object if successful, null otherwise.</returns>
         </member>
+        <member name="M:ChargifyDotNet.ChargifyConnect.GetPricePoints(System.Int32,System.Collections.Generic.List{ChargifyDotNet.ComponentPricePoint})">
+            <summary>
+            Bulk-create price points for a component. Not implemented.
+            </summary>
+            <exception cref="T:System.NotImplementedException">Always.</exception>
+        </member>
+        <member name="M:ChargifyDotNet.ChargifyConnect.SetPricePointDefault(System.Int64,System.Int64)">
+            <summary>
+            Make a price point the default for its component.
+            </summary>
+            <param name="componentID">The component ID</param>
+            <param name="pricePointId">The price point ID</param>
+            <returns>True if Chargify accepted the change, false if it returned an error.</returns>
+        </member>
+        <member name="M:ChargifyDotNet.ChargifyConnect.ArchivePricePoint(System.Int32,System.Int64)">
+            <summary>
+            Archive a component price point.
+            </summary>
+            <param name="componentID">The component ID</param>
+            <param name="pricePointId">The price point ID</param>
+            <returns>The archived price point.</returns>
+            <exception cref="T:System.InvalidOperationException">Chargify returned 404.</exception>
+        </member>
+        <member name="M:ChargifyDotNet.ChargifyConnect.UnarchivePricePoint(System.Int32,System.Int64)">
+            <summary>
+            Unarchive a component price point.
+            </summary>
+            <param name="componentID">The component ID</param>
+            <param name="pricePointId">The price point ID</param>
+            <returns>The unarchived price point.</returns>
+            <exception cref="T:System.InvalidOperationException">Chargify returned 404.</exception>
+        </member>
+        <member name="M:ChargifyDotNet.ChargifyConnect.UpdatePricePoint(System.Int32,ChargifyDotNet.ComponentPricePoint)">
+            <summary>
+            Update a component price point. Not implemented.
+            </summary>
+            <exception cref="T:System.NotImplementedException">Always.</exception>
+        </member>
+        <member name="M:ChargifyDotNet.ChargifyConnect.GetPricePoints(System.Int32)">
+            <summary>
+            Get the price points for a component.
+            </summary>
+            <param name="componentId">The component ID</param>
+            <returns>The price points, keyed by price point ID.</returns>
+        </member>
+        <member name="M:ChargifyDotNet.ChargifyConnect.CreatePricePoint(System.Int32,ChargifyDotNet.ComponentPricePoint)">
+            <summary>
+            Create a price point for a component.
+            </summary>
+            <param name="componentID">The component ID</param>
+            <param name="newPricePoint">The price point to create</param>
+            <returns>The created price point.</returns>
+        </member>
         <member name="M:ChargifyDotNet.ChargifyConnect.FormatPriceXml(System.Collections.Generic.IEnumerable{ChargifyDotNet.ComponentPrice},System.Boolean)">
             <summary>
             Format ComponentPrice Lists
@@ -2350,6 +2403,11 @@
             <param name="postData">The data included as part of a POST, PUT or DELETE request</param>
             <returns>The xml response to the request</returns>
         </member>
+        <member name="M:ChargifyDotNet.ChargifyConnect.GetArrayItemObject(ChargifyDotNet.Json.JsonArray,System.Int32,System.String)">
+            <summary>
+            Returns <c>array[index][key]</c> as a JsonObject, throwing a JsonException when the response is not shaped as expected.
+            </summary>
+        </member>
         <member name="M:ChargifyDotNet.ChargifyConnect.DoNewRequest(System.String,ChargifyDotNet.HttpRequestMethod,System.Object)">
             <summary>
             Make a request to Chargify
@@ -2440,6 +2498,13 @@
             </summary>
             <param name="errorStr">The JsonString obj that contains the error message</param>
         </member>
+        <member name="M:ChargifyDotNet.ChargifyError.ParseChargifyErrors(System.Net.Http.HttpResponseMessage)">
+            <summary>
+            Parse the errors in a failed response's body. Reads the response content.
+            </summary>
+            <param name="response">The failed response</param>
+            <returns>The errors, or an empty list if the body has none or cannot be parsed.</returns>
+        </member>
         <member name="M:ChargifyDotNet.ChargifyError.ParseErrorsFromContent(System.String)">
             <summary>
             Parses the error messages out of a Chargify error response body.
@@ -2469,6 +2534,18 @@
             Constructor
             </summary>
             <param name="message">The message of this exception</param>
+        </member>
+        <member name="M:ChargifyDotNet.ChargifyNetException.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:ChargifyDotNet.ChargifyNetException.#ctor(System.String,System.Exception)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="message">The message of this exception</param>
+            <param name="innerException">The exception that caused this exception</param>
         </member>
         <member name="T:ChargifyDotNet.ChargifyException">
             <summary>
@@ -2948,6 +3025,22 @@
             The unit price for the component
             </summary>
         </member>
+        <member name="T:ChargifyDotNet.ComponentPricePoint">
+            <summary>
+            A price point for a component: the pricing scheme and price tiers used to bill it.
+            </summary>
+        </member>
+        <member name="M:ChargifyDotNet.ComponentPricePoint.#ctor">
+            <summary>
+            Constructor. Pricing schemes default to Unknown and price lists are empty.
+            </summary>
+        </member>
+        <member name="M:ChargifyDotNet.ComponentPricePoint.#ctor(System.String)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="componentPricePointXml">XML containing a price_point element</param>
+        </member>
         <member name="M:ChargifyDotNet.ComponentPricePoint.#ctor(System.Xml.XmlNode)">
             <summary>
             Constructor
@@ -2973,6 +3066,106 @@
             Compare this ComponentAttributes to another
             </summary>
         </member>
+        <member name="P:ChargifyDotNet.ComponentPricePoint.Id">
+            <summary>
+            The price point ID
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.ComponentPricePoint.Default">
+            <summary>
+            Whether this is the component's default price point
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.ComponentPricePoint.RenewPrepaidAllocation">
+            <summary>
+            Prepaid components: whether the allocation renews each period
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.ComponentPricePoint.RolloverPrepaidRemainder">
+            <summary>
+            Prepaid components: whether unused quantity rolls over to the next period
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.ComponentPricePoint.Name">
+            <summary>
+            The price point name
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.ComponentPricePoint.Type">
+            <summary>
+            The price point type (e.g. "default", "catalog", "custom")
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.ComponentPricePoint.PricingScheme">
+            <summary>
+            The pricing scheme
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.ComponentPricePoint.ComponentId">
+            <summary>
+            The ID of the component this price point belongs to
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.ComponentPricePoint.Handle">
+            <summary>
+            The price point handle
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.ComponentPricePoint.ExpirationInterval">
+            <summary>
+            Prepaid components: how many expiration interval units the rollover lasts
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.ComponentPricePoint.ExpirationIntervalUnit">
+            <summary>
+            Prepaid components: the unit of the expiration interval
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.ComponentPricePoint.ArchivedAt">
+            <summary>
+            When the price point was archived, or null if it is active
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.ComponentPricePoint.IsArchived">
+            <summary>
+            True if the price point has been archived
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.ComponentPricePoint.CreatedAt">
+            <summary>
+            When the price point was created
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.ComponentPricePoint.UpdatedAt">
+            <summary>
+            When the price point was last updated
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.ComponentPricePoint.Prices">
+            <summary>
+            The price tiers
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.ComponentPricePoint.OveragePricingScheme">
+            <summary>
+            Prepaid components: the pricing scheme for usage above the allocation
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.ComponentPricePoint.OveragePricingPrices">
+            <summary>
+            Prepaid components: the price tiers for usage above the allocation
+            </summary>
+        </member>
+        <member name="T:ChargifyDotNet.ComponentPrice">
+            <summary>
+            A price tier within a component price point
+            </summary>
+        </member>
+        <member name="M:ChargifyDotNet.ComponentPrice.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
         <member name="M:ChargifyDotNet.ComponentPrice.#ctor(System.Xml.XmlNode)">
             <summary>
             Constructor
@@ -2992,6 +3185,46 @@
             Load data from a JsonObject
             </summary>
             <param name="obj">The JsonObject containing product data</param>
+        </member>
+        <member name="P:ChargifyDotNet.ComponentPrice.Id">
+            <summary>
+            The price tier ID
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.ComponentPrice.ComponentId">
+            <summary>
+            The ID of the component this tier belongs to
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.ComponentPrice.StartingQuantity">
+            <summary>
+            The first quantity this tier applies to
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.ComponentPrice.EndingQuantity">
+            <summary>
+            The last quantity this tier applies to (0 or unset for an open-ended tier)
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.ComponentPrice.UnitPrice">
+            <summary>
+            The price per unit in this tier
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.ComponentPrice.PricePointId">
+            <summary>
+            The ID of the price point this tier belongs to
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.ComponentPrice.FormattedUnitPrice">
+            <summary>
+            The unit price formatted by Chargify for display
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.ComponentPrice.SegmentId">
+            <summary>
+            The ID of the event-based billing segment this tier belongs to, if any
+            </summary>
         </member>
         <member name="T:ChargifyDotNet.Configuration.ChargifyConfigFactory">
             <summary>
@@ -4645,6 +4878,13 @@
             <param name="SubscriptionID">The related subscription id</param>
             <param name="UpdatedNote">The updated note information</param>
             <returns>The updated note, if successful. Null otherwise.</returns>
+        </member>
+        <member name="M:ChargifyDotNet.IChargifyConnect.ValidateReferralCode(System.String)">
+            <summary>
+            Check whether a referral code is valid.
+            </summary>
+            <param name="ReferralCode">The referral code</param>
+            <returns>The referral code if found, null otherwise.</returns>
         </member>
         <member name="M:ChargifyDotNet.IChargifyConnect.AddUsage(System.Int32,System.Int32,System.Int32,System.String)">
             <summary>
@@ -7394,6 +7634,12 @@
             Default constructor
             </summary>
         </member>
+        <member name="M:ChargifyDotNet.RenewalLineItem.#ctor(System.String)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="xml">XML containing a line item</param>
+        </member>
         <member name="M:ChargifyDotNet.RenewalLineItem.#ctor(System.Xml.XmlNode)">
             <summary>
             Xml parsing constructor
@@ -7449,6 +7695,21 @@
         <member name="P:ChargifyDotNet.RenewalLineItem.TaxableAmount">
             <summary>
             The taxable amount
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.RenewalLineItem.ProductHandle">
+            <summary>
+            The handle of the product the line item is for
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.RenewalLineItem.ProductId">
+            <summary>
+            The ID of the product the line item is for
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.RenewalLineItem.ProductName">
+            <summary>
+            The name of the product the line item is for
             </summary>
         </member>
         <member name="T:ChargifyDotNet.ISiteStatistics">
@@ -8392,6 +8653,86 @@
             Subscription preview billing manifest
             </summary>
         </member>
+        <member name="P:ChargifyDotNet.ISubscriptionPreviewBillingManifest.LineItems">
+            <summary>
+            The line items
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.ISubscriptionPreviewBillingManifest.TotalInCents">
+            <summary>
+            The total, in cents
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.ISubscriptionPreviewBillingManifest.TotalDiscountInCents">
+            <summary>
+            The total discount, in cents
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.ISubscriptionPreviewBillingManifest.TotalTaxInCents">
+            <summary>
+            The total tax, in cents
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.ISubscriptionPreviewBillingManifest.SubtotalInCents">
+            <summary>
+            The subtotal before discounts and tax, in cents
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.ISubscriptionPreviewBillingManifest.StartDate">
+            <summary>
+            The start of the billing period
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.ISubscriptionPreviewBillingManifest.EndDate">
+            <summary>
+            The end of the billing period
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.ISubscriptionPreviewBillingManifest.PeriodType">
+            <summary>
+            The billing period type (e.g. "recurring", "prorated")
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.ISubscriptionPreviewBillingManifest.ExistingBalanceInCents">
+            <summary>
+            The subscription balance carried into this period, in cents
+            </summary>
+        </member>
+        <member name="T:ChargifyDotNet.ISubscriptionPreviewLineItem">
+            <summary>
+            A line item in a subscription preview billing manifest
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.ISubscriptionPreviewLineItem.TransactionType">
+            <summary>
+            The transaction type (e.g. "charge", "credit", "adjustment")
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.ISubscriptionPreviewLineItem.Kind">
+            <summary>
+            The kind of line item (e.g. "baseline", "component", "trial")
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.ISubscriptionPreviewLineItem.AmountInCents">
+            <summary>
+            The amount, in cents
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.ISubscriptionPreviewLineItem.Memo">
+            <summary>
+            The line item description
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.ISubscriptionPreviewLineItem.DiscountAmountInCents">
+            <summary>
+            The discount applied, in cents
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.ISubscriptionPreviewLineItem.TaxableAmountInCents">
+            <summary>
+            The taxable amount, in cents
+            </summary>
+        </member>
         <member name="T:ChargifyDotNet.TransactionChargeKind">
             <summary>
             The specific "subtype" for the transaction_type
@@ -8743,6 +9084,18 @@
             </summary>
             <param name="message">The message to display</param>
         </member>
+        <member name="M:ChargifyDotNet.Json.JsonException.#ctor">
+            <summary>
+            JsonException constructor
+            </summary>
+        </member>
+        <member name="M:ChargifyDotNet.Json.JsonException.#ctor(System.String,System.Exception)">
+            <summary>
+            JsonException constructor
+            </summary>
+            <param name="message">The message to display</param>
+            <param name="innerException">The exception that caused this exception</param>
+        </member>
         <member name="T:ChargifyDotNet.Json.JsonParseException">
             <summary>
             Exception for dealing with Json parsing
@@ -8753,6 +9106,18 @@
             JsonParseException Constructor
             </summary>
             <param name="message">The message to display</param>
+        </member>
+        <member name="M:ChargifyDotNet.Json.JsonParseException.#ctor">
+            <summary>
+            JsonParseException constructor
+            </summary>
+        </member>
+        <member name="M:ChargifyDotNet.Json.JsonParseException.#ctor(System.String,System.Exception)">
+            <summary>
+            JsonParseException constructor
+            </summary>
+            <param name="message">The message to display</param>
+            <param name="innerException">The exception that caused this exception</param>
         </member>
         <member name="M:ChargifyDotNet.Json.JsonParseException.#ctor(System.String,System.Int32)">
             <summary>
@@ -8840,7 +9205,7 @@
             Enumerator into this object
             </summary>
             <param name="key">The string key to evaluate</param>
-            <returns>The JsonValue at key</returns>
+            <returns>The JsonValue at key (null for a JSON <c>null</c>)</returns>
         </member>
         <member name="P:ChargifyDotNet.Json.JsonObject.Keys">
             <summary>
@@ -9045,6 +9410,126 @@
         <member name="P:ChargifyDotNet.MetadataResult.Metadata">
             <summary>
             The list of metadata contained in this response
+            </summary>
+        </member>
+        <member name="T:ChargifyDotNet.IMetafield">
+            <summary>
+            A custom field (metafield) definition for customers or subscriptions
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.IMetafield.DataCount">
+            <summary>
+            The number of records with a value for this field
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.IMetafield.Enum">
+            <summary>
+            The allowed values, for dropdown and radio input types
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.IMetafield.InputType">
+            <summary>
+            The input type (e.g. "text", "dropdown", "radio")
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.IMetafield.Name">
+            <summary>
+            The field name
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.IMetafield.Scope">
+            <summary>
+            Where the field is shown
+            </summary>
+        </member>
+        <member name="T:ChargifyDotNet.IMetafieldScope">
+            <summary>
+            Where a metafield is shown
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.IMetafieldScope.Csv">
+            <summary>
+            Whether the field is included in CSV exports ("0"/"1")
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.IMetafieldScope.Hosted">
+            <summary>
+            The public signup pages that show the field
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.IMetafieldScope.Invoices">
+            <summary>
+            Whether the field is shown on invoices ("0"/"1")
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.IMetafieldScope.Portal">
+            <summary>
+            Whether the field is shown in the billing portal ("0"/"1")
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.IMetafieldScope.Statements">
+            <summary>
+            Whether the field is shown on statements ("0"/"1")
+            </summary>
+        </member>
+        <member name="T:ChargifyDotNet.Metafield">
+            <summary>
+            A custom field (metafield) definition for customers or subscriptions
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.Metafield.DataCount">
+            <summary>
+            The number of records with a value for this field
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.Metafield.Enum">
+            <summary>
+            The allowed values, for dropdown and radio input types
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.Metafield.InputType">
+            <summary>
+            The input type (e.g. "text", "dropdown", "radio")
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.Metafield.Name">
+            <summary>
+            The field name
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.Metafield.Scope">
+            <summary>
+            Where the field is shown
+            </summary>
+        </member>
+        <member name="T:ChargifyDotNet.MetafieldScope">
+            <summary>
+            Where a metafield is shown
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.MetafieldScope.Csv">
+            <summary>
+            Whether the field is included in CSV exports ("0"/"1")
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.MetafieldScope.Hosted">
+            <summary>
+            The public signup pages that show the field
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.MetafieldScope.Invoices">
+            <summary>
+            Whether the field is shown on invoices ("0"/"1")
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.MetafieldScope.Portal">
+            <summary>
+            Whether the field is shown in the billing portal ("0"/"1")
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.MetafieldScope.Statements">
+            <summary>
+            Whether the field is shown on statements ("0"/"1")
             </summary>
         </member>
         <member name="T:ChargifyDotNet.Migration">
@@ -9359,6 +9844,11 @@
             "customerPaymentProfileId" provided as the VaultToken
             </summary>
         </member>
+        <member name="M:ChargifyDotNet.PaymentProfileAttributes.ShouldSerializeCustomerVaultToken">
+            <summary>
+            Used by XmlSerializer: only serialize CustomerVaultToken when it has a value.
+            </summary>
+        </member>
         <member name="P:ChargifyDotNet.PaymentProfileAttributes.CurrentVault">
             <summary>
             The vault that stores the payment profile with the provided VaultToken
@@ -9369,9 +9859,19 @@
             The year of expiration
             </summary>
         </member>
+        <member name="M:ChargifyDotNet.PaymentProfileAttributes.ShouldSerializeExpirationYear">
+            <summary>
+            Used by XmlSerializer: only serialize ExpirationYear when it has a value.
+            </summary>
+        </member>
         <member name="P:ChargifyDotNet.PaymentProfileAttributes.ExpirationMonth">
             <summary>
             The month of expiration
+            </summary>
+        </member>
+        <member name="M:ChargifyDotNet.PaymentProfileAttributes.ShouldSerializeExpirationMonth">
+            <summary>
+            Used by XmlSerializer: only serialize ExpirationMonth when it has a value.
             </summary>
         </member>
         <member name="P:ChargifyDotNet.PaymentProfileAttributes.CardType">
@@ -9380,10 +9880,20 @@
             the card type in the UI.
             </summary>
         </member>
+        <member name="M:ChargifyDotNet.PaymentProfileAttributes.ShouldSerializeCardType">
+            <summary>
+            Used by XmlSerializer: only serialize CardType when it has a value.
+            </summary>
+        </member>
         <member name="P:ChargifyDotNet.PaymentProfileAttributes.LastFour">
             <summary>
             (Optional) If you have the last 4 digits of the credit card number, you may supply
             them here so we may create a masked card number for display in the UI
+            </summary>
+        </member>
+        <member name="M:ChargifyDotNet.PaymentProfileAttributes.ShouldSerializeLastFour">
+            <summary>
+            Used by XmlSerializer: only serialize LastFour when it has a value.
             </summary>
         </member>
         <member name="P:ChargifyDotNet.PaymentProfileAttributes.BankName">
@@ -9391,9 +9901,19 @@
             The name of the bank where the customer's account resides
             </summary>
         </member>
+        <member name="M:ChargifyDotNet.PaymentProfileAttributes.ShouldSerializeBankName">
+            <summary>
+            Used by XmlSerializer: only serialize BankName when it has a value.
+            </summary>
+        </member>
         <member name="P:ChargifyDotNet.PaymentProfileAttributes.BankRoutingNumber">
             <summary>
             The routing number of the bank
+            </summary>
+        </member>
+        <member name="M:ChargifyDotNet.PaymentProfileAttributes.ShouldSerializeBankRoutingNumber">
+            <summary>
+            Used by XmlSerializer: only serialize BankRoutingNumber when it has a value.
             </summary>
         </member>
         <member name="P:ChargifyDotNet.PaymentProfileAttributes.BankAccountNumber">
@@ -9401,14 +9921,29 @@
             The customer's bank account number
             </summary>
         </member>
+        <member name="M:ChargifyDotNet.PaymentProfileAttributes.ShouldSerializeBankAccountNumber">
+            <summary>
+            Used by XmlSerializer: only serialize BankAccountNumber when it has a value.
+            </summary>
+        </member>
         <member name="P:ChargifyDotNet.PaymentProfileAttributes.BankAccountType">
             <summary>
             Either checking or savings
             </summary>
         </member>
+        <member name="M:ChargifyDotNet.PaymentProfileAttributes.ShouldSerializeBankAccountType">
+            <summary>
+            Used by XmlSerializer: only serialize BankAccountType when it has a value.
+            </summary>
+        </member>
         <member name="P:ChargifyDotNet.PaymentProfileAttributes.BankAccountHolderType">
             <summary>
             Either personal or business
+            </summary>
+        </member>
+        <member name="M:ChargifyDotNet.PaymentProfileAttributes.ShouldSerializeBankAccountHolderType">
+            <summary>
+            Used by XmlSerializer: only serialize BankAccountHolderType when it has a value.
             </summary>
         </member>
         <member name="M:ChargifyDotNet.PaymentProfileAttributes.CompareTo(ChargifyDotNet.IPaymentProfileAttributes)">
@@ -10768,6 +11303,11 @@
             </summary>
             <param name="subscriptionNode">The subscription node</param>
         </member>
+        <member name="P:ChargifyDotNet.Subscription.ReferralCode">
+            <summary>
+            The referral code the subscription was created with, if any
+            </summary>
+        </member>
         <member name="P:ChargifyDotNet.Subscription.SubscriptionID">
             <summary>
             The subscription unique ID within Chargify
@@ -11056,15 +11596,166 @@
             Can be used to record an external expiration date. Chargify sets this field automatically when a subscription expires (ceases billing) after a prescribed amount of time.
             </summary>
         </member>
+        <member name="T:ChargifyDotNet.SubscriptionPreview">
+            <summary>
+            A preview of what a new subscription would be billed now and at its next renewal
+            </summary>
+        </member>
         <member name="M:ChargifyDotNet.SubscriptionPreview.#ctor(System.String)">
             <summary>
             Constructor
             </summary>
             <param name="xml"></param>
         </member>
+        <member name="M:ChargifyDotNet.SubscriptionPreview.#ctor(ChargifyDotNet.Json.JsonObject)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="json">JSON containing a subscription_preview object</param>
+        </member>
         <member name="P:ChargifyDotNet.SubscriptionPreview.SubscriptionPreviewResult">
             <summary>
             The subscription preview result
+            </summary>
+        </member>
+        <member name="T:ChargifyDotNet.SubscriptionPreviewResult">
+            <summary>
+            The billing manifests of a subscription preview
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.SubscriptionPreviewResult.CurrentBillingManifest">
+            <summary>
+            What would be billed when the subscription is created
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.SubscriptionPreviewResult.NextBillingManifest">
+            <summary>
+            What would be billed at the next renewal
+            </summary>
+        </member>
+        <member name="T:ChargifyDotNet.SubscriptionPreviewBillingManifest">
+            <summary>
+            A subscription preview billing manifest
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.SubscriptionPreviewBillingManifest.LineItems">
+            <summary>
+            The line items
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.SubscriptionPreviewBillingManifest.TotalInCents">
+            <summary>
+            The total, in cents
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.SubscriptionPreviewBillingManifest.Total">
+            <summary>
+            The total
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.SubscriptionPreviewBillingManifest.TotalDiscountInCents">
+            <summary>
+            The total discount, in cents
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.SubscriptionPreviewBillingManifest.TotalDiscount">
+            <summary>
+            The total discount
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.SubscriptionPreviewBillingManifest.TotalTaxInCents">
+            <summary>
+            The total tax, in cents
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.SubscriptionPreviewBillingManifest.TotalTax">
+            <summary>
+            The total tax
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.SubscriptionPreviewBillingManifest.SubtotalInCents">
+            <summary>
+            The subtotal before discounts and tax, in cents
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.SubscriptionPreviewBillingManifest.Subtotal">
+            <summary>
+            The subtotal before discounts and tax
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.SubscriptionPreviewBillingManifest.StartDate">
+            <summary>
+            The start of the billing period
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.SubscriptionPreviewBillingManifest.EndDate">
+            <summary>
+            The end of the billing period
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.SubscriptionPreviewBillingManifest.PeriodType">
+            <summary>
+            The billing period type (e.g. "recurring", "prorated")
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.SubscriptionPreviewBillingManifest.ExistingBalanceInCents">
+            <summary>
+            The subscription balance carried into this period, in cents
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.SubscriptionPreviewBillingManifest.ExistingBalance">
+            <summary>
+            The subscription balance carried into this period
+            </summary>
+        </member>
+        <member name="T:ChargifyDotNet.SubscriptionPreviewLineItem">
+            <summary>
+            A line item in a subscription preview billing manifest
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.SubscriptionPreviewLineItem.TransactionType">
+            <summary>
+            The transaction type (e.g. "charge", "credit", "adjustment")
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.SubscriptionPreviewLineItem.Kind">
+            <summary>
+            The kind of line item (e.g. "baseline", "component", "trial")
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.SubscriptionPreviewLineItem.AmountInCents">
+            <summary>
+            The amount, in cents
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.SubscriptionPreviewLineItem.Amount">
+            <summary>
+            The amount
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.SubscriptionPreviewLineItem.Memo">
+            <summary>
+            The line item description
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.SubscriptionPreviewLineItem.DiscountAmountInCents">
+            <summary>
+            The discount applied, in cents
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.SubscriptionPreviewLineItem.DiscountAmount">
+            <summary>
+            The discount applied
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.SubscriptionPreviewLineItem.TaxableAmountInCents">
+            <summary>
+            The taxable amount, in cents
+            </summary>
+        </member>
+        <member name="P:ChargifyDotNet.SubscriptionPreviewLineItem.TaxableAmount">
+            <summary>
+            The taxable amount
             </summary>
         </member>
         <member name="T:ChargifyDotNet.Transaction">
@@ -11644,6 +12335,13 @@
             <param name="node">The xml node containing renewal line item data</param>
             <returns>The renewal line item object, or null</returns>
         </member>
+        <member name="M:ChargifyDotNet.UsefulExtensions.GetNodeContentAsComponentPricePoint(System.Xml.XmlNode)">
+            <summary>
+            Get the content of an XmlNode as a component price point
+            </summary>
+            <param name="node">The price_point node</param>
+            <returns>The price point, or null if the node is empty.</returns>
+        </member>
         <member name="M:ChargifyDotNet.UsefulExtensions.ConvertNode``1(System.Xml.XmlNode)">
             <summary>
             Generic node convert method
@@ -11727,6 +12425,13 @@
             <param name="node">The node whose value needs to be extracted</param>
             <returns>The Product value of the node</returns>
         </member>
+        <member name="M:ChargifyDotNet.UsefulExtensions.GetNodeContentAsComponentPrice(System.Xml.XmlNode)">
+            <summary>
+            Get the content of an XmlNode as a component price tier
+            </summary>
+            <param name="node">The price node</param>
+            <returns>The price tier, or null if the node is empty.</returns>
+        </member>
         <member name="M:ChargifyDotNet.UsefulExtensions.GetJSONContentAsBoolean(ChargifyDotNet.Json.JsonObject,System.String)">
             <summary>
             Method for getting the content of a JsonObject as a boolean
@@ -11735,12 +12440,42 @@
             <param name="key">The key of the JsonObject to get the bool from</param>
             <returns>The boolean value of the object at key</returns>
         </member>
+        <member name="M:ChargifyDotNet.UsefulExtensions.GetJSONContentAsPricePoints(ChargifyDotNet.Json.JsonObject,System.String)">
+            <summary>
+            Get the keyed array of a JsonObject as component price points
+            </summary>
+            <param name="obj">The object containing the array</param>
+            <param name="key">The key of the array</param>
+            <returns>The price points; empty if the key is missing.</returns>
+        </member>
+        <member name="M:ChargifyDotNet.UsefulExtensions.GetJSONContentAsPrices(ChargifyDotNet.Json.JsonObject,System.String)">
+            <summary>
+            Get the keyed array of a JsonObject as component price tiers
+            </summary>
+            <param name="obj">The object containing the array</param>
+            <param name="key">The key of the array</param>
+            <returns>The price tiers; empty if the key is missing.</returns>
+        </member>
         <member name="M:ChargifyDotNet.UsefulExtensions.GetNodeContentAsBoolean(System.Xml.XmlNode)">
             <summary>
             Method for getting the content of an XmlNode as a boolean
             </summary>
             <param name="node">The node whose value needs to be extracted</param>
             <returns>The boolean value of the node</returns>
+        </member>
+        <member name="M:ChargifyDotNet.UsefulExtensions.GetNodeContentAsPricePoints(System.Xml.XmlNode)">
+            <summary>
+            Get the child nodes of an XmlNode as component price points
+            </summary>
+            <param name="node">The price_points node</param>
+            <returns>The price points.</returns>
+        </member>
+        <member name="M:ChargifyDotNet.UsefulExtensions.GetNodeContentAsComponentPrices(System.Xml.XmlNode)">
+            <summary>
+            Get the child nodes of an XmlNode as component price tiers
+            </summary>
+            <param name="node">The prices node</param>
+            <returns>The price tiers.</returns>
         </member>
         <member name="M:ChargifyDotNet.UsefulExtensions.GetJSONContentAsDateTime(ChargifyDotNet.Json.JsonObject,System.String)">
             <summary>

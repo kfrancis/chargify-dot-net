@@ -183,8 +183,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="other">The other instance to compare against</param>
         /// <returns>The result of the comparison</returns>
-        public int CompareTo(IProductFamilyAttributes other)
+        public int CompareTo(IProductFamilyAttributes? other)
         {
+            if (other is null) return 1;
             return string.Compare(Handle, other.Handle, StringComparison.InvariantCultureIgnoreCase);
         }
         #endregion
@@ -195,8 +196,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="other">The other instance to compare against</param>
         /// <returns>The result of the comparison</returns>
-        public int CompareTo(ProductFamilyAttributes other)
+        public int CompareTo(ProductFamilyAttributes? other)
         {
+            if (other is null) return 1;
             return string.Compare(Handle, other.Handle, StringComparison.InvariantCultureIgnoreCase);
         }
         #endregion
@@ -205,22 +207,22 @@ namespace ChargifyDotNet
         /// <summary>
         /// The accounting code of the product family
         /// </summary>
-        public string AccountingCode { get; set; }
+        public string AccountingCode { get; set; } = null!;
 
         /// <summary>
         /// The descrition of the product family
         /// </summary>
-        public string Description { get; set; }
+        public string Description { get; set; } = null!;
 
         /// <summary>
         /// The handle of the product family
         /// </summary>
-        public string Handle { get; set; }
+        public string Handle { get; set; } = null!;
 
         /// <summary>
         /// The name of the product family
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
         #endregion
     }
 }

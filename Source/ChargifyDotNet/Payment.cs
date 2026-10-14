@@ -324,8 +324,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="other">The other payment</param>
         /// <returns></returns>
-        public int CompareTo(IPayment other)
+        public int CompareTo(IPayment? other)
         {
+            if (other is null) return 1;
             return ID.CompareTo(other.ID);
         }
 
@@ -334,8 +335,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="other">The other payment</param>
         /// <returns></returns>
-        public int CompareTo(Payment other)
+        public int CompareTo(Payment? other)
         {
+            if (other is null) return 1;
             return ID.CompareTo(other.ID);
         }
         #endregion

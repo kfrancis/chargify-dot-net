@@ -301,7 +301,7 @@ namespace ChargifyDotNet
         /// Equals operator for two customers
         /// </summary>
         /// <returns>True if the Customers are equal</returns>
-        public static bool operator ==(Customer a, Customer b)
+        public static bool operator ==(Customer? a, Customer? b)
         {
             // If both are null or both are the same instance, return true.
             if (ReferenceEquals(a, b)) return true;
@@ -333,7 +333,7 @@ namespace ChargifyDotNet
         /// Equals operator for two customers
         /// </summary>
         /// <returns>True if the Customers are equal</returns>
-        public static bool operator ==(Customer a, ICustomer b)
+        public static bool operator ==(Customer? a, ICustomer? b)
         {
             // If both are null or both are the same instance, return true.
             if (ReferenceEquals(a, b)) return true;
@@ -365,7 +365,7 @@ namespace ChargifyDotNet
         /// Equals operator for two customers
         /// </summary>
         /// <returns>True if the Customers are equal</returns>
-        public static bool operator ==(ICustomer a, Customer b)
+        public static bool operator ==(ICustomer? a, Customer? b)
         {
             // If both are null or both are the same instance, return true.
             if (ReferenceEquals(a, b)) return true;
@@ -397,7 +397,7 @@ namespace ChargifyDotNet
         /// Not Equals operator for two customers
         /// </summary>
         /// <returns>True if the Customers are not equal</returns>
-        public static bool operator !=(Customer a, Customer b)
+        public static bool operator !=(Customer? a, Customer? b)
         {
             return !(a == b);
         }
@@ -406,7 +406,7 @@ namespace ChargifyDotNet
         /// Not Equals operator for two customers
         /// </summary>
         /// <returns>True if the Customers are not equal</returns>
-        public static bool operator !=(Customer a, ICustomer b)
+        public static bool operator !=(Customer? a, ICustomer? b)
         {
             return !(a == b);
         }
@@ -415,7 +415,7 @@ namespace ChargifyDotNet
         /// Not Equals operator for two customers
         /// </summary>
         /// <returns>True if the Customers are not equal</returns>
-        public static bool operator !=(ICustomer a, Customer b)
+        public static bool operator !=(ICustomer? a, Customer? b)
         {
             return !(a == b);
         }
@@ -436,7 +436,7 @@ namespace ChargifyDotNet
         /// Equals
         /// </summary>
         /// <param name="obj"></param>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             // If both are null or both are the same instance, return true.
             if (ReferenceEquals(this, obj)) return true;
@@ -482,8 +482,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="other">The other instance</param>
         /// <returns>The result of the comparison</returns>
-        public int CompareTo(ICustomer other)
+        public int CompareTo(ICustomer? other)
         {
+            if (other is null) return 1;
             return string.Compare(FullName, other.FullName, StringComparison.InvariantCultureIgnoreCase);
         }
 
@@ -496,8 +497,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="other">The other instance</param>
         /// <returns>The result of the comparison</returns>
-        public int CompareTo(Customer other)
+        public int CompareTo(Customer? other)
         {
+            if (other is null) return 1;
             return string.Compare(FullName, other.FullName, StringComparison.InvariantCultureIgnoreCase);
         }
 

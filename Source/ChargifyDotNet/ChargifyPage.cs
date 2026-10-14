@@ -87,7 +87,7 @@ namespace ChargifyDotNet
                 return _chargify;
             }
         }
-        private ChargifyConnect _chargify;
+        private ChargifyConnect? _chargify;
     }
 #endif
 }

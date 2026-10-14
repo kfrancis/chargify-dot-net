@@ -127,7 +127,7 @@ namespace ChargifyDotNet
         /// The value of the attribute that was added to the resource
         /// </summary>
         public string Value { get { return _value; } set { _value = value; } }
-        private string _value;
+        private string _value = null!;
 
         /// <summary>
         /// The name of the attribute that is added to the resource
@@ -159,7 +159,7 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        public bool Equals(Metadata value)
+        public bool Equals(Metadata? value)
         {
             if (value is null)
             {
@@ -179,7 +179,7 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (!(obj is Metadata temp))
                 return false;

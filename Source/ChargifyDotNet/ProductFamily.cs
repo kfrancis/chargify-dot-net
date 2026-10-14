@@ -187,7 +187,7 @@ namespace ChargifyDotNet
         /// Equals operator for two product families
         /// </summary>
         /// <returns>True if the products are equal</returns>
-        public static bool operator ==(ProductFamily a, ProductFamily b)
+        public static bool operator ==(ProductFamily? a, ProductFamily? b)
         {
             // If both are null, or both are same instance, return true.
             if (ReferenceEquals(a, b)) { return true; }
@@ -202,7 +202,7 @@ namespace ChargifyDotNet
         /// Equals operator for two product families
         /// </summary>
         /// <returns>True if the products are equal</returns>
-        public static bool operator ==(ProductFamily a, IProductFamily b)
+        public static bool operator ==(ProductFamily? a, IProductFamily? b)
         {
             // If both are null, or both are same instance, return true.
             if (ReferenceEquals(a, b)) { return true; }
@@ -217,7 +217,7 @@ namespace ChargifyDotNet
         /// Equals operator for two product families
         /// </summary>
         /// <returns>True if the products are equal</returns>
-        public static bool operator ==(IProductFamily a, ProductFamily b)
+        public static bool operator ==(IProductFamily? a, ProductFamily? b)
         {
             // If both are null, or both are same instance, return true.
             if (ReferenceEquals(a, b)) { return true; }
@@ -232,7 +232,7 @@ namespace ChargifyDotNet
         /// Not Equals operator for two product families
         /// </summary>
         /// <returns>True if the products are not equal</returns>
-        public static bool operator !=(ProductFamily a, ProductFamily b)
+        public static bool operator !=(ProductFamily? a, ProductFamily? b)
         {
             return !(a == b);
         }
@@ -241,7 +241,7 @@ namespace ChargifyDotNet
         /// Not Equals operator for two product families
         /// </summary>
         /// <returns>True if the products are not equal</returns>
-        public static bool operator !=(ProductFamily a, IProductFamily b)
+        public static bool operator !=(ProductFamily? a, IProductFamily? b)
         {
             return !(a == b);
         }
@@ -250,7 +250,7 @@ namespace ChargifyDotNet
         /// Not Equals operator for two product families
         /// </summary>
         /// <returns>True if the products are not equal</returns>
-        public static bool operator !=(IProductFamily a, ProductFamily b)
+        public static bool operator !=(IProductFamily? a, ProductFamily? b)
         {
             return !(a == b);
         }
@@ -271,7 +271,7 @@ namespace ChargifyDotNet
         /// Equals
         /// </summary>
         /// <param name="obj"></param>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj == null) return false;
 
@@ -300,8 +300,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="other">The other instance</param>
         /// <returns>The result of the comparison</returns>
-        public int CompareTo(IProductFamily other)
+        public int CompareTo(IProductFamily? other)
         {
+            if (other is null) return 1;
             return string.Compare(Handle, other.Handle, StringComparison.InvariantCultureIgnoreCase);
         }
 
@@ -314,8 +315,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="other">The other instance</param>
         /// <returns>The result of the comparison</returns>
-        public int CompareTo(ProductFamily other)
+        public int CompareTo(ProductFamily? other)
         {
+            if (other is null) return 1;
             return string.Compare(Handle, other.Handle, StringComparison.InvariantCultureIgnoreCase);
         }
 

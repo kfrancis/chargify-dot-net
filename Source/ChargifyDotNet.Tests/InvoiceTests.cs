@@ -46,7 +46,9 @@ namespace ChargifyDotNetTests
             // Arrange
             var customers = Chargify.GetCustomerList().Keys;
             var referenceValue = customers.FirstOrDefault(systemID => !string.IsNullOrWhiteSpace(systemID));
+            Assert.IsNotNull(referenceValue, "No customer with a reference value found");
             var customer = Chargify.LoadCustomer(referenceValue);
+            Assert.IsNotNull(customer, "Customer not found");
             var products = Chargify.GetProductList().Values;
             var product = products.FirstOrDefault(p => p.PriceInCents > 0 && !p.RequireCreditCard);
             Assert.IsNotNull(product, "No valid product was found.");
@@ -87,7 +89,7 @@ namespace ChargifyDotNetTests
             SetJson(isJson);
 
             // Arrange
-            var product = Chargify.GetProductList().Values.DefaultIfEmpty(null).FirstOrDefault(p => p.PriceInCents > 0 && p.RequireCreditCard == false);
+            var product = Chargify.GetProductList().Values.FirstOrDefault(p => p.PriceInCents > 0 && p.RequireCreditCard == false);
             if (product == null) { Assert.Inconclusive("No product to test"); return; }
             var referenceID = Guid.NewGuid().ToString();
             var faker = new Faker("en");
@@ -132,6 +134,7 @@ namespace ChargifyDotNetTests
             var invoices = Chargify.GetInvoiceList().Values;
             if (!invoices.Any()) Assert.Inconclusive("There are no valid invoices for use in this test.");
             var invoice = invoices.FirstOrDefault(i => i.AmountDue > 0);
+            Assert.IsNotNull(invoice, "No invoice with an amount due found");
             var memo = Guid.NewGuid().ToString();
 
             // Act
@@ -160,6 +163,7 @@ namespace ChargifyDotNetTests
             var invoices = Chargify.GetInvoiceList().Values;
             if (!invoices.Any()) Assert.Inconclusive("There are no valid invoices for use in this test.");
             var invoice = invoices.FirstOrDefault(i => i.AmountDueInCents > 0);
+            Assert.IsNotNull(invoice, "No invoice with an amount due found");
             var memo = Guid.NewGuid().ToString();
 
             // Act

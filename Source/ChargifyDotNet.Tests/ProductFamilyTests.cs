@@ -102,11 +102,13 @@ namespace ChargifyDotNetTests
             var familyListing = Chargify.GetProductFamilyList();
 
             // Act
-            var result = Chargify.LoadProductFamily(familyListing.Values.FirstOrDefault().Handle);
+            var family = familyListing.Values.FirstOrDefault();
+            Assert.IsNotNull(family, "No product family found");
+            var result = Chargify.LoadProductFamily(family.Handle);
 
             Assert.IsNotNull(result);
             //Assert.IsInstanceOfType(result, typeof(IProductFamily));
-            Assert.AreEqual(familyListing.Values.FirstOrDefault().ID, result.ID, "IDs didn't match");
+            Assert.AreEqual(family.ID, result.ID, "IDs didn't match");
 
             SetJson(!isJson);
         }
@@ -124,11 +126,13 @@ namespace ChargifyDotNetTests
             var familyListing = Chargify.GetProductFamilyList();
 
             // Act
-            var result = Chargify.LoadProductFamily(familyListing.Values.FirstOrDefault().ID);
+            var family = familyListing.Values.FirstOrDefault();
+            Assert.IsNotNull(family, "No product family found");
+            var result = Chargify.LoadProductFamily(family.ID);
 
             Assert.IsNotNull(result);
             //Assert.IsInstanceOfType(result, typeof(IProductFamily));
-            Assert.AreEqual(familyListing.Values.FirstOrDefault().ID, result.ID, "IDs didn't match");
+            Assert.AreEqual(family.ID, result.ID, "IDs didn't match");
 
             SetJson(!isJson);
         }

@@ -24,6 +24,7 @@ namespace ChargifyDotNetTests
             var productFamily = Chargify.GetProductFamilyList().Values.FirstOrDefault();
             if (productFamily == null) Assert.Inconclusive("A valid product family could not be found.");
             var coupons = Chargify.GetAllCoupons(productFamily.ID);
+            Assert.IsNotNull(coupons, "No coupons found");
             var couponID = coupons.FirstOrDefault(c => c.Value.AmountInCents > 0).Key;
 
             // Act
@@ -52,6 +53,7 @@ namespace ChargifyDotNetTests
             var productFamily = Chargify.GetProductFamilyList().Values.FirstOrDefault();
             if (productFamily == null) Assert.Inconclusive("A valid product family could not be found.");
             var coupons = Chargify.GetAllCoupons(productFamily.ID);
+            Assert.IsNotNull(coupons, "No coupons found");
             var coupon = coupons.FirstOrDefault(c => c.Value.Percentage > 0).Value;
             var couponID = coupon.ID;
 
@@ -122,7 +124,9 @@ namespace ChargifyDotNetTests
             // Arrange
             var productFamily = Chargify.GetProductFamilyList().Values.FirstOrDefault();
             if (productFamily == null) Assert.Inconclusive("A valid product family could not be found.");
-            var foundCoupon = Chargify.GetAllCoupons(productFamily.ID).FirstOrDefault().Value;
+            var allCoupons = Chargify.GetAllCoupons(productFamily.ID);
+            Assert.IsNotNull(allCoupons, "No coupons found");
+            var foundCoupon = allCoupons.FirstOrDefault().Value;
             if (foundCoupon == null) Assert.Inconclusive("A valid coupon could not be found.");
             var originalName = foundCoupon.Name;
             foundCoupon.Name = originalName + "_1";

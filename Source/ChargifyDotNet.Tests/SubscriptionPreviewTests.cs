@@ -25,7 +25,7 @@ namespace ChargifyDotNetTests
             var options = new SubscriptionCreateOptions()
             {
                 ProductHandle = subscription.Product.Handle,
-                CustomerAttributes = subscription.Customer.ToCustomerAttributes() as CustomerAttributes,
+                CustomerAttributes = (CustomerAttributes)subscription.Customer.ToCustomerAttributes(),
                 CreditCardAttributes = new CreditCardAttributes() { FullNumber = "1", ExpirationMonth = 1, ExpirationYear = DateTime.Now.Year + 1 }
             };
 

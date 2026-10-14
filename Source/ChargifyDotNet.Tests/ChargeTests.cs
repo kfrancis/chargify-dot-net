@@ -56,6 +56,7 @@ namespace ChargifyDotNetTests
             }
             var result = client.CreateCharge(subscription.SubscriptionID, 1.00m, "Test Charge");
             var retrievedSubscription = client.Find<Subscription>(subscription.SubscriptionID);
+            Assert.IsNotNull(retrievedSubscription, "Subscription not found");
             TestContext.WriteLine($"{retrievedSubscription.SubscriptionID}");
 
             // Assert
@@ -148,6 +149,7 @@ namespace ChargifyDotNetTests
             }
             var result = client.CreateCharge(subscription.SubscriptionID, amountToCharge, "Test Charge", delayCharge: true);
             var retrievedSubscription = client.Find<Subscription>(subscription.SubscriptionID);
+            Assert.IsNotNull(retrievedSubscription, "Subscription not found");
 
             // Assert
             if (subscription.BalanceInCents > 0)

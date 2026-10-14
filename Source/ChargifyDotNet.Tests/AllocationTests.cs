@@ -100,7 +100,7 @@ namespace ChargifyDotNetTests
             if (component == null) Assert.Inconclusive("A valid component could not be found.");
 
             var quantityToAllocate = (int)component.AllocatedQuantity + 1;
-            IComponentAllocation result = null;
+            IComponentAllocation? result = null;
 
             // Act
             try

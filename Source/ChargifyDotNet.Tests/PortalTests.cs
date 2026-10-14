@@ -18,7 +18,9 @@ namespace ChargifyDotNetTests
             SetJson(isJson);
 
             // Arrange
-            var customerId = Chargify.GetCustomerList().Values.Where(c => c.ChargifyID != int.MinValue).FirstOrDefault().ChargifyID;
+            var customer = Chargify.GetCustomerList().Values.FirstOrDefault(c => c.ChargifyID != int.MinValue);
+            Assert.IsNotNull(customer, "No customer found");
+            var customerId = customer.ChargifyID;
 
             // Act
             var result = Chargify.GetManagementLink(customerId);

@@ -27,7 +27,7 @@ namespace ChargifyDotNet.Json
         /// <param name="str">The string to parse</param>
         /// <param name="position">The current position</param>
         /// <returns>The JsonValue if parsed, null otherwise.</returns>
-        protected static JsonValue ParseValue(string str, ref int position)
+        protected static JsonValue? ParseValue(string str, ref int position)
         {
             EatSpaces(str, ref position);
 

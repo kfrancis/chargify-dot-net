@@ -330,8 +330,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="other">The other details to compare</param>
         /// <returns></returns>
-        public int CompareTo(RenewalDetails other)
+        public int CompareTo(RenewalDetails? other)
         {
+            if (other is null) return 1;
             throw new NotImplementedException();
         }
         #endregion

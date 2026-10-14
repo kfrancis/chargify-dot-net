@@ -203,7 +203,7 @@ namespace ChargifyDotNet
                             {
                                 var newObj = new Metadata();
                                 var hasData = false;
-                                var itemObj = (JsonObject)item;
+                                if (item is not JsonObject itemObj) continue;
                                 foreach (var subItemKey in itemObj.Keys)
                                 {
                                     switch (subItemKey)

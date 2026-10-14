@@ -309,8 +309,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="other">The adjustment to compare with</param>
         /// <returns>The comparison value</returns>
-        public int CompareTo(IAdjustment other)
+        public int CompareTo(IAdjustment? other)
         {
+            if (other is null) return 1;
             return _amountInCents.CompareTo(other.AmountInCents);
         }
         #endregion
@@ -321,8 +322,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="other">The adjustment to compare with</param>
         /// <returns>The comparison value</returns>
-        public int CompareTo(Adjustment other)
+        public int CompareTo(Adjustment? other)
         {
+            if (other is null) return 1;
             return _amountInCents.CompareTo(other.AmountInCents);
         }
         #endregion

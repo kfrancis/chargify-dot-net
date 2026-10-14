@@ -68,7 +68,7 @@ namespace ChargifyDotNet.Configuration
         /// </summary>
         public ChargifyAccountConfig GetDefaultOrFirst()
         {
-            ChargifyAccountConfig result = null;
+            ChargifyAccountConfig? result = null;
             if (!string.IsNullOrEmpty(DefaultAccount))
             {
                 foreach (ChargifyAccountConfig element in Accounts)
@@ -101,7 +101,7 @@ namespace ChargifyDotNet.Configuration
         /// <returns>The shared key for the default site, if applicable</returns>
         public string GetSharedKeyForDefaultOrFirstSite()
         {
-            ChargifyAccountConfig result = null;
+            ChargifyAccountConfig? result = null;
             if (!string.IsNullOrEmpty(DefaultAccount))
             {
                 foreach (ChargifyAccountConfig element in Accounts)

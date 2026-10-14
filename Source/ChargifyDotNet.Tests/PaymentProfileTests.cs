@@ -25,8 +25,9 @@ namespace ChargifyDotNetTests
             // Arrange
             var subscription = Chargify.GetSubscriptionList(SubscriptionState.Active).FirstOrDefault(s => s.Value.PaymentProfile != null).Value;
             var loadedSubscription = Chargify.LoadSubscription(subscription.SubscriptionID);
+            Assert.IsNotNull(loadedSubscription, "Subscription not found");
             TestContext.WriteLine("ID: " + loadedSubscription.PaymentProfile.Id);
-            var originalPaymentProfile = loadedSubscription.PaymentProfile as PaymentProfileView;
+            var originalPaymentProfile = (PaymentProfileView)loadedSubscription.PaymentProfile;
             originalPaymentProfile.FirstName = Guid.NewGuid().ToString();
             originalPaymentProfile.LastName = Guid.NewGuid().ToString();
 
@@ -53,8 +54,9 @@ namespace ChargifyDotNetTests
             // Arrange
             var subscription = Chargify.GetSubscriptionList(SubscriptionState.Active).FirstOrDefault(s => s.Value.PaymentProfile != null).Value;
             var loadedSubscription = Chargify.LoadSubscription(subscription.SubscriptionID);
+            Assert.IsNotNull(loadedSubscription, "Subscription not found");
 
-            var paymentProfile = loadedSubscription.PaymentProfile as PaymentProfileView;
+            var paymentProfile = (PaymentProfileView)loadedSubscription.PaymentProfile;
             paymentProfile.BillingAddress = GetNewRandomValue(subscription.PaymentProfile.BillingAddress, Faker.Address.StreetAddress);
             paymentProfile.BillingAddress2 = GetNewRandomValue(subscription.PaymentProfile.BillingAddress2, Faker.Address.StreetAddress);
             paymentProfile.BillingCity = GetNewRandomValue(subscription.PaymentProfile.BillingCity, Faker.Address.StreetAddress);
@@ -93,6 +95,7 @@ namespace ChargifyDotNetTests
             // Arrange
             var subscription = Chargify.GetSubscriptionList(SubscriptionState.Active).FirstOrDefault(s => s.Value.PaymentProfile != null).Value;
             var loadedSubscription = Chargify.LoadSubscription(subscription.SubscriptionID);
+            Assert.IsNotNull(loadedSubscription, "Subscription not found");
             TestContext.WriteLine("ID: " + loadedSubscription.PaymentProfile.Id);
 
             // Act

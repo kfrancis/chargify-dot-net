@@ -180,8 +180,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>
-        public int CompareTo(Usage other)
+        public int CompareTo(Usage? other)
         {
+            if (other is null) return 1;
             return string.Compare(ID, other.ID, StringComparison.InvariantCultureIgnoreCase);
         }
 
@@ -190,8 +191,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>
-        public int CompareTo(IUsage other)
+        public int CompareTo(IUsage? other)
         {
+            if (other is null) return 1;
             return string.Compare(ID, other.ID, StringComparison.InvariantCultureIgnoreCase);
         }
 

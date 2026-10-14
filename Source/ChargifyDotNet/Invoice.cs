@@ -125,8 +125,9 @@ namespace ChargifyDotNet
                         {
                             foreach (var jsonValue in chargesArray.Items)
                             {
-                                var charge = (JsonObject)jsonValue;
-                                _charges.Add(charge.GetJSONContentAsCharge(nameof(charge)));
+                                if (jsonValue is not JsonObject charge) continue;
+                                var item = charge.GetJSONContentAsCharge(nameof(charge));
+                                if (item is not null) _charges.Add(item);
                             }
                         }
                         // Sanity check, should be equal.
@@ -188,7 +189,8 @@ namespace ChargifyDotNet
                             switch (childNode.Name)
                             {
                                 case "charge":
-                                    _charges.Add(childNode.GetNodeContentAsCharge());
+                                    var item = childNode.GetNodeContentAsCharge();
+                                    if (item is not null) _charges.Add(item);
                                     break;
                             }
                         }

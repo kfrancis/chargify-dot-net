@@ -168,7 +168,7 @@ namespace ChargifyDotNet
         /// <summary>
         /// The main text content of the note
         /// </summary>
-        public string Body { get; set; }
+        public string Body { get; set; } = null!;
 
         /// <summary>
         /// Date and time the note was created
@@ -223,8 +223,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="other">The note to compare with</param>
         /// <returns>The comparison value</returns>
-        public int CompareTo(INote other)
+        public int CompareTo(INote? other)
         {
+            if (other is null) return 1;
             return ID.CompareTo(other.ID);
         }
         #endregion
@@ -235,8 +236,9 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="other">The note to compare with</param>
         /// <returns>The comparison value</returns>
-        public int CompareTo(Note other)
+        public int CompareTo(Note? other)
         {
+            if (other is null) return 1;
             return ID.CompareTo(other.ID);
         }
         #endregion

@@ -52,7 +52,7 @@ namespace ChargifyDotNet
         /// <summary>
         /// The message from Chargify
         /// </summary>
-        public string Message { get; private set; }
+        public string Message { get; private set; } = string.Empty;
 
         /// <summary>
         /// The field the error relates to, when Chargify returned field-keyed errors
@@ -81,7 +81,7 @@ namespace ChargifyDotNet
         /// <param name="errorNode">The XML node that contains the error message</param>
         internal ChargifyError(XmlNode errorNode)
         {
-            Message = errorNode.Value;
+            Message = errorNode.Value ?? string.Empty;
         }
 
         /// <summary>
@@ -94,6 +94,11 @@ namespace ChargifyDotNet
         }
 
         #endregion
+        /// <summary>
+        /// Parse the errors in a failed response's body. Reads the response content.
+        /// </summary>
+        /// <param name="response">The failed response</param>
+        /// <returns>The errors, or an empty list if the body has none or cannot be parsed.</returns>
         public static List<ChargifyError> ParseChargifyErrors(HttpResponseMessage response)
         {
             var errors = new List<ChargifyError>();
@@ -244,6 +249,22 @@ namespace ChargifyDotNet
         public ChargifyNetException(string message) : base(message)
         {
         }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public ChargifyNetException()
+        {
+        }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="message">The message of this exception</param>
+        /// <param name="innerException">The exception that caused this exception</param>
+        public ChargifyNetException(string message, Exception innerException) : base(message, innerException)
+        {
+        }
     }
 
     /// <summary>
@@ -251,6 +272,8 @@ namespace ChargifyDotNet
     /// </summary>
     [DebuggerDisplay("Status Description: {StatusDescription}, Status Code: {StatusCode}, Error Messages: {ErrorMessages.Count}")]
     [Serializable]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "RCS1194:Implement exception constructors",
+        Justification = "Every ChargifyException carries an HTTP status code; message-only constructors would leave StatusCode meaningless.")]
     public class ChargifyException : Exception
     {
         /// <summary>

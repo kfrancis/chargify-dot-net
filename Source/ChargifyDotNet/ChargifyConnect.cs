@@ -192,17 +192,17 @@ namespace ChargifyDotNet
         /// <summary>
         /// Get or set the API key
         /// </summary>
-        public string apiKey { get; set; }
+        public string apiKey { get; set; } = null!;
 
         /// <summary>
         /// Get or set the password
         /// </summary>
-        public string Password { get; set; }
+        public string Password { get; set; } = null!;
 
         /// <summary>
         /// Get or set the URL for chargify
         /// </summary>
-        public string URL { get; set; }
+        public string URL { get; set; } = null!;
 
         /// <summary>
         /// SharedKey used for url generation
@@ -282,7 +282,7 @@ namespace ChargifyDotNet
         /// <summary>
         /// Caller can plug in a delegate for logging raw Chargify requests
         /// </summary>
-        public Action<HttpRequestMethod, string, string>? LogRequest { get; set; }
+        public Action<HttpRequestMethod, string, string?>? LogRequest { get; set; }
 
         /// <summary>
         /// Caller can plug in a delegate for logging raw Chargify responses
@@ -388,7 +388,7 @@ namespace ChargifyDotNet
             if (UseJSON)
             {
                 var metadatumResult = JsonConvert.DeserializeObject<IList<Metadata>>(response);
-                retVal = metadatumResult.Cast<IMetadata>().ToList();
+                retVal = metadatumResult?.Cast<IMetadata>().ToList() ?? new List<IMetadata>();
             }
             else
             {
@@ -484,7 +484,7 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="chargifyId">The chargify ID of the customer</param>
         /// <returns>The customer with the specified chargify ID</returns>
-        public ICustomer LoadCustomer(long chargifyId)
+        public ICustomer? LoadCustomer(long chargifyId)
         {
             try
             {
@@ -507,7 +507,7 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="systemId">The system ID of the customer</param>
         /// <returns>The customer with the specified chargify ID</returns>
-        public ICustomer LoadCustomer(string systemId)
+        public ICustomer? LoadCustomer(string systemId)
         {
             try
             {
@@ -743,7 +743,7 @@ namespace ChargifyDotNet
                 {
                     if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("customer"))
                     {
-                        var customerObj = (array.Items[i] as JsonObject)["customer"] as JsonObject;
+                        var customerObj = GetArrayItemObject(array, i, "customer");
                         var loadedCustomer = new Customer(customerObj);
                         var key = keyByChargifyId ? loadedCustomer.ChargifyID.ToString() : loadedCustomer.SystemID;
                         if (!retValue.ContainsKey(key))
@@ -962,7 +962,7 @@ namespace ChargifyDotNet
         /// <param name="accountingCode">The accounting code used for this product</param>
         /// <param name="description">The product description</param>
         /// <returns>The created product</returns>
-        public IProduct CreateProduct(int productFamilyId, string name, string handle, int priceInCents, int interval, IntervalUnit intervalUnit, string accountingCode, string description)
+        public IProduct CreateProduct(int productFamilyId, string name, string handle, int priceInCents, int interval, IntervalUnit intervalUnit, string? accountingCode, string? description)
         {
             // make sure data is valid
             if (string.IsNullOrEmpty(name)) throw new ArgumentNullException(nameof(name));
@@ -977,7 +977,7 @@ namespace ChargifyDotNet
                 productXml.AppendFormat("<interval_unit>{0}</interval_unit>", intervalUnitName.ToLowerInvariant());
             if (!string.IsNullOrEmpty(handle)) productXml.AppendFormat("<handle>{0}</handle>", handle);
             if (!string.IsNullOrEmpty(accountingCode)) productXml.AppendFormat("<accounting_code>{0}</accounting_code>", accountingCode);
-            if (!string.IsNullOrEmpty(description)) productXml.AppendFormat("<description>{0}</description>", PCLWebUtility.WebUtility.HtmlEncode(description));
+            if (description is { Length: > 0 }) productXml.AppendFormat("<description>{0}</description>", PCLWebUtility.WebUtility.HtmlEncode(description));
             productXml.Append("</product>");
             // now make the request
             var response = DoRequest(string.Format("product_families/{0}/products.{1}", productFamilyId, GetMethodExtension()), HttpRequestMethod.Post, productXml.ToString());
@@ -990,7 +990,7 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="handle">The Chargify ID or handle of the product</param>
         /// <returns>The product with the specified chargify ID</returns>
-        public IProduct LoadProduct(string handle)
+        public IProduct? LoadProduct(string handle)
         {
             return LoadProduct(handle, true);
         }
@@ -1001,7 +1001,7 @@ namespace ChargifyDotNet
         /// <param name="productId">The Chargify ID or handle of the product</param>
         /// <param name="isHandle">If true, then the ProductID represents the handle, if false the ProductID represents the Chargify ID</param>
         /// <returns>The product with the specified chargify ID</returns>
-        public IProduct LoadProduct(string productId, bool isHandle)
+        public IProduct? LoadProduct(string productId, bool isHandle)
         {
             try
             {
@@ -1075,7 +1075,7 @@ namespace ChargifyDotNet
                 {
                     if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("product"))
                     {
-                        var productObj = (array.Items[i] as JsonObject)["product"] as JsonObject;
+                        var productObj = GetArrayItemObject(array, i, "product");
                         IProduct loadedProduct = new Product(productObj);
                         if (!retValue.ContainsKey(loadedProduct.ID))
                         {
@@ -1168,7 +1168,7 @@ namespace ChargifyDotNet
                 {
                     if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("product_family"))
                     {
-                        var productFamilyObj = (array.Items[i] as JsonObject)["product_family"] as JsonObject;
+                        var productFamilyObj = GetArrayItemObject(array, i, "product_family");
                         IProductFamily loadedProductFamily = new ProductFamily(productFamilyObj);
                         if (!retValue.ContainsKey(loadedProductFamily.ID))
                         {
@@ -1190,7 +1190,7 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="handle">The Chargify ID or handle of the product</param>
         /// <returns>The product family with the specified chargify ID</returns>
-        public IProductFamily LoadProductFamily(string handle)
+        public IProductFamily? LoadProductFamily(string handle)
         {
             return LoadProductFamily(handle, true);
         }
@@ -1200,7 +1200,7 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="id">The Chargify ID of the product</param>
         /// <returns>The product family with the specified chargify ID</returns>
-        public IProductFamily LoadProductFamily(int id)
+        public IProductFamily? LoadProductFamily(int id)
         {
             return LoadProductFamily(id.ToString(), false);
         }
@@ -1211,7 +1211,7 @@ namespace ChargifyDotNet
         /// <param name="productFamilyIdentifier">The Chargify identifier (ID or handle) of the product family</param>
         /// <param name="isHandle">If true, then the ProductID represents the handle, if false the ProductFamilyID represents the Chargify ID</param>
         /// <returns>The product family with the specified chargify ID</returns>
-        private IProductFamily LoadProductFamily(string productFamilyIdentifier, bool isHandle)
+        private IProductFamily? LoadProductFamily(string productFamilyIdentifier, bool isHandle)
         {
             try
             {
@@ -1275,7 +1275,7 @@ namespace ChargifyDotNet
 
         static string Slug(string? s)
         {
-            if (string.IsNullOrWhiteSpace(s)) return string.Empty;
+            if (s is null || string.IsNullOrWhiteSpace(s)) return string.Empty;
             var sb = new StringBuilder();
             foreach (var c in s.Normalize(NormalizationForm.FormD))
                 if (CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark) sb.Append(c);
@@ -1316,7 +1316,7 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="subscriptionId">The ID of the subscription to reactivate</param>
         /// <returns>The newly reactivated subscription, or nothing.</returns>
-        public ISubscription ReactivateSubscription(int subscriptionId)
+        public ISubscription? ReactivateSubscription(int subscriptionId)
         {
             try
             {
@@ -1337,7 +1337,7 @@ namespace ChargifyDotNet
         /// <param name="subscriptionId">The ID of the subscription to reactivate</param>
         /// <param name="includeTrial">If true, the reactivated subscription will include a trial if one is available.</param>
         /// <returns>The newly reactivated subscription, or nothing.</returns>
-        public ISubscription ReactivateSubscription(int subscriptionId, bool includeTrial)
+        public ISubscription? ReactivateSubscription(int subscriptionId, bool includeTrial)
         {
             return ReactivateSubscription(subscriptionId, includeTrial, null, null);
         }
@@ -1352,7 +1352,7 @@ namespace ChargifyDotNet
         /// <param name="preserveBalance">If true, the existing subscription balance will NOT be cleared/reset before adding the additional reactivation charges.</param>
         /// <param name="couponCode">The coupon code to be applied during reactivation.</param>
         /// <returns>The newly reactivated subscription, or nothing.</returns>
-        public ISubscription ReactivateSubscription(int subscriptionId, bool includeTrial, bool? preserveBalance, string? couponCode)
+        public ISubscription? ReactivateSubscription(int subscriptionId, bool includeTrial, bool? preserveBalance, string? couponCode)
         {
             try
             {
@@ -1463,7 +1463,7 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="subscriptionId">The ID of the subscription</param>
         /// <returns>The subscription with the specified ID</returns>
-        public ISubscription LoadSubscription(int subscriptionId)
+        public ISubscription? LoadSubscription(int subscriptionId)
         {
             try
             {
@@ -1615,7 +1615,7 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="chargifyId">The ChargifyID of the customer</param>
         /// <returns>A list of subscriptions</returns>
-        public IDictionary<int, ISubscription> GetSubscriptionListForCustomer(long chargifyId)
+        public IDictionary<int, ISubscription>? GetSubscriptionListForCustomer(long chargifyId)
         {
             try
             {
@@ -1662,7 +1662,7 @@ namespace ChargifyDotNet
                     {
                         if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("subscription"))
                         {
-                            var subscriptionObj = (array.Items[i] as JsonObject)["subscription"] as JsonObject;
+                            var subscriptionObj = GetArrayItemObject(array, i, "subscription");
                             ISubscription loadedSubscription = new Subscription(subscriptionObj);
                             if (!retValue.ContainsKey(loadedSubscription.SubscriptionID))
                             {
@@ -2199,7 +2199,7 @@ namespace ChargifyDotNet
         {
             if (creditCardAttributes == null) throw new ArgumentNullException(nameof(creditCardAttributes));
             if (customerAttributes == null) throw new ArgumentNullException(nameof(customerAttributes));
-            if (nextBillingAt == null || nextBillingAt == DateTime.MinValue) throw new ArgumentNullException(nameof(nextBillingAt));
+            if (nextBillingAt == DateTime.MinValue) throw new ArgumentNullException(nameof(nextBillingAt));
 
             return CreateSubscription(productHandle, customerAttributes.SystemID, customerAttributes.FirstName,
                                       customerAttributes.LastName, customerAttributes.Email, customerAttributes.Phone, customerAttributes.Organization,
@@ -2990,7 +2990,7 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="subscription">The subscription to update</param>
         /// <returns>The updated subscriptionn, null otherwise.</returns>
-        public ISubscription UpdateSubscription(ISubscription subscription)
+        public ISubscription? UpdateSubscription(ISubscription subscription)
         {
             return UpdateSubscription(subscription.SubscriptionID, subscription.Product.Handle, subscription.Customer.SystemID, subscription.Customer.FirstName,
                 subscription.Customer.LastName, subscription.Customer.Email, subscription.Customer.Phone, subscription.Customer.Organization, subscription.PaymentProfile.FullNumber, subscription.PaymentProfile.ExpirationMonth,
@@ -3227,7 +3227,7 @@ namespace ChargifyDotNet
         /// <param name="billingZip">The billing zip code or postal code (optional - set to null if not required)</param>
         /// <param name="billingCountry">The billing country (optional - set to null if not required)</param>
         /// <returns>The xml describing the new subsscription</returns>
-        private ISubscription UpdateSubscription(int subscriptionId, string productHandle, string systemId, string firstName, string lastName, string emailAddress, string phone,
+        private ISubscription? UpdateSubscription(int subscriptionId, string productHandle, string systemId, string firstName, string lastName, string emailAddress, string phone,
                                                  string organization, string fullNumber, int? expirationMonth, int? expirationYear,
                                                  string cvv, string billingAddress, string billingCity, string billingState, string billingZip,
                                                  string billingCountry)
@@ -3332,7 +3332,7 @@ namespace ChargifyDotNet
         /// <param name="cancelAtEndOfPeriod">True if the subscription should cancel at the end of the current period</param>
         /// <param name="cancellationMessage">The reason for cancelling the subscription</param>
         /// <returns>Subscription if successful, null otherwise.</returns>
-        public ISubscription UpdateDelayedCancelForSubscription(int subscriptionId, bool cancelAtEndOfPeriod, string cancellationMessage)
+        public ISubscription? UpdateDelayedCancelForSubscription(int subscriptionId, bool cancelAtEndOfPeriod, string cancellationMessage)
         {
             if (subscriptionId == int.MinValue) throw new ArgumentNullException(nameof(subscriptionId));
 
@@ -3604,7 +3604,7 @@ namespace ChargifyDotNet
                 var overrideXml = new StringBuilder(GetXmlStringIfApplicable());
                 overrideXml.Append("<subscription>");
                 if (activatedAt.HasValue) { overrideXml.AppendFormat("<activated_at>{0}</activated_at>", activatedAt.Value.ToString("o")); }
-                if (!string.IsNullOrEmpty(cancellationMessage)) { overrideXml.AppendFormat("<cancellation_message>{0}</cancellation_message>", PCLWebUtility.WebUtility.HtmlEncode(cancellationMessage)); }
+                if (cancellationMessage is { Length: > 0 }) { overrideXml.AppendFormat("<cancellation_message>{0}</cancellation_message>", PCLWebUtility.WebUtility.HtmlEncode(cancellationMessage)); }
                 if (canceledAt.HasValue) { overrideXml.AppendFormat("<canceled_at>{0}</canceled_at>", canceledAt.Value.ToString("o")); }
                 if (expiresAt.HasValue) { overrideXml.AppendFormat("<expires_at>{0}</expires_at>", expiresAt.Value.ToString("o")); }
                 overrideXml.Append("</subscription>");
@@ -3709,7 +3709,7 @@ namespace ChargifyDotNet
         /// <param name="productFamilyId">The ID of the product family that the coupon belongs to</param>
         /// <param name="couponId">The ID of the coupon</param>
         /// <returns>The object if found, null otherwise.</returns>
-        public ICoupon LoadCoupon(int productFamilyId, int couponId)
+        public ICoupon? LoadCoupon(int productFamilyId, int couponId)
         {
             try
             {
@@ -3735,7 +3735,7 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="productFamilyID">The ID of the product family that the coupon belongs to</param>
         /// <returns>A dictionary of objects if found, empty collection otherwise.</returns>
-        public IDictionary<int, ICoupon> GetAllCoupons(int productFamilyID)
+        public IDictionary<int, ICoupon>? GetAllCoupons(int productFamilyID)
         {
             var coupons = new Dictionary<int, ICoupon>();
 
@@ -3783,9 +3783,9 @@ namespace ChargifyDotNet
                     var array = JsonArray.Parse(response, ref position);
                     for (var i = 0; i <= array.Length - 1; i++)
                     {
-                        if ((array.Items[i] as JsonObject).ContainsKey("coupon"))
+                        if (array.Items[i] is JsonObject couponItem && couponItem.ContainsKey("coupon"))
                         {
-                            var couponObj = (array.Items[i] as JsonObject)["coupon"] as JsonObject;
+                            var couponObj = GetArrayItemObject(array, i, "coupon");
                             ICoupon loadedCooupon = new Coupon(couponObj);
                             if (!coupons.ContainsKey(loadedCooupon.ID))
                             {
@@ -3804,7 +3804,7 @@ namespace ChargifyDotNet
                 // Throw if anything but not found, since not found is telling us that it's working correctly
                 // but that there just isn't a coupon with that ID.
                 if (cex.StatusCode == HttpStatusCode.NotFound) return null;
-                throw cex;
+                throw;
             }
 
             return coupons;
@@ -4008,7 +4008,7 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="couponId">The ID of the coupon</param>
         /// <returns>The object if found, null otherwise.</returns>
-        public IDictionary<int, ICouponUsage> GetCouponUsage(int couponId)
+        public IDictionary<int, ICouponUsage>? GetCouponUsage(int couponId)
         {
             var coupons = new Dictionary<int, ICouponUsage>();
 
@@ -4077,7 +4077,7 @@ namespace ChargifyDotNet
         /// <param name="productFamilyId">The ID of the product family the coupon belongs to</param>
         /// <param name="couponCode">The code used to represent the coupon</param>
         /// <returns>The object if found, otherwise null.</returns>
-        public ICoupon FindCoupon(int productFamilyId, string couponCode)
+        public ICoupon? FindCoupon(int productFamilyId, string couponCode)
         {
             try
             {
@@ -4357,11 +4357,21 @@ namespace ChargifyDotNet
 
         #region Components
 
+        /// <summary>
+        /// Bulk-create price points for a component. Not implemented.
+        /// </summary>
+        /// <exception cref="NotImplementedException">Always.</exception>
         public List<ComponentPricePoint> GetPricePoints(int componentID, List<ComponentPricePoint> bulkPricePoints)
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Make a price point the default for its component.
+        /// </summary>
+        /// <param name="componentID">The component ID</param>
+        /// <param name="pricePointId">The price point ID</param>
+        /// <returns>True if Chargify accepted the change, false if it returned an error.</returns>
         public bool SetPricePointDefault(long componentID, long pricePointId)
         {
             //components/{component_id}/price_points/{price_point_id}/default.json
@@ -4383,6 +4393,13 @@ namespace ChargifyDotNet
             }
         }
 
+        /// <summary>
+        /// Archive a component price point.
+        /// </summary>
+        /// <param name="componentID">The component ID</param>
+        /// <param name="pricePointId">The price point ID</param>
+        /// <returns>The archived price point.</returns>
+        /// <exception cref="InvalidOperationException">Chargify returned 404.</exception>
         public ComponentPricePoint ArchivePricePoint(int componentID, long pricePointId)
         {
             try
@@ -4406,6 +4423,13 @@ namespace ChargifyDotNet
             }
         }
 
+        /// <summary>
+        /// Unarchive a component price point.
+        /// </summary>
+        /// <param name="componentID">The component ID</param>
+        /// <param name="pricePointId">The price point ID</param>
+        /// <returns>The unarchived price point.</returns>
+        /// <exception cref="InvalidOperationException">Chargify returned 404.</exception>
         public ComponentPricePoint UnarchivePricePoint(int componentID, long pricePointId)
         {
             try
@@ -4429,11 +4453,20 @@ namespace ChargifyDotNet
             }
         }
 
+        /// <summary>
+        /// Update a component price point. Not implemented.
+        /// </summary>
+        /// <exception cref="NotImplementedException">Always.</exception>
         public ComponentPricePoint UpdatePricePoint(int componentID, ComponentPricePoint updatedPricePoint)
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Get the price points for a component.
+        /// </summary>
+        /// <param name="componentId">The component ID</param>
+        /// <returns>The price points, keyed by price point ID.</returns>
         public IDictionary<long, ComponentPricePoint> GetPricePoints(int componentId)
         {
             // make sure data is valid
@@ -4476,13 +4509,12 @@ namespace ChargifyDotNet
                 var jObj = JsonObject.Parse(response);
 
                 // should be expecting an array
-                var array = jObj["price_points"] as JsonArray;
+                var array = jObj["price_points"] as JsonArray ?? throw new JsonException("Expected 'price_points' to be a JSON array");
                 for (var i = 0; i <= array.Length - 1; i++)
                 {
                     if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("prices"))
                     {
-                        var componentObj = array.Items[i] as JsonObject;
-                        var loadedComponent = new ComponentPricePoint(componentObj);
+                        var loadedComponent = new ComponentPricePoint(jsonObject);
                         if (!retValue.ContainsKey(loadedComponent.Id))
                         {
                             retValue.Add(loadedComponent.Id, loadedComponent);
@@ -4514,6 +4546,12 @@ namespace ChargifyDotNet
             return retValue;
         }
 
+        /// <summary>
+        /// Create a price point for a component.
+        /// </summary>
+        /// <param name="componentID">The component ID</param>
+        /// <param name="newPricePoint">The price point to create</param>
+        /// <returns>The created price point.</returns>
         public ComponentPricePoint CreatePricePoint(int componentID, ComponentPricePoint newPricePoint)
         {
             // create XML for creation of an adjustment
@@ -4535,8 +4573,8 @@ namespace ChargifyDotNet
                     pricePointXml.AppendFormat("<pricing_scheme>{0}</pricing_scheme>", pricingSchemeName.ToLowerInvariant());
             }
 
-            if (newPricePoint.RenewPrepaidAllocation.HasValue) pricePointXml.AppendFormat("<renew_prepaid_allocation>{0}</renew_prepaid_allocation>", newPricePoint.RenewPrepaidAllocation.ToString().ToLowerInvariant());
-            if (newPricePoint.RolloverPrepaidRemainder.HasValue) pricePointXml.AppendFormat("<rollover_prepaid_remainder>{0}</rollover_prepaid_remainder>", newPricePoint.RolloverPrepaidRemainder.ToString().ToLowerInvariant());
+            if (newPricePoint.RenewPrepaidAllocation.HasValue) pricePointXml.AppendFormat("<renew_prepaid_allocation>{0}</renew_prepaid_allocation>", newPricePoint.RenewPrepaidAllocation.Value.ToString().ToLowerInvariant());
+            if (newPricePoint.RolloverPrepaidRemainder.HasValue) pricePointXml.AppendFormat("<rollover_prepaid_remainder>{0}</rollover_prepaid_remainder>", newPricePoint.RolloverPrepaidRemainder.Value.ToString().ToLowerInvariant());
             if (newPricePoint.ArchivedAt.HasValue) pricePointXml.AppendFormat("<archived_at>{0}</archived_at>", newPricePoint.ArchivedAt);
             if (newPricePoint.ExpirationInterval > 0 && newPricePoint.RolloverPrepaidRemainder.HasValue)
             {
@@ -4720,7 +4758,7 @@ namespace ChargifyDotNet
                 {
                     if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("component"))
                     {
-                        var componentObj = (array.Items[i] as JsonObject)["component"] as JsonObject;
+                        var componentObj = GetArrayItemObject(array, i, "component");
                         IComponentAttributes loadedComponent = new ComponentAttributes(componentObj);
                         if (!retValue.ContainsKey(loadedComponent.ComponentID))
                         {
@@ -4790,7 +4828,7 @@ namespace ChargifyDotNet
                 {
                     if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("component"))
                     {
-                        var componentObj = (array.Items[i] as JsonObject)["component"] as JsonObject;
+                        var componentObj = GetArrayItemObject(array, i, "component");
                         IComponentInfo loadedComponent = new ComponentInfo(componentObj);
                         if (!retValue.ContainsKey(loadedComponent.ID))
                         {
@@ -4869,7 +4907,7 @@ namespace ChargifyDotNet
                 {
                     if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("component"))
                     {
-                        var componentObj = (array.Items[i] as JsonObject)["component"] as JsonObject;
+                        var componentObj = GetArrayItemObject(array, i, "component");
                         IComponent loadedComponent = new Component(componentObj);
                         if (!retValue.ContainsKey(loadedComponent.ID))
                         {
@@ -4920,7 +4958,7 @@ namespace ChargifyDotNet
         /// <param name="setEnabled">True if wanting to turn the component "on", false otherwise.</param>
         /// <returns>IComponentAttributes object if successful, null otherwise.</returns>
         [Obsolete("Use CreateComponentAllocation() Instead")]
-        public IComponentAttributes SetComponent(int subscriptionId, int componentId, bool setEnabled)
+        public IComponentAttributes? SetComponent(int subscriptionId, int componentId, bool setEnabled)
         {
             try
             {
@@ -4953,7 +4991,7 @@ namespace ChargifyDotNet
         /// <param name="componentId">The componentID to scope this request</param>
         /// <param name="page">Pass an integer in the page parameter via the query string to access subsequent pages of 50 transactions</param>
         /// <returns>A dictionary of allocation objects keyed by ComponentID, or null.</returns>
-        public IDictionary<int, List<IComponentAllocation>> GetAllocationListForSubscriptionComponent(int subscriptionId, int componentId, int? page = 0)
+        public IDictionary<int, List<IComponentAllocation>>? GetAllocationListForSubscriptionComponent(int subscriptionId, int componentId, int? page = 0)
         {
             // make sure data is valid
             if (subscriptionId == int.MinValue) throw new ArgumentNullException(nameof(subscriptionId));
@@ -5009,7 +5047,7 @@ namespace ChargifyDotNet
                     {
                         if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey(ComponentAllocation.AllocationRootKey))
                         {
-                            var componentObj = (array.Items[i] as JsonObject)[ComponentAllocation.AllocationRootKey] as JsonObject;
+                            var componentObj = GetArrayItemObject(array, i, ComponentAllocation.AllocationRootKey);
                             IComponentAllocation loadedComponentAllocation = new ComponentAllocation(componentObj);
                             childComponentAllocations.Add(loadedComponentAllocation);
                         }
@@ -5037,7 +5075,7 @@ namespace ChargifyDotNet
         /// <param name="componentId"></param>
         /// <param name="allocation"></param>
         /// <returns></returns>
-        public IComponentAllocation CreateComponentAllocation(int subscriptionId, int componentId, ComponentAllocation allocation)
+        public IComponentAllocation? CreateComponentAllocation(int subscriptionId, int componentId, ComponentAllocation allocation)
         {
             if (allocation == null) throw new ArgumentNullException(nameof(allocation));
             return CreateComponentAllocation(subscriptionId, componentId, allocation.Quantity, allocation.Memo, allocation.UpgradeScheme, allocation.DowngradeScheme);
@@ -5050,7 +5088,7 @@ namespace ChargifyDotNet
         /// <param name="componentId">The ID of the component to apply this quantity allocation to</param>
         /// <param name="quantity">The allocated quantity to which to set the line-items allocated quantity. This should always be an integer. For On/Off components, use 1 for on and 0 for off.</param>
         /// <returns></returns>
-        public IComponentAllocation CreateComponentAllocation(int subscriptionId, int componentId, int quantity)
+        public IComponentAllocation? CreateComponentAllocation(int subscriptionId, int componentId, int quantity)
         {
             return CreateComponentAllocation(subscriptionId, componentId, quantity, string.Empty, ComponentUpgradeProrationScheme.Unknown, ComponentDowngradeProrationScheme.Unknown);
         }
@@ -5063,7 +5101,7 @@ namespace ChargifyDotNet
         /// <param name="quantity">The allocated quantity to which to set the line-items allocated quantity. This should always be an integer. For On/Off components, use 1 for on and 0 for off.</param>
         /// <param name="memo">(optional) A memo to record along with the allocation</param>
         /// <returns></returns>
-        public IComponentAllocation CreateComponentAllocation(int subscriptionId, int componentId, int quantity, string memo)
+        public IComponentAllocation? CreateComponentAllocation(int subscriptionId, int componentId, int quantity, string memo)
         {
             return CreateComponentAllocation(subscriptionId, componentId, quantity, memo, ComponentUpgradeProrationScheme.Unknown, ComponentDowngradeProrationScheme.Unknown);
         }
@@ -5078,7 +5116,7 @@ namespace ChargifyDotNet
         /// <param name="upgradeScheme">(optional) The scheme used if the proration is an upgrade. Defaults to the site setting if one is not provided.</param>
         /// <param name="downgradeScheme">(optional) The scheme used if the proration is a downgrade. Defaults to the site setting if one is not provided.</param>
         /// <returns>The component allocation object, null otherwise.</returns>
-        public IComponentAllocation CreateComponentAllocation(int subscriptionId, int componentId, int quantity, string memo, ComponentUpgradeProrationScheme upgradeScheme, ComponentDowngradeProrationScheme downgradeScheme)
+        public IComponentAllocation? CreateComponentAllocation(int subscriptionId, int componentId, int quantity, string memo, ComponentUpgradeProrationScheme upgradeScheme, ComponentDowngradeProrationScheme downgradeScheme)
         {
             try
             {
@@ -5308,7 +5346,7 @@ namespace ChargifyDotNet
                 {
                     if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("transaction"))
                     {
-                        var transactionObj = (array.Items[i] as JsonObject)["transaction"] as JsonObject;
+                        var transactionObj = GetArrayItemObject(array, i, "transaction");
                         ITransaction loadedTransaction = new Transaction(transactionObj);
                         if (!retValue.ContainsKey(loadedTransaction.ID))
                         {
@@ -5505,7 +5543,7 @@ namespace ChargifyDotNet
                 {
                     if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("transaction"))
                     {
-                        var transactionObj = (array.Items[i] as JsonObject)["transaction"] as JsonObject;
+                        var transactionObj = GetArrayItemObject(array, i, "transaction");
                         ITransaction loadedTransaction = new Transaction(transactionObj);
                         if (!retValue.ContainsKey(loadedTransaction.ID))
                         {
@@ -5527,7 +5565,7 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="id">The ID of the transaction</param>
         /// <returns>The transaction with the specified ID</returns>
-        public ITransaction LoadTransaction(int id)
+        public ITransaction? LoadTransaction(int id)
         {
             try
             {
@@ -5598,7 +5636,7 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="statementId">The ID of the statement to retrieve</param>
         /// <returns>The statement if found, null otherwise.</returns>
-        public IStatement LoadStatement(int statementId)
+        public IStatement? LoadStatement(int statementId)
         {
             try
             {
@@ -5621,7 +5659,7 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="statementId">The ID of the statement to retrieve the byte[] for</param>
         /// <returns>A byte[] of the PDF data, to be sent to the user in a download</returns>
-        public byte[] LoadStatementPDF(int statementId)
+        public byte[]? LoadStatementPDF(int statementId)
         {
             try
             {
@@ -5795,7 +5833,7 @@ namespace ChargifyDotNet
                 {
                     if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("statement"))
                     {
-                        var statementObj = (array.Items[i] as JsonObject)["statement"] as JsonObject;
+                        var statementObj = GetArrayItemObject(array, i, "statement");
                         IStatement loadedStatement = new Statement(statementObj);
                         if (!retValue.ContainsKey(loadedStatement.ID))
                         {
@@ -5929,7 +5967,7 @@ namespace ChargifyDotNet
         /// <summary>
         /// From http://docs.chargify.com/api-billing-portal
         /// </summary>
-        public IBillingManagementInfo GetManagementLink(long chargifyId)
+        public IBillingManagementInfo? GetManagementLink(long chargifyId)
         {
             try
             {
@@ -6200,7 +6238,7 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="id">The ID of the payment profile</param>
         /// <returns>The payment profile, null if not found.</returns>
-        public IPaymentProfileView LoadPaymentProfile(int id)
+        public IPaymentProfileView? LoadPaymentProfile(int id)
         {
             try
             {
@@ -6225,7 +6263,7 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="paymentProfile">The payment profile object</param>
         /// <returns>The updated payment profile if successful, null or exception otherwise.</returns>
-        public IPaymentProfileView UpdatePaymentProfile(PaymentProfileView paymentProfile)
+        public IPaymentProfileView? UpdatePaymentProfile(PaymentProfileView paymentProfile)
         {
             try
             {
@@ -6384,7 +6422,7 @@ namespace ChargifyDotNet
                 {
                     if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey("note"))
                     {
-                        var componentObj = (array.Items[i] as JsonObject)["note"] as JsonObject;
+                        var componentObj = GetArrayItemObject(array, i, "note");
                         INote loadedComponent = new Note(componentObj);
                         if (!retValue.ContainsKey(loadedComponent.ID))
                         {
@@ -6407,7 +6445,7 @@ namespace ChargifyDotNet
         /// <param name="subscriptionId">The id of the subscription</param>
         /// <param name="noteId">The id of the note to retrieve</param>
         /// <returns></returns>
-        public INote LoadNote(int subscriptionId, int noteId)
+        public INote? LoadNote(int subscriptionId, int noteId)
         {
             try
             {
@@ -6509,7 +6547,7 @@ namespace ChargifyDotNet
         /// </summary>
         /// <param name="referralCode">Referral code</param>
         /// <returns>The object if found, null otherwise.</returns>
-        public IReferralCode ValidateReferralCode(string referralCode)
+        public IReferralCode? ValidateReferralCode(string referralCode)
         {
             try
             {
@@ -6522,7 +6560,7 @@ namespace ChargifyDotNet
                 // Throw if anything but not found, since not found is telling us that it's working correctly
                 // but that there just isn't a referral code with that code.
                 if (cex.StatusCode == HttpStatusCode.NotFound) return null;
-                throw cex;
+                throw;
             }
         }
 
@@ -6537,7 +6575,7 @@ namespace ChargifyDotNet
                 return json;
 
             var xmlNode = JsonConvert.DeserializeXmlNode(json);
-            return xmlNode.InnerXml;
+            return xmlNode?.InnerXml ?? string.Empty;
         }
 
         private static Dictionary<int, T> GetListedJsonResponse<T>(string key, string response)
@@ -6552,8 +6590,9 @@ namespace ChargifyDotNet
             {
                 if (array.Items[i] is JsonObject jsonObject && jsonObject.ContainsKey(key))
                 {
-                    var jsonObj = (array.Items[i] as JsonObject)[key] as JsonObject;
-                    var value = (T)Activator.CreateInstance(typeof(T), jsonObj);
+                    var jsonObj = jsonObject[key] as JsonObject;
+                    // Activator.CreateInstance only returns null for Nullable<T>; T is a class here.
+                    var value = (T)Activator.CreateInstance(typeof(T), jsonObj)!;
                     if (!retValue.ContainsKey(value.ID))
                     {
                         retValue.Add(value.ID, value);
@@ -6587,7 +6626,7 @@ namespace ChargifyDotNet
                     {
                         if (childNode.Name == key)
                         {
-                            var value = (T)Activator.CreateInstance(typeof(T), childNode);
+                            var value = (T)Activator.CreateInstance(typeof(T), childNode)!;
                             if (!retValue.ContainsKey(value.ID))
                             {
                                 retValue.Add(value.ID, value);
@@ -6837,7 +6876,7 @@ namespace ChargifyDotNet
                 {
                     errorContent = response.Content?.ReadAsStringAsync().GetAwaiter().GetResult();
                 }
-                catch (Exception)
+                catch (Exception ex) when (ex is HttpRequestException or IOException or ObjectDisposedException or InvalidOperationException)
                 {
                     // Body could not be read; still surface the status code.
                 }
@@ -6913,7 +6952,7 @@ namespace ChargifyDotNet
 
             if (requestMethod == HttpRequestMethod.Post || requestMethod == HttpRequestMethod.Put || requestMethod == HttpRequestMethod.Delete)
             {
-                if (!string.IsNullOrEmpty(postData))
+                if (postData is { Length: > 0 })
                 {
                     if (UseJSON)
                     {
@@ -6927,7 +6966,7 @@ namespace ChargifyDotNet
                         dataToPost = XmlToJsonConverter.XmlToJson(doc);
                     }
 
-                    content = new StringContent(dataToPost, Encoding.UTF8, contentType);
+                    content = new StringContent(dataToPost ?? postData, Encoding.UTF8, contentType);
                 }
             }
 
@@ -6940,6 +6979,15 @@ namespace ChargifyDotNet
             LogResponse?.Invoke(response.StatusCode, addressString, retValue);
 
             return retValue;
+        }
+
+        /// <summary>
+        /// Returns <c>array[index][key]</c> as a JsonObject, throwing a JsonException when the response is not shaped as expected.
+        /// </summary>
+        private static JsonObject GetArrayItemObject(JsonArray array, int index, string key)
+        {
+            if (array.Items[index] is not JsonObject item) throw new JsonException($"Expected a JSON object at index {index}");
+            return item[key] as JsonObject ?? throw new JsonException($"Expected '{key}' at index {index} to be a JSON object");
         }
 
         private static string? SanitizePostData(string? postData)
@@ -7011,7 +7059,7 @@ namespace ChargifyDotNet
                     {
                         var dataAsJson = JsonConvert.SerializeObject(body);
                         var dataAsJObject = JsonConvert.DeserializeXmlNode(dataAsJson);
-                        postData = GetXmlStringIfApplicable() + dataAsJObject.InnerXml;
+                        postData = GetXmlStringIfApplicable() + dataAsJObject?.InnerXml;
                     }
 
                     contentType = "text/xml";

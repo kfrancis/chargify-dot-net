@@ -13,7 +13,7 @@ namespace ChargifyDotNet.Data
     /// </summary>
     public sealed class CountryNameLookup
     {
-        private static XmlDocument _countries;
+        private static XmlDocument _countries = new();
         private const string CountriesFilename = @"ISO_3166-1_list_en.xml";
 
         /// <summary>

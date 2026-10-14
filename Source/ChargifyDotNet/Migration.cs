@@ -202,8 +202,9 @@ namespace ChargifyDotNet
         /// <summary>
         /// Compare this migration to another
         /// </summary>
-        public int CompareTo(IMigration other)
+        public int CompareTo(IMigration? other)
         {
+            if (other is null) return 1;
             return -1;
         }
 
@@ -214,8 +215,9 @@ namespace ChargifyDotNet
         /// <summary>
         /// Compare this migration to another
         /// </summary>
-        public int CompareTo(Migration other)
+        public int CompareTo(Migration? other)
         {
+            if (other is null) return 1;
             return -1;
         }
 

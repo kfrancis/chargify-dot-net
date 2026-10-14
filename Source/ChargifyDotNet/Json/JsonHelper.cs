@@ -13,7 +13,7 @@ namespace ChargifyDotNet.Json
         /// <param name="jsonObject">The object to get a string from</param>
         /// <param name="fieldName">The field to retrieve</param>
         /// <returns>The string if applicable, null otherwise.</returns>
-        public static string GetJsonStringAsString(JsonObject jsonObject, string fieldName)
+        public static string? GetJsonStringAsString(JsonObject jsonObject, string fieldName)
         {
             return GetJsonStringAsString(jsonObject, fieldName, null);
         }
@@ -25,11 +25,11 @@ namespace ChargifyDotNet.Json
         /// <param name="fieldName">The field to retrieve</param>
         /// <param name="defaultValue">The default value to return if not found.</param>
         /// <returns>The string if applicable, defaultValue otherwise.</returns>
-        public static string GetJsonStringAsString(JsonObject jsonObject, string fieldName, string defaultValue)
+        public static string? GetJsonStringAsString(JsonObject jsonObject, string fieldName, string? defaultValue)
         {
             if (jsonObject.ContainsKey(fieldName) &&
-                (jsonObject[fieldName] is JsonString))
-                return ((JsonString)jsonObject[fieldName]).Value;
+                jsonObject[fieldName] is JsonString value)
+                return value.Value;
             else
                 return defaultValue;
         }

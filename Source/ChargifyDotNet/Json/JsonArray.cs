@@ -7,12 +7,12 @@ namespace ChargifyDotNet.Json
     /// </summary>
     public sealed class JsonArray : JsonValue
     {
-        readonly List<JsonValue> _items;
+        readonly List<JsonValue?> _items;
 
         /// <summary>
         /// The JsonValue items in the array
         /// </summary>
-        public JsonValue[] Items
+        public JsonValue?[] Items
         {
             get { return _items.ToArray(); }
         }
@@ -30,7 +30,7 @@ namespace ChargifyDotNet.Json
             _items = [];
         }
 
-        private void Add(JsonValue jsonValue)
+        private void Add(JsonValue? jsonValue)
         {
             _items.Add(jsonValue);
         }
