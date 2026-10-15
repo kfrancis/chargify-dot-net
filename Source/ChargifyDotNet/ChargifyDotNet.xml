@@ -12113,14 +12113,16 @@
             <summary>
             Determine if the webhook request is valid by calculating the expected signature and comparing it
             </summary>
-            <param name="requestStream">The request stream</param>
+            <param name="requestStream">The request stream. It is read from the start (when seekable) and left open,
+            positioned at the start, so the caller can still read the body.</param>
             <param name="sharedKey">The site shared key from Chargify</param>
-            <param name="givenSignature">The signature returned along side the webhook for verification</param>
-            <returns>True if verified, false otherwise.</returns>
+            <param name="givenSignature">The signature returned along side the webhook for verification (hex, either case)</param>
+            <returns>True if verified, false otherwise (including a missing or malformed signature).</returns>
         </member>
         <member name="M:ChargifyDotNet.UsefulExtensions.CalculateHMAC256Signature(System.String,System.String)">
             <summary>
-            Method to calculate the expected HMAC-SHA256 signture of a body of text using the site's sharedKey
+            Method to calculate the expected HMAC-SHA256 signature of a body of text using the site's sharedKey.
+            The text and key are UTF-8 encoded (identical to the previous ASCII encoding for ASCII-only input).
             </summary>
             <param name="text">The text to run through the hashing algorithm</param>
             <param name="secret">The secret used to seed the hash</param>
@@ -12133,7 +12135,8 @@
             <param name="text">The body of the webhook message</param>
             <param name="signature">The signature in the header of the message</param>
             <param name="sharedKey">The site shared key (used to validate)</param>
-            <returns>True if the signature matches the calculated value, false otherwise.</returns>
+            <returns>True if the signature matches the calculated value, false otherwise (including a missing,
+            malformed or truncated signature).</returns>
         </member>
         <member name="M:ChargifyDotNet.UsefulExtensions.IsChargifyWebhookContentValidHMAC(System.String,System.String,System.String)">
             <summary>
@@ -12142,7 +12145,14 @@
             <param name="text">The body of the webhook message</param>
             <param name="signature">The signature in the header of the message</param>
             <param name="sharedKey">The site shared key (used to validate)</param>
-            <returns>True if the signature matches the calculated value, false otherwise.</returns>
+            <returns>True if the signature matches the calculated value, false otherwise (including a missing or
+            malformed signature).</returns>
+        </member>
+        <member name="M:ChargifyDotNet.UsefulExtensions.FixedTimeEqualsHex(System.Byte[],System.String)">
+            <summary>
+            Compares a computed digest with a hex signature (either case) in time that does not depend on where
+            they differ. A null, malformed or wrong-length signature returns false.
+            </summary>
         </member>
         <member name="M:ChargifyDotNet.UsefulExtensions.GetChargifyDirectSignature(System.String,System.String)">
             <summary>
